@@ -54,8 +54,8 @@
 #define XWSSC_CRC32_SIZE        (4U)
 #define XWSSC_SDU_MAX_SIZE      (XWSSC_MEMPOOL_SIZE / 8)
 
-#define XWSSC_TXTHD_STACK       (2048U)
-#define XWSSC_RXTHD_STACK       (2048U)
+#define XWSSC_TXTHD_STACK       (4096U)
+#define XWSSC_RXTHD_STACK       (4096U)
 
 #if defined(XWMDCFG_isc_xwssc_LOG) && (1 == XWMDCFG_isc_xwssc_LOG)
 #  define XWSSC_LOGTAG                  "XWSSC"

@@ -135,11 +135,24 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
  */
 xwer_t xwssc_stop(struct xwssc * xwssc);
+
+/**
+ * @brief XWSSC API: 测试XWSSC是否已经连接
+ * @param[in] xwssc: XWSSC对象的指针
+ * @return 布尔值
+ * @retval true: 已链接
+ * @retval false: 未链接
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ */
+bool xwssc_tst_connected(struct xwssc * xwssc);
 
 /**
  * @brief XWSSC API: 在限定的时间内，将用户数据加入到XWSSC的发送队列中，并等待发送结果
@@ -161,9 +174,9 @@ xwer_t xwssc_stop(struct xwssc * xwssc);
  * @retval -ENOBUFS: 帧槽被使用完
  * @retval -EPERM: XWSSC未启动
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：线程
+ * + 重入性：可重入
  * @details
  * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
@@ -194,14 +207,14 @@ xwer_t xwssc_tx(struct xwssc * xwssc,
  * @retval -ENOBUFS: 帧槽被使用完
  * @retval -EPERM: XWSSC未启动
  * @note
- * - 此函数将用户数据放如发送队列就返回。当用户数据被XWSSC的发送线程成功发送
+ * + 此函数将用户数据放如发送队列就返回。当用户数据被XWSSC的发送线程成功发送
  *   （接收到远程端应答），注册的回调函数会被调用；
- * - 回调函数在XWSSC的发送线程的线程上下文中执行，如果在此函数中使用了会
+ * + 回调函数在XWSSC的发送线程的线程上下文中执行，如果在此函数中使用了会
  *   长时间阻塞线程的函数，会导致XWSSC停止发送。
  * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：异步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
  */
 xwer_t xwssc_eq(struct xwssc * xwssc,
                 const xwu8_t data[], xwsz_t * size,
@@ -218,9 +231,9 @@ xwer_t xwssc_eq(struct xwssc * xwssc,
  * @retval -EFAULT: 空指针
  * @retval -EACCES: 消息帧已经正在发送
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
  * @details
  * 如果消息已经被 XWSSC TX 线程选中，发送不可被中断；
  * 仅当消息还在就绪队列中，未被选中发送时才可中断；
@@ -232,9 +245,9 @@ xwer_t xwssc_abort(struct xwssc * xwssc, xwssc_txh_t txh);
  * @param[in] txh: 发送句柄
  * @return 发送状态，取值： @ref xwssc_carrier_state_em
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
  */
 xwsq_t xwssc_get_txstate(xwssc_txh_t txh);
 
@@ -255,9 +268,9 @@ xwsq_t xwssc_get_txstate(xwssc_txh_t txh);
  * @retval -EPERM: XWSSC未启动
  * @retval -ETIMEDOUT: 超时
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：线程
+ * + 重入性：可重入
  * @details
  * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
@@ -281,9 +294,9 @@ xwer_t xwssc_rx(struct xwssc * xwssc, xwu8_t port,
  * @retval -ENODATA: 接收队列为空
  * @retval -EPERM: XWSSC未启动
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
  */
 xwer_t xwssc_try_rx(struct xwssc * xwssc, xwu8_t port,
                     xwu8_t rxbuf[], xwsz_t * size, xwu8_t * qos);
