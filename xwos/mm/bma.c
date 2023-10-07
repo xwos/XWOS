@@ -31,6 +31,7 @@ struct xwmm_bma_bcb * xwmm_bma_find_buddy(struct xwmm_bma * bma,
 static __xwos_code
 void xwmm_bma_orderlist_add(struct xwmm_bma * bma,
                             struct xwmm_bma_orderlist * ol,
+                            xwu8_t odr,
                             struct xwmm_bma_bcb * bcb);
 
 static __xwos_code
@@ -64,7 +65,7 @@ xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
         num = 1U << blkodr;
         if (size != (num * blksize)) {
                 rc = -ESIZE;
-                xwmm_bmalogf(ERR, "Size of memory(0x%X, %d) is error!\n",
+                xwmm_bmalogf(ERR, "Size of memory(0x%lX, 0x%lX) is error!\n",
                              origin, size);
                 goto err_size;
         }
@@ -73,21 +74,24 @@ xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
         bma->zone.size = blksize * num;
         bma->blksize = blksize;
         bma->blkodr = blkodr;
+        xwos_splk_init(&bma->lock);
         bma->orderlists = (struct xwmm_bma_orderlist *)&bma[(xwsz_t)1];
         bma->bcbs = (struct xwmm_bma_bcb *)&bma->orderlists[(xwsz_t)1 + blkodr];
+        xwmm_bmalogf(DEBUG,
+                     "memory:(0x%lX,0x%lX),orderlists:0x%lX,bcbs:0x%lX,"
+                     "blocksize:0x%lX, blockorder:0x%lX\n",
+                     origin, size, (xwptr_t)bma->orderlists, (xwptr_t)bma->bcbs,
+                     bma->blksize, bma->blkodr);
 
-        /* Init all blocks */
         for (i = 0; i < num; i++) {
-                bma->bcbs[i].order = XWMM_BMA_COMBINED;
+                bma->bcbs[i].order = XWMM_BMA_INUSED | XWMM_BMA_COMBINED;
         }
-        bma->bcbs[0].order = (xwu8_t)blkodr;
+        bma->bcbs[0].order = (xwu8_t)blkodr | XWMM_BMA_INUSED;
 
-        /* Init all order lists */
         for (i = 0; i <= blkodr; i++) {
                 xwlib_bclst_init_head(&bma->orderlists[i].head);
-                xwos_splk_init(&bma->orderlists[i].lock);
         }
-        xwmm_bma_orderlist_add(bma, &bma->orderlists[blkodr], &bma->bcbs[0]);
+        xwmm_bma_orderlist_add(bma, &bma->orderlists[blkodr], blkodr, &bma->bcbs[0]);
         return XWOK;
 
 err_size:
@@ -157,21 +161,31 @@ struct xwmm_bma_bcb * xwmm_bma_find_buddy(struct xwmm_bma * bma,
  * @brief 将一块内存加入到阶链表
  * @param[in] bma: 伙伴算法内存块分配器对象的指针
  * @param[in] ol: 阶链表的指针
+ * @param[in] odr: 阶链表的阶
  * @param[in] bcb: 内存块的控制块指针
  */
 static __xwos_code
 void xwmm_bma_orderlist_add(struct xwmm_bma * bma,
                             struct xwmm_bma_orderlist * ol,
+                            xwu8_t odr,
                             struct xwmm_bma_bcb * bcb)
 {
         struct xwlib_bclst_node * n;
-        xwreg_t flag;
 
-        n = xwmm_bma_bcb_to_mem(bma, bcb);
-        xwlib_bclst_init_node(n);
-        xwos_splk_lock_cpuirqsv(&ol->lock, &flag);
-        xwlib_bclst_add_tail(&ol->head, n);
-        xwos_splk_unlock_cpuirqrs(&ol->lock, flag);
+        /* 即将加入的块不在阶链表中，是本地数据。*/
+        if ((XWMM_BMA_INUSED | odr) == bcb->order) {
+                n = xwmm_bma_bcb_to_mem(bma, bcb);
+                xwmm_bmalogf(DEBUG,
+                             "[OL:0x%lX][+] bcb(idx:0x%lX,odr:0x%X),mem(0x%lX)\n",
+                             (xwptr_t)ol,
+                             (((xwptr_t)bcb - (xwptr_t)xwmm_bma->bcbs) /
+                              sizeof(struct xwmm_bma_bcb)),
+                             bcb->order, (xwptr_t)n);
+                xwlib_bclst_init_node(n);
+                xwlib_bclst_add_head(&ol->head, n);
+                /* 当块被加入到阶链表中，就变成共享数据。*/
+                bcb->order &= XWMM_BMA_ORDER_MASK;
+        }
 }
 
 /**
@@ -180,6 +194,9 @@ void xwmm_bma_orderlist_add(struct xwmm_bma * bma,
  * @param[in] ol: 阶链表的指针
  * @param[in] odr: 阶链表的阶
  * @param[in] bcb: 内存块的控制块指针
+ * @return 错误码
+ * @retval XWOK: 删除成功
+ * @retval -ESRCH: 阶链表中不存在此内存块
  */
 static __xwos_code
 xwer_t xwmm_bma_orderlist_remove(struct xwmm_bma * bma,
@@ -188,19 +205,24 @@ xwer_t xwmm_bma_orderlist_remove(struct xwmm_bma * bma,
                                  struct xwmm_bma_bcb * bcb)
 {
         struct xwlib_bclst_node * n;
-        xwreg_t flag;
         xwer_t rc;
 
+        XWOS_UNUSED(ol);
         n = xwmm_bma_bcb_to_mem(bma, bcb);
-
-        xwos_splk_lock_cpuirqsv(&ol->lock, &flag);
+        xwmm_bmalogf(DEBUG,
+                     "[OL:0x%lX][-] bcb(idx:0x%lX,odr:0x%X),mem(0x%lX)\n",
+                     (xwptr_t)ol,
+                     (((xwptr_t)bcb - (xwptr_t)xwmm_bma->bcbs) /
+                      sizeof(struct xwmm_bma_bcb)),
+                     bcb->order, (xwptr_t)n);
+        /* 即将被删除的块在阶链表中，是共享数据。*/
         if (odr != bcb->order) {
                 rc = -ESRCH;
         } else {
-                rc = XWOK;
                 xwlib_bclst_del_init(n);
+                bcb->order |= XWMM_BMA_INUSED;
+                rc = XWOK;
         }
-        xwos_splk_unlock_cpuirqrs(&ol->lock, flag);
         return rc;
 }
 
@@ -217,17 +239,20 @@ struct xwmm_bma_bcb * xwmm_bma_orderlist_choose(struct xwmm_bma * bma,
 {
         struct xwlib_bclst_node * n;
         struct xwmm_bma_bcb * bcb;
-        xwreg_t flag;
 
-        xwos_splk_lock_cpuirqsv(&ol->lock, &flag);
         if (xwlib_bclst_tst_empty(&ol->head)) {
-                xwos_splk_unlock_cpuirqrs(&ol->lock, flag);
                 bcb = err_ptr(-ENOENT);
         } else {
                 n = ol->head.next;
                 xwlib_bclst_del_init(n);
-                xwos_splk_unlock_cpuirqrs(&ol->lock, flag);
                 bcb = xwmm_bma_mem_to_bcb(bma, n);
+                xwmm_bmalogf(DEBUG,
+                             "[OL:0x%lX][C] bcb(idx:0x%lX,odr:0x%X)\n",
+                             (xwptr_t)ol,
+                             (((xwptr_t)bcb - (xwptr_t)xwmm_bma->bcbs) /
+                              sizeof(struct xwmm_bma_bcb)),
+                             bcb->order);
+                /* 即将被选择的块在阶链表中，是共享数据。*/
                 bcb->order |= XWMM_BMA_INUSED;
         }
         return bcb;
@@ -257,14 +282,20 @@ void xwmm_bma_divide_block(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb,
                 blk_odr--;
                 blk_ofs = 1U << blk_odr;
                 buddy = &bma->bcbs[blk_idx + blk_ofs];
-                buddy->order = (xwu8_t)blk_odr;
-                xwmm_bma_orderlist_add(bma, curr_ol, buddy);
+                /* 加入阶链表之前， `buddy` 是本地数据。*/
+                XWOS_BUG_ON((XWMM_BMA_COMBINED | XWMM_BMA_INUSED) != buddy->order);
+                buddy->order = (xwu8_t)blk_odr | XWMM_BMA_INUSED;
+                xwmm_bma_orderlist_add(bma, curr_ol, blk_odr, buddy);
+                /* `bcb` 是本地数据。*/
                 bcb->order = (xwu8_t)blk_odr | XWMM_BMA_INUSED;
                 xwmm_bmalogf(DEBUG,
-                             "bcb(idx:0x%X,odr:0x%X), buddy(idx:0x%X,odr:0x%X)\n",
-                             (bcb - bma->bcbs)/sizeof(struct xwmm_bma_bcb),
+                             "[ALLOC][D] bcb(idx:0x%lX,odr:0x%X),"
+                             "buddy(idx:0x%lX,odr:0x%X)\n",
+                             (((xwptr_t)bcb - (xwptr_t)xwmm_bma->bcbs) /
+                              sizeof(struct xwmm_bma_bcb)),
                              bcb->order,
-                             (buddy - bma->bcbs)/sizeof(struct xwmm_bma_bcb),
+                             (((xwptr_t)buddy - (xwptr_t)xwmm_bma->bcbs) /
+                              sizeof(struct xwmm_bma_bcb)),
                              buddy->order);
         }
 }
@@ -273,6 +304,7 @@ __xwos_api
 xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf)
 {
         xwer_t rc;
+        xwreg_t flag;
         xwsq_t o;
         struct xwmm_bma_orderlist * ol;
         struct xwmm_bma_bcb * bcb;
@@ -283,6 +315,7 @@ xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf)
 
         ol = NULL;
         bcb = err_ptr(-ENOENT);
+        xwos_splk_lock_cpuirqsv(&bma->lock, &flag);
         for (o = order; o <= bma->blkodr; o++) {
                 ol = &bma->orderlists[o];
                 bcb = xwmm_bma_orderlist_choose(bma, ol);
@@ -291,19 +324,20 @@ xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf)
                 }
         }
         if (is_err(bcb)) { // cppcheck-suppress [misra-c2012-14.4]
+                xwos_splk_unlock_cpuirqrs(&bma->lock, flag);
                 rc = -ENOMEM;
                 *membuf = NULL;
-                goto err_nomem;
+        } else {
+                xwmm_bmalogf(DEBUG,
+                             "[ALLOC] bcb(idx:0x%lX,odr:0x%X)\n",
+                             (((xwptr_t)bcb - (xwptr_t)xwmm_bma->bcbs) /
+                              sizeof(struct xwmm_bma_bcb)),
+                             bcb->order);
+                xwmm_bma_divide_block(bma, bcb, order, ol);
+                xwos_splk_unlock_cpuirqrs(&bma->lock, flag);
+                rc = XWOK;
+                *membuf = xwmm_bma_bcb_to_mem(bma, bcb);
         }
-        xwmm_bmalogf(DEBUG,
-                     "bcb(idx:0x%X,odr:0x%X)\n",
-                     (bcb - bma->bcbs)/sizeof(struct xwmm_bma_bcb),
-                     bcb->order);
-        xwmm_bma_divide_block(bma, bcb, order, ol);
-        *membuf = xwmm_bma_bcb_to_mem(bma, bcb);
-        return XWOK;
-
-err_nomem:
         return rc;
 }
 
@@ -317,46 +351,51 @@ static __xwos_code
 void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
 {
         struct xwmm_bma_bcb * buddy;
-        xwsq_t odr;
+        xwsq_t curr_odr;
+        xwsq_t target_odr;
         xwer_t rc;
 
-        bcb->order &= XWMM_BMA_ORDER_MASK; /* clear the `inused' state */
-        odr = (xwsq_t)bcb->order + (xwsz_t)1;
-
-        while (odr <= bma->blkodr) {
+        curr_odr = (bcb->order & XWMM_BMA_ORDER_MASK);
+        target_odr = curr_odr + (xwsq_t)1;
+        while (target_odr <= bma->blkodr) {
                 buddy = xwmm_bma_find_buddy(bma, bcb);
-                XWOS_BUG_ON((xwu8_t)XWMM_BMA_COMBINED == buddy->order);
                 xwmm_bmalogf(DEBUG,
-                             "bcb(idx:0x%X,odr:0x%X), buddy(idx:0x%X,odr:0x%X)\n",
-                             (bcb - bma->bcbs)/sizeof(struct xwmm_bma_bcb),
+                             "[FREE][M] bcb(idx:0x%lX,odr:0x%X),"
+                             "buddy(idx:0x%lX,odr:0x%X)\n",
+                             (((xwptr_t)bcb - (xwptr_t)xwmm_bma->bcbs) /
+                              sizeof(struct xwmm_bma_bcb)),
                              bcb->order,
-                             (buddy - bma->bcbs)/sizeof(struct xwmm_bma_bcb),
+                             (((xwptr_t)buddy - (xwptr_t)xwmm_bma->bcbs) /
+                              sizeof(struct xwmm_bma_bcb)),
                              buddy->order);
+                XWOS_BUG_ON((XWMM_BMA_COMBINED | XWMM_BMA_INUSED) == buddy->order);
                 rc = xwmm_bma_orderlist_remove(bma,
-                                               &bma->orderlists[bcb->order],
-                                               bcb->order,
+                                               &bma->orderlists[curr_odr],
+                                               curr_odr,
                                                buddy);
                 if (rc < 0) {
                         break;
                 }
+                /* 此时 `buddy->order` 以及 `bcb->order` 都是本地数据。 */
                 if (buddy > bcb) {
-                        buddy->order = XWMM_BMA_COMBINED;
-                        bcb->order = (xwu8_t)odr;
+                        buddy->order = XWMM_BMA_COMBINED | XWMM_BMA_INUSED;
+                        bcb->order = (xwu8_t)target_odr | XWMM_BMA_INUSED;
                 } else {
-                        bcb->order = XWMM_BMA_COMBINED;
-                        buddy->order = (xwu8_t)odr;
+                        bcb->order = XWMM_BMA_COMBINED | XWMM_BMA_INUSED;
+                        buddy->order = (xwu8_t)target_odr | XWMM_BMA_INUSED;
                         bcb = buddy;
                 }
-                odr++;
+                curr_odr = target_odr;
+                target_odr++;
         }
-        odr = bcb->order;
-        xwmm_bma_orderlist_add(bma, &bma->orderlists[odr], bcb);
+        xwmm_bma_orderlist_add(bma, &bma->orderlists[curr_odr], curr_odr, bcb);
 }
 
 __xwos_api
 xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
 {
         struct xwmm_bma_bcb * bcb;
+        xwreg_t flag;
         xwer_t rc;
 
         XWOS_VALIDATE((bma), "nullptr", -EFAULT);
@@ -372,15 +411,19 @@ xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
                 rc = ptr_err(bcb);
                 goto err_invalmem;
         }
-        if (!(XWMM_BMA_INUSED & bcb->order)) {
+        xwmm_bmalogf(DEBUG,
+                     "[FREE] mem:0x%lX,bcb(idx:0x%lX,odr:0x%X)\n",
+                     (xwptr_t)mem,
+                     (((xwptr_t)bcb - (xwptr_t)xwmm_bma->bcbs) /
+                      sizeof(struct xwmm_bma_bcb)),
+                     bcb->order);
+        if (0 == (XWMM_BMA_INUSED & bcb->order)) {
                 rc = -EINVAL;
                 goto err_invalmem;
         }
-        xwmm_bmalogf(DEBUG,
-                     "bcb(idx:0x%X,odr:0x%X)\n",
-                     (bcb - bma->bcbs)/sizeof(struct xwmm_bma_bcb),
-                     bcb->order);
+        xwos_splk_lock_cpuirqsv(&bma->lock, &flag);
         xwmm_bma_combine(bma, bcb);
+        xwos_splk_unlock_cpuirqrs(&bma->lock, flag);
         return XWOK;
 
 err_invalmem:

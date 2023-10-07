@@ -22,33 +22,33 @@
 /**
  * @defgroup xwmm_bma 伙伴算法内存块分配器
  * @ingroup xwmm
- * 伙伴算法分配器在分配时，会将内存不断地二等分，直到切割到能满足要求的最小内存大小为止。
- * 释放时会检查与之相邻并等长的内存块（称为伙伴）是否也空闲，
+ * 伙伴算法分配器在分配时，会将内存不断地二等分，直到切割到能满足内存的最小尺寸为止。
+ * 释放时会检查与之相邻并等长的内存块（称为伙伴）是否空闲，
  * 如果是，就和“伙伴”合并成更大的内存块，
- * 然后继续检测合并后的内存块是否也存在可以合并的伙伴，一直向上合并到不能合并为止。
+ * 然后继续检测合并后的内存块是否也存在空闲的伙伴，一直向上合并到不能合并为止。
  *
  * + 优点：
  *   + 支持释放操作；
  *   + 支持大小不固定的内存申请操作；
- *   + 反复申请与释放不会造成内存碎片。
+ *   + 内存碎片的大小只会是单位内存块大小的2的n次方倍，内存碎片更容易被合并。
  * + 缺点：
  *   + 代码稍微复杂；
- *  + 因为存在合并与切割的循环，申请与释放操作的所需要的时间不是特别稳定；
- *  + 内存大小固定为2的指数，如果申请的内存过小，会造成内存浪费。
+ *   + 因为存在合并与切割的循环，申请与释放操作的所需要的时间不是特别稳定；
+ *   + 内存大小固定为2的指数，如果申请的内存过小，会造成内存浪费。
  * + 适用性：对内存复用性要求高的应用场合。
  * + 上下文的安全性：在任何上下文（中断、中断底半部、线程）都是安全的。
  * @{
  */
 
-/* #define XWMM_BMA_LOG */
 
-#define XWMM_BMA_MAX_ORDER              (126) /**< 最大的阶 */
-#define XWMM_BMA_COMBINED               (127) /**< 块已被合并 */
-#define XWMM_BMA_ORDER_MASK             (0x7FU) /**< 阶的掩码 */
-#define XWMM_BMA_INUSED                 (XWBOP_BIT(7)) /**< 块正在使用的标记 */
+#define XWMM_BMA_MAX_ORDER              ((xwu8_t)126) /**< 最大的阶 */
+#define XWMM_BMA_COMBINED               ((xwu8_t)127) /**< 块已被合并 */
+#define XWMM_BMA_ORDER_MASK             ((xwu8_t)0x7F) /**< 阶的掩码 */
+#define XWMM_BMA_INUSED                 ((xwu8_t)0x80) /**< 块正在被使用 */
 
+/* #define XWMM_BMA_LOG */ /**< 调试日志开关，若在中断中使用BMA，需关闭此宏 */
 #if defined(XWMM_BMA_LOG)
-#  define xwmm_bmalogf(lv, fmt, ...) xwlogf(lv, fmt, ##__VA_ARGS__)
+#  define xwmm_bmalogf(lv, fmt, ...) xwlogf(lv, "[BMA]", fmt, ##__VA_ARGS__)
 #else
 #  define xwmm_bmalogf(lv, fmt, ...)
 #endif
@@ -62,8 +62,8 @@
 #define XWMM_BMA_TYPEDEF(name, blkodr) \
         struct name { \
                 struct xwmm_bma bma[1U]; \
-                struct xwmm_bma_orderlist orderlist[(blkodr) + 1U]; \
-                struct xwmm_bma_bcb bcb[1U << (blkodr)]; \
+                struct xwmm_bma_orderlist orderlists[(blkodr) + 1U]; \
+                struct xwmm_bma_bcb bcbs[1U << (blkodr)]; \
         }
 
 /**
@@ -80,7 +80,6 @@
  */
 struct xwmm_bma_orderlist {
         struct xwlib_bclst_head head; /**< 链表头 */
-        struct xwos_splk lock; /**< 保护list的锁 */
 };
 
 /**
@@ -101,6 +100,7 @@ struct xwmm_bma {
         const char * name; /**< 名字 */
         xwsz_t blksize; /**< 单位块的大小（单位：字节） */
         xwsq_t blkodr; /**< 单位块的数量，以2的blkodr次方的形式表示 */
+        struct xwos_splk lock; /**< 保护 `orderlists` 以及 `bcbs` 的锁 */
         struct xwmm_bma_orderlist * orderlists; /**< 阶链表数组指针 */
         struct xwmm_bma_bcb * bcbs; /**< 内存块控制块数组指针 */
 };
