@@ -361,8 +361,8 @@ void xwssc_rxq_pub(struct xwssc * xwssc,
                    xwu8_t port)
 {
         xwssclogf(DEBUG,
-                  "[RX][SDU] Publish a frame(%p): port:0x%X, frmsize:0x%u\n",
-                  slot, port, slot->rx.frmsize);
+                  "[RX][SDU] Publish a frame(0x%lX): port:0x%X, frmsize:0x%u\n",
+                  (xwptr_t)slot, port, slot->rx.frmsize);
         xwos_splk_lock(&xwssc->rxq.lock[port]);
         xwlib_bclst_add_tail(&xwssc->rxq.q[port], &slot->rx.node);
         xwos_splk_unlock(&xwssc->rxq.lock[port]);
@@ -957,8 +957,9 @@ xwer_t xwssc_eq_msg(struct xwssc * xwssc,
                            XWSSC_CRC32_SIZE + XWSSC_EOF_SIZE;
 
         xwssclogf(DEBUG,
-                  "[API][EQ] car(%p), slot(%p), pri:0x%X, port:0x%X, sdusize:0x%X\n",
-                  car, slot, pri, port, sdusize);
+                  "[API][EQ] car(0x%lX), slot(0x%lX), "
+                  "pri:0x%X, port:0x%X, sdusize:0x%X\n",
+                  (xwptr_t)car, (xwptr_t)slot, pri, port, sdusize);
         /* SOF */
         // cppcheck-suppress [misra-c2012-17.7]
         memset(slot->tx.frm.sof, XWSSC_SOF, XWSSC_SOF_SIZE);
@@ -1064,6 +1065,7 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
         xwssclogf(DEBUG, "[TX][CB] Remote ACK:0x%X, Remote ID:0x%X\n", ack, rmtid);
         if (rmtid != car->slot->tx.frm.head.id) {
                 xwaop_c0m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_CONNECT, NULL, NULL);
+                xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                 xwssc->txq.tmp = car;
                 xwssclogf(DEBUG, "[TX][CB] Remote ACK ID error!\n");
         } else {
@@ -1084,7 +1086,7 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                         xwssc_txq_carrier_free(xwssc, car);
                         break;
                 case XWSSC_ACK_EALREADY:
-                        xwssclogf(DEBUG, "[TX][CB] Msg is already TX-ed!\n");
+                        xwssclogf(DEBUG, "[TX][CB] Msg is already transmitted!\n");
                         xwaop_add(xwu32_t, &xwssc->txq.cnt, 1, NULL, NULL);
                         xwaop_write(xwu32_t, &car->state, XWSSC_CRS_FINISH, NULL);
                         xwos_splk_lock(&xwssc->txq.notiflk);
@@ -1160,8 +1162,8 @@ xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
                 xwaop_s1m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_TX, NULL, NULL);
                 do { // cppcheck-suppress [misra-c2012-15.4]
                         xwssclogf(DEBUG,
-                                  "[TX][SDU] carrier(%p), ID:0x%X, cnt:0x%X\n",
-                                  car, id, cnt);
+                                  "[TX][SDU] carrier(0x%lX), ID:0x%X, cnt:0x%X\n",
+                                  (xwptr_t)car, id, cnt);
                         rc = xwssc_hwifal_tx(xwssc,
                                              (const xwu8_t *)&car->slot->tx.frm,
                                              car->slot->tx.frmsize);
@@ -1266,10 +1268,10 @@ xwer_t xwssc_txfsm(struct xwssc * xwssc)
                         XWSSC_BUG_ON(is_err(car));
                 }
                 xwssclogf(DEBUG,
-                          "[TX][SDU] Choose carrier(%p), ID:0x%X, port:0x%X\n",
-                          car,
-                          car->slot->tx.frm.head.id,
-                          car->slot->tx.frm.head.port);
+                          "[TX][FSM] Choose carrier(0x%lX), port:0x%X, state:%d\n",
+                          (xwptr_t)car,
+                          car->slot->tx.frm.head.port,
+                          car->state);
                 rc = xwaop_teq_then_write(xwu32_t, &car->state,
                                           XWSSC_CRS_READY,
                                           XWSSC_CRS_INPROGRESS,
@@ -1289,11 +1291,20 @@ xwer_t xwssc_txfsm(struct xwssc * xwssc)
                                                             car->slot->tx.cbarg);
                                 }
                                 xwos_splk_unlock(&xwssc->txq.notiflk);
-                                // cppcheck-suppress [misra-c2012-17.7]
-                                xwmm_bma_free(xwssc->mempool, car->slot);
-                                car->slot = NULL;
-                                xwssc_txq_carrier_free(xwssc, car);
+                        } else {
+                                xwos_splk_lock(&xwssc->txq.notiflk);
+                                if (NULL != car->slot->tx.ntfcb) {
+                                        car->slot->tx.ntfcb(xwssc,
+                                                            (xwssc_txh_t)car,
+                                                            -EPROTO,
+                                                            car->slot->tx.cbarg);
+                                }
+                                xwos_splk_unlock(&xwssc->txq.notiflk);
                         }
+                        // cppcheck-suppress [misra-c2012-17.7]
+                        xwmm_bma_free(xwssc->mempool, car->slot);
+                        car->slot = NULL;
+                        xwssc_txq_carrier_free(xwssc, car);
                 }
         } else {
                 /* 连接 */

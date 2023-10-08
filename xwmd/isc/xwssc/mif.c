@@ -309,7 +309,7 @@ void xwssc_txcb_notify(struct xwssc * xwssc, xwssc_txh_t txh, xwer_t rc, void * 
 
         XWOS_UNUSED(xwssc);
         car = txh;
-        xwssclogf(DEBUG, "[API][TXCB] txh:%p, rc:%d\n", txh, rc);
+        xwssclogf(DEBUG, "[API][TXCB] txh:0x%lX, rc:%d\n", (xwptr_t)txh, rc);
         if ((xwu32_t)XWSSC_CRS_FINISH == car->state) {
                 cbarg = arg;
                 xwos_splk_lock(&cbarg->splk);
@@ -345,7 +345,7 @@ xwer_t xwssc_tx(struct xwssc * xwssc,
                 goto err_ifnotrdy;
         }
 
-        xwssclogf(DEBUG, "[API][TX] port:%d, size:%d\n", port, *size);
+        xwssclogf(DEBUG, "[API][TX] port:%d, size:%ld\n", port, *size);
         xwos_splk_init(&cbarg.splk);
         xwos_cond_init(&cbarg.cond);
         cbarg.rc = -EINPROGRESS;
@@ -469,7 +469,7 @@ xwer_t xwssc_rx(struct xwssc * xwssc, xwu8_t port,
         }
 
         bufsize = *size;
-        xwssclogf(DEBUG, "[API][RX] port:%d, buffer size:%d\n", port, bufsize);
+        xwssclogf(DEBUG, "[API][RX] port:%d, size:%ld\n", port, bufsize);
         rc = xwos_sem_wait_to(&xwssc->rxq.sem[port], to);
         if (rc < 0) {
                 goto err_sem_wait_to;
@@ -528,7 +528,7 @@ xwer_t xwssc_try_rx(struct xwssc * xwssc, xwu8_t port,
         }
 
         bufsize = *size;
-        xwssclogf(DEBUG, "[API][TRYRX] port:%d, buffer size:%d\n", port, bufsize);
+        xwssclogf(DEBUG, "[API][TRYRX] port:%d, size:%ld\n", port, bufsize);
         rc = xwos_sem_trywait(&xwssc->rxq.sem[port]);
         if (rc < 0) {
                 goto err_sem_trywait;
