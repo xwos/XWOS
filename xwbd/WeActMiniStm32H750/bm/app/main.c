@@ -198,10 +198,10 @@ xwer_t main_task(void * arg)
                 goto err_child_thd_start;
         }
 
-        rc = board_xwssc_start();
+        rc = board_xwssc_init();
         if (rc < 0) {
                 xwlogf(ERR, "main", "Start XWSSC ... <rc:%d>", rc);
-                goto err_xwssc_start;
+                goto err_xwssc_init;
         }
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
@@ -220,7 +220,7 @@ xwer_t main_task(void * arg)
 err_xwlua_start:
         BOARD_BUG();
 #endif
-err_xwssc_start:
+err_xwssc_init:
         BOARD_BUG();
 err_child_thd_start:
 

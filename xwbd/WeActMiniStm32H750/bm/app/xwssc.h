@@ -23,9 +23,11 @@
 
 #include "board/std.h"
 
-xwer_t board_xwssc_start(void);
-xwer_t board_xwssc_stop(void);
+xwer_t board_xwssc_init(void);
+xwer_t board_xwssc_fini(void);
 xwer_t board_xwssc_tx(const xwu8_t data[], xwsz_t * size, xwu8_t port, xwtm_t to);
 xwer_t board_xwssc_rx(xwu8_t rxbuf[], xwsz_t * size, xwu8_t port, xwtm_t to);
+void board_xwssc_txtstthd_start(void);
+void board_xwssc_rxtstthd_start(void);
 
 #endif /* bm/app/xwssc.h */
