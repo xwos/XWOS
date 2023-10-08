@@ -45,9 +45,8 @@
 
 /**
  * @note
- * + 页的最小单位是@ref XWMM_MEMPOOL_PAGE_SIZE (4K字节)
- * + 页的阶数n是指，所包含页的最小单位的数量以2的n次方的形式表示。n阶页
- *   的大小是(4K * pow(2, n))
+ * + 页的最小单位是 @ref XWMM_MEMPOOL_PAGE_SIZE
+ * + 页的阶数n是指，以2的n次方的形式表示的单位页的数量。n阶页的大小是(4K * pow(2, n))。
  */
 #define XWMM_MEMPOOL_PAGE_SIZE          (4096U) /**< 每页内存的字节数 */
 #define XWMM_MEMPOOL_OC_8_PAGE_ODR      (0U) /**< 8字节分配器所使用的页的阶数 */
@@ -79,8 +78,8 @@
 #define XWMM_MEMPOOL_TYPEDEF(name, pgodr) \
         struct name { \
                 struct xwmm_mempool mempool[1U]; \
-                struct xwmm_mempool_page_odrbtree odrbtree[(pgodr) + 1U]; \
-                struct xwmm_mempool_page page[1U << (pgodr)]; \
+                struct xwmm_mempool_page_odrbtree odrbtrees[(pgodr) + 1U]; \
+                struct xwmm_mempool_page pages[1U << (pgodr)]; \
         }
 
 /**

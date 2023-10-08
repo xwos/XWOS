@@ -141,7 +141,7 @@ err_mem2small:
 /**
  * @brief XWMM API：申请一页内存
  * @param[in] pa: 页分配器的指针
- * @param[in] order: 页数量的阶，页内存大小：((1 << order) * pa->pgsize)
+ * @param[in] order: 页数量的阶，页内存大小： `((1 << order) * pa->pgsize)`
  * @param[out] pgbuf: 指向缓冲区的指针，通过此缓冲区返回申请到的页控制块的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -162,15 +162,14 @@ xwer_t xwmm_mempool_page_allocate(struct xwmm_mempool_page_allocator * pa,
         for (odr = order; odr <= pa->max_order; odr++) {
                 ot = &pa->odrbtree[odr];
                 pg = xwmm_mempool_page_odrbtree_choose(ot);
-                if (!pg) {
-                        continue;
+                if (NULL != pg) {
+                        xwmm_mempool_page_divide_page(pa, pg, order, ot);
+                        origin = pa->zone.origin + (pg->attr.free.seq * pa->pgsize);
+                        pg->mapping = origin;
+                        *pgbuf = pg;
+                        rc = XWOK;
+                        break;
                 }
-                xwmm_mempool_page_divide_page(pa, pg, order, ot);
-                origin = pa->zone.origin + ((xwsq_t)pg->attr.free.seq * pa->pgsize);
-                pg->mapping = origin;
-                *pgbuf = pg;
-                rc = XWOK;
-                break;
         }
         return rc;
 }
@@ -189,7 +188,7 @@ xwer_t xwmm_mempool_page_free(struct xwmm_mempool_page_allocator * pa,
 {
         xwer_t rc;
 
-        if (!pg->mapping) {
+        if (XWMM_MEMPOOL_PAGE_MAPPING_FREE == pg->mapping) {
                 rc = -EALREADY;
                 goto err_already;
         }
@@ -210,8 +209,6 @@ err_already:
  * @param[in] pg: 被拆分的页控制块的指针
  * @param[in] target_odr: 目标页数量的阶
  * @param[in] ot: 被拆分的页所在的阶红黑树的指针
- * @note
- * - 被拆分的页已经从阶红黑树中删除，所以是私有数据。
  */
 static __xwos_code
 void xwmm_mempool_page_divide_page(struct xwmm_mempool_page_allocator * pa,
@@ -242,8 +239,6 @@ void xwmm_mempool_page_divide_page(struct xwmm_mempool_page_allocator * pa,
  * @brief 合并空闲的伙伴页
  * @param[in] pa: 页分配器的指针
  * @param[in] pg: 页控制块的指针
- * @note
- * - 正在合并的页不在阶红黑树中删除，所以是私有数据。
  */
 static __xwos_code
 void xwmm_mempool_page_combine(struct xwmm_mempool_page_allocator * pa,
@@ -256,10 +251,9 @@ void xwmm_mempool_page_combine(struct xwmm_mempool_page_allocator * pa,
         odr = pg->order + 1U;
         while (odr < pa->max_order) {
                 buddy = xwmm_mempool_page_get_buddy(pa, pg);
-                /* 不能使用 `buddy->order` ，因为未上锁时， `buddy->order` 有可能改变，
-                   尤其是多核系统。
-                   但此时可以使用 `pg->order` ，因为 `pg` 还未加入到红黑树，
-                   是私有数据。*/
+                /* `buddy->order` 不能在临界区外使用，
+                   因为 `buddy` 在阶红黑树上时，是共享数据。
+                   但可以使用 `pg->order` ，因为 `pg` 还未加入到阶红黑树，是本地数据。*/
                 rc = xwmm_mempool_page_odrbtree_remove(&pa->odrbtree[pg->order], buddy);
                 if (rc < 0) {
                         break;
@@ -286,9 +280,6 @@ void xwmm_mempool_page_combine(struct xwmm_mempool_page_allocator * pa,
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EEXIST: 页已在阶红黑树中
- * @note
- * - 正在加入的页不在阶红黑树中，所以是私有数据，对pg->mapping的读可在锁外；
- * - 但当页已经加入到阶红黑树中，就变成共享数据，对pg->mapping的写只在锁内。
  */
 static __xwos_code
 xwer_t xwmm_mempool_page_odrbtree_add(struct xwmm_mempool_page_odrbtree * ot,
@@ -306,6 +297,7 @@ xwer_t xwmm_mempool_page_odrbtree_add(struct xwmm_mempool_page_odrbtree * ot,
 
         tree = &ot->tree;
         pgseq = pg->attr.free.seq;
+        /* 即将加入的页不在阶红黑树中，是本地数据，对 `pg->mapping` 的读可在锁外。*/
         if (XWMM_MEMPOOL_PAGE_MAPPING_FREE == pg->mapping) {
                 rc = -EEXIST;
                 goto err_exist;
@@ -313,6 +305,7 @@ xwer_t xwmm_mempool_page_odrbtree_add(struct xwmm_mempool_page_odrbtree * ot,
 
         pg->order = ot->order;
         xwos_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
+        /* 当页被加入到阶红黑树中，就变成共享数据，对 `pg->mapping` 的写只在锁内。*/
         pg->mapping = XWMM_MEMPOOL_PAGE_MAPPING_FREE;
         new = &tree->root;
         lpc = (xwptr_t)new;
@@ -358,8 +351,6 @@ err_exist:
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 页不在阶红黑树中
  * @retval -EBUSY: 页不在阶红黑树中
- * @note
- * - 将要删除的页还在阶红黑树中，所以是共享数据，对 `pg->mapping` 的读只可在锁内。
  */
 static __xwos_code
 xwer_t xwmm_mempool_page_odrbtree_remove(struct xwmm_mempool_page_odrbtree * ot,
@@ -377,6 +368,7 @@ xwer_t xwmm_mempool_page_odrbtree_remove(struct xwmm_mempool_page_odrbtree * ot,
         }
 
         xwos_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
+        /* 即将被删除的页在阶红黑树中，是共享数据。对 `pg->mapping` 的读只可在锁内。*/
         if (XWMM_MEMPOOL_PAGE_MAPPING_FREE != pg->mapping) {
                 rc = -EBUSY;
                 goto err_notfree;
@@ -384,7 +376,7 @@ xwer_t xwmm_mempool_page_odrbtree_remove(struct xwmm_mempool_page_odrbtree * ot,
         pg->mapping = XWMM_MEMPOOL_PAGE_MAPPING_INVAILD;
         if (pg == ot->leftmost) {
                 s = pg->attr.free.rbnode.right;
-                if (!s) {
+                if (NULL == s) {
                         s = xwlib_rbtree_get_parent(&pg->attr.free.rbnode);
                 }
                 if (s != (struct xwlib_rbtree_node *)&tree->root) {
@@ -410,8 +402,6 @@ err_odrerr:
  * @brief 从阶红黑树中选择一页
  * @param[in] ot: 阶红黑树的指针
  * @return 页控制块的指针或空指针
- * @note
- * - 将要被选择的页还在阶红黑树中，所以是共享数据，对pg->mapping的写只可在锁内。
  */
 static __xwos_code
 struct xwmm_mempool_page *
@@ -425,13 +415,14 @@ xwmm_mempool_page_odrbtree_choose(struct xwmm_mempool_page_odrbtree * ot)
         tree = &ot->tree;
         xwos_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
         leftmost = ot->leftmost;
-        if (!leftmost) {
+        if (NULL == leftmost) {
                 xwos_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
                 goto err_empty;
         }
+        /* 即将被选择的页在阶红黑树中，是共享数据。对 `pg->mapping` 的写只可在锁内。*/
         leftmost->mapping = XWMM_MEMPOOL_PAGE_MAPPING_INVAILD;
         s = leftmost->attr.free.rbnode.right;
-        if (!s) {
+        if (NULL == s) {
                 s = xwlib_rbtree_get_parent(&leftmost->attr.free.rbnode);
         }
         if (s != (struct xwlib_rbtree_node *)&tree->root) {

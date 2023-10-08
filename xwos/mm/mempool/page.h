@@ -67,7 +67,7 @@ struct xwmm_mempool_page_allocator;
 /**
  * @brief 阶红黑树
  * @note
- * - 拥有相同阶(2的n次方)的页连接到同一颗阶红黑树上，关键字时页的序号
+ * + 拥有相同阶(2的n次方)的页连接到同一颗阶红黑树上，关键字时页的序号
  */
 struct xwmm_mempool_page_odrbtree {
         struct xwlib_rbtree tree; /**< 红黑树 */
