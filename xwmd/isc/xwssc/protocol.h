@@ -41,6 +41,7 @@
 #define XWSSC_FRMHEAD_SIZE(size)        ((size) & 0xFU)
 #define XWSSC_FRMHEAD_SIZE_MIRROR(size) ((size) & 0xF0U)
 #define XWSSC_FRMHEAD_MAXSIZE           (16U)
+#define XWSSC_FRM_ONSTACK_MAXSIZE       (64U)
 
 #define XWSSC_ID_MSK            (0xFFU)
 #define XWSSC_ID(id)            ((xwu8_t)((xwu8_t)(id) & XWSSC_ID_MSK))
@@ -86,7 +87,8 @@
  */
 enum xwssc_flag_em {
         XWSSC_FLAG_CONNECT = 0x10U, /**< 连接标志 */
-        XWSSC_FLAG_ACK = 0x80U, /**< 应答命令 */
+        XWSSC_FLAG_ACK = 0x80U, /**< 应答标志 */
+        XWSSC_FLAG_SDU = 0x00U, /**< 数据 */
         XWSSC_FLAG_MSK = 0xF0U,
 };
 
@@ -107,7 +109,7 @@ enum xwssc_frm_ack_em {
 struct __xwcc_packed xwssc_frmhead {
         xwu8_t headsize; /**< 帧头的长度 | 镜像反转 */
         xwu8_t chksum; /**< 帧头的校验和 */
-        xwu8_t port; /**< 端口，端口0保留为协议内部使用 */
+        xwu8_t port; /**< 端口 */
         xwu8_t id; /**< 消息的ID */
         xwu8_t qos; /**< [0:3]: QoS, [4:7]: 协议内部标签 */
         xwu8_t ecsdusz[0]; /**< 数据长度：变长编码 */

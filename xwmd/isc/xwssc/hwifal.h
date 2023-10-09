@@ -59,7 +59,9 @@ enum xwssc_hwifal_notification_em {
 xwer_t xwssc_hwifal_open(struct xwssc * xwssc, void * hwifcb);
 xwer_t xwssc_hwifal_close(struct xwssc * xwssc);
 xwer_t xwssc_hwifal_tx(struct xwssc * xwssc, const xwu8_t * stream, xwsz_t size);
-xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf);
+xwer_t xwssc_hwifal_rx_head(struct xwssc * xwssc, struct xwssc_frm * frm);
+xwer_t xwssc_hwifal_rx_body(struct xwssc * xwssc,
+                            struct xwssc_frm * frm, xwsz_t sdusize);
 void xwssc_hwifal_notify(struct xwssc * xwssc, xwsq_t evt);
 
 /**

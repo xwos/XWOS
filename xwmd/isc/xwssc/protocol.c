@@ -36,7 +36,7 @@
  * @brief 控制帧模板：连接帧
  */
 static __xwmd_rodata
-const xwu8_t xwssc_frm_connect[] = {
+const xwu8_t xwssc_frm_connection[] = {
         (xwu8_t)XWSSC_SOF,
         (xwu8_t)XWSSC_SOF,
         (xwu8_t)0x66, /* 帧头长度 | 长度的镜像 */
@@ -66,7 +66,7 @@ const xwu8_t xwssc_frm_connect[] = {
  * @brief 控制帧模板：连接应答帧
  */
 static __xwmd_rodata
-const xwu8_t xwssc_ackfrm_connect[] = {
+const xwu8_t xwssc_ackfrm_connection[] = {
         (xwu8_t)XWSSC_SOF,
         (xwu8_t)XWSSC_SOF,
         (xwu8_t)0x66, /* 帧头长度 | 长度的镜像 */
@@ -138,7 +138,7 @@ const xwu8_t xwssc_ecsdusz_shift_table[] = {
 };
 
 static __xwmd_code
-xwer_t xwssc_chk_frm(union xwssc_slot * slot);
+xwer_t xwssc_chk_frm(struct xwssc_frm * frm, xwsz_t sdusize);
 
 static __xwmd_code
 void xwssc_rxq_pub(struct xwssc * xwssc,
@@ -146,19 +146,16 @@ void xwssc_rxq_pub(struct xwssc * xwssc,
                    xwu8_t port);
 
 static __xwmd_code
-xwer_t xwssc_rx_frm_connect(struct xwssc * xwssc, union xwssc_slot * slot);
+xwer_t xwssc_rx_connection(struct xwssc * xwssc, struct xwssc_frm * frm);
 
 static __xwmd_code
-xwer_t xwssc_rx_ack_connect(struct xwssc * xwssc, union xwssc_slot * slot);
+xwer_t xwssc_rx_ack_connection(struct xwssc * xwssc, struct xwssc_frm * frm);
 
 static __xwmd_code
-xwer_t xwssc_rx_frm_sdu(struct xwssc * xwssc, union xwssc_slot * slot);
+xwer_t xwssc_rx_sdu(struct xwssc * xwssc, union xwssc_slot * slot);
 
 static __xwmd_code
-xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, union xwssc_slot * slot);
-
-static __xwmd_code
-xwer_t xwssc_rx_frm(struct xwssc * xwssc, union xwssc_slot * slot);
+xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, struct xwssc_frm * frm);
 
 static __xwmd_code
 xwer_t xwssc_rxfsm(struct xwssc * xwssc);
@@ -170,10 +167,10 @@ static __xwmd_code
 void xwssc_txq_add_tail(struct xwssc * xwssc, struct xwssc_carrier * car);
 
 static __xwmd_code
-xwer_t xwssc_tx_frm_connect(struct xwssc * xwssc);
+xwer_t xwssc_tx_connection(struct xwssc * xwssc);
 
 static __xwmd_code
-xwer_t xwssc_tx_ack_connect(struct xwssc * xwssc);
+xwer_t xwssc_tx_ack_connection(struct xwssc * xwssc);
 
 static __xwmd_code
 xwer_t xwssc_connect(struct xwssc * xwssc);
@@ -285,9 +282,9 @@ xwu8_t xwssc_cal_head_chksum(xwu8_t data[], xwsz_t size)
                 chksum += (xwu16_t)data[i];
         }
         while ((xwu16_t)0 != (chksum & (xwu16_t)0xFF00)) {
-                chksum = (xwu16_t)(chksum >> 8U) + (xwu16_t)(chksum & 0xFFU);
+                chksum = (chksum >> (xwu16_t)8) + (chksum & (xwu16_t)0xFF);
         }
-        chksum ^= 0xFF;
+        chksum ^= (xwu16_t)0xFF;
         return (xwu8_t)chksum;
 }
 
@@ -310,7 +307,7 @@ bool xwssc_chk_head(xwu8_t data[], xwsz_t size)
                 chksum += (xwu16_t)data[i];
         }
         while ((xwu16_t)0 != (chksum & (xwu16_t)0xFF00)) {
-                chksum = (xwu16_t)(chksum >> 8U) + (xwu16_t)(chksum & 0xFFU);
+                chksum = (chksum >> (xwu16_t)8) + (chksum & (xwu16_t)0xFF);
         }
         return (chksum == (xwu16_t)0xFF);
 }
@@ -318,23 +315,21 @@ bool xwssc_chk_head(xwu8_t data[], xwsz_t size)
 /**
  * @brief 校验帧是否合法
  * @param[in] xwssc: XWSSC对象的指针
- * @param[in] slot: 待校验的帧槽的指针
+ * @param[in] frm: 待校验的消息帧的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EBADMSG: 校验错误
  */
 static __xwmd_code
-xwer_t xwssc_chk_frm(union xwssc_slot * slot)
+xwer_t xwssc_chk_frm(struct xwssc_frm * frm, xwsz_t sdusize)
 {
         xwu8_t * sdupos;
         xwu8_t * crc32pos;
-        xwsz_t sdusize;
         xwsz_t calsz;
         xwu32_t crc32;
         xwer_t rc;
 
-        sdupos = XWSSC_SDUPOS(&slot->rx.frm.head);
-        sdusize = XWSSC_RXSDUSIZE(&slot->rx);
+        sdupos = XWSSC_SDUPOS(&frm->head);
         crc32pos = &sdupos[sdusize];
         calsz = sdusize;
         crc32 = xwlib_crc32_calms(sdupos, &calsz);
@@ -361,7 +356,7 @@ void xwssc_rxq_pub(struct xwssc * xwssc,
                    xwu8_t port)
 {
         xwssclogf(DEBUG,
-                  "[RX][SDU] Publish a frame(0x%lX): port:0x%X, frmsize:0x%u\n",
+                  "[R][RX][SDU] Publish slot::0x%lX, port:0x%X, frmsize:0x%u\n",
                   (xwptr_t)slot, port, slot->rx.frmsize);
         xwos_splk_lock(&xwssc->rxq.lock[port]);
         xwlib_bclst_add_tail(&xwssc->rxq.q[port], &slot->rx.node);
@@ -393,53 +388,52 @@ union xwssc_slot * xwssc_rxq_choose(struct xwssc * xwssc, xwu8_t port)
 /**
  * @brief 接收同步帧
  * @param[in] xwssc: XWSSC对象的指针
- * @param[in] slot: 接收到的帧槽指针
+ * @param[in] frm: 消息帧
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_rx_frm_connect(struct xwssc * xwssc, union xwssc_slot * slot)
+xwer_t xwssc_rx_connection(struct xwssc * xwssc, struct xwssc_frm * frm)
 {
         xwu8_t * sdupos;
         xwer_t rc;
         char proto[6];
 
-        sdupos = XWSSC_SDUPOS(&slot->rx.frm.head);
+        sdupos = XWSSC_SDUPOS(&frm->head);
         proto[0] = sdupos[0];
         proto[1] = sdupos[1];
         proto[2] = sdupos[2];
         proto[3] = sdupos[3];
         proto[4] = sdupos[4];
         proto[5] = '\0';
-        xwssclogf(DEBUG, "[RX][CONN] proto:%s-%d.%d.%d\n",
+        xwssclogf(DEBUG, "[R][RX][CONN] proto:%s-%d.%d.%d\n",
                   proto, sdupos[5], sdupos[6], sdupos[7]);
         if ((0 == strcmp(proto, "XWSSC")) &&
             (XWSSC_VERSION_MAJOR == sdupos[5]) &&
             (XWSSC_VERSION_MINOR == sdupos[6])) {
-                rc = xwssc_tx_ack_connect(xwssc);
+                rc = xwssc_tx_ack_connection(xwssc);
                 if (XWOK == rc) {
                         xwaop_write(xwu32_t, &xwssc->rxq.cnt, 0, NULL);
                 }
         } else {
                 rc = -EPERM;
         }
-        xwmm_bma_free(xwssc->mempool, slot); // cppcheck-suppress [misra-c2012-17.7]
         return rc;
 }
 
 /**
  * @brief 接收同步应答帧
  * @param[in] xwssc: XWSSC对象的指针
- * @param[in] slot: 接收到的帧槽指针
+ * @param[in] frm: 消息帧
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_rx_ack_connect(struct xwssc * xwssc, union xwssc_slot * slot)
+xwer_t xwssc_rx_ack_connection(struct xwssc * xwssc, struct xwssc_frm * frm)
 {
         xwu8_t * sdupos;
         xwsq_t hwifst;
         char proto[6];
 
-        sdupos = XWSSC_SDUPOS(&slot->rx.frm.head);
+        sdupos = XWSSC_SDUPOS(&frm->head);
         proto[0] = sdupos[0];
         proto[1] = sdupos[1];
         proto[2] = sdupos[2];
@@ -447,8 +441,7 @@ xwer_t xwssc_rx_ack_connect(struct xwssc * xwssc, union xwssc_slot * slot)
         proto[4] = sdupos[4];
         proto[5] = '\0';
 
-        xwssclogf(DEBUG,
-                  "[RX][CONNACK] proto:%s-%d.%d.%d\n",
+        xwssclogf(DEBUG, "[R][RX][CONNACK] proto:%s-%d.%d.%d\n",
                   proto, sdupos[5], sdupos[6], sdupos[7]);
         xwaop_read(xwsq_t, &xwssc->hwifst, &hwifst);
         if (!((xwsq_t)XWSSC_HWIFST_CONNECT & hwifst)) {
@@ -461,7 +454,6 @@ xwer_t xwssc_rx_ack_connect(struct xwssc * xwssc, union xwssc_slot * slot)
                         xwssc_hwifal_notify(xwssc, XWSSC_HWIFNTF_CONNECT);
                 }
         }
-        xwmm_bma_free(xwssc->mempool, slot); // cppcheck-suppress [misra-c2012-17.7]
         return XWOK;
 }
 
@@ -472,60 +464,58 @@ xwer_t xwssc_rx_ack_connect(struct xwssc * xwssc, union xwssc_slot * slot)
  * @return 错误码
  * @note
  * + 数据帧：
- *   - (xwu8_t)XWSSC_SOF,
- *   - (xwu8_t)XWSSC_SOF,
- *   - (xwu8_t)帧头长度 | 镜像反转
- *   - (xwu8_t)帧头校验和
- *   - (xwu8_t)端口
- *   - (xwu8_t)ID
- *   - (xwu8_t)QoS
- *   - (xwu8_t)ecsdusz[0:n] 编码的数据长度
- *   - (xwu8_t)sdu[0:msg->size - 1] 数据
- *   - (xwu8_t)sdu[msg->size + 0]/CRC32 最高有效字节
- *   - (xwu8_t)sdu[msg->size + 1]/CRC32 第二字节
- *   - (xwu8_t)sdu[msg->size + 2]/CRC32 第三字节
- *   - (xwu8_t)sdu[msg->size + 3]/CRC32 最低有效字节
- *   - (xwu8_t)XWSSC_EOF,
- *   - (xwu8_t)XWSSC_EOF,
+ *   + (xwu8_t)XWSSC_SOF,
+ *   + (xwu8_t)XWSSC_SOF,
+ *   + (xwu8_t)帧头长度 | 镜像反转
+ *   + (xwu8_t)帧头校验和
+ *   + (xwu8_t)端口
+ *   + (xwu8_t)ID
+ *   + (xwu8_t)QoS
+ *   + (xwu8_t)ecsdusz[0:n] 编码的数据长度
+ *   + (xwu8_t)sdu[0:msg->size - 1] 数据
+ *   + (xwu8_t)sdu[msg->size + 0]/CRC32 最高有效字节
+ *   + (xwu8_t)sdu[msg->size + 1]/CRC32 第二字节
+ *   + (xwu8_t)sdu[msg->size + 2]/CRC32 第三字节
+ *   + (xwu8_t)sdu[msg->size + 3]/CRC32 最低有效字节
+ *   + (xwu8_t)XWSSC_EOF,
+ *   + (xwu8_t)XWSSC_EOF,
  */
 static __xwmd_code
-xwer_t xwssc_rx_frm_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
+xwer_t xwssc_rx_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
 {
         xwu32_t rxcnt;
         xwu8_t rmtid;
         xwu8_t lclid;
         xwu8_t port;
+        xwu8_t qos;
         xwer_t rc;
 
         xwaop_read(xwu32_t, &xwssc->rxq.cnt, &rxcnt);
         lclid = XWSSC_ID(rxcnt);
         rmtid = slot->rx.frm.head.id;
         port = slot->rx.frm.head.port;
+        qos = slot->rx.frm.head.qos;
         xwssclogf(DEBUG,
-                  "[RX][SDU] port:0x%X, qos:0x%X, frmsize:0x%X, "
-                  "Remote ID:0x%X, Local ID:0x%X\n",
-                  port, slot->rx.frm.head.qos, slot->rx.frmsize, rmtid, lclid);
-        if ((xwu8_t)0 != (slot->rx.frm.head.qos & (xwu8_t)XWSSC_MSG_QOS_RELIABLE_MSK)) {
+                  "[R][RX][SDU] slot:0x%lX, port:0x%X, qos:0x%X, frmsize:0x%X, "
+                  "Remote ID:0x%X, Local ID:0x%X, Rx counter:0x%X\n",
+                  (xwptr_t)slot,
+                  port, qos, slot->rx.frmsize, rmtid, lclid, rxcnt);
+        if ((xwu8_t)0 != (qos & (xwu8_t)XWSSC_MSG_QOS_RELIABLE_MSK)) {
                 if (rmtid == lclid) {
                         /* 收到数据 */
                         rc = xwssc_tx_ack_sdu(xwssc, port, rmtid, XWSSC_ACK_OK);
                         if (XWOK == rc) {
                                 xwaop_add(xwu32_t, &xwssc->rxq.cnt, 1, NULL, NULL);
                                 xwssc_rxq_pub(xwssc, slot, port);
-                        } else {
-                                // cppcheck-suppress [misra-c2012-17.7]
-                                xwmm_bma_free(xwssc->mempool, slot);
                         }
                 } else if (XWSSC_ID(rmtid + (xwu8_t)1) == lclid) {
                         /* 收到重复的数据 */
-                        rc = xwssc_tx_ack_sdu(xwssc, port, rmtid, XWSSC_ACK_EALREADY);
-                        // cppcheck-suppress [misra-c2012-17.7]
-                        xwmm_bma_free(xwssc->mempool, slot);
+                        xwssc_tx_ack_sdu(xwssc, port, rmtid, XWSSC_ACK_EALREADY);
+                        rc = -EALREADY;
                 } else {
                         /* 连接被复位 */
-                        rc = xwssc_tx_ack_sdu(xwssc, port, rmtid, XWSSC_ACK_ECONNRESET);
-                        // cppcheck-suppress [misra-c2012-17.7]
-                        xwmm_bma_free(xwssc->mempool, slot);
+                        xwssc_tx_ack_sdu(xwssc, port, rmtid, XWSSC_ACK_ECONNRESET);
+                        rc = -ECONNRESET;
                 }
         } else {
                 xwssc_rxq_pub(xwssc, slot, port);
@@ -537,11 +527,11 @@ xwer_t xwssc_rx_frm_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
 /**
  * @brief 接收数据应答帧
  * @param[in] xwssc: XWSSC对象的指针
- * @param[in] slot: 接收到的帧槽指针
+ * @param[in] frm: 消息帧
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
+xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, struct xwssc_frm * frm)
 {
         xwu8_t * sdupos;
         xwu8_t rmtid;
@@ -549,10 +539,10 @@ xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
         xwer_t rc;
         xwsq_t hwifst;
 
-        sdupos = XWSSC_SDUPOS(&slot->rx.frm.head);
-        rmtid = XWSSC_ID(slot->rx.frm.head.id);
+        sdupos = XWSSC_SDUPOS(&frm->head);
+        rmtid = XWSSC_ID(frm->head.id);
         ack = sdupos[0];
-        xwssclogf(DEBUG, "[RX][SDUACK] ID:0x%X, ACK:0x%X\n", rmtid, ack);
+        xwssclogf(DEBUG, "[R][SDUACK] ID:0x%X, ACK:0x%X\n", rmtid, ack);
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (rc < 0) {
                 goto err_mtx_lock;
@@ -566,52 +556,10 @@ xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
                 xwos_cond_unicast(&xwssc->txq.cscond);
         } else {
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
-                xwssclogf(ERR, "[RX] No sending frame!\n");
+                rc = -ENOMSG;
         }
 
 err_mtx_lock:
-        xwmm_bma_free(xwssc->mempool, slot); // cppcheck-suppress [misra-c2012-17.7]
-        return rc;
-}
-
-/**
- * @brief 接收帧
- * @param[in] xwssc: XWSSC对象的指针
- * @param[in] slot: 接收到的帧槽指针
- * @return 错误码
- */
-static __xwmd_code
-xwer_t xwssc_rx_frm(struct xwssc * xwssc, union xwssc_slot * slot)
-{
-        xwer_t rc;
-        xwu8_t qos;
-
-        qos = slot->rx.frm.head.qos;
-        xwssclogf(DEBUG, "[RX] RX Frame(port:0x%X, ID:0x%X, qos:0x%X)\n",
-                  slot->rx.frm.head.port, slot->rx.frm.head.id, qos);
-        if ((xwu8_t)0 != ((xwu8_t)XWSSC_MSG_QOS_CHKSUM_MSK & qos)) {
-                rc = xwssc_chk_frm(slot);
-                if (rc < 0) {
-                        // cppcheck-suppress [misra-c2012-17.7]
-                        xwmm_bma_free(xwssc->mempool, slot);
-                        goto err_badmsg;
-                }
-        }
-        if ((xwu8_t)0 != ((xwu8_t)XWSSC_FLAG_CONNECT & qos)) {
-                if ((xwu8_t)0 != ((xwu8_t)XWSSC_FLAG_ACK & qos)) {
-                        rc = xwssc_rx_ack_connect(xwssc, slot);
-                } else {
-                        rc = xwssc_rx_frm_connect(xwssc, slot);
-                }
-        } else {
-                if ((xwu8_t)0 != ((xwu8_t)XWSSC_FLAG_ACK & qos)) {
-                        rc = xwssc_rx_ack_sdu(xwssc, slot);
-                } else {
-                        rc = xwssc_rx_frm_sdu(xwssc, slot);
-                }
-        }
-
-err_badmsg:
         return rc;
 }
 
@@ -623,15 +571,119 @@ err_badmsg:
 static __xwmd_code
 xwer_t xwssc_rxfsm(struct xwssc * xwssc)
 {
-        union xwssc_slot * slot;
+        union {
+                xwu8_t data[XWSSC_FRM_ONSTACK_MAXSIZE];
+                struct xwssc_frm frm;
+        } stream;
+        union {
+                union xwssc_slot * slot;
+                void * raw;
+        } mem;
+        xwsz_t sdusize;
+        xwu8_t qos;
         xwer_t rc;
 
-        do {
-                rc = xwssc_hwifal_rx(xwssc, &slot);
-        } while (-EAGAIN == rc);
-        if (XWOK == rc) {
-                rc = xwssc_rx_frm(xwssc, slot);
+        mem.raw = NULL;
+        /* 接收消息头 */
+        rc = xwssc_hwifal_rx_head(xwssc, &stream.frm);
+        if (rc < 0) {
+                goto err_rx_head;
         }
+        qos = stream.frm.head.qos;
+        xwssc_decode_sdusize(stream.frm.head.ecsdusz, &sdusize);
+        xwssclogf(DEBUG, "[R][HEAD] port:0x%X, ID:0x%X, qos:0x%X\n",
+                  stream.frm.head.port, stream.frm.head.id, qos);
+
+        /* 接收消息体 */
+        if (XWSSC_FLAG_SDU == ((xwu8_t)XWSSC_FLAG_MSK & qos)) {
+                xwsz_t ecsize;
+                xwsz_t need;
+                xwsz_t neednum;
+                xwssq_t odr;
+
+                /* 计算所需的内存大小 */
+                ecsize = XWSSC_ECSIZE(&stream.frm.head);
+                need = (sizeof(union xwssc_slot) + ecsize + sdusize +
+                        XWSSC_CRC32_SIZE + XWSSC_EOF_SIZE);
+                neednum = XWBOP_DIV_ROUND_UP(need, XWSSC_MEMBLK_SIZE);
+                odr = xwbop_fls(xwsz_t, neednum);
+                if ((odr < 0) || ((XWSSC_MEMBLK_SIZE << (xwsz_t)odr) < need)) {
+                        odr++;
+                }
+                /* 申请用于接收数据的帧槽 */
+                rc = xwmm_bma_alloc(xwssc->mempool, (xwsq_t)odr, &mem.raw);
+                if (rc < 0) {
+                        // cppcheck-suppress [misra-c2012-17.7]
+                        xwssc_tx_ack_sdu(xwssc,
+                                         stream.frm.head.port, stream.frm.head.id,
+                                         XWSSC_ACK_NOMEM);
+                        goto err_bma_alloc;
+                }
+                /* 初始化帧槽 */
+                xwlib_bclst_init_node(&mem.slot->rx.node);
+                mem.slot->rx.frmsize = (sizeof(struct xwssc_frm) + ecsize + sdusize +
+                                        XWSSC_CRC32_SIZE + XWSSC_EOF_SIZE);
+                // cppcheck-suppress [misra-c2012-17.7]
+                /* memset(mem.slot->rx.frm.sof, XWSSC_SOF, XWSSC_SOF_SIZE); */
+                // cppcheck-suppress [misra-c2012-17.7]
+                memcpy((xwu8_t *)&mem.slot->rx.frm.head, (xwu8_t *)&stream.frm.head,
+                       sizeof(struct xwssc_frmhead) + ecsize);
+                /* 接收消息体 */
+                rc = xwssc_hwifal_rx_body(xwssc, &mem.slot->rx.frm, sdusize);
+                if (rc < 0) {
+                        goto err_rx_body;
+                }
+                /* 校验消息 */
+                if ((xwu8_t)0 != ((xwu8_t)XWSSC_MSG_QOS_CHKSUM_MSK & qos)) {
+                        rc = xwssc_chk_frm(&mem.slot->rx.frm, sdusize);
+                        if (rc < 0) {
+                                goto err_badmsg;
+                        }
+                }
+                /* 处理消息 */
+                rc = xwssc_rx_sdu(xwssc, mem.slot);
+                if (rc < 0) {
+                        goto err_process;
+                }
+        } else {
+                /* 接收消息体 */
+                rc = xwssc_hwifal_rx_body(xwssc, &stream.frm, sdusize);
+                if (rc < 0) {
+                        goto err_rx_body;
+                }
+                /* 校验消息 */
+                if ((xwu8_t)0 != ((xwu8_t)XWSSC_MSG_QOS_CHKSUM_MSK & qos)) {
+                        rc = xwssc_chk_frm(&stream.frm, sdusize);
+                        if (rc < 0) {
+                                goto err_badmsg;
+                        }
+                }
+                /* 处理消息 */
+                if ((xwu8_t)0 != ((xwu8_t)XWSSC_FLAG_CONNECT & qos)) {
+                        if ((xwu8_t)0 != ((xwu8_t)XWSSC_FLAG_ACK & qos)) {
+                                rc = xwssc_rx_ack_connection(xwssc, &stream.frm);
+                        } else {
+                                rc = xwssc_rx_connection(xwssc, &stream.frm);
+                        }
+                } else {
+                        rc = xwssc_rx_ack_sdu(xwssc, &stream.frm);
+                }
+                if (rc < 0) {
+                        goto err_process;
+                }
+        }
+        return XWOK;
+
+err_process:
+err_badmsg:
+err_rx_body:
+        if (NULL != mem.raw) {
+                // cppcheck-suppress [misra-c2012-17.7]
+                xwmm_bma_free(xwssc->mempool, mem.raw);
+                mem.raw = NULL;
+        }
+err_bma_alloc:
+err_rx_head:
         return rc;
 }
 
@@ -648,35 +700,52 @@ xwer_t xwssc_rxthd(struct xwssc * xwssc)
         rc = XWOK;
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {
-                        xwssclogf(DEBUG, "[RX] Start freezing ...\n");
+                        xwssclogf(DEBUG, "[R] Start freezing ...\n");
                         rc = xwos_cthd_freeze();
                         if (rc < 0) {
                                 xwssclogf(DEBUG,
-                                          "[RX] Failed to freeze ... <rc:%d>\n",
+                                          "[R] Failed to freeze ... <rc:%d>\n",
                                           rc);
                                 xwssc_doze(1); // cppcheck-suppress [misra-c2012-17.7]
                         }
-                        xwssclogf(DEBUG, "[RX] Resuming ...\n");
-                } else {
-                        rc = xwssc_rxfsm(xwssc);
-                        if (-ETIMEDOUT == rc) {
-                                xwssclogf(DEBUG, "[RX] Timeout!\n");
-                        } else if (-ENOMEM == rc) {
-                                xwssclogf(DEBUG, "[RX] No Memory\n");
-                        } else if ((-EINTR == rc) || (-ERESTARTSYS == rc)) {
-                                xwssclogf(DEBUG,
-                                          "[RX] Interrupted ... <rc:%d>\n",
-                                          rc);
-                        } else if (-EBADMSG == rc) {
-                                xwssclogf(WARNING,
-                                          "[RX] Bad Frame! \n");
-                        } else if (XWOK != rc) {
-                                xwssclogf(ERR,
-                                          "[RX] xwssc_rxfsm() returns %d.\n",
-                                          rc);
-                                XWSSC_BUG();
-                                break;
-                        } else {}
+                        xwssclogf(DEBUG, "[R] Resuming ...\n");
+                }
+                rc = xwssc_rxfsm(xwssc);
+                switch (rc) {
+                case XWOK:
+                        break;
+                case -EAGAIN:
+                        xwssclogf(WARNING, "[R] Data stream error! Wait for SOF.\n");
+                        break;
+                case -ETIMEDOUT:
+                        xwssclogf(DEBUG, "[R] Timeout!\n");
+                        break;
+                case -EINTR:
+                case -ERESTARTSYS:
+                        xwssclogf(DEBUG, "[R] Interrupted!\n");
+                        break;
+                case -ENOMEM:
+                        xwssclogf(DEBUG, "[R] No Memory\n");
+                        break;
+                case -EBADMSG:
+                        xwssclogf(WARNING, "[R] Bad Message Frame!\n");
+                        break;
+                case -EPERM:
+                        xwssclogf(ERR, "[R] Protocol not match!\n");
+                        break;
+                case -EALREADY:
+                        xwssclogf(WARNING, "[R] Repeated Message Frame!\n");
+                        break;
+                case -ECONNRESET:
+                        xwssclogf(WARNING, "[R] Connection Reset!\n");
+                        break;
+                case -ENOMSG:
+                        xwssclogf(WARNING, "[R] No sending message!\n");
+                        break;
+                default:
+                        xwssclogf(CRIT, "[R] BUG!!! xwssc_rxfsm() returns %d!\n", rc);
+                        XWSSC_BUG();
+                        break;
                 }
         }
         return rc;
@@ -787,16 +856,16 @@ struct xwssc_carrier * xwssc_txq_choose(struct xwssc * xwssc)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_tx_frm_connect(struct xwssc * xwssc)
+xwer_t xwssc_tx_connection(struct xwssc * xwssc)
 {
         xwer_t rc;
 
-        xwssclogf(DEBUG, "[TX][CONN] Connecting ...\n");
+        xwssclogf(DEBUG, "[T][TX][CONN] Connecting ...\n");
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (XWOK == rc) {
                 rc = xwssc_hwifal_tx(xwssc,
-                                     xwssc_frm_connect,
-                                     sizeof(xwssc_frm_connect));
+                                     xwssc_frm_connection,
+                                     sizeof(xwssc_frm_connection));
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
         }
         return rc;
@@ -809,16 +878,16 @@ xwer_t xwssc_tx_frm_connect(struct xwssc * xwssc)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_tx_ack_connect(struct xwssc * xwssc)
+xwer_t xwssc_tx_ack_connection(struct xwssc * xwssc)
 {
         xwer_t rc;
 
-        xwssclogf(DEBUG, "[TX][CONNACK] Connecting ...\n");
+        xwssclogf(DEBUG, "[R][TX][CONNACK] Connecting ...\n");
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (XWOK == rc) {
                 rc = xwssc_hwifal_tx(xwssc,
-                                     xwssc_ackfrm_connect,
-                                     sizeof(xwssc_ackfrm_connect));
+                                     xwssc_ackfrm_connection,
+                                     sizeof(xwssc_ackfrm_connection));
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
         }
         return rc;
@@ -845,7 +914,7 @@ xwer_t xwssc_tx_ack_sdu(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack
         xwu32_t crc32;
         xwer_t rc;
 
-        xwssclogf(DEBUG, "[TX][SDUACK] ACK:0x%X, ID:0x%X\n", ack, id);
+        xwssclogf(DEBUG, "[R][TX][SDUACK] ACK:0x%X, ID:0x%X\n", ack, id);
         frm = (struct xwssc_frm *)stream;
         // cppcheck-suppress [misra-c2012-17.7]
         memcpy(stream, xwssc_ackfrm_sdu, sizeof(xwssc_ackfrm_sdu));
@@ -861,10 +930,10 @@ xwer_t xwssc_tx_ack_sdu(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack
         crc32pos = &sdupos[sdusize];
         calsz = sdusize;
         crc32 = xwlib_crc32_calms(sdupos, &calsz);
-        crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
-        crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
-        crc32pos[2] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
-        crc32pos[3] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
+        crc32pos[0] = (xwu8_t)((crc32 >> (xwu32_t)24) & (xwu32_t)0xFF);
+        crc32pos[1] = (xwu8_t)((crc32 >> (xwu32_t)16) & (xwu32_t)0xFF);
+        crc32pos[2] = (xwu8_t)((crc32 >> (xwu32_t)8) & (xwu32_t)0xFF);
+        crc32pos[3] = (xwu8_t)((crc32 >> (xwu32_t)0) & (xwu32_t)0xFF);
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (XWOK == rc) {
                 rc = xwssc_hwifal_tx(xwssc, stream, sizeof(xwssc_ackfrm_sdu));
@@ -889,21 +958,21 @@ xwer_t xwssc_tx_ack_sdu(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack
  * @retval -ENOMEM: 内存不足
  * @note
  * + 数据帧：
- *   - (xwu8_t)XWSSC_SOF,
- *   - (xwu8_t)XWSSC_SOF,
- *   - (xwu8_t)帧头长度 | 镜像反转
- *   - (xwu8_t)帧头校验和
- *   - (xwu8_t)端口
- *   - (xwu8_t)ID
- *   - (xwu8_t)QoS
- *   - (xwu8_t)ecsdusz[0:n] 编码的数据长度
- *   - (xwu8_t)sdu[0:sdusize - 1]: 数据
- *   - (xwu8_t)sdu[sdusize + 0]/CRC32 最高有效字节
- *   - (xwu8_t)sdu[sdusize + 1]/CRC32 第二字节
- *   - (xwu8_t)sdu[sdusize + 2]/CRC32 第三字节
- *   - (xwu8_t)sdu[sdusize + 3]/CRC32 最低有效字节
- *   - (xwu8_t)XWSSC_EOF,
- *   - (xwu8_t)XWSSC_EOF,
+ *   + (xwu8_t)XWSSC_SOF,
+ *   + (xwu8_t)XWSSC_SOF,
+ *   + (xwu8_t)帧头长度 | 镜像反转
+ *   + (xwu8_t)帧头校验和
+ *   + (xwu8_t)端口
+ *   + (xwu8_t)ID
+ *   + (xwu8_t)QoS
+ *   + (xwu8_t)ecsdusz[0:n] 编码的数据长度
+ *   + (xwu8_t)sdu[0:sdusize - 1]: 数据
+ *   + (xwu8_t)sdu[sdusize + 0]/CRC32 最高有效字节
+ *   + (xwu8_t)sdu[sdusize + 1]/CRC32 第二字节
+ *   + (xwu8_t)sdu[sdusize + 2]/CRC32 第三字节
+ *   + (xwu8_t)sdu[sdusize + 3]/CRC32 最低有效字节
+ *   + (xwu8_t)XWSSC_EOF,
+ *   + (xwu8_t)XWSSC_EOF,
  */
 __xwmd_code
 xwer_t xwssc_eq_msg(struct xwssc * xwssc,
@@ -957,7 +1026,7 @@ xwer_t xwssc_eq_msg(struct xwssc * xwssc,
                            XWSSC_CRC32_SIZE + XWSSC_EOF_SIZE;
 
         xwssclogf(DEBUG,
-                  "[API][EQ] car(0x%lX), slot(0x%lX), "
+                  "[A][EQ] car(0x%lX), slot(0x%lX), "
                   "pri:0x%X, port:0x%X, sdusize:0x%X\n",
                   (xwptr_t)car, (xwptr_t)slot, pri, port, sdusize);
         /* SOF */
@@ -1031,7 +1100,7 @@ xwer_t xwssc_connect(struct xwssc * xwssc)
                 if ((xwsq_t)0 != ((xwsq_t)XWSSC_HWIFST_CONNECT & hwifst)) {
                         break;
                 }
-                rc = xwssc_tx_frm_connect(xwssc);
+                rc = xwssc_tx_connection(xwssc);
                 if (XWOK == rc) {
                         rc = xwssc_doze(1); // cppcheck-suppress [misra-c2012-17.7]
                         if (rc < 0) {
@@ -1062,12 +1131,12 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
 
         ack = xwssc->txq.remote.ack;
         rmtid = xwssc->txq.remote.id;
-        xwssclogf(DEBUG, "[TX][CB] Remote ACK:0x%X, Remote ID:0x%X\n", ack, rmtid);
+        xwssclogf(DEBUG, "[T][>] Remote ACK:0x%X, Remote ID:0x%X\n", ack, rmtid);
         if (rmtid != car->slot->tx.frm.head.id) {
                 xwaop_c0m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_CONNECT, NULL, NULL);
                 xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                 xwssc->txq.tmp = car;
-                xwssclogf(DEBUG, "[TX][CB] Remote ACK ID error!\n");
+                xwssclogf(DEBUG, "[T][>] Remote ACK ID error!\n");
         } else {
                 switch (ack) {
                 case XWSSC_ACK_OK:
@@ -1086,7 +1155,7 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                         xwssc_txq_carrier_free(xwssc, car);
                         break;
                 case XWSSC_ACK_EALREADY:
-                        xwssclogf(DEBUG, "[TX][CB] Msg is already transmitted!\n");
+                        xwssclogf(DEBUG, "[T][>] Msg is already transmitted!\n");
                         xwaop_add(xwu32_t, &xwssc->txq.cnt, 1, NULL, NULL);
                         xwaop_write(xwu32_t, &car->state, XWSSC_CRS_FINISH, NULL);
                         xwos_splk_lock(&xwssc->txq.notiflk);
@@ -1102,16 +1171,17 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                         xwssc_txq_carrier_free(xwssc, car);
                         break;
                 case XWSSC_ACK_ECONNRESET:
-                        xwssclogf(WARNING, "[TX][CB] Link has been severed!\n");
+                        xwssclogf(WARNING, "[T][>] Link has been severed!\n");
                         xwaop_c0m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_CONNECT,
                                   NULL, NULL);
                         xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                         xwssc->txq.tmp = car;
                         break;
                 case XWSSC_ACK_NOMEM:
-                        xwssclogf(WARNING, "[TX][CB] Remote has no memory!\n");
+                        xwssclogf(WARNING, "[T][>] Remote has no memory!\n");
                         xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                         xwssc->txq.tmp = car;
+                        xwssc_doze(1); // cppcheck-suppress [misra-c2012-17.7]
                         break;
                 default:
                         XWSSC_BUG();
@@ -1157,12 +1227,12 @@ xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
         if (rc < 0) {
                 goto err_mtx_lock;
         }
-        if ((xwu8_t)0 != (car->slot->tx.frm.head.qos &
-                          (xwu8_t)XWSSC_MSG_QOS_RELIABLE_MSK)) {
+        if ((xwu8_t)0 !=
+            (car->slot->tx.frm.head.qos & (xwu8_t)XWSSC_MSG_QOS_RELIABLE_MSK)) {
                 xwaop_s1m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_TX, NULL, NULL);
                 do { // cppcheck-suppress [misra-c2012-15.4]
                         xwssclogf(DEBUG,
-                                  "[TX][SDU] carrier(0x%lX), ID:0x%X, cnt:0x%X\n",
+                                  "[T][.] carrier(0x%lX), ID:0x%X, cnt:0x%X\n",
                                   (xwptr_t)car, id, cnt);
                         rc = xwssc_hwifal_tx(xwssc,
                                              (const xwu8_t *)&car->slot->tx.frm,
@@ -1268,7 +1338,7 @@ xwer_t xwssc_txfsm(struct xwssc * xwssc)
                         XWSSC_BUG_ON(is_err(car));
                 }
                 xwssclogf(DEBUG,
-                          "[TX][FSM] Choose carrier(0x%lX), port:0x%X, state:%d\n",
+                          "[T][<] Choose carrier(0x%lX), port:0x%X, state:%d\n",
                           (xwptr_t)car,
                           car->slot->tx.frm.head.port,
                           car->state);
@@ -1335,33 +1405,33 @@ xwer_t xwssc_txthd(struct xwssc * xwssc)
         rc = XWOK;
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {
-                        xwssclogf(DEBUG, "[TX] Start freezing ...\n");
+                        xwssclogf(DEBUG, "[T] Start freezing ...\n");
                         rc = xwos_cthd_freeze();
                         if (rc < 0) {
-                                xwssclogf(DEBUG,
-                                          "[TX] Failed to freeze ... <rc:%d>\n",
+                                xwssclogf(DEBUG, "[T] Failed to freeze ... <rc:%d>\n",
                                           rc);
                         }
-                        xwssclogf(DEBUG, "[TX] Resuming ...\n");
-                } else {
-                        rc = xwssc_txfsm(xwssc);
-                        if ((-EINTR == rc) || (-ERESTARTSYS == rc)) {
-                                xwssclogf(DEBUG,
-                                          "[TX] Interrupted ... <rc:%d>\n",
-                                          rc);
-                        } else if (-EOVERFLOW == rc) {
-                                xwssclogf(WARNING,
-                                          "[TX] Buffer of HWIF is overflow!\n");
-                                xwssc_doze(1); // cppcheck-suppress [misra-c2012-17.7]
-                        } else if (-ETIMEDOUT == rc) {
-                                xwssclogf(WARNING, "[TX] Timeout!\n");
-                        } else if (XWOK != rc) {
-                                xwssclogf(ERR,
-                                          "[TX] xwssc_txfsm() ... <rc:%d>.\n",
-                                          rc);
-                                XWSSC_BUG();
-                                break;
-                        } else {}
+                        xwssclogf(DEBUG, "[T] Resuming ...\n");
+                }
+                rc = xwssc_txfsm(xwssc);
+                switch (rc) {
+                case XWOK:
+                        break;
+                case -EINTR:
+                case -ERESTARTSYS:
+                        xwssclogf(DEBUG, "[T] Interrupted!\n");
+                        break;
+                case -EOVERFLOW:
+                        xwssclogf(WARNING, "[T] Buffer of HWIF is overflow!\n");
+                        xwssc_doze(1); // cppcheck-suppress [misra-c2012-17.7]
+                        break;
+                case -ETIMEDOUT:
+                        xwssclogf(WARNING, "[T] Timeout!\n");
+                        break;
+                default:
+                        xwssclogf(CRIT, "[T] BUG!!! xwssc_txfsm() returns %d!\n", rc);
+                        XWSSC_BUG();
+                        break;
                 }
         }
         if (NULL != xwssc->txq.tmp) {

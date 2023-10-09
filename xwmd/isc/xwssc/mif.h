@@ -88,8 +88,8 @@ enum xwssc_msg_qos_em {
         XWSSC_MSG_QOS_NUM, /**< QOS数量 */
         XWSSC_MSG_QOS_CHKSUM_MSK = (1U), /**< CHKSUM标志的掩码，BIT(0) */
         XWSSC_MSG_QOS_RELIABLE_MSK = (2U), /**< RELIABLE标志的掩码，BIT(1) */
-        XWSSC_MSG_QOS_MSK = XWSSC_MSG_QOS_CHKSUM_MSK |
-                            XWSSC_MSG_QOS_RELIABLE_MSK, /**< 掩码，BIT(0) | BIT(1) */
+        XWSSC_MSG_QOS_MSK = (XWSSC_MSG_QOS_CHKSUM_MSK |
+                             XWSSC_MSG_QOS_RELIABLE_MSK), /**< 掩码，BIT(0) | BIT(1) */
 };
 
 
@@ -207,14 +207,14 @@ xwer_t xwssc_tx(struct xwssc * xwssc,
  * @retval -ENOBUFS: 帧槽被使用完
  * @retval -EPERM: XWSSC未启动
  * @note
+ * + 同步/异步：异步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
  * + 此函数将用户数据放如发送队列就返回。当用户数据被XWSSC的发送线程成功发送
  *   （接收到远程端应答），注册的回调函数会被调用；
  * + 回调函数在XWSSC的发送线程的线程上下文中执行，如果在此函数中使用了会
  *   长时间阻塞线程的函数，会导致XWSSC停止发送。
- * @note
- * + 同步/异步：异步
- * + 上下文：中断、中断底半部、线程
- * + 重入性：可重入
  */
 xwer_t xwssc_eq(struct xwssc * xwssc,
                 const xwu8_t data[], xwsz_t * size,

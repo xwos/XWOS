@@ -120,38 +120,26 @@ xwer_t xwssc_hwifal_tx(struct xwssc * xwssc, const xwu8_t * stream, xwsz_t size)
 }
 
 /**
- * @brief 通过硬件接口接收一帧
+ * @brief 通过硬件接口接收消息帧头
  * @param[in] xwssc: XWSSC对象的指针
- * @param[out] slotbuf: 指向缓冲区的指针，通过此缓冲区返回union xwssc_slot *
+ * @param[out] frm: 指向缓冲区的指针，此缓冲区用于接收消息帧
  * @return 错误码
+ * @retval XWOK: 接收成功
+ * @retval -EAGAIN: 接收错误
  */
 __xwmd_code
-xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf)
+xwer_t xwssc_hwifal_rx_head(struct xwssc * xwssc, struct xwssc_frm * frm)
 {
+        xwer_t rc;
+        xwu8_t * stream;
         xwu8_t delim;
         xwsz_t delimcnt;
-
         xwsz_t rxsize;
         xwsz_t total;
         xwssz_t rest;
-
-        union {
-                xwu8_t data[XWSSC_FRMHEAD_MAXSIZE];
-                struct xwssc_frmhead head;
-        } stream;
         xwu8_t headsize;
         xwu8_t headsize_mirror;
         bool headchk;
-        xwsz_t ecsize;
-        xwsz_t sdusize;
-
-        xwsz_t need;
-        xwsz_t neednum;
-        xwssq_t odr;
-        void * mem;
-        xwu8_t * sdupos;
-        union xwssc_slot * slot;
-        xwer_t rc;
 
         /* 接收帧首定界符 */
         delimcnt = 0;
@@ -171,11 +159,14 @@ xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf)
                 rc = -EAGAIN;
                 goto err_sof_ifrx;
         }
+        // cppcheck-suppress [misra-c2012-17.7]
+        /* memset(frm->sof, XWSSC_SOF, XWSSC_SOF_SIZE); */
 
         /* 接收Head */
-        stream.head.headsize = delim;
-        headsize = XWSSC_FRMHEAD_SIZE(stream.head.headsize);
-        headsize_mirror = XWSSC_FRMHEAD_SIZE_MIRROR(stream.head.headsize);
+        stream = (xwu8_t *)&frm->head;
+        frm->head.headsize = delim;
+        headsize = XWSSC_FRMHEAD_SIZE(frm->head.headsize);
+        headsize_mirror = XWSSC_FRMHEAD_SIZE_MIRROR(frm->head.headsize);
         if (headsize_mirror != xwbop_rbit(xwu8_t, headsize)) {
                 rc = -EAGAIN;
                 goto err_head_ifrx;
@@ -185,49 +176,47 @@ xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf)
         do {
                 rxsize = (xwsz_t)rest;
                 rc = xwssc->hwifops->rx(xwssc,
-                                        &stream.data[total - rxsize],
+                                        &stream[total - rxsize],
                                         &rxsize);
                 if (rc < 0) {
                         goto err_head_ifrx;
                 }
                 rest -= (xwssz_t)rxsize;
         } while (rest > 0);
-        headchk = xwssc_chk_head((xwu8_t *)&stream.head, headsize);
+        headchk = xwssc_chk_head((xwu8_t *)&frm->head, headsize);
         if (!headchk) {
                 rc = -EAGAIN;
                 goto err_head_ifrx;
         }
-        xwssc_decode_sdusize(stream.head.ecsdusz, &sdusize);
+        return XWOK;
 
-        /* 申请接收帧槽 */
-        ecsize = XWSSC_ECSIZE(&stream.head);
-        need = sizeof(union xwssc_slot) + ecsize + sdusize +
-               XWSSC_CRC32_SIZE + XWSSC_EOF_SIZE;
-        neednum = XWBOP_DIV_ROUND_UP(need, XWSSC_MEMBLK_SIZE);
-        odr = xwbop_fls(xwsz_t, neednum);
-        if ((odr < 0) || ((XWSSC_MEMBLK_SIZE << (xwsz_t)odr) < need)) {
-                odr++;
-        }
-        rc = xwmm_bma_alloc(xwssc->mempool, (xwsq_t)odr, &mem);
-        if (rc < 0) {
-                // cppcheck-suppress [misra-c2012-17.7]
-                xwssc_tx_ack_sdu(xwssc,
-                                 stream.head.port, stream.head.id,
-                                 XWSSC_ACK_NOMEM);
-                goto err_bma_alloc;
-        }
-        slot = mem;
-        xwlib_bclst_init_node(&slot->rx.node);
-        slot->rx.frmsize = sizeof(struct xwssc_frm) + ecsize + sdusize +
-                           XWSSC_CRC32_SIZE + XWSSC_EOF_SIZE;
-        // cppcheck-suppress [misra-c2012-17.7]
-        memset(slot->rx.frm.sof, XWSSC_SOF, XWSSC_SOF_SIZE);
-        // cppcheck-suppress [misra-c2012-17.7]
-        memcpy((xwu8_t *)&slot->rx.frm.head, &stream.data,
-               sizeof(struct xwssc_frmhead) + ecsize);
-        sdupos = &slot->rx.frm.head.ecsdusz[ecsize];
+err_head_ifrx:
+err_sof_ifrx:
+        return rc;
+}
 
-        /* 接收body */
+/**
+ * @brief 通过硬件接口接收消息体
+ * @param[in] xwssc: XWSSC对象的指针
+ * @param[out] frm: 指向缓冲区的指针，此缓冲区用于接收消息帧
+ * @param[in] sdusize: 消息体的大小
+ * @return 错误码
+ * @retval XWOK: 接收成功
+ * @retval -EAGAIN: 接收错误
+ */
+__xwmd_code
+xwer_t xwssc_hwifal_rx_body(struct xwssc * xwssc,
+                            struct xwssc_frm * frm, xwsz_t sdusize)
+{
+        xwer_t rc;
+        xwsz_t rxsize;
+        xwsz_t total;
+        xwssz_t rest;
+        xwu8_t * sdupos;
+        xwu8_t delim;
+        xwsz_t delimcnt;
+
+        sdupos = &frm->head.ecsdusz[XWSSC_ECSIZE(&frm->head)];
         total = sdusize + XWSSC_CRC32_SIZE;
         rest = (xwssz_t)total;
         do {
@@ -263,17 +252,11 @@ xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf)
                 goto err_eof_ifrx;
         }
         // cppcheck-suppress [misra-c2012-17.7]
-        memset(&sdupos[sdusize + XWSSC_CRC32_SIZE], XWSSC_EOF, XWSSC_EOF_SIZE);
-
-        *slotbuf = slot;
+        /* memset(&sdupos[sdusize + XWSSC_CRC32_SIZE], XWSSC_EOF, XWSSC_EOF_SIZE); */
         return XWOK;
 
 err_eof_ifrx:
 err_body_ifrx:
-        xwmm_bma_free(xwssc->mempool, mem); // cppcheck-suppress [misra-c2012-17.7]
-err_bma_alloc:
-err_head_ifrx:
-err_sof_ifrx:
         return rc;
 }
 
