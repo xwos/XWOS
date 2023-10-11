@@ -24,7 +24,6 @@
 #include <xwcd/ds/soc/gpio.h>
 #include <xwam/application/ramcode/mif.h>
 #include "bm/xwac/xwds/device.h"
-#include "bm/stm32cube/mif.h"
 #include "bm/rcd/xwssc.h"
 
 #define KEY_GPIO_PORT           XWDS_GPIO_PORT_C
@@ -108,8 +107,8 @@ err_skd_start_lc:
 
 static
 xwer_t board_ramcode_load(struct ramcode * ramcode,
-                       xwu8_t * loadbuf, xwsz_t * bufsize,
-                       xwtm_t to)
+                          xwu8_t * loadbuf, xwsz_t * bufsize,
+                          xwtm_t to)
 {
         XWOS_UNUSED(ramcode);
         return board_xwssc_rx(loadbuf, bufsize, to);

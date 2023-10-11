@@ -32,9 +32,10 @@
 #include <xwam/example/cxx/mif.h>
 #include "bm/xwac/xwds/device.h"
 #include "bm/xwac/fatfs/sdcard.h"
-#include "bm/stm32cube/mif.h"
 #include "bm/app/xwssc.h"
 #include "bm/app/thd.h"
+
+#define LOGTAG "Main"
 
 #define MAIN_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
@@ -86,25 +87,25 @@ xwer_t board_init_devices(void)
         /* Can print log from here */
         rc = stm32xwds_spi_init();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Init SPI ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Init SPI ... <rc:%d>\n", rc);
                 goto err_spi_init;
         }
         rc = stm32xwds_w25q64jv_init();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Init W25Q64JV ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Init W25Q64JV ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_st7735_init();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Init ST7735 ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Init ST7735 ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_i2c_init();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Init I2C ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Init I2C ... <rc:%d>\n", rc);
                 goto err_i2c_init;
         }
         rc = stm32xwds_eeprom_init();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Init EEPROM ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Init EEPROM ... <rc:%d>\n", rc);
         }
         return XWOK;
 
@@ -124,23 +125,23 @@ void board_fini_devices(void)
 
         rc = stm32xwds_eeprom_fini();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Fini EEPROM ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Fini EEPROM ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_i2c_fini();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Fini I2C ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Fini I2C ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_st7735_fini();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Fini ST7735 ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Fini ST7735 ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_w25q64jv_fini();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Fini W25Q64JV ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Fini W25Q64JV ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_spi_fini();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Fini SPI ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Fini SPI ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_uart_fini();
         if (rc < 0) {
@@ -165,7 +166,7 @@ xwer_t main_task(void * arg)
         /* Mount sdcard */
         rc = sdcard_fatfs_mount();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Mount SDCard ... <rc:%d>\n", rc);
+                xwlogf(ERR, LOGTAG, "Mount SDCard ... <rc:%d>\n", rc);
         }
 
         /* Draw Logo */
@@ -174,7 +175,7 @@ xwer_t main_task(void * arg)
 #ifdef XWCFG_LIBC__newlib
         rc = newlibac_init();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Init newlib ... <rc:%d>", rc);
+                xwlogf(ERR, LOGTAG, "Init newlib ... <rc:%d>", rc);
                 goto err_newlibac_init;
         }
 #endif
@@ -182,32 +183,32 @@ xwer_t main_task(void * arg)
 #ifdef XWCFG_LIBC__picolibc
         rc = picolibcac_init();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Init picolibc ... <rc:%d>", rc);
+                xwlogf(ERR, LOGTAG, "Init picolibc ... <rc:%d>", rc);
                 goto err_picolibcac_init;
         }
 #endif
 
         rc = xwos_example_cxx();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Start C++ example ... <rc:%d>", rc);
+                xwlogf(ERR, LOGTAG, "Start C++ example ... <rc:%d>", rc);
         }
 
         rc = child_thd_start();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Start child threads ... <rc:%d>", rc);
+                xwlogf(ERR, LOGTAG, "Start child threads ... <rc:%d>", rc);
                 goto err_child_thd_start;
         }
 
         rc = board_xwssc_init();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Start XWSSC ... <rc:%d>", rc);
+                xwlogf(ERR, LOGTAG, "Start XWSSC ... <rc:%d>", rc);
                 goto err_xwssc_init;
         }
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
         rc = xwlua_start();
         if (rc < 0) {
-                xwlogf(ERR, "main", "Start lua VM ... <rc:%d>", rc);
+                xwlogf(ERR, LOGTAG, "Start lua VM ... <rc:%d>", rc);
                 goto err_xwlua_start;
         }
 #endif

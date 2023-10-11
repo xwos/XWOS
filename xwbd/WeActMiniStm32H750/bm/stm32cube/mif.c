@@ -19,7 +19,6 @@
  */
 
 #include "board/std.h"
-#include <xwos/lib/xwbop.h>
 #include "bm/stm32cube/Core/Inc/main.h"
 
 extern xwsz_t itcm_mr_origin[];

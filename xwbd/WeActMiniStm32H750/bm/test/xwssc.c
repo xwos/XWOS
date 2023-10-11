@@ -24,6 +24,8 @@
 #include <xwos/osal/thd.h>
 #include "bm/app/xwssc.h"
 
+#define LOGTAG "TST|XWSSC"
+
 xwer_t board_xwssc_txtsttask(void * arg)
 {
         xwer_t rc;
@@ -54,7 +56,7 @@ xwer_t board_xwssc_txtsttask(void * arg)
                                 count++;
                         } else {
                                 xwlogf(ERR,
-                                       "[T|XWSSC]", "Failed to TX ... <%ld>\n",
+                                       LOGTAG, "Failed to TX ... <%ld>\n",
                                        rc);
                         }
                 }
@@ -100,7 +102,7 @@ xwer_t board_xwssc_rxtsttask(void * arg)
                 rxsz = sizeof(msg);
                 rc = board_xwssc_rx((xwu8_t *)msg, &rxsz, 1, XWTM_MAX);
                 if (XWOK == rc) {
-                        xwlogf(INFO, "[T|XWSSC]", "RX(%ld bytes):[%s]\n", rxsz, msg);
+                        xwlogf(INFO, LOGTAG, "RX(%ld bytes):[%s]\n", rxsz, msg);
                 }
         }
         return rc;

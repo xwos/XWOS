@@ -24,6 +24,8 @@
 #include <xwcd/perpheral/i2c/eeprom/driver.h>
 #include "bm/xwac/xwds/device.h"
 
+#define LOGTAG "TST|EEPROM"
+
 void board_eeprom_test(void)
 {
         xwu8_t rdbuf[64];
@@ -35,9 +37,9 @@ void board_eeprom_test(void)
                                 rdbuf, &rdsz, 0,
                                 xwtm_ft(xwtm_s(1)));
         if (rc < 0) {
-                xwlogf(ERR, "[T][EEPROM]", "Failed to read EEPROM ... <%ld>\n", rc);
+                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
         } else {
                 rdbuf[63] = 0;
-                xwlogf(INFO, "[T][EEPROM]", "EEPROM:%s\n", rdbuf);
+                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
         }
 }

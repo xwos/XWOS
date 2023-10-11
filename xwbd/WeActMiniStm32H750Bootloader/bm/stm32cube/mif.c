@@ -19,7 +19,6 @@
  */
 
 #include "board/std.h"
-#include <xwos/lib/xwbop.h>
 #include "Core/Inc/main.h"
 #include "Core/Inc/quadspi.h"
 
@@ -31,10 +30,6 @@ extern xwsz_t dtcm_mr_size[];
 
 extern xwsz_t axisram_mr_origin[];
 extern xwsz_t axisram_mr_size[];
-
-extern xwu8_t data4_lma_base[];
-extern xwu8_t data4_vma_base[];
-extern xwu8_t data4_vma_end[];
 
 /**
  * @brief 连接占位符
@@ -57,9 +52,6 @@ void stm32cube_init_vtor(void);
 
 static
 void axisram_init(void);
-
-static
-void sram4_init(void);
 
 /**
  * @brief STM32CUBE模块的低级初始化
@@ -88,7 +80,6 @@ void stm32cube_init(void)
         HAL_Init();
         SystemClock_Config();
         axisram_init();
-        /* sram4_init(); */
         MX_W25Q_Init();
 }
 
@@ -119,24 +110,5 @@ void axisram_init(void)
 
         for (i = 0; i < n; i++) {
                 origin[i] = 0;
-        }
-}
-
-static
-void sram4_init(void)
-{
-        xwsz_t count, i;
-        xwu8_t * src;
-        xwu8_t * dst;
-
-        src = data4_lma_base;
-        dst = data4_vma_base;
-        if (dst != src) {
-                count = (xwsz_t)data4_vma_end - (xwsz_t)data4_vma_base;
-                for (i = 0; i < count; i++) {
-                        *dst = *src;
-                        dst++;
-                        src++;
-                }
         }
 }
