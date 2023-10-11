@@ -20,6 +20,7 @@
 
 #include "board/std.h"
 #include <xwos/osal/pm.h>
+#include <xwcd/ds/xwds.h>
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include "bm/stm32cube/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_cortex.h"
 #include "bm/stm32cube/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_pwr.h"
@@ -34,8 +35,7 @@ void xwosac_pmcb_resume(void * arg)
         xwirq_t irq;
 
         rc = xwos_irq_get_id(&irq); /* 获取中断号，用于调试 */
-        /* 恢复stm32cube中的所有设备 */
-        xwds_pm_resume(&stm32xwds);
+        xwds_pm_resume(&stm32xwds); /* 恢复所有设备 */
 }
 
 void xwosac_pmcb_suspend(void * arg)
@@ -44,10 +44,7 @@ void xwosac_pmcb_suspend(void * arg)
         xwirq_t irq;
 
         rc = xwos_irq_get_id(&irq); /* 获取中断号或上下文，用于调试 */
-        /* 暂停stm32cube：
-           + 暂停所有设备
-           + 配置GPIO */
-        xwds_pm_suspend(&stm32xwds);
+        xwds_pm_suspend(&stm32xwds); /* 暂停所有设备 */
 
         /* 设置休眠方式为STOP模式：
            STOP模式下寄存器与内部RAM数据不丢失，
@@ -68,8 +65,7 @@ void xwosac_pmcb_wakeup(void * arg)
 
 void xwosac_pmcb_sleep(void * arg)
 {
-        /* 通过 WFI 指令进入STOP模式 */
-        cm_wfi();
+        cm_wfi(); /* 通过 WFI 指令进入STOP模式 */
 }
 
 void xwosac_pmcb_init(void)

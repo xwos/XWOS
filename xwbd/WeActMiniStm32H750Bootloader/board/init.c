@@ -47,5 +47,6 @@ void xwos_postinit(void)
         stm32cube_init();
         stm32xwds_init();
         stm32xwds_soc_init();
+        stm32cube_cache_init();
         xwlibac_crc_init();
 }

@@ -88,13 +88,19 @@ void stm32cube_init(void)
         HAL_Init();
         SystemClock_Config();
         axisram_init();
-        sram4_init();
+        /* sram4_init(); */
         MX_W25Q_Init();
-        /*
-           若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
-           开启Cache可能会因为Cache的预取操作导致宕机。
-           开启Cache必须在上述器件初始化完成之后。
-         */
+}
+
+/**
+ * @brief STM32CUBE模块：初始化Cache
+ * @details
+ * 若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
+ * 开启Cache可能会因为Cache的预取操作导致宕机。开启Cache必须在上述器件初始化完成之后。
+ */
+__xwbsp_init_code
+void stm32cube_cache_init(void)
+{
 #if defined(BRDCFG_ICACHE) && (1 == BRDCFG_ICACHE)
         SCB_EnableICache();
 #endif
