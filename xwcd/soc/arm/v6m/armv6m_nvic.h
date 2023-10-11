@@ -35,7 +35,9 @@
 #define SOC_IRQ_PRIO_MSK (((1U << CM_NVIC_PRIO_BITNUM) - 1U) << CM_NVIC_PRIO_SHIFT)
 
 #define SOC_IRQ_PRIO_HIGHEST 0x0U
+#define SOC_IRQ_PRIO_SUBHIGH 0x1U
 #define SOC_IRQ_PRIO_LOWEST ((1U << CM_NVIC_PRIO_BITNUM) - 1U)
+#define SOC_IRQ_PRIO_SUBLOW (SOC_IRQ_PRIO_LOWEST - 1U)
 
 enum soc_exc_em {
         SOC_SP_TOP = -16, /**< initial value of stack point */

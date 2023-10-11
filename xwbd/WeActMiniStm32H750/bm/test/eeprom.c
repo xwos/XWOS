@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：用户程序：xwssc
+ * @brief 板级描述层：测试程序：eeprom
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,16 +18,26 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_app_xwssc_h__
-#define __bm_app_xwssc_h__
-
 #include "board/std.h"
+#include <xwos/lib/xwlog.h>
+#include <xwos/osal/time.h>
+#include <xwcd/perpheral/i2c/eeprom/driver.h>
+#include "bm/xwac/xwds/device.h"
 
-xwer_t board_xwssc_init(void);
-xwer_t board_xwssc_fini(void);
-struct xwssc * board_xwssc_get(void);
-xwer_t board_xwssc_tx(const xwu8_t data[], xwsz_t * size, xwu8_t port, xwtm_t to);
-xwer_t board_xwssc_rx(xwu8_t rxbuf[], xwsz_t * size, xwu8_t port, xwtm_t to);
-bool board_xwssc_tst_connected(void);
+void board_eeprom_test(void)
+{
+        xwu8_t rdbuf[64];
+        xwsz_t rdsz;
+        xwer_t rc;
 
-#endif /* bm/app/xwssc.h */
+        rdsz = sizeof(rdbuf);
+        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
+                                rdbuf, &rdsz, 0,
+                                xwtm_ft(xwtm_s(1)));
+        if (rc < 0) {
+                xwlogf(ERR, "[T][EEPROM]", "Failed to read EEPROM ... <%ld>\n", rc);
+        } else {
+                rdbuf[63] = 0;
+                xwlogf(INFO, "[T][EEPROM]", "EEPROM:%s\n", rdbuf);
+        }
+}

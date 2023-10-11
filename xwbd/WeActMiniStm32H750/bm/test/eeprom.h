@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：用户程序：xwssc
+ * @brief 板级描述层：测试程序：eeprom
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,16 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_app_xwssc_h__
-#define __bm_app_xwssc_h__
+#ifndef __bm_test_eeprom_h__
+#define __bm_test_eeprom_h__
 
 #include "board/std.h"
 
-xwer_t board_xwssc_init(void);
-xwer_t board_xwssc_fini(void);
-struct xwssc * board_xwssc_get(void);
-xwer_t board_xwssc_tx(const xwu8_t data[], xwsz_t * size, xwu8_t port, xwtm_t to);
-xwer_t board_xwssc_rx(xwu8_t rxbuf[], xwsz_t * size, xwu8_t port, xwtm_t to);
-bool board_xwssc_tst_connected(void);
+void board_eeprom_test(void);
 
-#endif /* bm/app/xwssc.h */
+#endif /* bm/test/eeprom.h */
