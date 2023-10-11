@@ -42,7 +42,6 @@
 #define XWCDCFG_ds_SOC_EIRQ_ROISRT                              0
 #define XWCDCFG_ds_SOC_DMA                                      0
 #define XWCDCFG_ds_SOC_DMA_ROCBT                                0
-#define XWCDCFG_ds_SOC_ERAM                                     1
 
 /******** ******** UART ******** ********/
 #define XWCDCFG_ds_UART                                         1

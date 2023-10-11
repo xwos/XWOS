@@ -41,9 +41,6 @@ ifeq ($(XWCDCFG_ds_SOC),y)
     ifeq ($(XWCDCFG_ds_SOC_EIRQ),y)
         XWMO_CSRCS += soc/eirq.c
     endif
-    ifeq ($(XWCDCFG_ds_SOC_ERAM),y)
-        XWMO_CSRCS += soc/eram.c
-    endif
 endif
 ifeq ($(XWCDCFG_ds_UART),y)
     XWMO_CSRCS += uart/controller.c

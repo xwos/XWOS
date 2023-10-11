@@ -121,8 +121,6 @@ const struct xwds_soc_driver stm32xwds_soc_drv = {
 
         .eirq_req = stm32xwds_soc_drv_eirq_req,
         .eirq_rls = stm32xwds_soc_drv_eirq_rls,
-
-        .eram_tst = NULL,
 };
 
 struct stm32xwds_soc_cfg stm32xwds_soc_cfg = {

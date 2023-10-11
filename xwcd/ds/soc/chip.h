@@ -122,11 +122,6 @@ struct xwds_soc_driver {
         xwer_t (* dma_stop)(struct xwds_soc * /*soc*/,
                             xwid_t /*ch*/); /**< 停止DMA传输 */
 #endif
-
-#if defined(XWCDCFG_ds_SOC_ERAM) && (1 == XWCDCFG_ds_SOC_ERAM)
-        xwer_t (* eram_tst)(struct xwds_soc * /*soc*/,
-                            xwptr_t * /*erraddr*/); /**< 测试ERAM */
-#endif
 };
 
 /**
@@ -197,13 +192,6 @@ struct xwds_soc {
                 __xwds_soc_dma_tbl_qualifier xwds_dma_cbarg_t * chcbargs;
                                                 /**< DMA通道传输结束参数表 */
         } dma; /**< DMA描述 */
-#endif
-
-#if defined(XWCDCFG_ds_SOC_ERAM) && (1 == XWCDCFG_ds_SOC_ERAM)
-        struct {
-                xwptr_t origin; /**< 基地址 */
-                xwsz_t size; /**< 大小 */
-        } eram;
 #endif
 };
 
