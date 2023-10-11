@@ -20,21 +20,11 @@
 
 #include "board/std.h"
 #include "Core/Inc/main.h"
-#include "Core/Inc/quadspi.h"
-
-extern xwsz_t itcm_mr_origin[];
-extern xwsz_t itcm_mr_size[];
-
-extern xwsz_t dtcm_mr_origin[];
-extern xwsz_t dtcm_mr_size[];
-
-extern xwsz_t axisram_mr_origin[];
-extern xwsz_t axisram_mr_size[];
 
 /**
- * @brief 连接占位符
- * @note
- * + 确保链接时使用此符号的文件。
+ * @brief 链接选择表
+ * @details
+ * 用于在符号重定义时，选择链接的符号。
  */
 void * const stm32cube_linkage_table[] = {
         stm32cube_override_linkage_msp,
@@ -50,16 +40,15 @@ void SystemClock_Config(void);
 extern
 void stm32cube_init_vtor(void);
 
-static
-void axisram_init(void);
-
 /**
- * @brief STM32CUBE模块的低级初始化
+ * @brief STM32CUBE模块：预初始化
  * @details
- * 此函数在 `board_lowlevel_init()` 中被调用。只能配置部分寄存器，不可访问全局变量。
+ * + 此函数在 `xwos_preinit()` 中被调用。
+ * + 此函数被设计为，在重定向数据 `soc_relocate_data()` 函数之 **前** 调用。
+ *   只能配置部分寄存器，不可访问全局变量。
  */
 __xwbsp_init_code
-void stm32cube_lowlevel_init(void)
+void stm32cube_preinit(void)
 {
         SystemInit();
         __HAL_RCC_D2SRAM1_CLK_ENABLE();
@@ -70,45 +59,15 @@ void stm32cube_lowlevel_init(void)
 }
 
 /**
- * @brief STM32CUBE模块的初始化
+ * @brief STM32CUBE模块：初始化
  * @details
- * 此函数在 `board_init()` 中被调用。
+ * + 此函数可在在 `xwos_preinit()` 或 `xwos_postinit()` 中被调用。
+ * + 此函数被设计为，在重定向数据 `soc_relocate_data()` 函数之 **后** 调用。
+ *   可访问全局变量。
  */
 __xwbsp_init_code
 void stm32cube_init(void)
 {
         HAL_Init();
         SystemClock_Config();
-        axisram_init();
-        MX_W25Q_Init();
-}
-
-/**
- * @brief STM32CUBE模块：初始化Cache
- * @details
- * 若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
- * 开启Cache可能会因为Cache的预取操作导致宕机。开启Cache必须在上述器件初始化完成之后。
- */
-__xwbsp_init_code
-void stm32cube_cache_init(void)
-{
-#if defined(BRDCFG_ICACHE) && (1 == BRDCFG_ICACHE)
-        SCB_EnableICache();
-#endif
-#if defined(BRDCFG_DCACHE) && (1 == BRDCFG_DCACHE)
-        SCB_EnableDCache();
-        SCB_CleanInvalidateDCache();
-#endif
-}
-
-static
-void axisram_init(void)
-{
-        xwsq_t i;
-        xwsz_t * origin = (xwsz_t *)axisram_mr_origin;
-        xwsz_t n = (xwsz_t)axisram_mr_size / sizeof(xwsz_t);
-
-        for (i = 0; i < n; i++) {
-                origin[i] = 0;
-        }
 }

@@ -23,8 +23,7 @@
 
 #include "board/std.h"
 
-void stm32cube_lowlevel_init(void);
+void stm32cube_preinit(void);
 void stm32cube_init(void);
-void stm32cube_cache_init(void);
 
 #endif /* bm/stm32cube/mif.h */

@@ -89,9 +89,10 @@ void xwos_preinit(void)
 {
         arch_init();
         soc_init();
-        stm32cube_lowlevel_init();
+        stm32cube_preinit();
         soc_relocate_data();
         soc_relocate_ivt();
+        stm32cube_init();
 }
 
 /**
@@ -100,10 +101,8 @@ void xwos_preinit(void)
 __xwbsp_init_code
 void xwos_postinit(void)
 {
-        stm32cube_init();
         stm32xwds_init();
         stm32xwds_soc_init();
-        stm32cube_cache_init();
         xwosac_pmcb_init();
         xwlibac_crc_init();
         board_mm_init();

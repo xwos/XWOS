@@ -19,13 +19,13 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
+include xwbs/util/mk/xwmo.mk
 include $(XWOS_ARCH_DIR)/arch.mk
 include $(XWOS_CPU_DIR)/cpu.mk
 include $(XWOS_SOC_DIR)/soc.mk
 include $(XWOS_BRD_DIR)/brd.mk
 include $(XWOS_OS_DIR)/xwos.mk
 include $(XWOS_BRD_DIR)/lib.mk
-include xwbs/util/mk/xwmo.mk
 include xwbs/$(XWCFG_ARCH).$(XWCFG_COMPILER).rule
 
 ARCH_INCDIRS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_INCDIRS))

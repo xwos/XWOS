@@ -26,6 +26,7 @@
 #include "bm/xwac/xwds/device.h"
 #include "bm/stm32cube/Core/Inc/dma.h"
 #include "bm/stm32cube/Core/Inc/gpio.h"
+#include "bm/stm32cube/Core/Inc/quadspi.h"
 
 struct stm32xwds_soc_cfg {
         struct {
@@ -81,6 +82,9 @@ static
 xwer_t stm32xwds_soc_drv_gpio_input(struct xwds_soc * soc,
                                     xwid_t port, xwsq_t pinmask,
                                     xwsq_t * in);
+
+static
+void stm32xwds_soc_cache_init(void);
 
 const struct xwds_soc_driver stm32xwds_soc_drv = {
         .base = {
@@ -164,6 +168,11 @@ xwer_t stm32xwds_soc_drv_start(struct xwds_device * dev)
 
         MX_GPIO_Init();
         MX_DMA_Init();
+        MX_W25Q_Init();
+        /* 若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
+         * 开启Cache可能会因为Cache的预取操作导致宕机。
+         * 开启Cache必须在上述器件初始化完成之后。*/
+        stm32xwds_soc_cache_init();
 
         return XWOK;
 }
@@ -194,6 +203,18 @@ xwer_t stm32xwds_soc_drv_resume(struct xwds_device * dev)
         return XWOK;
 }
 #endif
+
+static
+void stm32xwds_soc_cache_init(void)
+{
+#if defined(BRDCFG_ICACHE) && (1 == BRDCFG_ICACHE)
+        SCB_EnableICache();
+#endif
+#if defined(BRDCFG_DCACHE) && (1 == BRDCFG_DCACHE)
+        SCB_EnableDCache();
+        SCB_CleanInvalidateDCache();
+#endif
+}
 
 /******** ******** gpio operation driver ******** ********/
 static

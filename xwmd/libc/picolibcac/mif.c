@@ -23,9 +23,9 @@ extern void __libc_init_array(void);
 extern void __libc_fini_array(void);
 
 /**
- * @brief 静态链接表
- * @note
- * + 此函数表作为静态链接占位符，可保证符号重名时优先使用此库中的符号。
+ * @brief 链接选择表
+ * @details
+ * 用于在符号重定义时，选择链接的符号。
  */
 // cppcheck-suppress [misra-c2012-8.4]
 const picolibcac_linkage_f picolibcac_linkage_table[] = {
