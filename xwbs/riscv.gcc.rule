@@ -81,7 +81,7 @@ ELIBS += $(ELIBS_gcc)
 
 D ?= 1
 WARN := -Wall -Wextra -Wsign-conversion -Werror
-WARN += -Wno-undef -Wno-cast-function-type
+WARN += -Wno-undef -Wno-cast-function-type -Wno-error=unused-parameter
 INCDIRS = -I. \
           -I$(XWOS_ARCH_DIR) \
           -I$(XWOS_CPU_DIR) \
