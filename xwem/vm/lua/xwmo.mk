@@ -19,7 +19,7 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include xwbs/util/mk/xwmo.mk
+include xwbs/functions.mk
 
 CORE_O := $(shell xwbs/util/el/makefile-grep-variable.el -a CORE_O $(call getXwmoDir)/src/Makefile)
 LUA_CORE := $(addprefix src/,$(addsuffix .c,$(basename $(CORE_O))))

@@ -19,7 +19,7 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include xwbs/util/mk/xwmo.mk
+include xwbs/functions.mk
 include $(XWOS_ARCH_DIR)/arch.mk
 include $(XWOS_CPU_DIR)/cpu.mk
 include $(XWOS_SOC_DIR)/soc.mk

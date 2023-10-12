@@ -18,7 +18,7 @@
 # > limitations under the License.
 #
 
-include xwbs/util/mk/xwmo.mk
+include xwbs/functions.mk
 
 XWCD_LIST := $(shell test -d $(XWOS_XWCD_DIR) && \
                      find $(XWOS_XWCD_DIR) -type f -name "xwmo.mk" -exec dirname {} \;)

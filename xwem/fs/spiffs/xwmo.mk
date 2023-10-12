@@ -19,7 +19,7 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include xwbs/util/mk/xwmo.mk
+include xwbs/functions.mk
 
 XWMO_CSRCS := spiffs_nucleus.c spiffs_gc.c spiffs_hydrogen.c spiffs_cache.c spiffs_check.c
 XWMO_CFLAGS := -DCONFIG_BUILD_SPIFFS -Wno-sign-conversion -Wno-undef

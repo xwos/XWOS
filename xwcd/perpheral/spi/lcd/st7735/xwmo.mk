@@ -19,7 +19,7 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include xwbs/util/mk/xwmo.mk
+include xwbs/functions.mk
 
 $(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_MASTER,y))
 $(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_PERPHERAL,y))

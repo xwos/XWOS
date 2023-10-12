@@ -10,7 +10,7 @@
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include xwbs/util/mk/xwmo.mk
+include xwbs/functions.mk
 XWMO_CSRCS := allocator.c
 XWMO_CSRCS += xwtm.c skd.c thd.c swt.c pm.c
 XWMO_CSRCS += spinlock.c seqlock.c mtx.c

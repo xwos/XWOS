@@ -20,7 +20,7 @@
 
 # 引入配置
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include xwbs/util/mk/xwmo.mk
+include xwbs/functions.mk
 
 # 定义C源码
 XWMO_CSRCS := mif.c

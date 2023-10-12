@@ -24,7 +24,7 @@ include $(XWOS_SOC_DIR)/soc.mk
 include $(XWOS_BRD_DIR)/brd.mk
 include $(XWOS_OS_DIR)/xwos.mk
 include $(XWOS_BRD_DIR)/lib.mk
-include xwbs/util/mk/xwmo.mk
+include xwbs/functions.mk
 include xwbs/$(XWCFG_ARCH).$(XWCFG_COMPILER).rule
 
 XWMO_NAME := $(call getXwmoName)

@@ -58,6 +58,36 @@ define XwmoWildcardRecursively
 $(subst $(call getXwmoDir)/,,$(shell find $(call getXwmoDir)/$(2) -name $(1)))
 endef
 
+XwosWildcard = $(subst $(XWOS_OS_DIR)/,,$(wildcard $(XWOS_OS_DIR)/$(2)/$(1)))
+
+define XwosWildcardRecursively
+$(subst $(XWOS_OS_DIR)/,,$(shell find $(XWOS_OS_DIR)/$(2) -name $(1)))
+endef
+
+ArchWildcard = $(subst $(XWOS_ARCH_DIR)/,,$(wildcard $(XWOS_ARCH_DIR)/$(2)/$(1)))
+
+define ArchWildcardRecursively
+$(subst $(XWOS_ARCH_DIR)/,,$(shell find $(XWOS_ARCH_DIR)/$(2) -name $(1)))
+endef
+
+CpuWildcard = $(subst $(XWOS_CPU_DIR)/,,$(wildcard $(XWOS_CPU_DIR)/$(2)/$(1)))
+
+define CpuWildcardRecursively
+$(subst $(XWOS_CPU_DIR)/,,$(shell find $(XWOS_CPU_DIR)/$(2) -name $(1)))
+endef
+
+SocWildcard = $(subst $(XWOS_SOC_DIR)/,,$(wildcard $(XWOS_SOC_DIR)/$(2)/$(1)))
+
+define SocWildcardRecursively
+$(subst $(XWOS_SOC_DIR)/,,$(shell find $(XWOS_SOC_DIR)/$(2) -name $(1)))
+endef
+
+BrdWildcard = $(subst $(XWOS_BRD_DIR)/,,$(wildcard $(XWOS_BRD_DIR)/$(2)/$(1)))
+
+define BrdWildcardRecursively
+$(subst $(XWOS_BRD_DIR)/,,$(shell find $(XWOS_BRD_DIR)/$(2) -name $(1)))
+endef
+
 define XwmoReqCfg
 ifneq ($$($(1)),$(2))
     $$(error "$(1) is not configured to $(2)!")

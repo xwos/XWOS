@@ -18,7 +18,7 @@
 # > limitations under the License.
 #
 
-include xwbs/util/mk/xwmo.mk
+include xwbs/functions.mk
 
 OEM_LIST := $(shell test -d $(XWOS_OEM_DIR) && \
                     find $(XWOS_OEM_DIR) -type f -name "xwmo.mk" -exec dirname {} \;)
