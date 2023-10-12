@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief 板级描述层：XWOS适配层：内核：HOOK
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,27 +19,29 @@
  */
 
 #include "board/std.h"
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/time.h>
-#include <xwcd/perpheral/i2c/eeprom/driver.h>
-#include "board/xwac/xwds/device.h"
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
+#include <xwos/ospl/skd.h>
 
-#define LOGTAG "TST|EEPROM"
-
-void board_eeprom_test(void)
+__xwos_code
+void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
 {
-        xwu8_t rdbuf[64];
-        xwsz_t rdsz;
-        xwer_t rc;
+        XWOS_UNUSED(xwskd);
+        cm_wfi();
+}
 
-        rdsz = sizeof(rdbuf);
-        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
-                                rdbuf, &rdsz, 0,
-                                xwtm_ft(xwtm_s(1)));
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
-        } else {
-                rdbuf[63] = 0;
-                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
-        }
+extern
+void HAL_IncTick(void);
+
+__xwos_code
+void board_xwskd_syshwt_hook(struct xwospl_skd * xwskd)
+{
+        XWOS_UNUSED(xwskd);
+        HAL_IncTick();
+}
+
+__xwos_code
+void board_thd_postinit_hook(struct xwospl_thd * thd)
+{
+        XWOS_UNUSED(thd);
+        /* Add MPU code here. */
 }

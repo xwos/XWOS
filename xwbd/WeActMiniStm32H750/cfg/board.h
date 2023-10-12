@@ -56,10 +56,8 @@
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BMCFG_stm32cube                         1
-#define BMCFG_xwac                              1
-#define BMCFG_luamod                            1
 #define BMCFG_rustapp                           1
-#define BMCFG_test                              1
 #define BMCFG_app                               1
+#define BMCFG_test                              1
 
 #endif /* cfg/board.h */

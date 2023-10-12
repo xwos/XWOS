@@ -25,7 +25,7 @@
 #include "board/std.h"
 #include <string.h>
 #include <xwos/lib/xwbop.h>
-#include "bm/xwac/xwds/i2cm.h"
+#include "board/xwac/xwds/i2cm.h"
 
 /* Buffer of hi2c1 is in SRAM. Both SRAM & DMA1 are in D2 Domain.
    Data path in AHB bus matrix is shorter. */

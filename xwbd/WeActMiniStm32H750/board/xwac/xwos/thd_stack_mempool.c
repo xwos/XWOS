@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief 板级描述层：XWOS适配层：内核：线程栈内存池
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,27 +19,28 @@
  */
 
 #include "board/std.h"
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/time.h>
-#include <xwcd/perpheral/i2c/eeprom/driver.h>
-#include "board/xwac/xwds/device.h"
+#include "board/axisram.h"
 
-#define LOGTAG "TST|EEPROM"
-
-void board_eeprom_test(void)
+__xwos_code
+xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
 {
-        xwu8_t rdbuf[64];
-        xwsz_t rdsz;
+        union {
+                xwstk_t * stk;
+                void * anon;
+        } mem;
         xwer_t rc;
 
-        rdsz = sizeof(rdbuf);
-        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
-                                rdbuf, &rdsz, 0,
-                                xwtm_ft(xwtm_s(1)));
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
+        rc = xwmm_mempool_malloc(axisram_mempool, stack_size, &mem.anon);
+        if (XWOK == rc) {
+                *membuf = mem.stk;
         } else {
-                rdbuf[63] = 0;
-                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
+                *membuf = NULL;
         }
+        return rc;
+}
+
+__xwos_code
+xwer_t board_thd_stack_pool_free(xwstk_t * stk)
+{
+        return xwmm_mempool_free(axisram_mempool, stk);
 }

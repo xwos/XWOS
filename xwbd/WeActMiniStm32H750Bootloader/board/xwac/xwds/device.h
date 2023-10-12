@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief 板级描述层：XWOS适配层：XWOS设备栈：设备
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,28 +18,28 @@
  * > limitations under the License.
  */
 
+#ifndef __board_xwac_xwds_device_h__
+#define __board_xwac_xwds_device_h__
+
 #include "board/std.h"
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/time.h>
-#include <xwcd/perpheral/i2c/eeprom/driver.h>
-#include "board/xwac/xwds/device.h"
+#include <xwcd/ds/device.h>
+#include <xwcd/ds/soc/chip.h>
+#include <xwcd/ds/uart/controller.h>
 
-#define LOGTAG "TST|EEPROM"
+/******** ******** ds ******** ********/
+extern struct xwds stm32xwds;
+void stm32xwds_init(void);
+void stm32xwds_fini(void);
 
-void board_eeprom_test(void)
-{
-        xwu8_t rdbuf[64];
-        xwsz_t rdsz;
-        xwer_t rc;
+/******** ******** soc ******** ********/
+extern struct xwds_soc stm32xwds_soc;
+xwer_t stm32xwds_soc_init(void);
+xwer_t stm32xwds_soc_fini(void);
 
-        rdsz = sizeof(rdbuf);
-        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
-                                rdbuf, &rdsz, 0,
-                                xwtm_ft(xwtm_s(1)));
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
-        } else {
-                rdbuf[63] = 0;
-                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
-        }
-}
+/******** ******** uart ******** ********/
+extern struct xwds_uartc stm32xwds_usart1;
+extern struct xwds_uartc stm32xwds_usart3;
+xwer_t stm32xwds_uart_init(void);
+xwer_t stm32xwds_uart_fini(void);
+
+#endif /* board/xwac/xwds/device.h */

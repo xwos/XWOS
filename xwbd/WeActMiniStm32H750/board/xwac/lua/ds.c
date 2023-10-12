@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief 板级描述层：XWOS适配层：LUA：XWOS设备栈
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,27 +19,17 @@
  */
 
 #include "board/std.h"
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/time.h>
-#include <xwcd/perpheral/i2c/eeprom/driver.h>
+#include <xwem/vm/lua/src/lauxlib.h>
+#include <xwem/vm/lua/xwlua/xwds/soc.h>
+#include <xwem/vm/lua/xwlua/xwds/uart.h>
+#include <xwem/vm/lua/xwlua/xwds/spim.h>
 #include "board/xwac/xwds/device.h"
 
-#define LOGTAG "TST|EEPROM"
-
-void board_eeprom_test(void)
+void xwlua_open_brdlibs(lua_State * L)
 {
-        xwu8_t rdbuf[64];
-        xwsz_t rdsz;
-        xwer_t rc;
-
-        rdsz = sizeof(rdbuf);
-        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
-                                rdbuf, &rdsz, 0,
-                                xwtm_ft(xwtm_s(1)));
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
-        } else {
-                rdbuf[63] = 0;
-                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
-        }
+        xwlua_soc_register(L, "stm32", &stm32xwds_soc);
+        xwlua_uart_register(L, "usart1", &stm32xwds_usart1);
+        xwlua_uart_register(L, "usart3", &stm32xwds_usart3);
+        xwlua_spim_register(L, "spi1", &stm32xwds_spi1m);
+        xwlua_spim_register(L, "spi4", &stm32xwds_spi4m);
 }

@@ -86,7 +86,7 @@ else
 endif
 D ?= 1
 WARN := -Wall -Wextra -Wundef -Wsign-conversion -Werror
-WARN += -Wno-cast-function-type -Wno-error=unused-parameter
+WARN += -Wno-error=unused-parameter
 INCDIRS = -I. \
           -I$(XWOS_ARCH_DIR) \
           -I$(XWOS_CPU_DIR) \

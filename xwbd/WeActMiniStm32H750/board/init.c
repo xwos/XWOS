@@ -23,10 +23,10 @@
 #include <xwcd/soc/arm/v7m/m7/stm32/soc_init.h>
 #include <string.h>
 #include <xwos/mm/mempool/allocator.h>
+#include "board/xwac/xwos/pm.h"
+#include "board/xwac/xwlib/crc.h"
+#include "board/xwac/xwds/device.h"
 #include "bm/stm32cube/mif.h"
-#include "bm/xwac/xwos/pm.h"
-#include "bm/xwac/xwlib/crc.h"
-#include "bm/xwac/xwds/device.h"
 
 extern xwsz_t axisram_mr_origin[];
 extern xwsz_t axisram_mr_size[];

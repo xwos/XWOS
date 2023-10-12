@@ -24,7 +24,7 @@
 /* USER CODE BEGIN 0 */
 #include "board/std.h"
 #include <string.h>
-#include "bm/xwac/xwds/spim.h"
+#include "board/xwac/xwds/spim.h"
 
 struct MX_SPI_MasterDriverData hspi1_drvdata;
 struct MX_SPI_MasterDriverData hspi4_drvdata;

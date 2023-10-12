@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief 板级描述层：XWOS适配层：XWRUST：内存池
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,27 +19,7 @@
  */
 
 #include "board/std.h"
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/time.h>
-#include <xwcd/perpheral/i2c/eeprom/driver.h>
-#include "board/xwac/xwds/device.h"
+#include <xwos/mm/mempool/allocator.h>
 
-#define LOGTAG "TST|EEPROM"
-
-void board_eeprom_test(void)
-{
-        xwu8_t rdbuf[64];
-        xwsz_t rdsz;
-        xwer_t rc;
-
-        rdsz = sizeof(rdbuf);
-        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
-                                rdbuf, &rdsz, 0,
-                                xwtm_ft(xwtm_s(1)));
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
-        } else {
-                rdbuf[63] = 0;
-                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
-        }
-}
+extern xwsz_t axisram_mr_origin[];
+struct xwmm_mempool * xwrust_mempool = (void *)axisram_mr_origin;

@@ -28,7 +28,7 @@ STM32CUBE_INCDIRS += bm/stm32cube/Drivers/CMSIS/Include
 BRD_INCDIRS := $(STM32CUBE_INCDIRS)
 BRD_AFLAGS := $(STM32CUBE_DEFS)
 BRD_CFLAGS := $(STM32CUBE_DEFS)
-BRD_CXFLAGS := $(STM32CUBE_DEFS)
+BRD_CXXFLAGS := $(STM32CUBE_DEFS)
 BRD_LDFLAGS :=
 
 BRD_ASRCS :=
@@ -36,9 +36,16 @@ BRD_CSRCS :=
 BRD_CXXSRCS :=
 BRD_LDFLAGS_gcc := -Wl,--no-warn-rwx-segment
 
+BRD_CXXFLAGS += -Wno-sign-conversion
+BRD_CFLAGS += -Wno-sign-conversion
+
 BRD_EOBJS :=
 
 BRD_CSRCS :=
 BRD_CSRCS += board/init.c
 BRD_CSRCS += board/reset.c
 BRD_CSRCS += board/firmware.c
+
+BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwos)
+BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwlib)
+BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwds)

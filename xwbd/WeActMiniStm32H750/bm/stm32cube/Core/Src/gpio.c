@@ -25,7 +25,7 @@
 /* USER CODE BEGIN 0 */
 #include "board/std.h"
 #include <xwos/lib/xwbop.h>
-#include "bm/xwac/xwds/soc.h"
+#include "board/xwac/xwds/soc.h"
 
 /* USER CODE END 0 */
 

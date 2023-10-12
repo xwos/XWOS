@@ -25,7 +25,7 @@
 #include "board/std.h"
 #include <string.h>
 #include <xwos/lib/xwbop.h>
-#include "bm/xwac/xwds/uart.h"
+#include "board/xwac/xwds/uart.h"
 
 struct MX_UART_DriverData huart1_drvdata;
 struct MX_UART_DriverData huart3_drvdata;

@@ -23,7 +23,7 @@
 #include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <xwam/application/ramcode/mif.h>
-#include "bm/xwac/xwds/device.h"
+#include "board/xwac/xwds/device.h"
 #include "bm/rcd/xwssc.h"
 
 #define KEY_GPIO_PORT           XWDS_GPIO_PORT_C

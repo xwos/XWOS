@@ -22,7 +22,7 @@
 #include <xwmd/isc/xwssc/protocol.h>
 #include <xwmd/isc/xwssc/mif.h>
 #include <xwmd/isc/xwssc/hwif/uart.h>
-#include "bm/xwac/xwds/device.h"
+#include "board/xwac/xwds/device.h"
 
 #define BOARD_XWSSC_PORT_RAMCODE 0
 

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：初始化
+ * @brief 板级描述层：XWOS适配层：内核：电源管理
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,34 +18,11 @@
  * > limitations under the License.
  */
 
+#ifndef __board_xwac_xwos_pm_h__
+#define __board_xwac_xwos_pm_h__
+
 #include "board/std.h"
-#include <xwcd/soc/arm/v7m/arch_init.h>
-#include <xwcd/soc/arm/v7m/m7/stm32/soc_init.h>
-#include "board/xwac/xwlib/crc.h"
-#include "board/xwac/xwds/device.h"
-#include "bm/stm32cube/mif.h"
 
-/**
- * @brief XWOS预初始化
- */
-__xwbsp_init_code
-void xwos_preinit(void)
-{
-        arch_init();
-        soc_init();
-        stm32cube_preinit();
-        soc_relocate_data();
-        soc_relocate_ivt();
-        stm32cube_init();
-}
+void xwosac_pmcb_init(void);
 
-/**
- * @brief XWOS后初始化
- */
-__xwbsp_init_code
-void xwos_postinit(void)
-{
-        stm32xwds_init();
-        stm32xwds_soc_init();
-        xwlibac_crc_init();
-}
+#endif /* board/xwac/xwos/pm.h */

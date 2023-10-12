@@ -21,7 +21,7 @@
 #include "board/std.h"
 #include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
-#include "bm/xwac/xwds/device.h"
+#include "board/xwac/xwds/device.h"
 #include <bm/app/thd.h>
 
 #define LED_TASK_PRIORITY (XWOS_SKD_PRIORITY_RAISE(XWOS_SKD_PRIORITY_RT_MIN, 1))

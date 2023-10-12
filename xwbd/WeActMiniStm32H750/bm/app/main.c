@@ -30,8 +30,8 @@
 #endif
 #include <xwem/vm/lua/mif.h>
 #include <xwam/example/cxx/mif.h>
-#include "bm/xwac/xwds/device.h"
-#include "bm/xwac/fatfs/sdcard.h"
+#include "board/xwac/xwds/device.h"
+#include "board/xwac/fatfs/sdcard.h"
 #include "bm/app/xwssc.h"
 #include "bm/app/thd.h"
 
