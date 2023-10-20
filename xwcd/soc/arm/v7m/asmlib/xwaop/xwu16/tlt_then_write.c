@@ -38,7 +38,7 @@ xwer_t xwaop__xwu16_t__tlt_then_write(atomic_xwu16_t * a,
                         rc = cm_strexh(a, (xwu16_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_mp_ddb();
+                        xwmb_ddb();
                         break;
                 }
         } while (rc);

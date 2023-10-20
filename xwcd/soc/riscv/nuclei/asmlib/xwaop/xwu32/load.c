@@ -34,7 +34,7 @@ xwu32_t xwaop__xwu32_t__load(atomic_xwu32_t * a,
                 break;
         case xwaop_mo_consume:
                 v = *a;
-                xwmb_mp_ddb();
+                xwmb_ddb();
                 break;
         case xwaop_mo_acquire:
                 v = *a;

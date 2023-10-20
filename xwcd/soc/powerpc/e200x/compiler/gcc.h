@@ -75,16 +75,25 @@
 #define __flsopc                __xwcc_section(".flsopc")
 
 /******** ******** barrier ******** ********/
-#define xwccmb()                __asm__ volatile("": : :"memory")
 #define eppc_isb()              __asm__ volatile("se_isync" : : : "memory")
 #define eppc_dmb()              __asm__ volatile("msync" : : : "memory")
 
+#define xwmb_compiler()         __asm__ volatile("": : :"memory")
+#define xwmb_isb()              eppc_isb()
+#define xwmb_ddb()              xwmb_compiler()
+
+#define xwmb_mb()               eppc_dmb()
+#define xwmb_rmb()              eppc_dmb()
+#define xwmb_wmb()              eppc_dmb()
+
+#define xwmb_dma_mb()           eppc_dmb()
+#define xwmb_dma_rmb()          eppc_dmb()
+#define xwmb_dma_wmb()          eppc_dmb()
+
 #define xwmb_mp_mb()            eppc_dmb()
-#define xwmb_mp_rmb()           xwmb_mp_mb()
+#define xwmb_mp_rmb()           eppc_dmb()
 #define xwmb_mp_wmb()           __asm__ volatile("mbar      0" : : : "memory")
-#define xwmb_mp_ddb()           xwccmb()
+#define xwmb_mp_acquire()       xwmb_mp_rmb()
+#define xwmb_mp_release()       xwmb_mp_wmb()
 
-#define xwmb_mp_load_acquire_mb()       xwmb_mp_mb()
-#define xwmb_mp_store_release_mb()      xwmb_mp_mb()
-
-#endif /* compiler/gcc.h */
+#endif /* xwcd/soc/powerpc/e200x/compiler/gcc.h */

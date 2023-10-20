@@ -41,7 +41,7 @@ xwer_t xwaop__xwu64_t__tgelt_then_add(atomic_xwu64_t * a,
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_mp_ddb();
+                        xwmb_ddb();
                         break;
                 }
         } while (rc);

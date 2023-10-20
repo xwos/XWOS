@@ -41,7 +41,7 @@ xwer_t xwaop__xwu8_t__tgelt_then_rsb(atomic_xwu8_t * a,
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_mp_ddb();
+                        xwmb_ddb();
                         break;
                 }
         } while (rc);

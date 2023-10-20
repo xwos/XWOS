@@ -281,11 +281,11 @@ struct xwmp_skd * xwmp_skd_get_lc(void)
         xwid_t cpuid;
 
         cpuid = xwmp_skd_id_lc();
-        xwmb_mp_ddb();
+        xwmb_ddb();
         do {
                 xwskd = &xwmp_skd[cpuid];
                 cpuid = xwmp_skd_id_lc();
-                xwmb_mp_ddb();
+                xwmb_ddb();
         } while (xwskd->id != cpuid);
         return xwskd;
 }
@@ -336,12 +336,12 @@ struct xwmp_thd * xwmp_skd_get_cthd_lc(void)
         xwid_t cpuid;
 
         cpuid = xwmp_skd_id_lc();
-        xwmb_mp_ddb();
+        xwmb_ddb();
         do {
                 xwskd = &xwmp_skd[cpuid];
                 cthd = xwcc_derof(xwskd->cstk, struct xwmp_thd, stack);
                 cpuid = xwmp_skd_id_lc();
-                xwmb_mp_ddb();
+                xwmb_ddb();
         } while (xwskd->id != cpuid);
         return cthd;
 }

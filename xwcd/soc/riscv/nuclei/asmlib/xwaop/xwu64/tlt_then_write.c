@@ -38,7 +38,7 @@ xwer_t xwaop__xwu64_t__tlt_then_write(atomic_xwu64_t * a,
                         rc = rv_scd(a, (xwu64_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_mp_ddb();
+                        xwmb_ddb();
                         break;
                 }
         } while (rc);

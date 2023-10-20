@@ -78,18 +78,26 @@
 #define __firmware_tail         __xwcc_section(".firmware.tail")
 
 /******** ******** barrier ******** ********/
-#define xwccmb()                __asm__ volatile("": : :"memory")
 #define armv6m_isb()            __asm__ volatile("isb" : : : "memory")
 #define armv6m_dsb()            __asm__ volatile("dsb" : : : "memory")
 #define armv6m_dmb()            __asm__ volatile("dmb" : : : "memory")
 
-#define xwmb_mp_isb()           armv6m_isb()
+#define xwmb_compiler()         __asm__ volatile("": : :"memory")
+#define xwmb_isb()              armv6m_isb()
+#define xwmb_ddb()              xwmb_compiler()
+
+#define xwmb_mb()               armv6m_dsb()
+#define xwmb_rmb()              armv6m_dsb()
+#define xwmb_wmb()              armv6m_dsb()
+
+#define xwmb_dma_mb()           armv6m_dsb()
+#define xwmb_dma_rmb()          armv6m_dsb()
+#define xwmb_dma_wmb()          armv6m_dsb()
+
 #define xwmb_mp_mb()            armv6m_dmb()
-#define xwmb_mp_rmb()           xwmb_mp_mb()
+#define xwmb_mp_rmb()           armv6m_dmb()
 #define xwmb_mp_wmb()           armv6m_dmb()
-#define xwmb_mp_ddb()           xwccmb()
+#define xwmb_mp_acquire()       xwmb_mp_rmb()
+#define xwmb_mp_release()       xwmb_mp_wmb()
 
-#define xwmb_mp_load_acquire_mb()       xwmb_mp_mb()
-#define xwmb_mp_store_release_mb()      xwmb_mp_mb()
-
-#endif /* compiler/gcc.h */
+#endif /* xwcd/soc/arm/v6m/compiler/gcc.h */

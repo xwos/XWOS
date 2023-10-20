@@ -54,7 +54,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num)
                 } while (i < total);
                 if (pos < 0) {
                         pos = -ENODATA;
-                        xwmb_mp_ddb();
+                        xwmb_ddb();
                         break;
                 } else {
                         m = (1U << (xwsq_t)pos);

@@ -451,11 +451,11 @@
 // cppcheck-suppress [misra-c2012-20.7]
 #define xwmb_write(t, p, v)     (*(volatile t * )(p)) = (v)
 
-#ifndef xwccmb
+#ifndef xwmb_compiler
 /**
  * @brief 编译器内存屏障
  */
-#  define xwccmb()
+#  define xwmb_compiler()
 #endif
 
 #ifndef xwmb_mp_mb
@@ -479,26 +479,30 @@
 #  define xwmb_mp_wmb()
 #endif
 
-#ifndef xwmb_mp_ddb
+#ifndef xwmb_ddb
 /**
  * @brief 多核系统数据依赖屏障
  */
-#  define xwmb_mp_ddb()
+#  define xwmb_ddb()
 #endif
 
 /******** ******** MP primitives ******** ********/
-#ifndef xwmb_mp_load_acquire_mb
+#ifndef xwmb_mp_acquire
 /**
- * @brief 多核系统“加载-获取”屏障
+ * @brief 多核系统 **获取** 屏障
+ * @details
+ * 通常用于 **加载** 操作之后。
  */
-#  define xwmb_mp_load_acquire_mb()     xwmb_mp_mb()
+#  define xwmb_mp_acquire()  xwmb_mp_mb()
 #endif
 
-#ifndef xwmb_mp_store_release_mb
+#ifndef xwmb_mp_release
 /**
- * @brief 多核系统“存储-释放”屏障
+ * @brief 多核系统 **释放** 屏障
+ * @details
+ * 通常用于 **存储** 操作之前。
  */
-#  define xwmb_mp_store_release_mb()    xwmb_mp_mb()
+#  define xwmb_mp_release()  xwmb_mp_mb()
 #endif
 
 #ifndef xwmb_mp_load_acquire
@@ -514,7 +518,7 @@
 #define xwmb_mp_load_acquire(t, v, p)           \
         do {                                    \
                 xwmb_read(t, (v), (p));         \
-                xwmb_mp_load_acquire_mb();      \
+                xwmb_mp_acquire();              \
         } while (0)
 #endif
 
@@ -530,12 +534,12 @@
  */
 #define xwmb_mp_store_release(t, p, v)          \
         do {                                    \
-                xwmb_mp_store_release_mb();     \
+                xwmb_mp_release();              \
                 xwmb_write(t, (p), (v));        \
         } while (0)
 #endif
 
-#ifndef xwmb_mp_ddb
+#ifndef xwmb_ddb
 /**
  * @brief Flush all pending reads that subsequents reads depend on.
  * @detail
@@ -595,7 +599,7 @@
  *   + DEC Alpha这种弱内存模型的CPU，不带有数据依赖(Data dependency)，
  *     需要使用读依赖屏障
  */
-#  define xwmb_mp_ddb()                 xwccmb()
+#  define xwmb_ddb()    xwmb_compiler()
 #endif
 
 /******** ******** compiletime check ******** ********/
