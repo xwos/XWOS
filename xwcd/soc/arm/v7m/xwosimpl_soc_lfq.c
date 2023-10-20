@@ -23,19 +23,20 @@
 #include <armv7m_isa.h>
 
 __xwbsp_code
-void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
+void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
         register xwlfq_t * next;
 
         do {
                 next = (xwlfq_t *)cm_ldrex(h);
+                xwmb_mp_mb();
                 *n = (xwlfq_t)next;
                 xwmb_mp_mb();
         } while (cm_strex(h, (xwu32_t)n));
 }
 
 __xwbsp_code
-xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
+xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h)
 {
         register xwlfq_t * top;
         register xwlfq_t * next;
@@ -43,6 +44,7 @@ xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
 
         do {
                 top = (xwlfq_t *)cm_ldrex(h);
+                xwmb_mp_mb();
                 if (top) {
                         next = (xwlfq_t *)(*top);
                         xwmb_mp_mb();

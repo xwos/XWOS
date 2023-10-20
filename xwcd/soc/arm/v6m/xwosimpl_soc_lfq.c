@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <arch_irq.h>
 
-void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
+void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
         xwreg_t flag;
 
@@ -31,7 +31,7 @@ void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
         arch_cpuirq_restore_lc(flag);
 }
 
-xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
+xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h)
 {
         xwreg_t flag;
         xwlfq_t * top;

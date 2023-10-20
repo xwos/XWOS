@@ -38,14 +38,22 @@ void xwlib_lfq_init(atomic_xwlfq_t * n)
  * @param[in] h: 无锁队列头的指针
  * @param[in] n: 入队节点的指针
  */
-void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n);
+static __xwlib_inline
+void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
+{
+        soc_lfq_push(h, n);
+}
 
 /**
  * @brief 弹出无锁队列中的第一个节点（栈式队列）
  * @param[in] h: 无锁队列头的指针
  * @return 被弹出的节点
  */
-xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h);
+static __xwlib_inline
+xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
+{
+        return soc_lfq_pop(h);
+}
 
 /**
  * @} xwos_lib_lfq

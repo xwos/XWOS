@@ -29,6 +29,7 @@ void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 
         do {
                 next = (xwlfq_t *)rv_lrw(h);
+                xwmb_mp_mb();
                 *n = (xwlfq_t)next;
                 xwmb_mp_mb();
         } while (rv_scw(h, (xwu32_t)n));
@@ -43,6 +44,7 @@ xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h)
 
         do {
                 top = (xwlfq_t *)rv_lrw(h);
+                xwmb_mp_mb();
                 if (top) {
                         next = (xwlfq_t *)(*top);
                         xwmb_mp_mb();

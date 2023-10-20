@@ -23,19 +23,20 @@
 #include <xwos/lib/lfq.h>
 
 __xwbsp_code
-void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
+void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
         xwlfq_t * next;
 
         do {
                 next = (xwlfq_t *)lwarx(h);
+                xwmb_mp_mb();
                 *n = (xwlfq_t)next;
                 xwmb_mp_mb();
         } while (stwcx(h, (xwu32_t)n));
 }
 
 __xwbsp_code
-xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
+xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h)
 {
         xwlfq_t * top;
         xwlfq_t * next;
@@ -43,6 +44,7 @@ xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
 
         do {
                 top = (xwlfq_t *)lwarx(h);
+                xwmb_mp_mb();
                 if (top) {
                         next = (xwlfq_t *)(*top);
                         xwmb_mp_mb();
