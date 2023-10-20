@@ -28,297 +28,131 @@
 #include <cfg/project.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <float.h>
 #include <limits.h>
 
-/* Use 32-bit data on PowerPC because of atomic operations */
-#define ARCH_HAVE_XWU8_T        1
-typedef uint8_t xwu8_t;
-
-#define ARCH_HAVE_XWS8_T        1
-typedef int8_t xws8_t;
-
-#define ARCH_HAVE_XWU16_T       1
-typedef uint16_t xwu16_t;
-
-#define ARCH_HAVE_XWS16_T       1
-typedef int16_t xws16_t;
-
-#define ARCH_HAVE_XWU32_T       1
-typedef uint32_t xwu32_t;
-
-#define ARCH_HAVE_XWS32_T       1
-typedef int32_t xws32_t;
-
-#define ARCH_HAVE_XWU64_T       1
-typedef uint64_t xwu64_t;
-
-#define ARCH_HAVE_XWS64_T       1
-typedef int64_t xws64_t;
-
-#define ARCH_HAVE_XWSZ_T        1
-typedef unsigned int xwsz_t; /**< 大小值 (无符号) */
-
-#define ARCH_HAVE_XWSSZ_T       1
-typedef int xwssz_t; /**< 大小值 (有符号) */
-
-#define ARCH_HAVE_XWSTK_T       1
-typedef unsigned long xwstk_t; /**< 栈槽 */
-
-#define ARCH_HAVE_XWPTR_T       1
-typedef unsigned long xwptr_t; /**< 指针数值 */
-
-#define ARCH_HAVE_XWREG_T       1
-typedef unsigned long xwreg_t; /**< 寄存器数值 (无符号) */
-
-#define ARCH_HAVE_XWSREG_T      1
-typedef signed long xwsreg_t; /**< 寄存器数值 (有符号) */
-
-#define ARCH_HAVE_XWSQ_T        1
-typedef unsigned long xwsq_t; /**< 顺序值 (无符号) */
-
-#define ARCH_HAVE_XWSSQ_T       1
-typedef signed long xwssq_t; /**< 顺序值 (有符号) */
-
-#define ARCH_HAVE_XWID_T        1
-typedef unsigned long xwid_t; /**< ID (无符号) */
-
-#define ARCH_HAVE_XWSID_T       1
-typedef signed long xwsid_t; /**< ID (有符号) */
-
-#define ARCH_HAVE_XWISR_F       1
-typedef void (* xwisr_f)(void); /**< 中断向量 */
-
-#define ARCH_HAVE_XWIRQ_T       1
-typedef signed int xwirq_t; /**< 中断号 (有符号) */
-
-#define ARCH_HAVE_XWPR_T        1
-typedef signed int xwpr_t; /**< 优先级 (有符号) */
-
-#ifndef UCHAR_MAX
-#  define UCHAR_MAX             ((unsigned char)(~((unsigned char)0)))
-#endif
-#ifndef CHAR_MAX
-#  define CHAR_MAX              ((signed char)(UCHAR_MAX >> 1))
-#endif
-#ifndef CHAR_MIN
-#  define CHAR_MIN              ((signed char)(-CHAR_MAX - 1))
-#endif
-
-#ifndef USHRT_MAX
-#  define USHRT_MAX             ((unsigned short)(~((unsigned short)0)))
-#endif
-#ifndef SHRT_MAX
-#  define SHRT_MAX              ((signed short)(USHRT_MAX>>1))
-#endif
-#ifndef SHRT_MIN
-#  define SHRT_MIN              ((signed short)(-SHRT_MAX - 1))
-#endif
-
-#ifndef UINT_MAX
-#  define UINT_MAX              ((unsigned int)(~((unsigned int)0)))
-#endif
-#ifndef INT_MAX
-#  define INT_MAX               ((signed int)(UINT_MAX >> 1))
-#endif
-#ifndef INT_MIN
-#  define INT_MIN               ((signed int)(-INT_MAX - 1))
-#endif
-
-#ifndef ULONG_MAX
-#  define ULONG_MAX             ((unsigned long)(~((unsigned long)0)))
-#endif
-#ifndef LONG_MAX
-#  define LONG_MAX              ((signed long)(ULONG_MAX >> 1))
-#endif
-#ifndef LONG_MIN
-#  define LONG_MIN              ((signed long)(-LONG_MAX - 1))
-#endif
-
-#ifndef ULLONG_MAX
-#  define ULLONG_MAX            ((unsigned long long)(~((unsigned long long)0)))
-#endif
-#ifndef LLONG_MAX
-#  define LLONG_MAX             ((signed long long)(ULLONG_MAX >> 1))
-#endif
-#ifndef LLONG_MIN
-#  define LLONG_MIN             ((signed long long)(-LLONG_MAX - 1))
-#endif
-
-#define XWU8_MAX                ((xwu8_t)(~((xwu8_t)0)))
-#define XWS8_MAX                ((xws8_t)(XWU8_MAX >> 1))
-#define XWS8_MIN                ((xws8_t)(-XWS8_MAX - 1))
-
-#define XWU16_MAX               ((xwu16_t)(~((xwu16_t)0)))
-#define XWS16_MAX               ((xws16_t)(XWU16_MAX >> 1))
-#define XWS16_MIN               ((xws16_t)(-XWS16_MAX - 1))
-
-#define XWU32_MAX               ((xwu32_t)(~((xwu32_t)0)))
-#define XWS32_MAX               ((xws32_t)(XWU32_MAX >> 1))
-#define XWS32_MIN               ((xws32_t)(-XWS32_MAX - 1))
-
-#define XWU64_MAX               ((xwu64_t)(~((xwu64_t)0)))
-#define XWS64_MAX               ((xws64_t)(XWU64_MAX >> 1))
-#define XWS64_MIN               ((xws64_t)(-XWS64_MAX - 1))
-
-#ifndef XWSZ_MAX
-#  define XWSZ_MAX              ((xwsz_t)(~((xwsz_t)0)))
-#endif
-#ifndef XWSSZ_MAX
-#  define XWSSZ_MAX             ((xwssz_t)(XWSZ_MAX >> 1))
-#endif
-#ifndef XWSSZ_MIN
-#  define XWSSZ_MIN             ((xwssz_t)(-XWSSZ_MAX - 1))
-#endif
-
-#ifndef XWPTR_MAX
-#  define XWPTR_MAX             ((xwptr_t)(~0UL))
-#endif
-
-#ifndef XWREG_MAX
-#  define XWREG_MAX             ((xwreg_t)(~((xwreg_t)0)))
-#endif
-#ifndef XWSREG_MAX
-#  define XWSREG_MAX            ((xwsreg_t)(REG_MAX >> 1))
-#endif
-#ifndef XWSREG_MIN
-#  define XWSREG_MIN            ((xwsreg_t)(-XWSREG_MAX - 1))
-#endif
-
-#ifndef XWSQ_MAX
-#  define XWSQ_MAX              ((xwsq_t)(~((xwsq_t)0)))
-#endif
-#ifndef XWSSQ_MAX
-#  define XWSSQ_MAX             ((xwssq_t)(XWSQ_MAX >> 1))
-#endif
-#ifndef XWSSQ_MIN
-#  define XWSSQ_MIN             ((xwssq_t)(-XWSSQ_MAX - 1))
-#endif
-
-#ifndef XWID_MAX
-#  define XWID_MAX              ((xwid_t)(~((xwid_t)0)))
-#endif
-#ifndef XWSID_MAX
-#  define XWSID_MAX             ((xwsid_t)(XWID_MAX >> 1))
-#endif
-#ifndef XWSID_MIN
-#  define XWSID_MIN             ((xwsid_t)(-XWSID_MAX - 1))
-#endif
-
-#ifndef XWIRQ_MAX
-#  define XWIRQ_MAX             ((xwirq_t)((~0UL) >> 1))
-#endif
-#ifndef XWIRQ_MIN
-#  define XWIRQ_MIN             ((xwirq_t)(-XWIRQ_MAX - 1))
-#endif
-
-#ifndef XWPR_MAX
-#  define XWPR_MAX              ((xwpr_t)((~0UL) >> 1))
-#endif
-#ifndef XWPR_MIN
-#  define XWPR_MIN              ((xwpr_t)(-XWPR_MAX - 1))
-#endif
-
-#define XWU8_T__SIZE
-#define BITS_PER_XWU8_T         8U
-#define XWU8_T_SHIFT            3U
-#define XWS8_T__SIZE
-#define BITS_PER_XWS8_T         8U
-#define XWS8_T_SHIFT            3U
-
-#define XWU16_T__SIZE
-#define BITS_PER_XWU16_T        16U
-#define XWU16_T_SHIFT           4U
-#define XWS16_T__SIZE
-#define BITS_PER_XWS16_T        16U
-#define XWS16_T_SHIFT           4U
-
-#define XWU32_T__SIZE
-#define BITS_PER_XWU32_T        32U
-#define XWU32_T_SHIFT           5U
-#define XWS32_T__SIZE
-#define BITS_PER_XWS32_T        32U
-#define XWS32_T_SHIFT           5U
-
-#define XWU64_T__SIZE
-#define BITS_PER_XWU64_T        64U
-#define XWU64_T_SHIFT           6U
-#define XWS64_T__SIZE
-#define BITS_PER_XWS64_T        64U
-#define XWS64_T_SHIFT           6U
-
-#define CHAR__SIZE
 #define BITS_PER_CHAR           8U
 #define CHAR_SHIFT              3U
-#define UCHAR__SIZE
 #define BITS_PER_UCHAR          8U
 #define UCHAR_SHIFT             3U
 
-#define SHORT__SIZE
-#define BITS_PER_SHORT          16U
-#define SHORT_SHIFT             4U
-#define USHORT__SIZE
-#define BITS_PER_USHORT         16U
-#define USHORT_SHIFT            4U
+#define BITS_PER_SHRT           16U
+#define SHRT_SHIFT              4U
+#define BITS_PER_USHRT          16U
+#define USHRT_SHIFT             4U
 
-#define INT__SIZE
 #define BITS_PER_INT            32U
 #define INT_SHIFT               5U
-#define UINT__SIZE
 #define BITS_PER_UINT           32U
 #define UINT_SHIFT              5U
 
-#define LONG__SIZE
 #define BITS_PER_LONG           32U
 #define LONG_SHIFT              5U
-#define ULONG__SIZE
 #define BITS_PER_ULONG          32U
 #define LONG_SHIFT              5U
 
-#define LONGLONG__SIZE
-#define BITS_PER_LONGLONG       64U
-#define LONGLONG_SHIFT          6U
-#define ULONGLONG__SIZE
-#define BITS_PER_ULONGLONG      64U
-#define ULONGLONG_SHIFT         6U
+#define BITS_PER_LLONG          64U
+#define LLONG_SHIFT             6U
+#define BITS_PER_ULLONG         64U
+#define ULLONG_SHIFT            6U
 
-#define FLOAT__SIZE
-#define BITS_PER_FLOAT          32U
-#define FLOAT_SHIFT             5U
+#define BITS_PER_FLT            32U
+#define FLT_SHIFT               5U
 
-#define DOUBLE__SIZE
-#define BITS_PER_DOUBLE         64U
-#define DOUBLE_SHIFT            6U
+#define BITS_PER_DBL            64U
+#define DBL_SHIFT               6U
 
-#define XWSZ_T__SIZE
-#define BITS_PER_XWSZ_T         BITS_PER_LONG
-#define XWSZ_T_SHIFT            LONG_SHIFT
-#define XWSSZ_T__SIZE
-#define BITS_PER_XWSSZ_T        BITS_PER_LONG
-#define XWSSZ_T_SHIFT           LONG_SHIFT
+#define BITS_PER_LDBL           128U
+#define LDBL_SHIFT              7U
 
-#define XWPTR_T__SIZE
-#define BITS_PER_XWPTR_T        BITS_PER_LONG
-#define XWPTR_T_SHIFT           LONG_SHIFT
+#define ARCH_HAVE_XWU8_T        1
+typedef uint8_t xwu8_t; /**< 无符号8位整数 */
+#define BITS_PER_XWU8_T         8U
+#define XWU8_T_SHIFT            3U
 
-#define XWSID_T__SIZE
-#define BITS_PER_XWSID_T        BITS_PER_LONG
-#define XWSID_T_SHIFT           LONG_SHIFT
-#define XWID_T__SIZE
-#define BITS_PER_XWID_T         BITS_PER_LONG
-#define XWID_T_SHIFT            LONG_SHIFT
+#define ARCH_HAVE_XWS8_T        1
+typedef int8_t xws8_t; /**< 有符号8位整数 */
+#define BITS_PER_XWS8_T         8U
+#define XWS8_T_SHIFT            3U
 
-#define XWREG_T__SIZE
-#define BITS_PER_XWREG_T        BITS_PER_LONG
-#define XWREG_T_SHIFT           LONG_SHIFT
-#define XWSREG_T__SIZE
+#define ARCH_HAVE_XWU16_T       1
+typedef uint16_t xwu16_t; /**< 无符号16位整数 */
+#define BITS_PER_XWU16_T        16U
+#define XWU16_T_SHIFT           4U
+
+#define ARCH_HAVE_XWS16_T       1
+typedef int16_t xws16_t; /**< 有符号16位整数 */
+#define BITS_PER_XWS16_T        16U
+#define XWS16_T_SHIFT           4U
+
+#define ARCH_HAVE_XWU32_T       1
+typedef uint32_t xwu32_t; /**< 无符号32位整数 */
+#define BITS_PER_XWU32_T        32U
+#define XWU32_T_SHIFT           5U
+
+#define ARCH_HAVE_XWS32_T       1
+typedef int32_t xws32_t; /**< 有符号32位整数 */
+#define BITS_PER_XWS32_T        32U
+#define XWS32_T_SHIFT           5U
+
+#define ARCH_HAVE_XWU64_T       1
+typedef uint64_t xwu64_t; /**< 无符号64位整数 */
+#define BITS_PER_XWU64_T        64U
+#define XWU64_T_SHIFT           6U
+
+#define ARCH_HAVE_XWS64_T       1
+typedef int64_t xws64_t; /**< 有符号64位整数 */
+#define BITS_PER_XWS64_T        64U
+#define XWS64_T_SHIFT           6U
+
+#define ARCH_HAVE_XWSZ_T        1
+typedef unsigned int xwsz_t; /**< 大小值 (无符号) */
+#define BITS_PER_XWSZ_T         BITS_PER_UINT
+#define XWSZ_T_SHIFT            UINT_SHIFT
+
+#define ARCH_HAVE_XWSSZ_T       1
+typedef int xwssz_t; /**< 大小值 (有符号) */
+#define BITS_PER_XWSSZ_T        BITS_PER_INT
+#define XWSSZ_T_SHIFT           INT_SHIFT
+
+#define ARCH_HAVE_XWPTR_T       1
+typedef unsigned long xwptr_t; /**< 指针数值 */
+#define BITS_PER_XWPTR_T        BITS_PER_ULONG
+#define XWPTR_T_SHIFT           ULONG_SHIFT
+
+#define ARCH_HAVE_XWSTK_T       1
+typedef unsigned long xwstk_t; /**< 栈槽 */
+#define BITS_PER_XWSTK_T        BITS_PER_ULONG
+#define XWSTK_T_SHIFT           ULONG_SHIFT
+
+#define ARCH_HAVE_XWREG_T       1
+typedef unsigned long xwreg_t; /**< 寄存器数值 (无符号) */
+#define BITS_PER_XWREG_T        BITS_PER_ULONG
+#define XWREG_T_SHIFT           ULONG_SHIFT
+
+#define ARCH_HAVE_XWSREG_T      1
+typedef signed long xwsreg_t; /**< 寄存器数值 (有符号) */
 #define BITS_PER_XWSREG_T       BITS_PER_LONG
 #define XWSREG_T_SHIFT          LONG_SHIFT
 
-#define XWSQ_T__SIZE
-#define BITS_PER_XWSQ_T         BITS_PER_LONG
-#define XWSQ_T_SHIFT            LONG_SHIFT
-#define XWSSQ_T__SIZE
+#define ARCH_HAVE_XWSQ_T        1
+typedef unsigned long xwsq_t; /**< 顺序值 (无符号) */
+#define BITS_PER_XWSQ_T         BITS_PER_ULONG
+#define XWSQ_T_SHIFT            ULONG_SHIFT
+
+#define ARCH_HAVE_XWSSQ_T       1
+typedef signed long xwssq_t; /**< 顺序值 (有符号) */
 #define BITS_PER_XWSSQ_T        BITS_PER_LONG
 #define XWSSQ_T_SHIFT           LONG_SHIFT
+
+#define ARCH_HAVE_XWID_T        1
+typedef unsigned long xwid_t; /**< ID (无符号) */
+#define BITS_PER_XWID_T         BITS_PER_ULONG
+#define XWID_T_SHIFT            ULONG_SHIFT
+
+#define ARCH_HAVE_XWSID_T       1
+typedef signed long xwsid_t; /**< ID (有符号) */
+#define BITS_PER_XWSID_T        BITS_PER_LONG
+#define XWSID_T_SHIFT           LONG_SHIFT
 
 #endif /* xwosimpl_soc_type.h */
