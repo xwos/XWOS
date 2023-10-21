@@ -44,19 +44,8 @@
 
 xwssq_t xwbop_ffs8(xwu8_t x);
 xwssq_t xwbop_fls8(xwu8_t x);
-
-static __xwlib_inline
-xwssq_t xwbop_ffz8(xwu8_t x)
-{
-        return xwbop_ffs8((xwu8_t)(~x));
-}
-
-static __xwlib_inline
-xwssq_t xwbop_flz8(xwu8_t x)
-{
-        return xwbop_fls8((xwu8_t)(~x));
-}
-
+xwssq_t xwbop_ffz8(xwu8_t x);
+xwssq_t xwbop_flz8(xwu8_t x);
 xwu8_t xwbop_rbit8(xwu8_t x);
 
 static __xwlib_inline
@@ -74,19 +63,8 @@ xwsz_t xwbop_weight8(xwu8_t x);
 
 xwssq_t xwbop_ffs16(xwu16_t x);
 xwssq_t xwbop_fls16(xwu16_t x);
-
-static __xwlib_inline
-xwssq_t xwbop_ffz16(xwu16_t x)
-{
-        return xwbop_ffs16((xwu16_t)(~x));
-}
-
-static __xwlib_inline
-xwssq_t xwbop_flz16(xwu16_t x)
-{
-        return xwbop_fls16((xwu16_t)(~x));
-}
-
+xwssq_t xwbop_ffz16(xwu16_t x);
+xwssq_t xwbop_flz16(xwu16_t x);
 xwu16_t xwbop_rbit16(xwu16_t x);
 xwu16_t xwbop_re16(xwu16_t a);
 xwsz_t xwbop_weight16(xwu16_t x);
@@ -98,19 +76,8 @@ xwsz_t xwbop_weight16(xwu16_t x);
 
 xwssq_t xwbop_ffs32(xwu32_t x);
 xwssq_t xwbop_fls32(xwu32_t x);
-
-static __xwlib_inline
-xwssq_t xwbop_ffz32(xwu32_t x)
-{
-        return xwbop_ffs32(~x);
-}
-
-static __xwlib_inline
-xwssq_t xwbop_flz32(xwu32_t x)
-{
-        return xwbop_fls32(~x);
-}
-
+xwssq_t xwbop_ffz32(xwu32_t x);
+xwssq_t xwbop_flz32(xwu32_t x);
 xwu32_t xwbop_rbit32(xwu32_t x);
 xwu32_t xwbop_re32(xwu32_t x);
 xwsz_t xwbop_weight32(xwu32_t x);
@@ -122,19 +89,8 @@ xwsz_t xwbop_weight32(xwu32_t x);
 
 xwssq_t xwbop_ffs64(xwu64_t x);
 xwssq_t xwbop_fls64(xwu64_t x);
-
-static __xwlib_inline
-xwssq_t xwbop_ffz64(xwu64_t x)
-{
-        return xwbop_ffs64(~x);
-}
-
-static __xwlib_inline
-xwssq_t xwbop_flz64(xwu64_t x)
-{
-        return xwbop_ffs64(~x);
-}
-
+xwssq_t xwbop_ffz64(xwu64_t x);
+xwssq_t xwbop_flz64(xwu64_t x);
 xwu64_t xwbop_re64(xwu64_t x);
 xwu64_t xwbop_rbit64(xwu64_t x);
 xwsz_t xwbop_weight64(xwu64_t x);

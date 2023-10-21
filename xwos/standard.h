@@ -19,9 +19,8 @@
 #include <xwos/version.h>
 #include <xwos/lib/type.h>
 #include <xwos/lib/error.h>
-#if defined(SOCCFG_BKPT) && (1 == SOCCFG_BKPT)
-#  include <xwos/ospl/soc/bkpt.h>
-#endif
+#include <xwos/ospl/soc/isa.h>
+#include <xwos/lib/mb.h>
 
 /**
  * @defgroup xwos_standard XWOS的标准头文件
@@ -32,6 +31,7 @@
  * + 基本类型
  * + 错误码
  * + 版本号
+ * + 内存屏障
  * @{
  */
 

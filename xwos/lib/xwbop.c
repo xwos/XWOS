@@ -101,6 +101,22 @@ xwssq_t xwbop_fls8(xwu8_t x)
 }
 #endif
 
+#if ((!defined(ARCHCFG_LIB_XWBOP_FFZ8)) || (1 != ARCHCFG_LIB_XWBOP_FFZ8))
+__xwlib_code
+xwssq_t xwbop_ffz8(xwu8_t x)
+{
+        return xwbop_ffs8((xwu8_t)(~x));
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_FLZ8)) || (1 != ARCHCFG_LIB_XWBOP_FLZ8)
+__xwlib_code
+xwssq_t xwbop_flz8(xwu8_t x)
+{
+        return xwbop_fls8((xwu8_t)(~x));
+}
+#endif
+
 #if (!defined(ARCHCFG_LIB_XWBOP_FFS16)) || (1 != ARCHCFG_LIB_XWBOP_FFS16)
 __xwlib_code
 xwssq_t xwbop_ffs16(xwu16_t x)
@@ -172,6 +188,22 @@ xwssq_t xwbop_fls16(xwu16_t x)
         }
 #  endif
         return r;
+}
+#endif
+
+#if ((!defined(ARCHCFG_LIB_XWBOP_FFZ16)) || (1 != ARCHCFG_LIB_XWBOP_FFZ16))
+__xwlib_code
+xwssq_t xwbop_ffz16(xwu16_t x)
+{
+        return xwbop_ffs16((xwu16_t)(~x));
+}
+#endif
+
+#if ((!defined(ARCHCFG_LIB_XWBOP_FLZ16)) || (1 != ARCHCFG_LIB_XWBOP_FLZ16))
+__xwlib_code
+xwssq_t xwbop_flz16(xwu16_t x)
+{
+        return xwbop_fls16((xwu16_t)(~x));
 }
 #endif
 
@@ -254,6 +286,22 @@ xwssq_t xwbop_fls32(xwu32_t x)
         }
 #  endif
         return r;
+}
+#endif
+
+#if ((!defined(ARCHCFG_LIB_XWBOP_FFZ32)) || (1 != ARCHCFG_LIB_XWBOP_FFZ32))
+__xwlib_code
+xwssq_t xwbop_ffz32(xwu32_t x)
+{
+        return xwbop_ffs32(~x);
+}
+#endif
+
+#if ((!defined(ARCHCFG_LIB_XWBOP_FLZ32)) || (1 != ARCHCFG_LIB_XWBOP_FLZ32))
+__xwlib_code
+xwssq_t xwbop_flz32(xwu32_t x)
+{
+        return xwbop_fls32(~x);
 }
 #endif
 
@@ -345,6 +393,22 @@ xwssq_t xwbop_fls64(xwu64_t x)
         }
 #  endif
         return r;
+}
+#endif
+
+#if ((!defined(ARCHCFG_LIB_XWBOP_FFZ64)) || (1 != ARCHCFG_LIB_XWBOP_FFZ64))
+__xwlib_code
+xwssq_t xwbop_ffz64(xwu64_t x)
+{
+        return xwbop_ffs64(~x);
+}
+#endif
+
+#if ((!defined(ARCHCFG_LIB_XWBOP_FLZ64)) || (1 != ARCHCFG_LIB_XWBOP_FLZ64))
+__xwlib_code
+xwssq_t xwbop_flz64(xwu64_t x)
+{
+        return xwbop_ffs64(~x);
 }
 #endif
 
@@ -967,9 +1031,9 @@ xwu64_t xwbop_rbit64(xwu64_t x)
 __xwlib_code
 xwsz_t xwbop_weight8(xwu8_t x)
 {
-        xwu8_t res = x - ((x >> 1) & (xwu8_t)0x55);
-        res = (res & (xwu8_t)0x33) + ((res >> 2) & (xwu8_t)0x33);
-        return (res + (res >> 4)) & (xwu8_t)0x0F;
+        xwu8_t res = x - ((x >> (xwu8_t)1) & (xwu8_t)0x55);
+        res = (res & (xwu8_t)0x33) + ((res >> (xwu8_t)2) & (xwu8_t)0x33);
+        return (res + (res >> (xwu8_t)4)) & (xwu8_t)0x0F;
 }
 #endif
 
@@ -977,10 +1041,10 @@ xwsz_t xwbop_weight8(xwu8_t x)
 __xwlib_code
 xwsz_t xwbop_weight16(xwu16_t x)
 {
-        xwu16_t res = x - ((x >> 1) & (xwu16_t)0x5555);
-        res = (res & (xwu16_t)0x3333) + ((res >> 2) & (xwu16_t)0x3333);
-        res = (res + (res >> 4)) & (xwu16_t)0x0F0F;
-        return (res + (res >> 8)) & (xwu16_t)0x00FF;
+        xwu16_t res = x - ((x >> (xwu16_t)1) & (xwu16_t)0x5555);
+        res = (res & (xwu16_t)0x3333) + ((res >> (xwu16_t)2) & (xwu16_t)0x3333);
+        res = (res + (res >> (xwu16_t)4)) & (xwu16_t)0x0F0F;
+        return (res + (res >> (xwu16_t)8)) & (xwu16_t)0x00FF;
 }
 #endif
 
@@ -988,11 +1052,11 @@ xwsz_t xwbop_weight16(xwu16_t x)
 __xwlib_code
 xwsz_t xwbop_weight32(xwu32_t x)
 {
-        xwu32_t res = x - ((x >> 1) & (xwu32_t)0x55555555);
-        res = (res & (xwu32_t)0x33333333) + ((res >> 2) & (xwu32_t)0x33333333);
-        res = (res + (res >> 4)) & (xwu32_t)0x0F0F0F0F;
-        res = res + (res >> 8);
-        return (res + (res >> 16)) & (xwu32_t)0x000000FF;
+        xwu32_t res = x - ((x >> (xwu32_t)1) & (xwu32_t)0x55555555);
+        res = (res & (xwu32_t)0x33333333) + ((res >> (xwu32_t)2) & (xwu32_t)0x33333333);
+        res = (res + (res >> (xwu32_t)4)) & (xwu32_t)0x0F0F0F0F;
+        res = res + (res >> (xwu32_t)8);
+        return (res + (res >> (xwu32_t)16)) & (xwu32_t)0x000000FF;
 }
 #endif
 
@@ -1000,12 +1064,12 @@ xwsz_t xwbop_weight32(xwu32_t x)
 __xwlib_code
 xwsz_t xwbop_weight64(xwu64_t x)
 {
-        xwu64_t res = x - ((x >> 1) & (xwu64_t)0x5555555555555555);
+        xwu64_t res = x - ((x >> (xwu64_t)1) & (xwu64_t)0x5555555555555555);
         res = (res & (xwu64_t)0x3333333333333333) +
-              ((res >> 2) & (xwu64_t)0x3333333333333333);
-        res = (res + (res >> 4)) & (xwu64_t)0x0F0F0F0F0F0F0F0F;
-        res = res + (res >> 8);
-        res = res + (res >> 16);
-        return (res + (res >> 32)) & (xwu64_t)0x00000000000000FF;
+              ((res >> (xwu64_t)2) & (xwu64_t)0x3333333333333333);
+        res = (res + (res >> (xwu64_t)4)) & (xwu64_t)0x0F0F0F0F0F0F0F0F;
+        res = res + (res >> (xwu64_t)8);
+        res = res + (res >> (xwu64_t)16);
+        return (res + (res >> (xwu64_t)32)) & (xwu64_t)0x00000000000000FF;
 }
 #endif

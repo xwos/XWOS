@@ -41,16 +41,16 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num)
                         break;
                 }
                 msk = (xwbmp_t)0;
-         } while (i > 0);
+         } while (i > (xwsz_t)0);
         __asm__ volatile(
-        "       clz             %[__p], %[__tmp]\n"
+        "       clz     %[__p], %[__tmp]\n"
         : [__p] "=&r" (p)
         : [__tmp] "r" (tmp)
         :
         );
-        p = ((xwssq_t)BITS_PER_XWBMP_T - 1) - p;
-        if (p >= 0) {
-                p += (xwssq_t)(i << XWBMP_T_SHIFT);
-        }/* else {} */
+        p = ((xwssq_t)BITS_PER_XWBMP_T - (xwssq_t)1) - p;
+        if (p >= (xwssq_t)0) {
+                p += ((xwssq_t)i << (xwssq_t)XWBMP_T_SHIFT);
+        }
         return p;
 }

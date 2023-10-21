@@ -31,7 +31,7 @@ xwu64_t xwbop_re64(xwu64_t x)
         } r;
 
         addrl = (xwu32_t *)&x;
-        addrh = addrl + 1;
+        addrh = addrl + (xwu32_t)1;
         __asm__ volatile(
         "       rev     %[__r_l32], %[__x_h32]\n"
         "       rev     %[__r_h32], %[__x_l32]\n"

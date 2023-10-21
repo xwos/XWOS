@@ -26,13 +26,14 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t m;
         xwsz_t i;
-        xwbmp_t msk, tmp;
+        xwbmp_t msk;
+        xwbmp_t tmp;
         xwssq_t p;
 
         m = BITS_TO_XWBMP_T(num);
-        p = -1;
-        for (i = 0; i < m; i++) {
-                if (i == (m - 1)) {
+        p = -(xwssq_t)1;
+        for (i = (xwsz_t)0; i < m; i++) {
+                if (i == (m - (xwsz_t)1)) {
                         msk = XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1;
                         if ((xwbmp_t)0 == msk) {
                                 msk = (~(xwbmp_t)0);
@@ -43,13 +44,13 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
                 }
                 if (tmp) {
                         __asm__ volatile(
-                        "       rbit            %[__p], %[__tmp]\n"
-                        "       clz             %[__p], %[__p]\n"
+                        "       rbit    %[__p], %[__tmp]\n"
+                        "       clz     %[__p], %[__p]\n"
                         : [__p] "=&r" (p)
                         : [__tmp] "r" (tmp)
                         :
                         );
-                        p += (xwssq_t)(i << XWBMP_T_SHIFT);
+                        p += ((xwssq_t)i << (xwssq_t)XWBMP_T_SHIFT);
                         break;
                 }
         }

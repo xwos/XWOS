@@ -83,23 +83,4 @@
 #define __evt                   __xwcc_section(".evt")
 #define __soc_ivt               __xwcc_section(".soc.ivt")
 
-/******** ******** barrier ******** ********/
-#define xwmb_compiler()         __asm__ volatile("": : :"memory")
-#define xwmb_isb()              __asm__ volatile("fence.i" : : : "memory")
-#define xwmb_ddb()              xwmb_compiler()
-
-#define xwmb_mb()               __asm__ volatile("fence iorw, iorw" : : : "memory")
-#define xwmb_rmb()              __asm__ volatile("fence ir, ir" : : : "memory")
-#define xwmb_wmb()              __asm__ volatile("fence ow, ow" : : : "memory")
-
-#define xwmb_dma_mb()           __asm__ volatile("fence iorw, iorw" : : : "memory")
-#define xwmb_dma_rmb()          __asm__ volatile("fence ir, ir" : : : "memory")
-#define xwmb_dma_wmb()          __asm__ volatile("fence ow, ow" : : : "memory")
-
-#define xwmb_mp_mb()            __asm__ volatile("fence iorw, iorw" : : : "memory")
-#define xwmb_mp_rmb()           __asm__ volatile("fence ir, ir" : : : "memory")
-#define xwmb_mp_wmb()           __asm__ volatile("fence ow, ow" : : : "memory")
-#define xwmb_mp_acquire()       __asm__ volatile("fence r, rw" : : : "memory")
-#define xwmb_mp_release()       __asm__ volatile("fence rw, w" : : : "memory")
-
 #endif /* xwcd/soc/riscv/nuclei/compiler/gcc.h */

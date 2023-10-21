@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植层：SOC BKPT
+ * @brief XWOS移植层：指令与架构
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,13 +10,10 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwos_ospl_soc_bkpt_h__
-#define __xwos_ospl_soc_bkpt_h__
+#ifndef __xwos_ospl_soc_isa_h__
+#define __xwos_ospl_soc_isa_h__
 
 #include <xwos/standard.h>
-#include <xwosimpl_soc_bkpt.h>
+#include <xwosimpl_soc_isa.h>
 
-static __xwbsp_inline
-void soc_bkpt(void);
-
-#endif /* xwos/ospl/soc/bkpt.h */
+#endif /* xwos/ospl/soc/isa.h */

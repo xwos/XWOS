@@ -74,26 +74,4 @@
 #define __firmware_tail         __xwcc_section(".firmware_tail")
 #define __flsopc                __xwcc_section(".flsopc")
 
-/******** ******** barrier ******** ********/
-#define eppc_isb()              __asm__ volatile("se_isync" : : : "memory")
-#define eppc_dmb()              __asm__ volatile("msync" : : : "memory")
-
-#define xwmb_compiler()         __asm__ volatile("": : :"memory")
-#define xwmb_isb()              eppc_isb()
-#define xwmb_ddb()              xwmb_compiler()
-
-#define xwmb_mb()               eppc_dmb()
-#define xwmb_rmb()              eppc_dmb()
-#define xwmb_wmb()              eppc_dmb()
-
-#define xwmb_dma_mb()           eppc_dmb()
-#define xwmb_dma_rmb()          eppc_dmb()
-#define xwmb_dma_wmb()          eppc_dmb()
-
-#define xwmb_mp_mb()            eppc_dmb()
-#define xwmb_mp_rmb()           eppc_dmb()
-#define xwmb_mp_wmb()           __asm__ volatile("mbar      0" : : : "memory")
-#define xwmb_mp_acquire()       xwmb_mp_rmb()
-#define xwmb_mp_release()       xwmb_mp_wmb()
-
 #endif /* xwcd/soc/powerpc/e200x/compiler/gcc.h */
