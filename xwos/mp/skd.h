@@ -202,7 +202,7 @@ xwer_t xwmp_skd_init_lc(void);
 xwer_t xwmp_skd_start_lc(void);
 xwer_t xwmp_skd_start_syshwt_lc(void);
 xwer_t xwmp_skd_stop_syshwt_lc(void);
-xwid_t xwmp_skd_id_lc(void);
+xwid_t xwmp_skd_get_cpuid_lc(void);
 
 struct xwmp_skd * xwmp_skd_dsbh_lc(void);
 struct xwmp_skd * xwmp_skd_enbh_lc(void);

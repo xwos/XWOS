@@ -40,7 +40,7 @@ void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
 #define SOC_MSCM_CPXNUM (*((__xw_io xwreg_t *)0x40260004U))
 
 __xwbsp_code
-xwid_t xwospl_skd_id_lc(void)
+xwid_t xwospl_skd_get_cpuid_lc(void)
 {
         xwid_t cpuid = SOC_MSCM_CPXNUM & 0x3U;
         return cpuid;

@@ -37,9 +37,9 @@
  * XWOS将上下文分为五种，定义可以参考 @ref xwos_skd_context ，
  * 当前代码的上下文可以通过 `xwos_skd_get_context_lc()` 获取。
  *
- * ## 调度器ID
+ * ## CPU ID
  *
- * + `xwos_skd_id_lc()` ：获取调度器ID（也是CPU ID）。
+ * + `xwos_skd_get_cpuid_lc()` ：获取CPU ID。
  *
  * ## 启动调度
  *
@@ -187,9 +187,9 @@ xwer_t xwos_skd_start_lc(void)
  * + 上下文：线程、中断、中断底半部、空闲任务
  */
 static __xwos_inline_api
-xwid_t xwos_skd_id_lc(void)
+xwid_t xwos_skd_get_cpuid_lc(void)
 {
-        return xwosdl_skd_id_lc();
+        return xwosdl_skd_get_cpuid_lc();
 }
 
 /**

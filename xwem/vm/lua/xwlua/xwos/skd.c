@@ -26,11 +26,11 @@
 #include "xwem/vm/lua/xwlua/xwos/skd.h"
 
 /******** xwos.skd ********/
-int xwlua_skd_id_lc(lua_State * L)
+int xwlua_skd_get_cpuid_lc(lua_State * L)
 {
         xwid_t id;
 
-        id = xwos_skd_id_lc();
+        id = xwos_skd_get_cpuid_lc();
         lua_pushnumber(L, (lua_Number)id);
         return 1;
 }
@@ -50,7 +50,7 @@ int xwlua_skd_get_enpmpt_lc(lua_State * L)
 }
 
 const luaL_Reg xwlua_skd_libconstructor[] = {
-        {"id", xwlua_skd_id_lc},
+        {"cpuid", xwlua_skd_get_cpuid_lc},
         {"dspmpt", xwlua_skd_get_dspmpt_lc},
         {"enpmpt", xwlua_skd_get_enpmpt_lc},
         {NULL, NULL},

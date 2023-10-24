@@ -156,7 +156,7 @@ xwer_t xwmp_skd_init_lc(void)
         xwer_t rc;
         struct xwmp_skd * xwskd;
 
-        id = xwmp_skd_id_lc();
+        id = xwmp_skd_get_cpuid_lc();
         xwskd = &xwmp_skd[id];
 
         xwskd->cstk = XWMP_SKD_IDLE_STK(xwskd);
@@ -215,7 +215,7 @@ xwer_t xwmp_skd_start_lc(void)
         xwer_t rc;
         xwid_t id;
 
-        id = xwmp_skd_id_lc();
+        id = xwmp_skd_get_cpuid_lc();
         xwskd = &xwmp_skd[id];
         rc = xwmp_syshwt_start(&xwskd->tt.hwt);
         if (XWOK == rc) {
@@ -265,9 +265,9 @@ xwer_t xwmp_skd_stop_syshwt_lc(void)
 }
 
 __xwmp_api
-xwid_t xwmp_skd_id_lc(void)
+xwid_t xwmp_skd_get_cpuid_lc(void)
 {
-        return xwospl_skd_id_lc();
+        return xwospl_skd_get_cpuid_lc();
 }
 
 /**
@@ -280,11 +280,11 @@ struct xwmp_skd * xwmp_skd_get_lc(void)
         struct xwmp_skd * xwskd;
         xwid_t cpuid;
 
-        cpuid = xwmp_skd_id_lc();
+        cpuid = xwmp_skd_get_cpuid_lc();
         xwmb_ddb();
         do {
                 xwskd = &xwmp_skd[cpuid];
-                cpuid = xwmp_skd_id_lc();
+                cpuid = xwmp_skd_get_cpuid_lc();
                 xwmb_ddb();
         } while (xwskd->id != cpuid);
         return xwskd;
@@ -335,12 +335,12 @@ struct xwmp_thd * xwmp_skd_get_cthd_lc(void)
         struct xwmp_thd * cthd;
         xwid_t cpuid;
 
-        cpuid = xwmp_skd_id_lc();
+        cpuid = xwmp_skd_get_cpuid_lc();
         xwmb_ddb();
         do {
                 xwskd = &xwmp_skd[cpuid];
                 cthd = xwcc_derof(xwskd->cstk, struct xwmp_thd, stack);
-                cpuid = xwmp_skd_id_lc();
+                cpuid = xwmp_skd_get_cpuid_lc();
                 xwmb_ddb();
         } while (xwskd->id != cpuid);
         return cthd;
@@ -1481,7 +1481,7 @@ xwer_t xwmp_skd_resume(xwid_t cpuid)
         xwid_t localid;
         xwer_t rc;
 
-        localid = xwmp_skd_id_lc();
+        localid = xwmp_skd_get_cpuid_lc();
         if (localid == cpuid) {
                 xwskd = xwmp_skd_get_lc();
                 if (XWOK == xwmp_irq_get_id(NULL)) {

@@ -69,7 +69,7 @@ void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
 /**
  * @brief XWOS移植层：获取当前CPU的ID
  */
-xwid_t xwospl_skd_id_lc(void);
+xwid_t xwospl_skd_get_cpuid_lc(void);
 
 /**
  * @brief XWOS移植层：启动调度器

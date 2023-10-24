@@ -1989,7 +1989,7 @@ xwer_t xwmp_thd_migrate(struct xwmp_thd * thd, xwid_t dstcpu)
                 goto err_thd_standby;
         }
 
-        localcpu = xwmp_skd_id_lc();
+        localcpu = xwmp_skd_get_cpuid_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         srccpu = xwskd->id;
         if (localcpu == srccpu) {

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：ARMv7M指令和架构
+ * @brief 架构描述层：ARMv7M的架构指令
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

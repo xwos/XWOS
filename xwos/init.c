@@ -27,7 +27,7 @@ void xwos_init(void)
 {
         xwid_t cpuid;
 
-        cpuid = xwos_skd_id_lc();
+        cpuid = xwos_skd_get_cpuid_lc();
         if ((xwid_t)0 == cpuid) {
                 xwos_objtik_init();
         }

@@ -85,7 +85,7 @@ xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
  * @brief 获取当前CPU的ID
  */
 __xwbsp_code
-xwid_t xwospl_skd_id_lc(void)
+xwid_t xwospl_skd_get_cpuid_lc(void)
 {
         return 0;
 }

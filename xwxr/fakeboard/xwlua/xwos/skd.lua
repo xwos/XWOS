@@ -14,9 +14,9 @@ XWLUA模块：调度器
 
 @treturn number CPU的ID
 
-@usage id = xwos.skd.id()
+@usage cpuid = xwos.skd.cpuid()
 ]]
-function id()
+function cpuid()
 end
 
 

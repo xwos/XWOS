@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC的指令与架构
+ * @brief XWOS移植实现层：SOC的架构指令
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

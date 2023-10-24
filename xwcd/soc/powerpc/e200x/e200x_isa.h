@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief e200z0指令和架构
+ * @brief e200z0的架构指令
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

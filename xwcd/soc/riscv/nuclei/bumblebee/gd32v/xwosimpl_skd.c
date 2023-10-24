@@ -213,7 +213,7 @@ void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
 }
 
 __xwbsp_code
-xwid_t xwospl_skd_id_lc(void)
+xwid_t xwospl_skd_get_cpuid_lc(void)
 {
         xwid_t hartid;
 

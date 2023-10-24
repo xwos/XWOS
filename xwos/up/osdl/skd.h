@@ -42,7 +42,7 @@ xwer_t xwosdl_skd_start_lc(void)
 }
 
 static __xwcc_inline
-xwid_t xwosdl_skd_id_lc(void)
+xwid_t xwosdl_skd_get_cpuid_lc(void)
 {
         return 0;
 }

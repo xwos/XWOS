@@ -72,7 +72,7 @@ xwsq_t xwos_objtik_get(void)
         xwsq_t ov;
         xwer_t rc;
 
-        cpu = xwos_skd_id_lc();
+        cpu = xwos_skd_get_cpuid_lc();
         objtik = &xwos_objtik[cpu];
         do {
                 curr = xwaop_load(xwsq_t, objtik, xwaop_mo_relaxed);
