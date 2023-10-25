@@ -73,7 +73,7 @@ void xwospl_tls_init(struct xwospl_skdobj_stack * stk)
  * @return TLS段的基地址
  * @details
  * ARM EABI中定义的函数，用于返回TLS段的基地址。
- * 当使用C11（含）以后标准中的 `_Thread_local` 变量时，会连接到此函数。
+ * 当使用C11（含）以后标准中的 `_Thread_local` 变量时，会链接到此函数。
  *
  * 编译器会假定此函数内只会使用 `r0` 寄存器，
  * 因此，若此函数内需要使用 `volatile` 寄存器，需要保护 `r1`, `r2`, `r3`, `lr` 。
