@@ -21,7 +21,7 @@
 #include <xwcd/ds/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/lib/xwbmpaop.h>
+#include <xwos/lib/xwaop.h>
 #include <xwcd/ds/can/transceiver.h>
 
 static __xwds_vop

@@ -17,35 +17,35 @@ XWOS_CSRCS += lib/div64.c
 
 ifeq ($(XWLIBCFG_XWAOP8),y)
   ifneq ($(ARCHCFG_LIB_XWAOP8),y)
-    XWOS_CSRCS += lib/xwaops8.c
-    XWOS_CSRCS += lib/xwaopu8.c
+    XWOS_CSRCS += lib/xwaop/s8.c
+    XWOS_CSRCS += lib/xwaop/u8.c
   endif
 endif
 
 ifeq ($(XWLIBCFG_XWAOP16),y)
   ifneq ($(ARCHCFG_LIB_XWAOP16),y)
-    XWOS_CSRCS += lib/xwaops16.c
-    XWOS_CSRCS += lib/xwaopu16.c
+    XWOS_CSRCS += lib/xwaop/s16.c
+    XWOS_CSRCS += lib/xwaop/u16.c
   endif
 endif
 
 ifeq ($(XWLIBCFG_XWAOP32),y)
   ifneq ($(ARCHCFG_LIB_XWAOP32),y)
-    XWOS_CSRCS += lib/xwaops32.c
-    XWOS_CSRCS += lib/xwaopu32.c
+    XWOS_CSRCS += lib/xwaop/s32.c
+    XWOS_CSRCS += lib/xwaop/u32.c
   endif
 endif
 
 ifeq ($(XWLIBCFG_XWAOP64),y)
   ifneq ($(ARCHCFG_LIB_XWAOP64),y)
-    XWOS_CSRCS += lib/xwaops64.c
-    XWOS_CSRCS += lib/xwaopu64.c
+    XWOS_CSRCS += lib/xwaop/s64.c
+    XWOS_CSRCS += lib/xwaop/u64.c
   endif
 endif
 
 ifeq ($(XWLIBCFG_XWBMPAOP),y)
   ifneq ($(ARCHCFG_LIB_XWBMPAOP),y)
-    XWOS_CSRCS += lib/xwbmpaop.c
+    XWOS_CSRCS += lib/xwaop/bmp.c
   endif
 endif
 

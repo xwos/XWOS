@@ -13,7 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
-#include <xwos/lib/xwbmpaop.h>
 
 __xwlib_code
 bool xwbmpaop_t1i(atomic_xwbmp_t * bmp, xwsq_t idx)

@@ -21,7 +21,7 @@
 #include <xwcd/ds/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/lib/xwbmpaop.h>
+#include <xwos/lib/xwaop.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/sem.h>
 #include <xwcd/ds/can/controller.h>

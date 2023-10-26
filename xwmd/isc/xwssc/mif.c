@@ -14,7 +14,6 @@
 #include <string.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwaop.h>
-#include <xwos/lib/xwbmpaop.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/bma.h>
 #include <xwos/osal/thd.h>

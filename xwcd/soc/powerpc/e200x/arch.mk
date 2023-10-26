@@ -31,18 +31,20 @@ ARCH_CXXSRCS :=
 ARCH_EOBJS :=
 
 ifeq ($(ARCHCFG_LIB_XWAOP32),y)
-  ARCH_CSRCS += asmlib/xwaop/xws32.c
-  ARCH_CSRCS += asmlib/xwaop/xwu32.c
+  ARCH_CSRCS += xwosimpl_soc_xwaop/s32.c
+  ARCH_CSRCS += xwosimpl_soc_xwaop/u32.c
 endif
 
 ifeq ($(ARCHCFG_LIB_XWBMPAOP),y)
-  ARCH_CSRCS += asmlib/xwbmpaop.c
-  ARCH_ASRCS += asmlib/asm_xwbmpaop.S
+  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp.c
+  ARCH_ASRCS += xwosimpl_soc_xwaop/asm_bmp.S
 endif
 
-ARCH_CSRCS += asmlib/xwbop.c
-ARCH_CSRCS += arch_init.c arch_sc_trap.c xwosimpl_soc_lfq.c xwosimpl_soc_xwsc.c
+ARCH_CSRCS += xwosimpl_soc_xwbop/xwbop.c
+ARCH_ASRCS += xwosimpl_soc_xwbop/asm_xwbop.S
 
-ARCH_ASRCS += asmlib/asm_rw.S asmlib/asm_xwbop.S
+ARCH_CSRCS += arch_init.c arch_sc_trap.c
+ARCH_CSRCS += xwosimpl_soc_lfq.c xwosimpl_soc_xwsc.c xwosimpl_tls.c
+
+ARCH_ASRCS += e200x_isa.S
 ARCH_ASRCS += startup.S arch_isr.S xwosimpl_soc_spinlock.S
-ARCH_CSRCS += xwosimpl_tls.c

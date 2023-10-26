@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC位操作
+ * @brief XWOS移植实现层：SOC：位操作
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

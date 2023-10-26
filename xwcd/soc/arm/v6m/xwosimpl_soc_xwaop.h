@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC位图原子操作
+ * @brief XWOS移植实现层：SOC：8位原子操作
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_xwbmpaop_h__
-#define __xwosimpl_soc_xwbmpaop_h__
+#ifndef __xwosimpl_soc_xwaop_h__
+#define __xwosimpl_soc_xwaop_h__
 
-#ifndef __xwos_ospl_soc_xwbmpaop_h__
-#  error "This file should be included from <xwos/ospl/soc/xwbmpaop.h>."
+#ifndef __xwos_ospl_soc_xwaop_h__
+#  error "This file should be included from <xwos/ospl/soc/xwaop.h>."
 #endif
 
-#endif /* xwosimpl_soc_xwbmpaop.h */
+#endif /* xwosimpl_soc_xwaop.h */

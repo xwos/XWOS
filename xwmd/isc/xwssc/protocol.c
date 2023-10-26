@@ -13,7 +13,6 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwaop.h>
-#include <xwos/lib/xwbmpaop.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/crc32.h>
