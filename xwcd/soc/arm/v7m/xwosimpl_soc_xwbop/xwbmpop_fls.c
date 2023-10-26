@@ -29,19 +29,20 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
         xwbmp_t tmp;
         xwssq_t p;
 
+        tmp = 0;
         i = BITS_TO_XWBMP_T(num);
         msk = (XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((xwbmp_t)0 == msk) {
                 msk = (~(xwbmp_t)0);
         }
-        do {
+        while (i > (xwsz_t)0) {
                 i--;
                 tmp = bmp[i] & msk;
                 if (tmp) {
                         break;
                 }
                 msk = (~(xwbmp_t)0);
-        } while (i > (xwsz_t)0);
+        }
         __asm__ volatile(
         "       clz     %[__p], %[__tmp]\n"
         : [__p] "=&r" (p)

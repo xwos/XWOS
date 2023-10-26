@@ -117,6 +117,24 @@ xwssq_t xwbop_flz8(xwu8_t x)
 }
 #endif
 
+#if (!defined(ARCHCFG_LIB_XWBOP_RBIT8)) || (1 != ARCHCFG_LIB_XWBOP_RBIT8)
+__xwlib_code
+xwu8_t xwbop_rbit8(xwu8_t x)
+{
+        return xwbop_rbit8_table[x];
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT8)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT8)
+__xwlib_code
+xwsz_t xwbop_weight8(xwu8_t x)
+{
+        xwu8_t res = x - ((x >> (xwu8_t)1) & (xwu8_t)0x55);
+        res = (res & (xwu8_t)0x33) + ((res >> (xwu8_t)2) & (xwu8_t)0x33);
+        return (res + (res >> (xwu8_t)4)) & (xwu8_t)0x0F;
+}
+#endif
+
 #if (!defined(ARCHCFG_LIB_XWBOP_FFS16)) || (1 != ARCHCFG_LIB_XWBOP_FFS16)
 __xwlib_code
 xwssq_t xwbop_ffs16(xwu16_t x)
@@ -204,6 +222,54 @@ __xwlib_code
 xwssq_t xwbop_flz16(xwu16_t x)
 {
         return xwbop_fls16((xwu16_t)(~x));
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_RBIT16)) || (1 != ARCHCFG_LIB_XWBOP_RBIT16)
+__xwlib_code
+xwu16_t xwbop_rbit16(xwu16_t x)
+{
+        union {
+                xwu16_t d16;
+                struct {
+                        xwu8_t h;
+                        xwu8_t l;
+                } d8;
+        } r, t; // cppcheck-suppress [misra-c2012-12.3]
+
+        t.d16 = x;
+        r.d8.h = xwbop_rbit8(t.d8.l);
+        r.d8.l = xwbop_rbit8(t.d8.h);
+        return r.d16;
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_RE16)) || (1 != ARCHCFG_LIB_XWBOP_RE16)
+__xwlib_code
+xwu16_t xwbop_re16(xwu16_t x)
+{
+        union {
+                xwu16_t d16;
+                struct {
+                        xwu8_t byte0;
+                        xwu8_t byte1;
+                } d8;
+        } r;
+
+        r.d8.byte0 = (xwu8_t)(x >> (xwu16_t)8);
+        r.d8.byte1 = (xwu8_t)(x >> (xwu16_t)0);
+        return r.d16;
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT16)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT16)
+__xwlib_code
+xwsz_t xwbop_weight16(xwu16_t x)
+{
+        xwu16_t res = x - ((x >> (xwu16_t)1) & (xwu16_t)0x5555);
+        res = (res & (xwu16_t)0x3333) + ((res >> (xwu16_t)2) & (xwu16_t)0x3333);
+        res = (res + (res >> (xwu16_t)4)) & (xwu16_t)0x0F0F;
+        return (res + (res >> (xwu16_t)8)) & (xwu16_t)0x00FF;
 }
 #endif
 
@@ -302,6 +368,63 @@ __xwlib_code
 xwssq_t xwbop_flz32(xwu32_t x)
 {
         return xwbop_fls32(~x);
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_RBIT32)) || (1 != ARCHCFG_LIB_XWBOP_RBIT32)
+__xwlib_code
+xwu32_t xwbop_rbit32(xwu32_t x)
+{
+        union {
+                xwu32_t d32;
+                struct {
+                        xwu8_t byte0;
+                        xwu8_t byte1;
+                        xwu8_t byte2;
+                        xwu8_t byte3;
+                } d8;
+        } r, t; // cppcheck-suppress [misra-c2012-12.3]
+
+        t.d32 = x;
+        r.d8.byte0 = xwbop_rbit8(t.d8.byte3);
+        r.d8.byte1 = xwbop_rbit8(t.d8.byte2);
+        r.d8.byte2 = xwbop_rbit8(t.d8.byte1);
+        r.d8.byte3 = xwbop_rbit8(t.d8.byte0);
+        return r.d32;
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_RE32)) || (1 != ARCHCFG_LIB_XWBOP_RE32)
+__xwlib_code
+xwu32_t xwbop_re32(xwu32_t x)
+{
+        union {
+                xwu32_t d32;
+                struct {
+                        xwu8_t byte0;
+                        xwu8_t byte1;
+                        xwu8_t byte2;
+                        xwu8_t byte3;
+                } d8;
+        } r;
+
+        r.d8.byte0 = (xwu8_t)(x >> (xwu32_t)24);
+        r.d8.byte1 = (xwu8_t)(x >> (xwu32_t)16);
+        r.d8.byte2 = (xwu8_t)(x >> (xwu32_t)8);
+        r.d8.byte3 = (xwu8_t)(x >> (xwu32_t)0);
+        return r.d32;
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT32)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT32)
+__xwlib_code
+xwsz_t xwbop_weight32(xwu32_t x)
+{
+        xwu32_t res = x - ((x >> (xwu32_t)1) & (xwu32_t)0x55555555);
+        res = (res & (xwu32_t)0x33333333) + ((res >> (xwu32_t)2) & (xwu32_t)0x33333333);
+        res = (res + (res >> (xwu32_t)4)) & (xwu32_t)0x0F0F0F0F;
+        res = res + (res >> (xwu32_t)8);
+        return (res + (res >> (xwu32_t)16)) & (xwu32_t)0x000000FF;
 }
 #endif
 
@@ -409,6 +532,81 @@ __xwlib_code
 xwssq_t xwbop_flz64(xwu64_t x)
 {
         return xwbop_ffs64(~x);
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_RBIT64)) || (1 != ARCHCFG_LIB_XWBOP_RBIT64)
+__xwlib_code
+xwu64_t xwbop_rbit64(xwu64_t x)
+{
+        union {
+                xwu64_t d64;
+                struct {
+                        xwu8_t byte0;
+                        xwu8_t byte1;
+                        xwu8_t byte2;
+                        xwu8_t byte3;
+                        xwu8_t byte4;
+                        xwu8_t byte5;
+                        xwu8_t byte6;
+                        xwu8_t byte7;
+                } d8;
+        } r, t; // cppcheck-suppress [misra-c2012-12.3]
+
+        t.d64 = x;
+        r.d8.byte0 = xwbop_rbit8(t.d8.byte7);
+        r.d8.byte1 = xwbop_rbit8(t.d8.byte6);
+        r.d8.byte2 = xwbop_rbit8(t.d8.byte5);
+        r.d8.byte3 = xwbop_rbit8(t.d8.byte4);
+        r.d8.byte4 = xwbop_rbit8(t.d8.byte3);
+        r.d8.byte5 = xwbop_rbit8(t.d8.byte2);
+        r.d8.byte6 = xwbop_rbit8(t.d8.byte1);
+        r.d8.byte7 = xwbop_rbit8(t.d8.byte0);
+        return r.d64;
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_RE64)) || (1 != ARCHCFG_LIB_XWBOP_RE64)
+__xwlib_code
+xwu64_t xwbop_re64(xwu64_t x)
+{
+        union {
+                xwu64_t d64;
+                struct {
+                        xwu8_t byte0;
+                        xwu8_t byte1;
+                        xwu8_t byte2;
+                        xwu8_t byte3;
+                        xwu8_t byte4;
+                        xwu8_t byte5;
+                        xwu8_t byte6;
+                        xwu8_t byte7;
+                } d8;
+        } r;
+
+        r.d8.byte0 = (xwu8_t)(x >> (xwu64_t)56);
+        r.d8.byte1 = (xwu8_t)(x >> (xwu64_t)48);
+        r.d8.byte2 = (xwu8_t)(x >> (xwu64_t)40);
+        r.d8.byte3 = (xwu8_t)(x >> (xwu64_t)32);
+        r.d8.byte4 = (xwu8_t)(x >> (xwu64_t)24);
+        r.d8.byte5 = (xwu8_t)(x >> (xwu64_t)16);
+        r.d8.byte6 = (xwu8_t)(x >> (xwu64_t)8);
+        r.d8.byte7 = (xwu8_t)(x >> (xwu64_t)0);
+        return r.d64;
+}
+#endif
+
+#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT64)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT64)
+__xwlib_code
+xwsz_t xwbop_weight64(xwu64_t x)
+{
+        xwu64_t res = x - ((x >> (xwu64_t)1) & (xwu64_t)0x5555555555555555);
+        res = (res & (xwu64_t)0x3333333333333333) +
+              ((res >> (xwu64_t)2) & (xwu64_t)0x3333333333333333);
+        res = (res + (res >> (xwu64_t)4)) & (xwu64_t)0x0F0F0F0F0F0F0F0F;
+        res = res + (res >> (xwu64_t)8);
+        res = res + (res >> (xwu64_t)16);
+        return (res + (res >> (xwu64_t)32)) & (xwu64_t)0x00000000000000FF;
 }
 #endif
 
@@ -823,14 +1021,14 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
         if ((xwbmp_t)0 == msk) {
                 msk = (xwbmp_t)(~(xwbmp_t)0);
         }
-        do {
+        while (i > 0) {
                 i--;
                 p = xwbop_fls(xwbmp_t, bmp[i] & msk);
                 if (p >= 0) {
                         break;
                 }
                 msk = (xwbmp_t)(~(xwbmp_t)0);
-        } while (i > 0);
+        }
         p += ((xwssq_t)i << XWBMP_T_SHIFT); /* p = p + i * BITS_PER_XWBMP_T; */
         return p;
 }
@@ -848,14 +1046,14 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num)
         if ((xwbmp_t)(~(xwbmp_t)0) == msk) {
                 msk = (xwbmp_t)0;
         }
-        do {
+        while (i > 0) {
                 i--;
                 p = xwbop_flz(xwbmp_t, bmp[i] | msk);
                 if (p >= 0) {
                         break;
                 }
                 msk = (xwbmp_t)0;
-        } while (i > 0);
+        }
         p += ((xwssq_t)i << XWBMP_T_SHIFT); /* p = p + i * BITS_PER_XWBMP_T; */
         return p;
 }
@@ -875,201 +1073,3 @@ xwsz_t xwbmpop_weight(xwbmp_t * bmp, xwsz_t num)
         }
         return res;
 }
-
-#if (!defined(ARCHCFG_LIB_XWBOP_RE16)) || (1 != ARCHCFG_LIB_XWBOP_RE16)
-__xwlib_code
-xwu16_t xwbop_re16(xwu16_t x)
-{
-        union {
-                xwu16_t d16;
-                struct {
-                        xwu8_t byte0;
-                        xwu8_t byte1;
-                } d8;
-        } r;
-
-        r.d8.byte0 = (xwu8_t)(x >> (xwu16_t)8);
-        r.d8.byte1 = (xwu8_t)(x >> (xwu16_t)0);
-        return r.d16;
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_RE32)) || (1 != ARCHCFG_LIB_XWBOP_RE32)
-__xwlib_code
-xwu32_t xwbop_re32(xwu32_t x)
-{
-        union {
-                xwu32_t d32;
-                struct {
-                        xwu8_t byte0;
-                        xwu8_t byte1;
-                        xwu8_t byte2;
-                        xwu8_t byte3;
-                } d8;
-        } r;
-
-        r.d8.byte0 = (xwu8_t)(x >> (xwu32_t)24);
-        r.d8.byte1 = (xwu8_t)(x >> (xwu32_t)16);
-        r.d8.byte2 = (xwu8_t)(x >> (xwu32_t)8);
-        r.d8.byte3 = (xwu8_t)(x >> (xwu32_t)0);
-        return r.d32;
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_RE64)) || (1 != ARCHCFG_LIB_XWBOP_RE64)
-__xwlib_code
-xwu64_t xwbop_re64(xwu64_t x)
-{
-        union {
-                xwu64_t d64;
-                struct {
-                        xwu8_t byte0;
-                        xwu8_t byte1;
-                        xwu8_t byte2;
-                        xwu8_t byte3;
-                        xwu8_t byte4;
-                        xwu8_t byte5;
-                        xwu8_t byte6;
-                        xwu8_t byte7;
-                } d8;
-        } r;
-
-        r.d8.byte0 = (xwu8_t)(x >> (xwu64_t)56);
-        r.d8.byte1 = (xwu8_t)(x >> (xwu64_t)48);
-        r.d8.byte2 = (xwu8_t)(x >> (xwu64_t)40);
-        r.d8.byte3 = (xwu8_t)(x >> (xwu64_t)32);
-        r.d8.byte4 = (xwu8_t)(x >> (xwu64_t)24);
-        r.d8.byte5 = (xwu8_t)(x >> (xwu64_t)16);
-        r.d8.byte6 = (xwu8_t)(x >> (xwu64_t)8);
-        r.d8.byte7 = (xwu8_t)(x >> (xwu64_t)0);
-        return r.d64;
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_RBIT8)) || (1 != ARCHCFG_LIB_XWBOP_RBIT8)
-__xwlib_code
-xwu8_t xwbop_rbit8(xwu8_t x)
-{
-        return xwbop_rbit8_table[x];
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_RBIT16)) || (1 != ARCHCFG_LIB_XWBOP_RBIT16)
-__xwlib_code
-xwu16_t xwbop_rbit16(xwu16_t x)
-{
-        union {
-                xwu16_t d16;
-                struct {
-                        xwu8_t h;
-                        xwu8_t l;
-                } d8;
-        } r, t; // cppcheck-suppress [misra-c2012-12.3]
-
-        t.d16 = x;
-        r.d8.h = xwbop_rbit8(t.d8.l);
-        r.d8.l = xwbop_rbit8(t.d8.h);
-        return r.d16;
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_RBIT32)) || (1 != ARCHCFG_LIB_XWBOP_RBIT32)
-__xwlib_code
-xwu32_t xwbop_rbit32(xwu32_t x)
-{
-        union {
-                xwu32_t d32;
-                struct {
-                        xwu8_t byte0;
-                        xwu8_t byte1;
-                        xwu8_t byte2;
-                        xwu8_t byte3;
-                } d8;
-        } r, t; // cppcheck-suppress [misra-c2012-12.3]
-
-        t.d32 = x;
-        r.d8.byte0 = xwbop_rbit8(t.d8.byte3);
-        r.d8.byte1 = xwbop_rbit8(t.d8.byte2);
-        r.d8.byte2 = xwbop_rbit8(t.d8.byte1);
-        r.d8.byte3 = xwbop_rbit8(t.d8.byte0);
-        return r.d32;
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_RBIT64)) || (1 != ARCHCFG_LIB_XWBOP_RBIT64)
-__xwlib_code
-xwu64_t xwbop_rbit64(xwu64_t x)
-{
-        union {
-                xwu64_t d64;
-                struct {
-                        xwu8_t byte0;
-                        xwu8_t byte1;
-                        xwu8_t byte2;
-                        xwu8_t byte3;
-                        xwu8_t byte4;
-                        xwu8_t byte5;
-                        xwu8_t byte6;
-                        xwu8_t byte7;
-                } d8;
-        } r, t; // cppcheck-suppress [misra-c2012-12.3]
-
-        t.d64 = x;
-        r.d8.byte0 = xwbop_rbit8(t.d8.byte7);
-        r.d8.byte1 = xwbop_rbit8(t.d8.byte6);
-        r.d8.byte2 = xwbop_rbit8(t.d8.byte5);
-        r.d8.byte3 = xwbop_rbit8(t.d8.byte4);
-        r.d8.byte4 = xwbop_rbit8(t.d8.byte3);
-        r.d8.byte5 = xwbop_rbit8(t.d8.byte2);
-        r.d8.byte6 = xwbop_rbit8(t.d8.byte1);
-        r.d8.byte7 = xwbop_rbit8(t.d8.byte0);
-        return r.d64;
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT8)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT8)
-__xwlib_code
-xwsz_t xwbop_weight8(xwu8_t x)
-{
-        xwu8_t res = x - ((x >> (xwu8_t)1) & (xwu8_t)0x55);
-        res = (res & (xwu8_t)0x33) + ((res >> (xwu8_t)2) & (xwu8_t)0x33);
-        return (res + (res >> (xwu8_t)4)) & (xwu8_t)0x0F;
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT16)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT16)
-__xwlib_code
-xwsz_t xwbop_weight16(xwu16_t x)
-{
-        xwu16_t res = x - ((x >> (xwu16_t)1) & (xwu16_t)0x5555);
-        res = (res & (xwu16_t)0x3333) + ((res >> (xwu16_t)2) & (xwu16_t)0x3333);
-        res = (res + (res >> (xwu16_t)4)) & (xwu16_t)0x0F0F;
-        return (res + (res >> (xwu16_t)8)) & (xwu16_t)0x00FF;
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT32)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT32)
-__xwlib_code
-xwsz_t xwbop_weight32(xwu32_t x)
-{
-        xwu32_t res = x - ((x >> (xwu32_t)1) & (xwu32_t)0x55555555);
-        res = (res & (xwu32_t)0x33333333) + ((res >> (xwu32_t)2) & (xwu32_t)0x33333333);
-        res = (res + (res >> (xwu32_t)4)) & (xwu32_t)0x0F0F0F0F;
-        res = res + (res >> (xwu32_t)8);
-        return (res + (res >> (xwu32_t)16)) & (xwu32_t)0x000000FF;
-}
-#endif
-
-#if (!defined(ARCHCFG_LIB_XWBOP_WEIGHT64)) || (1 != ARCHCFG_LIB_XWBOP_WEIGHT64)
-__xwlib_code
-xwsz_t xwbop_weight64(xwu64_t x)
-{
-        xwu64_t res = x - ((x >> (xwu64_t)1) & (xwu64_t)0x5555555555555555);
-        res = (res & (xwu64_t)0x3333333333333333) +
-              ((res >> (xwu64_t)2) & (xwu64_t)0x3333333333333333);
-        res = (res + (res >> (xwu64_t)4)) & (xwu64_t)0x0F0F0F0F0F0F0F0F;
-        res = res + (res >> (xwu64_t)8);
-        res = res + (res >> (xwu64_t)16);
-        return (res + (res >> (xwu64_t)32)) & (xwu64_t)0x00000000000000FF;
-}
-#endif

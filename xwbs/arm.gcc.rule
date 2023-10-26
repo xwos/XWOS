@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief Makefile规则：ARM-cortex-m-gcc
+# @brief Makefile规则：ARM GCC
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright

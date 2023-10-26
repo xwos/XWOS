@@ -90,7 +90,7 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t len)
         xwssq_t p;
 
         m = BITS_TO_XWBMP_T(len);
-        p = -1;
+        p = -(xwssq_t)1;
         for (i = 0; i < m; i++) {
                 if (i == (m - 1)) {
                         msk = (XWBOP_BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
@@ -127,7 +127,7 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t len)
         xwbmp_t tmp;
 
         m = BITS_TO_XWBMP_T(len);
-        p = -1;
+        p = -(xwssq_t)1;
         for (i = 0; i < m; i++) {
                 if (i == (m - 1)) {
                         msk = ~(XWBOP_BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
@@ -158,16 +158,17 @@ __xwbsp_code
 xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t len)
 {
         xwsz_t i;
-        xwbmp_t msk, tmp;
+        xwbmp_t msk;
+        xwbmp_t tmp;
         xwssq_t p;
 
         i = BITS_TO_XWBMP_T(len);
         msk = (XWBOP_BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((xwbmp_t)0 == msk) {
                 msk = (~(xwbmp_t)0);
-        }/* else {} */
-        p = -1;
-        do {
+        }
+        p = -(xwssq_t)1;
+        while (i > (xwsz_t)0) {
                 i--;
                 tmp = bmp[i] & msk;
                 if (tmp) {
@@ -178,11 +179,11 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t len)
                         : [__tmp] "r" (tmp)
                         : "memory"
                         );
-                        p += (xwssq_t)(i << XWBMP_T_SHIFT);
+                        p += ((xwssq_t)i << (xwssq_t)XWBMP_T_SHIFT);
                         break;
-                }/* else {} */
+                }
                 msk = (~(xwbmp_t)0);
-        } while (i > 0);
+        }
         return p;
 }
 
@@ -198,9 +199,9 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t len)
         msk = ~(XWBOP_BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((~(xwbmp_t)0) == msk) {
                 msk = (xwbmp_t)0;
-        }/* else {} */
-        p = -1;
-        do {
+        }
+        p = -(xwssq_t)1;
+        while (i > (xwsz_t)0) {
                 i--;
                 tmp = ~(bmp[i] | msk);
                 if (tmp) {
@@ -211,10 +212,10 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t len)
                         : [__tmp] "r" (tmp)
                         : "memory"
                         );
-                        p += (xwssq_t)(i << XWBMP_T_SHIFT);
+                        p += ((xwssq_t)i << (xwssq_t)XWBMP_T_SHIFT);
                         break;
-                }/* else {} */
+                }
                 msk = (xwbmp_t)0;
-        } while (i > 0);
+        }
         return p;
 }
