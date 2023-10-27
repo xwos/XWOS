@@ -24,7 +24,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/thd.h>
-#include <xwcd/perpheral/spi/flash/w25qxx/device.h>
+#include <xwcd/peripheral/spi/flash/w25qxx/device.h>
 #include <xwam/application/w25qrpt/hwifal.h>
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)

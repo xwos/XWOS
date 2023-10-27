@@ -19,8 +19,8 @@
  */
 
 #include "board/std.h"
-#include <xwcd/perpheral/i2c/eeprom/device.h>
-#include <xwcd/perpheral/i2c/eeprom/driver.h>
+#include <xwcd/peripheral/i2c/eeprom/device.h>
+#include <xwcd/peripheral/i2c/eeprom/driver.h>
 #include "board/xwac/xwds/device.h"
 
 struct xwds_eeprom stm32xwds_eeprom256k = {

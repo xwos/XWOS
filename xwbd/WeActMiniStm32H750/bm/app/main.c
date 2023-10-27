@@ -21,7 +21,7 @@
 #include "board/std.h"
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/thd.h>
-#include <xwcd/perpheral/spi/lcd/st7735/driver.h>
+#include <xwcd/peripheral/spi/lcd/st7735/driver.h>
 #ifdef XWCFG_LIBC__newlib
 #  include <xwmd/libc/newlibac/mif.h>
 #endif

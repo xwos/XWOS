@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief W25Qxx编程器
+ * @brief SPI Flash W25Qxx Device
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_application_w25qrpt_mif_h__
-#define __xwam_application_w25qrpt_mif_h__
-
-#include <xwos/standard.h>
 #include <xwcd/peripheral/spi/flash/w25qxx/device.h>
-#include <xwam/application/w25qrpt/w25qrpt.h>
-#include <xwam/application/w25qrpt/hwifal.h>
-#include <xwam/application/w25qrpt/hwif/uart.h>
 
-xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
-                     const char * name,
-                     struct xwds_w25qxx * flash,
-                     const struct w25qrpt_hwifal_operations * hwifops,
-                     void * hwifcb);
+void xwds_w25qxx_construct(struct xwds_w25qxx * w25qxx)
+{
+        xwds_spip_construct(&w25qxx->spip);
+}
 
-xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt);
-
-#endif /* xwam/application/w25qrpt/mif.h */
+void xwds_w25qxx_destruct(struct xwds_w25qxx * w25qxx)
+{
+        xwds_spip_destruct(&w25qxx->spip);
+}

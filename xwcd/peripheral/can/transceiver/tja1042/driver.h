@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief W25Qxx编程器
+ * @brief CAN Transceiver TJA1042驱动
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,21 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_application_w25qrpt_mif_h__
-#define __xwam_application_w25qrpt_mif_h__
+#ifndef __xwcd_peripheral_can_transceiver_tja1042_driver_h__
+#define __xwcd_peripheral_can_transceiver_tja1042_driver_h__
 
 #include <xwos/standard.h>
-#include <xwcd/peripheral/spi/flash/w25qxx/device.h>
-#include <xwam/application/w25qrpt/w25qrpt.h>
-#include <xwam/application/w25qrpt/hwifal.h>
-#include <xwam/application/w25qrpt/hwif/uart.h>
+#include <xwcd/ds/can/transceiver.h>
 
-xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
-                     const char * name,
-                     struct xwds_w25qxx * flash,
-                     const struct w25qrpt_hwifal_operations * hwifops,
-                     void * hwifcb);
+struct xwds_cantrcv_tja1042_cfg {
+        const struct xwds_resource_gpio *gpiorsc_stb; /**< STANDBY GPIO资源 */
+        const struct xwds_resource_gpio *gpiorsc_eirq; /**< 唤醒外部中断 GPIO资源 */
+        const xwsq_t eirq; /**< 唤醒外部中断资源 */
+};
 
-xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt);
+extern __xwbsp_rodata const struct xwds_cantrcv_driver tja1042_cantrcv_drv;
 
-#endif /* xwam/application/w25qrpt/mif.h */
+void tja1042_cantrcv_eirq_wkup(struct xwds_soc *soc, xwid_t eiid,
+                               xwds_eirq_arg_t arg);
+
+#endif /* xwcd/peripheral/can/transceiver/tja1042/driver.h */

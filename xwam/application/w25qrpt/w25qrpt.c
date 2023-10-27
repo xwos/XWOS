@@ -25,8 +25,8 @@
 #include <xwos/lib/xwlog.h>
 #include <xwos/mm/common.h>
 #include <xwos/osal/thd.h>
-#include <xwcd/perpheral/spi/flash/w25qxx/device.h>
-#include <xwcd/perpheral/spi/flash/w25qxx/driver.h>
+#include <xwcd/peripheral/spi/flash/w25qxx/device.h>
+#include <xwcd/peripheral/spi/flash/w25qxx/driver.h>
 #include <xwam/application/w25qrpt/w25qrpt.h>
 #include <xwam/application/w25qrpt/hwifal.h>
 #include <xwam/application/w25qrpt/protocol.h>

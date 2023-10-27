@@ -201,11 +201,11 @@ struct xwds_canc {
         union { /* union中继承多个基类相当于C++中的virtual继承，
                    struct xwds_device只继承一次。 */
                 struct xwds_device dev; /**< C语言面向对象：继承struct xwds_device */
-#if (defined(XWCDCFG_ds_I2C_PERPHERAL) && (1 == XWCDCFG_ds_I2C_PERPHERAL) && \
+#if (defined(XWCDCFG_ds_I2C_PERIPHERAL) && (1 == XWCDCFG_ds_I2C_PERIPHERAL) && \
      defined(XWCDCFG_ds_CAN_CONTROLLER_I2CP) && (1 == XWCDCFG_ds_CAN_CONTROLLER_I2CP))
                 struct xwds_i2cp i2cp; /**< 继承struct xwds_i2cp */
 #endif
-#if (defined(XWCDCFG_ds_SPI_PERPHERAL) && (1 == XWCDCFG_ds_SPI_PERPHERAL) && \
+#if (defined(XWCDCFG_ds_SPI_PERIPHERAL) && (1 == XWCDCFG_ds_SPI_PERIPHERAL) && \
      defined(XWCDCFG_ds_CAN_CONTROLLER_SPIP) && (1 == XWCDCFG_ds_CAN_CONTROLLER_SPIP))
                 struct xwds_spip spip; /**< 继承struct xwds_spip */
 #endif

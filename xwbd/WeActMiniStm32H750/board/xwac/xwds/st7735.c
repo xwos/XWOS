@@ -19,10 +19,10 @@
  */
 
 #include "board/std.h"
-#include <xwcd/ds/spi/perpheral.h>
+#include <xwcd/ds/spi/peripheral.h>
 #include <xwcd/ds/soc/gpio.h>
-#include <xwcd/perpheral/spi/lcd/st7735/device.h>
-#include <xwcd/perpheral/spi/lcd/st7735/driver.h>
+#include <xwcd/peripheral/spi/lcd/st7735/device.h>
+#include <xwcd/peripheral/spi/lcd/st7735/driver.h>
 #include "bm/stm32cube/Core/Inc/tim.h"
 #include "board/xwac/xwds/device.h"
 

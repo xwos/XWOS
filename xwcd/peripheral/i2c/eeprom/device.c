@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief W25Qxx编程器
+ * @brief I2C EEPROM 设备
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,16 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_application_w25qrpt_mif_h__
-#define __xwam_application_w25qrpt_mif_h__
-
 #include <xwos/standard.h>
-#include <xwcd/peripheral/spi/flash/w25qxx/device.h>
-#include <xwam/application/w25qrpt/w25qrpt.h>
-#include <xwam/application/w25qrpt/hwifal.h>
-#include <xwam/application/w25qrpt/hwif/uart.h>
+#include <xwcd/ds/i2c/peripheral.h>
+#include <xwcd/peripheral/i2c/eeprom/device.h>
 
-xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
-                     const char * name,
-                     struct xwds_w25qxx * flash,
-                     const struct w25qrpt_hwifal_operations * hwifops,
-                     void * hwifcb);
+void xwds_eeprom_construct(struct xwds_eeprom * eeprom)
+{
+        xwds_i2cp_construct(&eeprom->i2cp);
+}
 
-xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt);
-
-#endif /* xwam/application/w25qrpt/mif.h */
+void xwds_eeprom_destruct(struct xwds_eeprom * eeprom)
+{
+        xwds_i2cp_destruct(&eeprom->i2cp);
+}

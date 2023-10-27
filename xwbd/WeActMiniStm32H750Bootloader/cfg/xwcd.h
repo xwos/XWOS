@@ -49,11 +49,11 @@
 
 /******** ******** I2C device ******** ********/
 #define XWCDCFG_ds_I2C_MASTER                                   0
-#define XWCDCFG_ds_I2C_PERPHERAL                                0
+#define XWCDCFG_ds_I2C_PERIPHERAL                               0
 
 /******** ******** SPI device ******** ********/
 #define XWCDCFG_ds_SPI_MASTER                                   0
-#define XWCDCFG_ds_SPI_PERPHERAL                                0
+#define XWCDCFG_ds_SPI_PERIPHERAL                               0
 
 /******** ******** LIN Bus ******** ********/
 #define XWCDCFG_ds_LIN                                          0
@@ -75,19 +75,19 @@
 #define XWCDCFG_ds_MISC                                         0
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********   I2C perpheral   ******** ******** ********
+ ******** ******** ********   I2C peripheral  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWCDCFG_perpheral_i2c_eeprom                            0
+#define XWCDCFG_peripheral_i2c_eeprom                           0
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********   SPI perpheral   ******** ******** ********
+ ******** ******** ********   SPI peripheral  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWCDCFG_perpheral_spi_flash_w25qxx                      0
-#define XWCDCFG_perpheral_spi_lcd_st7735                        0
+#define XWCDCFG_peripheral_spi_flash_w25qxx                     0
+#define XWCDCFG_peripheral_spi_lcd_st7735                       0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  CAN transceiver  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWCDCFG_perpheral_can_transceiver_tja1042               0
+#define XWCDCFG_peripheral_can_transceiver_tja1042              0
 
 #endif /* cfg/xwcd.h */

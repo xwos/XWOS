@@ -25,8 +25,8 @@
 #include <xwos/lib/xwbop.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/can/controller.h>
-#include <xwcd/ds/i2c/perpheral.h>
-#include <xwcd/ds/spi/perpheral.h>
+#include <xwcd/ds/i2c/peripheral.h>
+#include <xwcd/ds/spi/peripheral.h>
 
 /**
  * @brief CAN接收器模式枚举
@@ -100,11 +100,11 @@ struct xwds_cantrcv_driver {
 struct xwds_cantrcv {
         union {
                 struct xwds_device dev; /**< 继承struct xwds_device */
-#if (defined(MDCFG_ds_I2C_PERPHERAL) && (1 == MDCFG_ds_I2C_PERPHERAL) && \
+#if (defined(MDCFG_ds_I2C_PERIPHERAL) && (1 == MDCFG_ds_I2C_PERIPHERAL) && \
      defined(MDCFG_ds_CAN_TRANSCEIVER_I2CP) && (1 == MDCFG_ds_CAN_TRANSCEIVER_I2CP))
                 struct xwds_i2cp i2cp; /**< 继承struct xwds_i2cp */
 #endif
-#if (defined(MDCFG_ds_SPI_PERPHERAL) && (1 == MDCFG_ds_SPI_PERPHERAL) && \
+#if (defined(MDCFG_ds_SPI_PERIPHERAL) && (1 == MDCFG_ds_SPI_PERIPHERAL) && \
      defined(MDCFG_ds_CAN_TRANSCEIVER_SPIP) && (1 == MDCFG_ds_CAN_TRANSCEIVER_SPIP))
                 struct xwds_spip spip; /**< 继承struct xwds_spip */
 #endif

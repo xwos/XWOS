@@ -13,6 +13,7 @@
 *.gdb
 *.pyc
 wkspc
+WKSPC
 XWOS.cfg
 node_modules
 package-lock.json

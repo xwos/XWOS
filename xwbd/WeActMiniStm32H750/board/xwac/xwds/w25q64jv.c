@@ -19,10 +19,10 @@
  */
 
 #include "board/std.h"
-#include <xwcd/ds/spi/perpheral.h>
+#include <xwcd/ds/spi/peripheral.h>
 #include <xwcd/ds/soc/gpio.h>
-#include <xwcd/perpheral/spi/flash/w25qxx/device.h>
-#include <xwcd/perpheral/spi/flash/w25qxx/driver.h>
+#include <xwcd/peripheral/spi/flash/w25qxx/device.h>
+#include <xwcd/peripheral/spi/flash/w25qxx/driver.h>
 #include "board/xwac/xwds/device.h"
 
 xwer_t stm32xwds_w25q64jv_drv_start(struct xwds_device * dev);

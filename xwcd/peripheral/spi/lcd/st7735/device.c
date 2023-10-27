@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief W25Qxx编程器
+ * @brief SPI LCD Controller ST7735 Device
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_application_w25qrpt_mif_h__
-#define __xwam_application_w25qrpt_mif_h__
+#include <xwcd/peripheral/spi/lcd/st7735/device.h>
 
-#include <xwos/standard.h>
-#include <xwcd/peripheral/spi/flash/w25qxx/device.h>
-#include <xwam/application/w25qrpt/w25qrpt.h>
-#include <xwam/application/w25qrpt/hwifal.h>
-#include <xwam/application/w25qrpt/hwif/uart.h>
+void xwds_st7735_construct(struct xwds_st7735 * st7735)
+{
+        xwds_spip_construct(&st7735->spip);
+}
 
-xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
-                     const char * name,
-                     struct xwds_w25qxx * flash,
-                     const struct w25qrpt_hwifal_operations * hwifops,
-                     void * hwifcb);
-
-xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt);
-
-#endif /* xwam/application/w25qrpt/mif.h */
+void xwds_st7735_destruct(struct xwds_st7735 * st7735)
+{
+        xwds_spip_destruct(&st7735->spip);
+}

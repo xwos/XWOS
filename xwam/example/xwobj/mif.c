@@ -39,9 +39,9 @@
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/uart/controller.h>
 #include <xwcd/ds/i2c/master.h>
-#include <xwcd/ds/i2c/perpheral.h>
+#include <xwcd/ds/i2c/peripheral.h>
 #include <xwcd/ds/spi/master.h>
-#include <xwcd/ds/spi/perpheral.h>
+#include <xwcd/ds/spi/peripheral.h>
 #include <xwcd/ds/can/controller.h>
 #include <xwcd/ds/can/transceiver.h>
 #include <xwcd/ds/lin/controller.h>

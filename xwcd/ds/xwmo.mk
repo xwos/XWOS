@@ -48,8 +48,8 @@ endif
 ifeq ($(XWCDCFG_ds_SPI_MASTER),y)
     XWMO_CSRCS += spi/master.c
 endif
-ifeq ($(XWCDCFG_ds_SPI_PERPHERAL),y)
-    XWMO_CSRCS += spi/perpheral.c
+ifeq ($(XWCDCFG_ds_SPI_PERIPHERAL),y)
+    XWMO_CSRCS += spi/peripheral.c
 endif
 ifeq ($(XWCDCFG_ds_I2C_MASTER),y)
     XWMO_CSRCS += i2c/master.c
@@ -57,8 +57,8 @@ endif
 ifeq ($(XWCDCFG_ds_I2C_SLAVE),y)
     XWMO_CSRCS += i2c/slave.c
 endif
-ifeq ($(XWCDCFG_ds_I2C_PERPHERAL),y)
-    XWMO_CSRCS += i2c/perpheral.c
+ifeq ($(XWCDCFG_ds_I2C_PERIPHERAL),y)
+    XWMO_CSRCS += i2c/peripheral.c
 endif
 ifeq ($(XWCDCFG_ds_LIN),y)
     XWMO_CSRCS += lin/controller.c

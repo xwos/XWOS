@@ -27,10 +27,10 @@
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/uart/controller.h>
 #include <xwcd/ds/spi/master.h>
-#include <xwcd/perpheral/spi/flash/w25qxx/device.h>
-#include <xwcd/perpheral/spi/lcd/st7735/device.h>
+#include <xwcd/peripheral/spi/flash/w25qxx/device.h>
+#include <xwcd/peripheral/spi/lcd/st7735/device.h>
 #include <xwcd/ds/i2c/master.h>
-#include <xwcd/perpheral/i2c/eeprom/device.h>
+#include <xwcd/peripheral/i2c/eeprom/device.h>
 
 /******** ******** ds ******** ********/
 extern struct xwds stm32xwds;

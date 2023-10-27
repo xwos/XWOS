@@ -21,7 +21,7 @@
 #include "board/std.h"
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/time.h>
-#include <xwcd/perpheral/i2c/eeprom/driver.h>
+#include <xwcd/peripheral/i2c/eeprom/driver.h>
 #include "board/xwac/xwds/device.h"
 
 #define LOGTAG "TST|EEPROM"
