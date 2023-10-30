@@ -73,39 +73,61 @@ void * memcpy(void * restrict dst, const void * restrict src, size_t count)
         union {
                 const xwu8_t * u8;
                 const xwu32_t * u32;
+                const xwu64_t * u64;
                 xwptr_t val;
         } s;
         union {
                 xwu8_t * u8;
                 xwu32_t * u32;
+                xwu64_t * u64;
                 xwptr_t val;
         } d;
 
         s.u8 = src;
         d.u8 = dst;
 
-        if ((s.val & (sizeof(void *) - 1U)) ||
-            (d.val & (sizeof(void *) - 1U)) ||
-            (count < sizeof(void *))) {
-                while (0U != count) {
-                        *d.u8 = *s.u8;
-                        d.u8++;
-                        s.u8++;
-                        count--; // cppcheck-suppress [misra-c2012-17.8]
+        if (count < sizeof(xwu32_t)) {
+                goto byte_copy;
+        } else if (count < sizeof(xwu64_t)) {
+                if ((0 == (s.val & (sizeof(xwu32_t) - 1U))) &&
+                    (0 == (d.val & (sizeof(xwu32_t) - 1U)))) {
+                        goto word_copy;
+                } else {
+                        goto byte_copy;
                 }
         } else {
-                do {
-                        *d.u32 = *s.u32;
-                        d.u32++;
-                        s.u32++;
-                        count -= sizeof(void *); // cppcheck-suppress [misra-c2012-17.8]
-                } while (count >= sizeof(void *));
-                while (0U != count) {
-                        *d.u8 = *s.u8;
-                        d.u8++;
-                        s.u8++;
-                        count--; // cppcheck-suppress [misra-c2012-17.8]
+                if ((0 == (s.val & (sizeof(xwu64_t) - 1U))) &&
+                    (0 == (d.val & (sizeof(xwu64_t) - 1U)))) {
+                        goto dword_copy;
+                } else
+                if ((0 == (s.val & (sizeof(xwu32_t) - 1U))) &&
+                           (0 == (d.val & (sizeof(xwu32_t) - 1U)))) {
+                        goto word_copy;
+                } else {
+                        goto byte_copy;
                 }
+        }
+
+dword_copy:
+        while (count >= sizeof(xwu64_t)) {
+                *d.u64 = *s.u64;
+                d.u64++;
+                s.u64++;
+                count -= sizeof(xwu64_t); // cppcheck-suppress [misra-c2012-17.8]
+        }
+word_copy:
+        while (count >= sizeof(xwu32_t)) {
+                *d.u32 = *s.u32;
+                d.u32++;
+                s.u32++;
+                count -= sizeof(xwu32_t); // cppcheck-suppress [misra-c2012-17.8]
+        }
+byte_copy:
+        while (0U != count) {
+                *d.u8 = *s.u8;
+                d.u8++;
+                s.u8++;
+                count--; // cppcheck-suppress [misra-c2012-17.8]
         }
         return dst;
 }

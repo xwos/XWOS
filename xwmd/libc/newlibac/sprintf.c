@@ -155,7 +155,7 @@ char * vsnprintf_put_dec(char * buf, unsigned long long num)
                 if (num < 100000) {
                         return vsnprintf_put_dec_trunc(buf, (unsigned int)num);
                 }
-                rem = xwdiv64(&num, 100000);
+                rem = xwdiv64((xwu64_t *)&num, 100000);
                 buf = vsnprintf_put_dec_full(buf, rem);
         }
 }

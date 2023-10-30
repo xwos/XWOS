@@ -49,7 +49,7 @@ xwer_t board_xwssc_txtsttask(void * arg)
                         fmtsz = snprintf(msg, sizeof(msg),
                                          "[WeActMiniStm32H750/XWOS-3.0/XWSSC-1.0.0] "
                                          "Count:%ld",
-                                         count);
+                                         (unsigned long)count);
                         txsz = (xwsz_t)fmtsz;
                         rc = board_xwssc_tx((xwu8_t *)msg, &txsz, 1, XWTM_MAX);
                         if (XWOK == rc) {

@@ -60,7 +60,7 @@
 /**
  * @brief 每CPU的调度器
  */
-__xwmp_data
+__xwmp_data __xwcc_alignl1cache
 struct xwmp_skd xwmp_skd[CPUCFG_CPU_NUM];
 
 /**
