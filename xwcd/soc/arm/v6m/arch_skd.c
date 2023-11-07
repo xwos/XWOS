@@ -244,6 +244,8 @@ void xwospl_skd_isr_swcx(void)
         __asm__ volatile("      isb");
         __asm__ volatile("      bl      xwosplcb_skd_post_swcx_lic");
         __asm__ volatile("      add     sp, #4");
+        __asm__ volatile("      dsb");
+        __asm__ volatile("      isb");
         __asm__ volatile("      pop     {pc}");
 }
 

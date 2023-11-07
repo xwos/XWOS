@@ -223,9 +223,8 @@ void arch_skd_init_stack(struct xwospl_skdobj_stack * stk,
 __xwbsp_isr __xwcc_naked
 void arch_svc_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
 {
-        /* r3 = r0->cstk; */
         __asm__ volatile(".syntax       unified");
-        /* get xwskd->cstk */
+        /* get xwskd->cstk, r3 = r0->cstk */
         __asm__ volatile("      ldr     r3, [r0, %[__cstk]]"
                          :
                          :[__cstk] "I" (xwcc_offsetof(struct xwospl_skd, cstk))
@@ -332,12 +331,10 @@ void xwospl_skd_isr_swcx(void)
         __asm__ volatile("      sub     sp, #4");
         __asm__ volatile("      bl      xwosplcb_skd_post_swcx_lic");
         __asm__ volatile("      add     sp, #4");
-        __asm__ volatile("      pop     {pc}");
-
-        /* return */
         __asm__ volatile("      clrex");
         __asm__ volatile("      dsb");
         __asm__ volatile("      isb");
+        __asm__ volatile("      pop     {pc}");
 }
 
 /**

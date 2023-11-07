@@ -463,7 +463,11 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 
         xwmp_splk_init(&thd->stlock);
         thd->state = (xwsq_t)XWMP_SKDOBJ_ST_UNKNOWN;
+        /* FIXME: Current version supports privileged thread only. */
         if (attr->privileged) {
+                xwaop_s1m(xwsq_t, &thd->stack.flag, (xwsq_t)XWMP_SKDOBJ_FLAG_PRIVILEGED,
+                          NULL, NULL);
+        } else {
                 xwaop_s1m(xwsq_t, &thd->stack.flag, (xwsq_t)XWMP_SKDOBJ_FLAG_PRIVILEGED,
                           NULL, NULL);
         }

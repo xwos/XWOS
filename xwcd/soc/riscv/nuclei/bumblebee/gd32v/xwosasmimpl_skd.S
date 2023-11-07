@@ -143,7 +143,7 @@ xwospl_skd_start_end:
         /* void xwospl_skd_isr_swcx(void) */
 xwospl_skd_isr_swcx:
         /* prolog */
-        addi	        sp, sp, -16
+        addi            sp, sp, -16
         STORE           ra, 3 * REGBYTES (sp)
 
         /* check previous stack */
@@ -168,7 +168,9 @@ xwospl_skd_isr_swcx:
 
         /* epilog */
         LOAD            ra, 3 * REGBYTES (sp)
-        addi	        sp, sp, 16
+        addi	          sp, sp, 16
+        fence           iorw, iorw
+        fence.i
         ret
         .endfunc
 xwospl_skd_isr_swcx_end:

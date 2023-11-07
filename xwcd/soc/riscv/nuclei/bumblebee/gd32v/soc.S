@@ -57,8 +57,8 @@ soc_boot:
         /* Boot Stage 1 */
         csrc            CSR_MSTATUS, MSTATUS_MIE /* 关闭全局中断 */
         /* 启动分为几种情况：
-         * +   启动配置(boot0==1,boot1==1)，PC从0x20000000开始执行代码；
-         * +   启动配置(boot0==0)，flash(0x08000000)被映射到0x0，PC从0x0开始执行代码；
+         * + 启动配置(boot0==1,boot1==1)，PC从0x20000000开始执行代码；
+         * + 启动配置(boot0==0)，flash(0x08000000)被映射到0x0，PC从0x0开始执行代码；
          */
         la              a0, soc_boot /* 相对于PC加载soc_boot地址 */
         /* 判断soc_boot的值是否在RAM的范围内，若为真，直接相对跳转到soc_boot_vma */
@@ -118,7 +118,7 @@ soc_boot_end:
 /**
  * @brief Macro to save caller general registers
  */
-        .macro SOC_SAVE_CALLER_X_CONTEXT
+        .macro SOC_SAVE_CALLER_CONTEXT
         addi            sp, sp, -(SOC_CALLER_CONTEXT_SIZE)
         STORE           ra, 0 * REGBYTES (sp)
         STORE           t0, 1 * REGBYTES (sp)
@@ -143,7 +143,7 @@ soc_boot_end:
 /**
  * @brief Macro to restore caller general registers
  */
-        .macro SOC_RESTORE_CALLER_X_CONTEXT
+        .macro SOC_RESTORE_CALLER_CONTEXT
 #ifndef __riscv_32e
         LOAD            t6, 19 * REGBYTES (sp)
         LOAD            t5, 18 * REGBYTES (sp)
@@ -168,7 +168,7 @@ soc_boot_end:
 /**
  * @brief Macro to restore caller registers when EXC is ecall
  */
-        .macro SOC_RESTORE_CALLER_X_CONTEXT_ECALL
+        .macro SOC_RESTORE_CALLER_CONTEXT_ECALL
 #ifndef __riscv_32e
         LOAD            t6, 19 * REGBYTES (sp)
         LOAD            t5, 18 * REGBYTES (sp)
@@ -231,7 +231,7 @@ soc_boot_end:
         .global         soc_esr_entry
         .func           soc_esr_entry
 soc_esr_entry:
-        SOC_SAVE_CALLER_X_CONTEXT
+        SOC_SAVE_CALLER_CONTEXT
         SOC_SAVE_CALLER_CSR_CONTEXT
         /* switch (mcase & 0xFFF) */
         csrr            t0, mcause
@@ -252,21 +252,21 @@ soc_esr_entry:
         call            soc_esr_c_entry
         /* Restore registers */
         SOC_RESTORE_CALLER_CSR_CONTEXT 0
-        SOC_RESTORE_CALLER_X_CONTEXT
+        SOC_RESTORE_CALLER_CONTEXT
         j               5f
 2:      /* NMI */
         call            soc_esr_nmi
         SOC_RESTORE_CALLER_CSR_CONTEXT 0
-        SOC_RESTORE_CALLER_X_CONTEXT_ECALL
+        SOC_RESTORE_CALLER_CONTEXT_ECALL
 3:      /* ebreak */
         call            soc_esr_ebreak /* soc_esr_ebreak(); */
         SOC_RESTORE_CALLER_CSR_CONTEXT 4
-        SOC_RESTORE_CALLER_X_CONTEXT
+        SOC_RESTORE_CALLER_CONTEXT
         j               5f
 4:      /* ecall */
         call            soc_esr_xwsc /* a0, a1 = soc_esr_xwsc(a0, a1, a2); */
         SOC_RESTORE_CALLER_CSR_CONTEXT 4
-        SOC_RESTORE_CALLER_X_CONTEXT_ECALL
+        SOC_RESTORE_CALLER_CONTEXT_ECALL
 5:      /* Return to regular code */
         mret
         .endfunc
@@ -291,7 +291,7 @@ soc_esr_entry_end:
 /* void soc_isr_entry(void); */
 soc_isr_entry:
         /* Save context */
-        SOC_SAVE_CALLER_X_CONTEXT
+        SOC_SAVE_CALLER_CONTEXT
         SOC_SAVE_CALLER_CSR_CONTEXT
 
         /* Change stack */
@@ -312,7 +312,7 @@ soc_isr_entry:
 
         /* Restore context */
         SOC_RESTORE_CALLER_CSR_CONTEXT 0
-        SOC_RESTORE_CALLER_X_CONTEXT
+        SOC_RESTORE_CALLER_CONTEXT
 
         /* Return to regular code */
         mret
