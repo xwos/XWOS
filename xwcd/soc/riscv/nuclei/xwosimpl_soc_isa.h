@@ -27,9 +27,9 @@
 
 #include <xwos/ospl/soc/compiler.h>
 
-/******** ******** break point ******** ********/
+/******** ******** Bug report ******** ********/
 static __xwbsp_inline
-void soc_bkpt(void)
+void soc_bug(void)
 {
         __asm__ volatile("ebreak");
 }

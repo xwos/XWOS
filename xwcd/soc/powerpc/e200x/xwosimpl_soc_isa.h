@@ -27,7 +27,7 @@
 
 #include <xwos/ospl/soc/compiler.h>
 
-/******** ******** break point ******** ********/
+/******** ******** Bug report ******** ********/
 
 /******** ******** barrier ******** ********/
 #define eppc_isb()              __asm__ volatile("se_isync" : : : "memory")

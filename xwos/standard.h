@@ -49,8 +49,8 @@
 #endif
 
 #if defined(XWOSCFG_BUG) && (1 == XWOSCFG_BUG)
-#  if defined(SOCCFG_BKPT) && (1 == SOCCFG_BKPT)
-#    define XWOS_BUG()          soc_bkpt() /**< 报告BUG */
+#  if defined(SOCCFG_BUG) && (1 == SOCCFG_BUG)
+#    define XWOS_BUG()          soc_bug() /**< 报告BUG */
 #  else
 #    define XWOS_BUG()          do {} while (1) /**< 报告BUG */
 #  endif

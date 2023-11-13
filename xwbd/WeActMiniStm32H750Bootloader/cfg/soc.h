@@ -31,7 +31,7 @@
 #define SOCCFG_NVIC_SUBPRIO_BITIDX              4U
 
 /******** Debug ********/
-#define SOCCFG_BKPT                             1
+#define SOCCFG_BUG                              1
 
 /******** ******** CRC ******** ********/
 #define SOCCFG_CRC32                            1
