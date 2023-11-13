@@ -173,6 +173,7 @@ xwer_t xwds_uartc_vop_start(struct xwds_uartc * uartc)
         memset(uartc->rxq.mem, 0, sizeof(uartc->rxq.mem));
         uartc->rxq.pos = 0;
         uartc->rxq.tail = 0;
+        uartc->rxq.idx = 0;
 
         rc = xwds_device_vop_start(&uartc->dev);
         return rc;
@@ -224,23 +225,6 @@ xwer_t xwds_uartc_vop_resume(struct xwds_uartc * uartc)
 #endif
 
 /******** ******** ******** UART APIs ******** ******** ********/
-/**
- * @brief XWDS API：从接收队列中获取数据
- * @param[in] uartc: UART控制器对象指针
- * @param[out] buf: 指向缓冲区的指针，通过此缓冲区返回数据
- * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示缓冲区大小（单位：字节）
- * + (O) 作为输出时，返回实际读取的数据大小
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ETIMEDOUT: 超时
- * @note
- * + 上下文：线程
- * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwds_api
 xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                      xwu8_t * buf, xwsz_t * size,
@@ -301,20 +285,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：尝试从接收队列中获取数据
- * @param[in] uartc: UART控制器对象指针
- * @param[out] buf: 指向缓冲区的指针，通过此缓冲区返回数据
- * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示缓冲区大小（单位：字节）
- * + (O) 作为输出时，返回实际读取的数据大小
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ENODATA: 没有数据
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc,
                          xwu8_t * buf, xwsz_t * size)
@@ -374,25 +344,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：配置UART的DMA通道发送数据
- * @param[in] uartc: UART控制器对象指针
- * @param[in] data: 待发送的数据的缓冲区
- * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
- * + (O) 作为输出时，返回实际发送的数据大小
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ENOSYS: 不支持此操作
- * @retval -ECANCELED: 发送被取消
- * @retval -ETIMEDOUT: 超时
- * @note
- * + 上下文：线程
- * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwds_api
 xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                      const xwu8_t * data, xwsz_t * size,
@@ -434,20 +385,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：直接发送一个字节（非DMA模式）
- * @param[in] uartc: UART控制器对象指针
- * @param[in] byte: 待发送的字节
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ENOSYS: 不支持此操作
- * @note
- * + 上下文：线程
- * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwds_api
 xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
                        const xwu8_t byte,
@@ -487,17 +424,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：配置UART
- * @param[in] uartc: UART控制器对象指针
- * @param[in] cfg: 新的配置
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ENOSYS: 不支持此操作
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
                       const struct xwds_uart_cfg * cfg)
@@ -531,11 +457,7 @@ err_uartc_grab:
 }
 
 /******** ******** Callbacks for driver ******** ********/
-/**
- * @brief XWDS Driver Callback：清空接收队列
- * @param[in] uartc: UART控制器对象指针
- */
-__xwds_api
+__xwds_code
 void xwds_uartc_drvcb_rxq_flush(struct xwds_uartc * uartc)
 {
         xwreg_t cpuirq;
@@ -544,14 +466,24 @@ void xwds_uartc_drvcb_rxq_flush(struct xwds_uartc * uartc)
         xwos_splk_lock_cpuirqsv(&uartc->rxq.lock, &cpuirq);
         uartc->rxq.pos = 0;
         uartc->rxq.tail = 0;
+        uartc->rxq.idx = 0;
         xwos_splk_unlock_cpuirqrs(&uartc->rxq.lock, cpuirq);
 }
 
-/**
- * @brief XWDS Driver Callback：发布数据到接收队列
- * @param[in] uartc: UART控制器对象指针
- * @param[in] pub: 新的数据接收位置（有效数据结尾 + 1）
- */
+__xwds_code
+xwsq_t xwds_uartc_drvcb_rxq_fill(struct xwds_uartc * uartc,
+                                 xwu8_t bytes[], xwsz_t size)
+{
+        for (xwsz_t i = 0; i < size; i++) {
+                uartc->rxq.mem[uartc->rxq.idx] = bytes[i];
+                uartc->rxq.idx++;
+                if (sizeof(uartc->rxq.mem) == uartc->rxq.idx) {
+                        uartc->rxq.idx = 0;
+                }
+        }
+        return uartc->rxq.idx;
+}
+
 __xwds_code
 void xwds_uartc_drvcb_rxq_pub(struct xwds_uartc * uartc, xwsq_t pub)
 {
