@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：LIN控制器
+ * @brief 玄武设备栈：LIN：控制器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -54,10 +54,6 @@ __xwds_rodata const struct xwds_virtual_operation xwds_linc_vop = {
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
-/**
- * @brief XWDS API：LIN控制器的构造函数
- * @param[in] linc: LIN控制器对象指针
- */
 __xwds_code
 void xwds_linc_construct(struct xwds_linc * linc)
 {
@@ -65,30 +61,18 @@ void xwds_linc_construct(struct xwds_linc * linc)
         linc->dev.vop = &xwds_linc_vop;
 }
 
-/**
- * @brief XWDS API：LIN控制器对象的析构函数
- * @param[in] linc: LIN控制器对象指针
- */
 __xwds_code
 void xwds_linc_destruct(struct xwds_linc * linc)
 {
         xwds_device_destruct(&linc->dev);
 }
 
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] linc: LIN控制器对象指针
- */
 __xwds_api
 xwer_t xwds_linc_grab(struct xwds_linc * linc)
 {
         return xwds_device_grab(&linc->dev);
 }
 
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] linc: LIN控制器对象指针
- */
 __xwds_api
 xwer_t xwds_linc_put(struct xwds_linc * linc)
 {
@@ -106,14 +90,14 @@ xwer_t xwds_linc_vop_probe(struct xwds_linc * linc)
         xwer_t rc;
 
         rc = xwos_mtx_init(&linc->txlock, XWOS_SKD_PRIORITY_RT_MIN);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_mtx_init;
         }
         if (is_err_or_null(linc->get_msg_size)) {
                 linc->get_msg_size = xwds_linc_get_msg_size;
         }
         rc = xwds_device_vop_probe(&linc->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_probe;
         }
         return XWOK;
@@ -134,7 +118,7 @@ xwer_t xwds_linc_vop_remove(struct xwds_linc * linc)
         xwer_t rc;
 
         rc = xwds_device_vop_remove(&linc->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_remove;
         }
         xwos_mtx_fini(&linc->txlock);
@@ -200,21 +184,6 @@ xwer_t xwds_linc_vop_resume(struct xwds_linc * linc)
 #endif
 
 /******** ******** ******** APIs ******** ******** ********/
-/**
- * @brief XWDS API：主机节点发送一条LIN消息
- * @param[in] linc: LIN控制器对象指针
- * @param[in] id: 主机节点调度消息的ID
- * @param[in] msg: LIN消息结构体指针
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ENOSYS: 控制器不支持主机模式发送
- * @note
- * + 上下文：线程
- * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwds_api
 xwer_t xwds_linc_msttx(struct xwds_linc * linc,
                        xwu8_t id, struct xwds_lin_msg * msg,
@@ -227,11 +196,11 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
         XWDS_VALIDATE(msg, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_linc_grab;
         }
         rc = xwos_mtx_lock_to(&linc->txlock, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_linc_txlock;
         }
         drv = xwds_cast(const struct xwds_linc_driver *, linc->dev.drv);
@@ -240,7 +209,7 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_msttx;
         }
         xwos_mtx_unlock(&linc->txlock);
@@ -255,20 +224,6 @@ err_linc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：从机节点发送一条LIN消息
- * @param[in] linc: LIN控制器对象指针
- * @param[in] msg: LIN消息结构体指针
- * @param[in,out] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ENOSYS: 控制器不支持从机模式发送
- * @note
- * + 上下文：线程
- * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwds_api
 xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
                        struct xwds_lin_msg * msg,
@@ -281,20 +236,20 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
         XWDS_VALIDATE(msg, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_linc_grab;
         }
         rc = xwos_mtx_lock_to(&linc->txlock, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_linc_txlock;
         }
         drv = xwds_cast(const struct xwds_linc_driver *, linc->dev.drv);
-        if (__xwcc_likely((drv) && (drv->slvtx))) {
+        if ((drv) && (drv->slvtx)) {
                 rc = drv->slvtx(linc, msg, to);
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_slvtx;
         }
         xwos_mtx_unlock(&linc->txlock);
@@ -309,20 +264,6 @@ err_linc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：接收一条LIN消息
- * @param[in] linc: LIN控制器对象指针
- * @param[out] msgbuf: 指向接收消息缓冲区的指针
- * @param[in,out] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ENOSYS: 控制器不支持接收
- * @note
- * + 上下文：线程
- * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwds_api
 xwer_t xwds_linc_rx(struct xwds_linc * linc,
                     struct xwds_lin_msg * msgbuf,
@@ -335,16 +276,16 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
         XWDS_VALIDATE(msgbuf, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_linc_grab;
         }
         drv = xwds_cast(const struct xwds_linc_driver *, linc->dev.drv);
-        if (__xwcc_likely((drv) && (drv->rx))) {
+        if ((drv) && (drv->rx)) {
                 rc = drv->rx(linc, msgbuf, to);
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_rx;
         }
         xwds_linc_put(linc);
@@ -356,18 +297,6 @@ err_linc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：通过LIN保护ID查询消息大小
- * @param[in] linc: LIN控制器对象指针
- * @param[in] protected_id: 消息的LIN保护ID
- * @param[out] ret: 指向缓冲区的指针，通过此缓冲区返回消息大小
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ENODEV: 找不到ID
- * @note
- * + 上下文：任意
- */
 __xwds_api
 xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
                               xwu8_t protected_id,

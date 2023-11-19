@@ -25,7 +25,7 @@
 #include <xwcd/peripheral/spi/lcd/st7735/device.h>
 #include <xwcd/peripheral/spi/lcd/st7735/driver.h>
 
-static
+static __xwbsp_code
 xwer_t xwds_st7735_write(struct xwds_st7735 * st7735, xwu8_t reg,
                          const xwu8_t * data, xwsz_t size,
                          xwtm_t to)
@@ -36,7 +36,7 @@ xwer_t xwds_st7735_write(struct xwds_st7735 * st7735, xwu8_t reg,
         return drv->write(st7735, reg, data, &size, to);
 }
 
-static
+static __xwbsp_code
 xwer_t xwds_st7735_read(struct xwds_st7735 * st7735, xwu8_t reg,
                         xwu8_t * buf, xwsz_t size,
                         xwtm_t to)
@@ -54,6 +54,7 @@ struct xwds_st7735_cmd_table {
         xwu8_t data[16];
 };
 
+__xwbsp_rodata
 const struct xwds_st7735_cmd_table xwds_st7735_init_table[] = {
         /* software reset */
         {XWDS_ST7735_SWRESET, 0, {0},},
@@ -99,6 +100,7 @@ const struct xwds_st7735_cmd_table xwds_st7735_init_table[] = {
         {XWDS_ST7735_NORON, 0, {0},},
 };
 
+__xwbsp_code
 xwer_t xwds_st7735_drv_start(struct xwds_device * dev)
 {
         struct xwds_st7735 * st7735;
@@ -230,11 +232,13 @@ err_drv:
         return rc;
 }
 
+__xwbsp_rodata
 const struct xwds_st7735_cmd_table xwds_st7735_deinit_table[] = {
         /* enter sleep mode */
         {XWDS_ST7735_SLPIN, 0, {0},},
 };
 
+__xwbsp_code
 xwer_t xwds_st7735_drv_stop(struct xwds_device * dev)
 {
         struct xwds_st7735 * st7735;
@@ -261,11 +265,13 @@ err_write:
 }
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+__xwbsp_code
 xwer_t xwds_st7735_drv_resume(struct xwds_device * dev)
 {
         return xwds_st7735_drv_start(dev);
 }
 
+__xwbsp_code
 xwer_t xwds_st7735_drv_suspend(struct xwds_device * dev)
 {
         return xwds_st7735_drv_stop(dev);
@@ -273,6 +279,7 @@ xwer_t xwds_st7735_drv_suspend(struct xwds_device * dev)
 #endif
 
 /******** ******** ******** APIs ******** ******** ********/
+__xwbsp_api
 xwer_t xwds_st7735_cfgbus(struct xwds_st7735 * st7735, xwtm_t to)
 {
         xwer_t rc;
@@ -296,6 +303,7 @@ err_st7735_grab:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_read_id(struct xwds_st7735 * st7735, xwu32_t * id, xwtm_t to)
 {
         xwer_t rc;
@@ -315,6 +323,7 @@ err_st7735_grab:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_read_status(struct xwds_st7735 * st7735,
                                xwu8_t st[5],
                                xwtm_t to)
@@ -336,6 +345,7 @@ err_st7735_grab:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_read_madctl(struct xwds_st7735 * st7735,
                                xwu8_t madctl[2],
                                xwtm_t to)
@@ -357,6 +367,7 @@ err_st7735_grab:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_read_colmod(struct xwds_st7735 * st7735,
                                xwu8_t colmod[2],
                                xwtm_t to)
@@ -378,6 +389,7 @@ err_st7735_grab:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_display_on(struct xwds_st7735 * st7735, xwtm_t to)
 {
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
@@ -387,6 +399,7 @@ xwer_t xwds_st7735_display_on(struct xwds_st7735 * st7735, xwtm_t to)
                                  to);
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_display_off(struct xwds_st7735 * st7735, xwtm_t to)
 {
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
@@ -396,6 +409,7 @@ xwer_t xwds_st7735_display_off(struct xwds_st7735 * st7735, xwtm_t to)
                                  to);
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_set_brightness(struct xwds_st7735 * st7735, xwu32_t brightness)
 {
         struct xwds_st7735_driver * drv;
@@ -415,6 +429,7 @@ xwer_t xwds_st7735_set_brightness(struct xwds_st7735 * st7735, xwu32_t brightnes
         return rc;
 }
 
+__xwbsp_api
 void xwds_st7735_get_brightness(struct xwds_st7735 * st7735, xwu32_t * brightness)
 {
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
@@ -423,6 +438,7 @@ void xwds_st7735_get_brightness(struct xwds_st7735 * st7735, xwu32_t * brightnes
         *brightness = st7735->parameter.brightness;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_set_orientation(struct xwds_st7735 * st7735,
                                    xwu8_t orientation, xwtm_t to)
 {
@@ -476,6 +492,7 @@ err_write:
         return rc;
 }
 
+__xwbsp_api
 void xwds_st7735_get_orientation(struct xwds_st7735 * st7735, xwu8_t * orientation)
 {
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
@@ -484,7 +501,7 @@ void xwds_st7735_get_orientation(struct xwds_st7735 * st7735, xwu8_t * orientati
         *orientation = st7735->parameter.orientation;
 }
 
-static
+__xwbsp_api
 xwer_t xwds_st7735_set_cursor(struct xwds_st7735 * st7735, xwu8_t x, xwu8_t y,
                               xwtm_t to)
 {
@@ -528,7 +545,7 @@ err_write:
         return rc;
 }
 
-static
+__xwbsp_api
 xwer_t xwds_st7735_set_window(struct xwds_st7735 * st7735,
                               xwu8_t x, xwu8_t y, xwu8_t width, xwu8_t height,
                               xwtm_t to)
@@ -575,6 +592,7 @@ err_write:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_invert_color(struct xwds_st7735 * st7735, bool inv, xwtm_t to)
 {
         xwer_t rc;
@@ -593,6 +611,7 @@ xwer_t xwds_st7735_invert_color(struct xwds_st7735 * st7735, bool inv, xwtm_t to
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_set_pixel(struct xwds_st7735 * st7735,
                              xwu8_t x, xwu8_t y,
                              xwu16_t color, xwtm_t to)
@@ -616,6 +635,7 @@ err_set_cursor:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_fill_rect(struct xwds_st7735 * st7735,
                              xwu8_t x, xwu8_t y, xwu8_t width, xwu8_t height,
                              xwu16_t color, xwtm_t to)
@@ -660,6 +680,7 @@ err_set_window:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_st7735_draw(struct xwds_st7735 * st7735,
                         xwu8_t x, xwu8_t y, xwu8_t width, xwu8_t height,
                         const xwu8_t img[], xwtm_t to)

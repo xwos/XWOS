@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：I2C外设
+ * @brief 玄武设备栈：I2C：外设
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -27,6 +27,12 @@
 #include <xwcd/ds/i2c/common.h>
 #include <xwcd/ds/i2c/master.h>
 
+/**
+ * @defgroup xwcd_ds_i2c_peripheral I2C外设
+ * @ingroup xwcd_ds_i2c
+ * @{
+ */
+
 struct xwds_i2cp;
 
 /**
@@ -47,9 +53,32 @@ struct xwds_i2cp {
         xwu16_t addr; /**< 外设地址 */
 };
 
+/**
+ * @brief XWDS API：I2C外设的构造函数
+ * @param[in] i2cp: I2C外设对象指针
+ */
 void xwds_i2cp_construct(struct xwds_i2cp * i2cp);
+
+/**
+ * @brief XWDS API：I2C外设的构造函数
+ * @param[in] i2cp: I2C外设对象指针
+ */
 void xwds_i2cp_destruct(struct xwds_i2cp * i2cp);
+
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] i2cp: I2C外设对象指针
+ */
 xwer_t xwds_i2cp_grab(struct xwds_i2cp * i2cp);
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] i2cp: I2C外设对象指针
+ */
 xwer_t xwds_i2cp_put(struct xwds_i2cp * i2cp);
+
+/**
+ * @} xwcd_ds_i2c_peripheral
+ */
 
 #endif /* xwcd/ds/i2c/peripheral.h */

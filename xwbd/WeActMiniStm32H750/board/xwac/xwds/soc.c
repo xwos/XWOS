@@ -555,5 +555,5 @@ void stm32xwds_soc_cb_eirq_isr(xwid_t eiid)
 
         if (!is_err_or_null(soc->eirq.isrs[eiid])) {
                 soc->eirq.isrs[eiid](soc, (xwid_t)eiid, soc->eirq.isrargs[eiid]);
-        }/* else {} */
+        }
 }

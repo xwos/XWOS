@@ -24,19 +24,13 @@
 #include <xwos/standard.h>
 #include <xwcd/ds/i2c/peripheral.h>
 
-enum xwds_eeprom_rsc_gpio_idx_em {
-        XWDS_EEPROM_RSC_GPIO_IDX_PWR = 0,
-        XWDS_EEPROM_RSC_GPIO_IDX_WP,
-        XWDS_EEPROM_RSC_GPIO_NUM,
-};
-
 struct xwds_eeprom_parameter {
         xwsz_t page_size;
         xwsz_t total;
 };
 
 struct xwds_eeprom {
-        struct xwds_i2cp i2cp; /**< C语言面向对象：继承struct xwds_i2cp */
+        struct xwds_i2cp i2cp; /**< C语言面向对象：继承 `struct xwds_i2cp` */
         const struct xwds_eeprom_parameter parameter; /**< 参数 */
         const struct xwds_resource_gpio * pwr_gpiorsc; /**< 电源开关GPIO */
         const struct xwds_resource_gpio * wp_gpiorsc; /**< 写保护GPIO */

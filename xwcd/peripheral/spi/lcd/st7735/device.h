@@ -18,12 +18,10 @@
  * > limitations under the License.
  * @note
  * + SPI总线配置：
- *   - spip->bus指明是SOC中的哪条SPI总线；
- *   - 若需要支持APIxwds_w25qxx_cfgbus()，需要在配置spip->buscfgid指明
+ *   + `spip->bus` 指明是SOC中的哪条SPI总线；
+ *   + 若需要支持API `xwds_w25qxx_cfgbus()` ，需要在配置 `spip->buscfgid` 指明
  *     SPI总线配置的序号，SPI主机配置列表（spip->bus->buscfg数组）
- *     中必须要有此配置；；
- *   - SPI主机配置的结构体通常由SOC的SDK定义，例如S32K为自动生成的代码中的
- *     lpspi_master_config_t，STM32为HAL库中的SPI_InitTypeDef；
+ *     中必须要有此配置；
  */
 
 #ifndef __xwcd_peripheral_spi_lcd_st7735_device_h__
@@ -161,7 +159,7 @@ struct xwds_st7735_parameter {
  * @brief ST7735 设备
  */
 struct xwds_st7735 {
-        struct xwds_spip spip; /**< 继承struct xwds_spip */
+        struct xwds_spip spip; /**< C语言面向对象：继承 `struct xwds_spip` */
 
         /* attributes */
         struct xwds_st7735_parameter parameter; /**< 参数 */

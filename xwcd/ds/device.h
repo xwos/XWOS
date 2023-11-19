@@ -33,6 +33,12 @@
 #include <xwcd/ds/object.h>
 
 /**
+ * @defgroup xwcd_ds_device 设备基类
+ * @ingroup xwcd_ds
+ * @{
+ */
+
+/**
  * @brief 向前迭代每个设备
  */
 #define xwds_itr_next_device(ds, p) \
@@ -142,19 +148,100 @@ xwer_t xwds_device_vop_suspend(struct xwds_device * dev);
 xwer_t xwds_device_vop_resume(struct xwds_device * dev);
 #endif
 
+/**
+ * @brief XWDS API：设备的构造函数
+ * @param[in] dev: 设备对象的指针
+ */
 void xwds_device_construct(struct xwds_device * dev);
+
+/**
+ * @brief XWDS API：设备的析构函数
+ * @param[in] dev: 设备对象的指针
+ */
 void xwds_device_destruct(struct xwds_device * dev);
 
+/**
+ * @brief XWDS API：探测设备
+ * @param[in] ds: 设备栈控制块指针
+ * @param[in] dev: 设备对象的指针
+ * @param[in] gcfunc: 垃圾回收函数
+ * @return 错误码
+ * @retval XWOK: 没有错误发生
+ * @retval -EPERM: 引用计数错误
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
                          xwobj_gc_f gcfunc);
+
+/**
+ * @brief XWDS API：删除设备
+ * @param[in] dev: 设备对象的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误发生
+ * @retval -EPERM: 引用计数错误
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_device_remove(struct xwds_device * dev);
+
+/**
+ * @brief XWDS API：启动设备
+ * @param[in] dev: 设备对象的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误发生
+ * @retval -EPERM: 引用计数错误
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_device_start(struct xwds_device * dev);
+
+/**
+ * @brief XWDS API：停止设备
+ * @param[in] dev: 设备对象的指针
+ * @return 错误码
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_device_stop(struct xwds_device * dev);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+/**
+ * @brief XWDS API：暂停设备
+ * @param[in] dev: 设备对象的指针
+ * @return 错误码
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_device_suspend(struct xwds_device * dev);
+
+/**
+ * @brief XWDS API：继续设备
+ * @param[in] dev: 设备对象的指针
+ * @return 错误码
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_device_resume(struct xwds_device * dev);
+
+/**
+ * @brief XWDS API：暂停所有设备
+ * @param[in] ds: 设备栈控制块指针
+ * @param[in] ign_err: 是否忽略错误：若为假，发生错误时，函数会中止并返回
+ * @return 错误码
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err);
+
+/**
+ * @brief XWDS API：继续所有设备
+ * @param[in] ds: 设备栈控制块指针
+ * @param[in] ign_err: 是否忽略错误：若为假，发生错误时，函数会中止并返回
+ * @return 错误码
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err);
 #endif
 
@@ -245,5 +332,9 @@ xwsq_t xwds_device_get_refcnt(struct xwds_device * dev)
         return xwds_obj_get_refcnt(&dev->obj);
 }
 #endif
+
+/**
+ * @} xwcd_ds_device
+ */
 
 #endif /* xwcd/ds/device.h */

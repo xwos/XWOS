@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：SOC外部中断
+ * @brief 玄武设备栈：SOC：外部中断
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -25,6 +25,11 @@
 #include <xwcd/ds/soc/chip.h>
 
 /**
+ * @ingroup xwcd_ds_soc
+ * @{
+ */
+
+/**
  * @brief XWDS External IRQ Number
  */
 #define XWDS_EIRQ(x)    ((xwid_t)x)
@@ -35,20 +40,54 @@
 enum xwds_soc_ei_flag_em {
         XWDS_SOC_EIF_TM_RISING = XWBOP_BIT(0), /**< 上升沿触发 */
         XWDS_SOC_EIF_TM_FALLING = XWBOP_BIT(1), /**< 下降沿触发 */
-        XWDS_SOC_EIF_TM_EITHER = XWDS_SOC_EIF_TM_RISING |
-                                 XWDS_SOC_EIF_TM_FALLING, /**< 任意边沿触发 */
+        XWDS_SOC_EIF_TM_EITHER = (XWDS_SOC_EIF_TM_RISING |
+                                  XWDS_SOC_EIF_TM_FALLING), /**< 任意边沿触发 */
         XWDS_SOC_EIF_TM_LOW = XWBOP_BIT(2), /**< 低电平触发*/
         XWDS_SOC_EIF_TM_HIGH = XWBOP_BIT(3), /**< 高电平触发 */
-        XWDS_SOC_EIF_TM_MASK = XWDS_SOC_EIF_TM_RISING | XWDS_SOC_EIF_TM_FALLING |
-                               XWDS_SOC_EIF_TM_LOW | XWDS_SOC_EIF_TM_HIGH,
+        XWDS_SOC_EIF_TM_MASK = (XWDS_SOC_EIF_TM_RISING | XWDS_SOC_EIF_TM_FALLING |
+                                XWDS_SOC_EIF_TM_LOW | XWDS_SOC_EIF_TM_HIGH),
         XWDS_SOC_EIF_WKUP = XWBOP_BIT(4), /**< 唤醒 */
         XWDS_SOC_EIF_DMA = XWBOP_BIT(5), /**< 触发DMA */
 };
 
+/**
+ * @brief XWDS API：申请外部中断
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口
+ * @param[in] pinmask: GPIO PIN
+ * @param[in] eiid: 外部中断ID
+ * @param[in] eiflag: 触发标志
+ * @param[in] isr: 中断响应函数
+ * @param[in] arg: 中断响应函数参数
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: 外部中断ID错误
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
                      xwid_t eiid, xwsq_t eiflag,
                      xwds_eirq_f isr, xwds_eirq_arg_t arg);
+
+/**
+ * @brief XWDS API：释放外部中断
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口
+ * @param[in] pinmask: GPIO PIN
+ * @param[in] eiid: 外部中断ID
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: 外部中断ID错误
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
                      xwid_t eiid);
+
+/**
+ * @} xwcd_ds_soc
+ */
 
 #endif /* xwcd/ds/soc/eirq.h */

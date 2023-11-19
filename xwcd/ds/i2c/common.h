@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：I2C协议通用的定义
+ * @brief 玄武设备栈：I2C：协议通用的定义
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -22,6 +22,12 @@
 #define __xwcd_ds_i2c_common_h__
 
 #include <xwcd/ds/standard.h>
+
+/**
+ * @defgroup xwcd_ds_i2c I2C
+ * @ingroup xwcd_ds
+ * @{
+ */
 
 #define XWDS_I2C_10BITADDR_LEADING_BYTE_MASK    ((xwu8_t)0xF0)
 
@@ -61,5 +67,9 @@ struct xwds_i2c_msg {
         xwu8_t * data; /**< 数据缓存区的指针 */
         xwsz_t size; /** 数据缓存区的大小 */
 };
+
+/**
+ * @} xwcd_ds_i2c
+ */
 
 #endif /* xwcd/ds/i2c/common.h */

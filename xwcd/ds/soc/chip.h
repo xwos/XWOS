@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：SOC设备
+ * @brief 玄武设备栈：SOC
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,6 +23,12 @@
 
 #include <xwcd/ds/standard.h>
 #include <xwcd/ds/device.h>
+
+/**
+ * @defgroup xwcd_ds_soc SOC
+ * @ingroup xwcd_ds
+ * @{
+ */
 
 #if defined(XWCDCFG_ds_SOC_EIRQ_ROISRT) && (1 == XWCDCFG_ds_SOC_EIRQ_ROISRT)
 #  define __xwds_soc_eirq_tbl_qualifier const
@@ -80,7 +86,7 @@ struct xwds_soc_driver {
         xwer_t (* gpio_output)(struct xwds_soc *,
                                xwid_t /*port*/,
                                xwsq_t /*pinmask*/,
-                               xwsq_t); /**< 输出GPIO */
+                               xwsq_t /*out*/); /**< 输出GPIO */
         xwer_t (* gpio_set)(struct xwds_soc * /*soc*/,
                             xwid_t /*port*/,
                             xwsq_t /*pinmask*/); /**< 将GPIO置为高电平 */
@@ -175,10 +181,8 @@ struct xwds_soc {
 #endif
 #if (defined(XWCDCFG_ds_SOC_EIRQ) && (1 == XWCDCFG_ds_SOC_EIRQ))
         struct {
-                __xwds_soc_eirq_tbl_qualifier xwds_eirq_f * isrs;
-                                                        /**< 外部中断的ISR表 */
-                __xwds_soc_eirq_tbl_qualifier xwds_eirq_arg_t * isrargs;
-                                                        /**< 外部中断的参数表 */
+                __xwds_soc_eirq_tbl_qualifier xwds_eirq_f * isrs; /**< 外部中断的ISR表 */
+                __xwds_soc_eirq_tbl_qualifier xwds_eirq_arg_t * isrargs; /**< 外部中断的参数表 */
                 xwsz_t num; /**< 外部中断的数量 */
         } eirq; /**< 外部中断的描述 */
 #endif
@@ -187,17 +191,38 @@ struct xwds_soc {
                 xwsz_t ch_num; /**< DMA通道数量 */
                 void * ccfg; /**< SOC DMA控制器配置 */
                 atomic_xwbmp_t * chstatus; /**< DMA通道状态图 */
-                __xwds_soc_dma_tbl_qualifier xwds_dma_f * chcbs;
-                                                /**< DMA通道传输结束回调函数表 */
-                __xwds_soc_dma_tbl_qualifier xwds_dma_cbarg_t * chcbargs;
-                                                /**< DMA通道传输结束参数表 */
+                __xwds_soc_dma_tbl_qualifier xwds_dma_f * chcbs; /**< DMA通道传输结束回调函数表 */
+                __xwds_soc_dma_tbl_qualifier xwds_dma_cbarg_t * chcbargs; /**< DMA通道传输结束参数表 */
         } dma; /**< DMA描述 */
 #endif
 };
 
+/**
+ * @brief XWDS API：SOC构造函数
+ * @param[in] soc: SOC对象指针
+ */
 void xwds_soc_construct(struct xwds_soc * soc);
+
+/**
+ * @brief XWDS API：SOC对象的析构函数
+ * @param[in] soc: SOC对象指针
+ */
 void xwds_soc_destruct(struct xwds_soc * soc);
+
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] soc: SOC对象指针
+ */
 xwer_t xwds_soc_grab(struct xwds_soc * soc);
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] soc: SOC对象指针
+ */
 xwer_t xwds_soc_put(struct xwds_soc * soc);
+
+/**
+ * @} xwcd_ds_soc
+ */
 
 #endif /* xwcd/ds/soc/chip.h */

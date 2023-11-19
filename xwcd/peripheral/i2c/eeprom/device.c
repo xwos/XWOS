@@ -22,11 +22,13 @@
 #include <xwcd/ds/i2c/peripheral.h>
 #include <xwcd/peripheral/i2c/eeprom/device.h>
 
+__xwbsp_api
 void xwds_eeprom_construct(struct xwds_eeprom * eeprom)
 {
         xwds_i2cp_construct(&eeprom->i2cp);
 }
 
+__xwbsp_api
 void xwds_eeprom_destruct(struct xwds_eeprom * eeprom)
 {
         xwds_i2cp_destruct(&eeprom->i2cp);

@@ -44,10 +44,6 @@ __xwds_rodata const struct xwds_virtual_operation xwds_dev_vop = {
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
-/**
- * @brief XWDS API：设备的构造函数
- * @param[in] dev: 设备对象的指针
- */
 __xwds_api
 void xwds_device_construct(struct xwds_device * dev)
 {
@@ -56,10 +52,6 @@ void xwds_device_construct(struct xwds_device * dev)
         dev->ds = NULL;
 }
 
-/**
- * @brief XWDS API：设备的析构函数
- * @param[in] dev: 设备对象的指针
- */
 __xwds_api
 void xwds_device_destruct(struct xwds_device * dev)
 {
@@ -206,7 +198,7 @@ xwer_t xwds_device_gc(void * obj)
         } else {
                 rc = xwds_device_vop_remove(dev);
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_remove;
         }
         return XWOK;
@@ -217,17 +209,6 @@ err_dev_vop_remove:
         return rc;
 }
 
-/**
- * @brief XWDS API：探测设备
- * @param[in] ds: 设备栈控制块指针
- * @param[in] dev: 设备对象的指针
- * @param[in] gcfunc: 垃圾回收函数
- * @return 错误码
- * @retval XWOK: 没有错误发生
- * @retval -EPERM: 引用计数错误
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
                          xwobj_gc_f gcfunc)
@@ -239,7 +220,7 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwds_obj_probe(&dev->obj, gcfunc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_obj_probe;
         }
         /* refcnt == XWDS_OBJ_REF_SHUTDOWN */
@@ -251,13 +232,13 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
         } else {
                 rc = xwds_device_vop_probe(dev);
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_probe;
         }
 
         /* add to device stack */
         rc = xwds_obj_add(ds, &dev->obj);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_xwds_obj_add;
         }
         dev->ds = ds;
@@ -276,15 +257,6 @@ err_obj_probe:
         return rc;
 }
 
-/**
- * @brief XWDS API：删除设备
- * @param[in] dev: 设备对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误发生
- * @retval -EPERM: 引用计数错误
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_device_remove(struct xwds_device * dev)
 {
@@ -293,15 +265,6 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
         return xwds_obj_remove(&dev->obj);
 }
 
-/**
- * @brief XWDS API：启动设备
- * @param[in] dev: 设备对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误发生
- * @retval -EPERM: 引用计数错误
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_device_start(struct xwds_device * dev)
 {
@@ -311,7 +274,7 @@ xwer_t xwds_device_start(struct xwds_device * dev)
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwds_obj_start(&dev->obj);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_obj_start;
         }
         /* refcnt == XWDS_OBJ_REF_RUNNING */
@@ -323,7 +286,7 @@ xwer_t xwds_device_start(struct xwds_device * dev)
         } else {
                 rc = xwds_device_vop_start(dev);
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_start;
         }
         return XWOK;
@@ -334,13 +297,6 @@ err_obj_start:
         return rc;
 }
 
-/**
- * @brief XWDS API：停止设备
- * @param[in] dev: 设备对象的指针
- * @return 错误码
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_device_stop(struct xwds_device * dev)
 {
@@ -350,7 +306,7 @@ xwer_t xwds_device_stop(struct xwds_device * dev)
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwds_obj_stop(&dev->obj);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_obj_stop;
         }
         /* refcnt == XWDS_OBJ_REF_SHUTDOWN */
@@ -362,7 +318,7 @@ xwer_t xwds_device_stop(struct xwds_device * dev)
         } else {
                 rc = xwds_device_vop_stop(dev);
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_stop;
         }
         return XWOK;
@@ -374,13 +330,6 @@ err_obj_stop:
 }
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-/**
- * @brief XWDS API：暂停设备
- * @param[in] dev: 设备对象的指针
- * @return 错误码
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_device_suspend(struct xwds_device * dev)
 {
@@ -390,7 +339,7 @@ xwer_t xwds_device_suspend(struct xwds_device * dev)
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwds_obj_suspend(&dev->obj);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_obj_suspend;
         }
         /* refcnt == XWDS_OBJ_REF_SUSPEND */
@@ -402,7 +351,7 @@ xwer_t xwds_device_suspend(struct xwds_device * dev)
         } else {
                 rc = xwds_device_vop_suspend(dev);
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_suspend;
         }
         return XWOK;
@@ -413,13 +362,6 @@ err_obj_suspend:
         return rc;
 }
 
-/**
- * @brief XWDS API：继续设备
- * @param[in] dev: 设备对象的指针
- * @return 错误码
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_device_resume(struct xwds_device * dev)
 {
@@ -429,7 +371,7 @@ xwer_t xwds_device_resume(struct xwds_device * dev)
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwds_obj_resume(&dev->obj);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_obj_resume;
         }
         /* refcnt == XWDS_OBJ_REF_RUNNING */
@@ -441,7 +383,7 @@ xwer_t xwds_device_resume(struct xwds_device * dev)
         } else {
                 rc = xwds_device_vop_resume(dev);
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_resume;
         }
         return XWOK;
@@ -452,14 +394,6 @@ err_obj_resume:
         return rc;
 }
 
-/**
- * @brief XWDS API：暂停所有设备
- * @param[in] ds: 设备栈控制块指针
- * @param[in] ign_err: 是否忽略错误：若为假，发生错误时，函数会中止并返回
- * @return 错误码
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
 {
@@ -475,7 +409,7 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
                 xwos_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
                 rc = xwds_device_suspend(c);
                 xwos_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         if (ign_err) {
                                 rc = XWOK;
                         } else {
@@ -487,14 +421,6 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
         return rc;
 }
 
-/**
- * @brief XWDS API：继续所有设备
- * @param[in] ds: 设备栈控制块指针
- * @param[in] ign_err: 是否忽略错误：若为假，发生错误时，函数会中止并返回
- * @return 错误码
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
 {
@@ -510,7 +436,7 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
                 xwos_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
                 rc = xwds_device_resume(c);
                 xwos_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         if (ign_err) {
                                 rc = XWOK;
                         } else {

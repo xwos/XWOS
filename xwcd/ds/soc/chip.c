@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：SOC设备
+ * @brief 玄武设备栈：SOC
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -54,10 +54,6 @@ __xwds_rodata const struct xwds_virtual_operation xwds_soc_vop = {
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
-/**
- * @brief XWDS API：SOC构造函数
- * @param[in] soc: SOC对象指针
- */
 __xwds_api
 void xwds_soc_construct(struct xwds_soc * soc)
 {
@@ -65,30 +61,18 @@ void xwds_soc_construct(struct xwds_soc * soc)
         soc->dev.vop = &xwds_soc_vop;
 }
 
-/**
- * @brief XWDS API：SOC对象的析构函数
- * @param[in] soc: SOC对象指针
- */
 __xwds_api
 void xwds_soc_destruct(struct xwds_soc * soc)
 {
         xwds_device_destruct(&soc->dev);
 }
 
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] soc: SOC对象指针
- */
 __xwds_api
 xwer_t xwds_soc_grab(struct xwds_soc * soc)
 {
         return xwds_device_grab(&soc->dev);
 }
 
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] soc: SOC对象指针
- */
 __xwds_api
 xwer_t xwds_soc_put(struct xwds_soc * soc)
 {

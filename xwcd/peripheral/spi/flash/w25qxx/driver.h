@@ -30,7 +30,7 @@
  * @brief W25QXX驱动函数表
  */
 struct xwds_w25qxx_driver {
-        struct xwds_spip_driver spip; /**< C语言面向对象：继承struct xwds_spip_driver */
+        struct xwds_spip_driver spip; /**< C语言面向对象：继承 `struct xwds_spip_driver` */
         xwer_t (* io)(struct xwds_w25qxx * /*w25qxx*/,
                       xwu8_t * /*txq*/, xwu8_t * /*rxq*/,
                       xwsz_t * /*size*/, xwtm_t /*to*/);

@@ -23,6 +23,11 @@
 
 #include <xwos/standard.h>
 
+/**
+ * @ingroup xwcd_ds
+ * @{
+ */
+
 #define __xwds_code             __xwcd_code
 #define __xwds_isr              __xwcd_isr
 #define __xwds_api              __xwcd_api
@@ -67,11 +72,13 @@ struct xwds_resource_irq {
         const char * description; /**< 描述 */
 };
 
+struct xwds_soc;
+
 /**
  * @brief 设备栈时钟资源
  */
 struct xwds_resource_clk {
-        void * soc; /**< SOC芯片 */
+        struct xwds_soc * soc; /**< 芯片 */
         xwid_t clkid; /**< ID */
         const char * description; /**< 资源描述 */
 };
@@ -80,7 +87,7 @@ struct xwds_resource_clk {
  * @brief 设备栈电源资源
  */
 struct xwds_resource_pwr {
-        void * soc; /**< SOC芯片 */
+        struct xwds_soc * soc; /**< 芯片 */
         xwid_t pwrid; /**< ID */
         const char * description; /**< 资源描述 */
 };
@@ -89,7 +96,7 @@ struct xwds_resource_pwr {
  * @brief 设备栈GPIO资源
  */
 struct xwds_resource_gpio {
-        void * soc; /**< SOC芯片 */
+        struct xwds_soc * soc; /**< 芯片 */
         xwid_t port; /**< port ID */
         xwsq_t pinmask; /**< pin 掩码 */
         const char * description; /**< 资源描述 */
@@ -99,7 +106,7 @@ struct xwds_resource_gpio {
  * @brief 设备栈DMA资源
  */
 struct xwds_resource_dma {
-        void * soc; /**< SOC芯片 */
+        struct xwds_soc * soc; /**< 芯片 */
         xwid_t ch; /**< DMA通道 */
         void * xwccfg; /**< SOC DMA 通道私有配置 */
         const char * description; /**< 资源描述 */
@@ -122,5 +129,9 @@ struct xwds_resources {
         const struct xwds_resource_dma * dmarsc_array; /**< DMA资源数组 */
         xwsz_t dmarsc_num; /**< DMA资源数量 */
 };
+
+/**
+ * @} xwcd_ds
+ */
 
 #endif /* xwcd/ds/standard.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：SOC外部中断
+ * @brief 玄武设备栈：SOC：外部中断
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -22,22 +22,6 @@
 #include <xwcd/ds/soc/gpio.h>
 #include <xwcd/ds/soc/eirq.h>
 
-/**
- * @brief XWDS API：申请外部中断
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口
- * @param[in] pinmask: GPIO PIN
- * @param[in] eiid: 外部中断ID
- * @param[in] eiflag: 触发标志
- * @param[in] isr: 中断响应函数
- * @param[in] arg: 中断响应函数参数
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 外部中断ID错误
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
                      xwid_t eiid, xwsq_t eiflag,
@@ -50,19 +34,19 @@ xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
         XWDS_VALIDATE((eiid < soc->eirq.num), "out-of-range", -ERANGE);
 
         rc = xwds_soc_grab(soc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_soc_grab;
         }
 
 #if defined(XWCDCFG_ds_SOC_EIRQ_ROISRT) && (1 == XWCDCFG_ds_SOC_EIRQ_ROISRT)
         XWOS_UNUSED(isr);
         XWOS_UNUSED(arg);
-        if (__xwcc_unlikely(NULL == soc->eirq.isrs[eiid])) {
+        if (NULL == soc->eirq.isrs[eiid]) {
                 rc = -EPERM;
                 goto err_perm;
         }
 #else
-        if (__xwcc_unlikely(soc->eirq.isrs[eiid])) {
+        if (soc->eirq.isrs[eiid]) {
                 rc = -EBUSY;
                 goto err_perm;
         }
@@ -76,7 +60,7 @@ xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_eirq_req;
         }
         return XWOK;
@@ -92,19 +76,6 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：释放外部中断
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口
- * @param[in] pinmask: GPIO PIN
- * @param[in] eiid: 外部中断ID
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 外部中断ID错误
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t eiid)
 {
@@ -114,7 +85,7 @@ xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t 
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE((eiid < soc->eirq.num), "out-of-range", -ERANGE);
 
-        if (__xwcc_unlikely(NULL == soc->eirq.isrs[eiid])) {
+        if (NULL == soc->eirq.isrs[eiid]) {
                 rc = -EPERM;
                 goto err_notinused;
         }
@@ -124,7 +95,7 @@ xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t 
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_rlsei;
         }
 #if !defined(XWCDCFG_ds_SOC_EIRQ_ROISRT) || (1 != XWCDCFG_ds_SOC_EIRQ_ROISRT)

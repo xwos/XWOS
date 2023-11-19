@@ -31,7 +31,7 @@
  * @brief ST7735驱动函数表
  */
 struct xwds_st7735_driver {
-        struct xwds_spip_driver spip; /**< C语言面向对象：继承struct xwds_spip_driver */
+        struct xwds_spip_driver spip; /**< C语言面向对象：继承 `struct xwds_spip_driver` */
         xwer_t (* write)(struct xwds_st7735 * /*st7735*/, xwu8_t /*reg*/,
                          const xwu8_t * /*data*/, xwsz_t * /*size*/,
                          xwtm_t /*to*/);
@@ -70,6 +70,11 @@ void xwds_st7735_get_brightness(struct xwds_st7735 * st7735, xwu32_t * brightnes
 xwer_t xwds_st7735_set_orientation(struct xwds_st7735 * st7735,
                                    xwu8_t orientation, xwtm_t to);
 void xwds_st7735_get_orientation(struct xwds_st7735 * st7735, xwu8_t * orientation);
+xwer_t xwds_st7735_set_cursor(struct xwds_st7735 * st7735, xwu8_t x, xwu8_t y,
+                              xwtm_t to);
+xwer_t xwds_st7735_set_window(struct xwds_st7735 * st7735,
+                              xwu8_t x, xwu8_t y, xwu8_t width, xwu8_t height,
+                              xwtm_t to);
 xwer_t xwds_st7735_invert_color(struct xwds_st7735 * st7735, bool inv, xwtm_t to);
 xwer_t xwds_st7735_set_pixel(struct xwds_st7735 * st7735,
                              xwu8_t x, xwu8_t y,

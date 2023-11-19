@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：I2C主机
+ * @brief 玄武设备栈：I2C：主机
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -54,10 +54,6 @@ __xwds_rodata const struct xwds_virtual_operation xwds_i2cm_vop = {
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
-/**
- * @brief XWDS API：I2C主机控制器的构造函数
- * @param[in] i2cm: I2C主机控制器对象指针
- */
 __xwds_api
 void xwds_i2cm_construct(struct xwds_i2cm * i2cm)
 {
@@ -65,30 +61,18 @@ void xwds_i2cm_construct(struct xwds_i2cm * i2cm)
         i2cm->dev.vop = &xwds_i2cm_vop;
 }
 
-/**
- * @brief XWDS API：I2C主机控制器对象的析构函数
- * @param[in] i2cm: I2C主机控制器对象指针
- */
 __xwds_api
 void xwds_i2cm_destruct(struct xwds_i2cm * i2cm)
 {
         xwds_device_destruct(&i2cm->dev);
 }
 
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] i2cm: I2C主机控制器对象指针
- */
 __xwds_api
 xwer_t xwds_i2cm_grab(struct xwds_i2cm * i2cm)
 {
         return xwds_device_grab(&i2cm->dev);
 }
 
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] i2cm: I2C主机控制器对象指针
- */
 __xwds_api
 xwer_t xwds_i2cm_put(struct xwds_i2cm * i2cm)
 {
@@ -109,15 +93,15 @@ xwer_t xwds_i2cm_vop_probe(struct xwds_i2cm * i2cm)
         XWDS_VALIDATE(i2cm->xwccfg, "nullptr", -EFAULT);
 
         rc = xwos_mtx_init(&i2cm->xfer.apimtx, XWOS_SKD_PRIORITY_RT_MIN);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_xfer_mtx_init;
         }
         rc = xwos_mtx_init(&i2cm->abort.apimtx, XWOS_SKD_PRIORITY_RT_MIN);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_abort_mtx_init;
         }
         rc = xwds_device_vop_probe(&i2cm->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_probe;
         }
         return XWOK;
@@ -142,7 +126,7 @@ xwer_t xwds_i2cm_vop_remove(struct xwds_i2cm * i2cm)
         xwer_t rc;
 
         rc = xwds_device_vop_remove(&i2cm->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_remove;
         }
         xwos_mtx_fini(&i2cm->abort.apimtx);
@@ -213,39 +197,6 @@ xwer_t xwds_i2cm_vop_resume(struct xwds_i2cm * i2cm)
 #endif
 
 /******** ******** ******** APIs ******** ******** ********/
-/**
- * @brief XWDS API：传输I2C消息
- * @param[in] i2cm: I2C主机控制器对象指针
- * @param[in,out] msg: I2C消息结构体的指针
- * + (I) addr: 地址，只作为输入
- * + (I) flag: 传输标志，只作为输入，取值：
- *   - 地址标志：
- *     + XWDS_I2C_F_7BITADDR: 7位地址
- *     + XWDS_I2C_F_10BITADDR: 10位地址
- *   - 方向标志：
- *     + XWDS_I2C_F_RD: 读
- *     + XWDS_I2C_F_WR: 写
- *   - 开始/停止条件标志：
- *     + XWDS_I2C_F_START: 产生开始条件
- *     + XWDS_I2C_F_STOP: 产生结束条件
- * + data: 数据缓冲区：
- *   - (I) 当方向标志为读时，只作为输入缓冲区
- *   - (O) 当方向标志为写时，只作为输出缓冲区
- * + size: 传输的字节数
- *   - (I) 当作为输入时，表示缓冲区的大小
- *   - (O) 当作为输出时，返回实际传输的数据大小
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 设备对象不可引用
- * @retval -ESHUTDOWN: 设备没有运行
- * @retval -EADDRNOTAVAIL: 地址无响应
- * @retval -ETIMEDOUT: 超时
- * @note
- * + 上下文：线程
- * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwds_api
 xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg, xwtm_t to)
 {
@@ -257,11 +208,11 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg, xwtm_t
         XWDS_VALIDATE((msg->flag & XWDS_I2C_F_DIRMSK), "no-direction", -EINVAL);
 
         rc = xwds_i2cm_grab(i2cm);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_i2cm_grab;
         }
         rc = xwos_mtx_lock_to(&i2cm->xfer.apimtx, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_i2cm_lock;
         }
         drv = xwds_cast(const struct xwds_i2cm_driver *, i2cm->dev.drv);
@@ -270,7 +221,7 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg, xwtm_t
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_xfer;
         }
         xwos_mtx_unlock(&i2cm->xfer.apimtx);
@@ -285,27 +236,6 @@ err_i2cm_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：中止I2C总线传输
- * @param[in] i2cm: I2C主机控制器对象指针
- * @param[in] address: I2C地址
- * @param[in] addrmode: I2C地址模式，取值：
- *   @arg XWDS_I2C_F_7BITADDR 7位地址模式
- *   @arg XWDS_I2C_F_10BITADDR 10位地址模式
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 设备对象不可引用
- * @retval -ESHUTDOWN: 设备没有运行
- * @retval -EADDRNOTAVAIL: 地址无响应
- * @retval -ETIMEDOUT: 超时
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwds_api
 xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
                        xwu16_t address, xwu16_t addrmode,
@@ -317,11 +247,11 @@ xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
         XWDS_VALIDATE(i2cm, "nullptr", -EFAULT);
 
         rc = xwds_i2cm_grab(i2cm);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_i2cm_grab;
         }
         rc = xwos_mtx_lock_to(&i2cm->abort.apimtx, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_i2cm_lock;
         }
         drv = xwds_cast(const struct xwds_i2cm_driver *, i2cm->dev.drv);
@@ -330,7 +260,7 @@ xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_abort;
         }
         xwos_mtx_unlock(&i2cm->abort.apimtx);

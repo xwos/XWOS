@@ -42,11 +42,10 @@
 #define XWCDCFG_ds_SOC_EIRQ_ROISRT                              0
 #define XWCDCFG_ds_SOC_DMA                                      0
 #define XWCDCFG_ds_SOC_DMA_ROCBT                                0
-#define XWCDCFG_ds_SOC_ERAM                                     1
 
 /******** ******** UART ******** ********/
 #define XWCDCFG_ds_UART                                         1
-#define XWCDCFG_ds_UART_RXQ_SIZE                                (256U)
+#define XWCDCFG_ds_UART_RXQ_SIZE                                (128U)
 
 /******** ******** I2C device ******** ********/
 #define XWCDCFG_ds_I2C_MASTER                                   1
@@ -55,6 +54,9 @@
 /******** ******** SPI device ******** ********/
 #define XWCDCFG_ds_SPI_MASTER                                   1
 #define XWCDCFG_ds_SPI_PERIPHERAL                               1
+
+/******** ******** IO Chip ******** ********/
+#define XWCDCFG_ds_IOCHIP                                       1
 
 /******** ******** LIN Bus ******** ********/
 #define XWCDCFG_ds_LIN                                          1
@@ -79,6 +81,7 @@
  ******** ******** ********   I2C peripheral  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWCDCFG_peripheral_i2c_eeprom                           1
+#define XWCDCFG_peripheral_i2c_iochip_tca9539                   1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   SPI peripheral  ******** ******** ********

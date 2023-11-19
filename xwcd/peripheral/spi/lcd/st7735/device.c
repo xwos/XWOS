@@ -20,11 +20,13 @@
 
 #include <xwcd/peripheral/spi/lcd/st7735/device.h>
 
+__xwbsp_api
 void xwds_st7735_construct(struct xwds_st7735 * st7735)
 {
         xwds_spip_construct(&st7735->spip);
 }
 
+__xwbsp_api
 void xwds_st7735_destruct(struct xwds_st7735 * st7735)
 {
         xwds_spip_destruct(&st7735->spip);

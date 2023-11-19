@@ -30,7 +30,7 @@ struct xwds_cantrcv_tja1042_cfg {
         const xwsq_t eirq; /**< 唤醒外部中断资源 */
 };
 
-extern __xwbsp_rodata const struct xwds_cantrcv_driver tja1042_cantrcv_drv;
+extern const struct xwds_cantrcv_driver tja1042_cantrcv_drv;
 
 void tja1042_cantrcv_eirq_wkup(struct xwds_soc *soc, xwid_t eiid,
                                xwds_eirq_arg_t arg);

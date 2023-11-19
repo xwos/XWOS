@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：I2C外设
+ * @brief 玄武设备栈：I2C：外设
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -53,10 +53,6 @@ __xwds_rodata const struct xwds_virtual_operation xwds_i2cp_vop = {
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
-/**
- * @brief XWDS API：I2C外设的构造函数
- * @param[in] i2cp: I2C外设对象指针
- */
 __xwds_api
 void xwds_i2cp_construct(struct xwds_i2cp * i2cp)
 {
@@ -64,30 +60,18 @@ void xwds_i2cp_construct(struct xwds_i2cp * i2cp)
         i2cp->dev.vop = &xwds_i2cp_vop;
 }
 
-/**
- * @brief XWDS API：I2C外设的构造函数
- * @param[in] i2cp: I2C外设对象指针
- */
 __xwds_api
 void xwds_i2cp_destruct(struct xwds_i2cp * i2cp)
 {
         xwds_device_destruct(&i2cp->dev);
 }
 
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] i2cp: I2C外设对象指针
- */
 __xwds_api
 xwer_t xwds_i2cp_grab(struct xwds_i2cp * i2cp)
 {
         return xwds_device_grab(&i2cp->dev);
 }
 
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] i2cp: I2C外设对象指针
- */
 __xwds_api
 xwer_t xwds_i2cp_put(struct xwds_i2cp * i2cp)
 {
@@ -105,7 +89,7 @@ xwer_t xwds_i2cp_vop_probe(struct xwds_i2cp * i2cp)
         xwer_t rc;
 
         rc = xwds_device_vop_probe(&i2cp->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_probe;
         }
         return XWOK;
@@ -126,7 +110,7 @@ xwer_t xwds_i2cp_vop_remove(struct xwds_i2cp * i2cp)
         XWDS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_vop_remove(&i2cp->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_remove;
         }
         return XWOK;
@@ -149,11 +133,11 @@ xwer_t xwds_i2cp_vop_start(struct xwds_i2cp * i2cp)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_i2cm_grab;
         }
         rc = xwds_device_vop_start(&i2cp->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_start;
         }
         return XWOK;
@@ -176,7 +160,7 @@ xwer_t xwds_i2cp_vop_stop(struct xwds_i2cp * i2cp)
         XWDS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_vop_stop(&i2cp->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_stop;
         }
         xwds_i2cm_put(i2cp->bus);
@@ -200,7 +184,7 @@ xwer_t xwds_i2cp_vop_suspend(struct xwds_i2cp * i2cp)
         XWDS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_vop_suspend(&i2cp->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_suspend;
         }
         xwds_i2cm_put(i2cp->bus);
@@ -224,11 +208,11 @@ xwer_t xwds_i2cp_vop_resume(struct xwds_i2cp * i2cp)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_i2cm_grab;
         }
         rc = xwds_device_vop_resume(&i2cp->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_resume;
         }
         return XWOK;

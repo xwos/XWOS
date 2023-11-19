@@ -24,6 +24,12 @@
 #include <xwcd/ds/standard.h>
 #include <xwcd/ds/device.h>
 
+/**
+ * @defgroup xwcd_ds_misc MISC设备
+ * @ingroup xwcd_ds
+ * @{
+ */
+
 struct xwds_misc;
 
 /**
@@ -43,9 +49,32 @@ struct xwds_misc {
         const void * misccfg; /**< 配置 */
 };
 
+/**
+ * @brief XWDS API：MISC设备的构造函数
+ * @param[in] misc: MISC设备对象指针
+ */
 void xwds_misc_construct(struct xwds_misc * misc);
+
+/**
+ * @brief XWDS API：MISC设备对象的析构函数
+ * @param[in] misc: MISC设备对象指针
+ */
 void xwds_misc_destruct(struct xwds_misc * misc);
+
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] misc: MISC设备对象指针
+ */
 xwer_t xwds_misc_grab(struct xwds_misc * misc);
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] misc: MISC设备对象指针
+ */
 xwer_t xwds_misc_put(struct xwds_misc * misc);
+
+/**
+ * @} xwcd_ds_misc
+ */
 
 #endif /* xwcd/ds/misc/chip.h */

@@ -53,10 +53,6 @@ __xwds_rodata const struct xwds_virtual_operation xwds_misc_vop = {
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
-/**
- * @brief XWDS API：MISC设备的构造函数
- * @param[in] misc: MISC设备对象指针
- */
 __xwds_api
 void xwds_misc_construct(struct xwds_misc * misc)
 {
@@ -64,30 +60,18 @@ void xwds_misc_construct(struct xwds_misc * misc)
         misc->dev.vop = &xwds_misc_vop;
 }
 
-/**
- * @brief XWDS API：MISC设备对象的析构函数
- * @param[in] misc: MISC设备对象指针
- */
 __xwds_api
 void xwds_misc_destruct(struct xwds_misc * misc)
 {
         xwds_device_destruct(&misc->dev);
 }
 
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] misc: MISC设备对象指针
- */
 __xwds_api
 xwer_t xwds_misc_grab(struct xwds_misc * misc)
 {
         return xwds_device_grab(&misc->dev);
 }
 
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] misc: MISC设备对象指针
- */
 __xwds_api
 xwer_t xwds_misc_put(struct xwds_misc * misc)
 {

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：GPIO
+ * @brief 玄武设备栈：SOC：GPIO
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,19 +23,6 @@
 #include <xwos/lib/xwaop.h>
 #include <xwcd/ds/soc/gpio.h>
 
-/**
- * @brief XWDS API：申请GPIO
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
- * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的组合（或运算）
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: GPIO PORT错误
- * @retval -EBUSY: GPIO PIN已被使用
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 {
@@ -47,18 +34,18 @@ xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         rc = xwds_soc_grab(soc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_soc_grab;
         }
         rc = xwaop_t0ma_then_s1m(xwsq_t, &soc->gpio.pins[port], pinmask, NULL, NULL);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 rc = -EBUSY;
                 goto err_set_pin;
         }
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->gpio_req)) {
                 rc = drv->gpio_req(soc, port, pinmask);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         goto err_drv_gpio_req;
                 }
         }
@@ -72,19 +59,6 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：释放GPIO
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
- * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的组合（或运算）
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: GPIO PORT错误
- * @retval -EPERM: GPIO PIN未被申请
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 {
@@ -97,14 +71,14 @@ xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
-        if (__xwcc_unlikely(pinmask & (~pinsts))) {
+        if (pinmask & (~pinsts)) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->gpio_rls)) {
                 rc = drv->gpio_rls(soc, port, pinmask);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         goto err_drv_gpio_rls;
                 }
         }
@@ -118,20 +92,6 @@ err_pinsts:
         return rc;
 }
 
-/**
- * @brief XWDS API：配置GPIO
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
- * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的组合（或运算）
- * @param[in] cfg: GPIO配置，取值 依据不同SOC
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: GPIO PORT错误
- * @retval -ENOSYS: 不支持的API
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
                      xwid_t port, xwsq_t pinmask,
@@ -146,7 +106,7 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         rc = xwds_soc_grab(soc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                goto err_soc_grab;
         }
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
@@ -155,7 +115,7 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_gpio_cfg;
         }
         xwds_soc_put(soc);
@@ -167,20 +127,6 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：将GPIO的PIN置为高电平
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
- * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的组合（或运算）
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: GPIO PORT错误
- * @retval -EPERM: GPIO PIN未被申请
- * @retval -ENOSYS: 不支持的API
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 {
@@ -193,11 +139,11 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         rc = xwds_soc_grab(soc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_soc_grab;
         }
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
-        if (__xwcc_unlikely(pinmask & (~pinsts))) {
+        if (pinmask & (~pinsts)) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -207,7 +153,7 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_set;
         }
         xwds_soc_put(soc);
@@ -220,20 +166,6 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：将GPIO的PIN置为低电平
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
- * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的组合（或运算）
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: GPIO PORT错误
- * @retval -EPERM: GPIO PIN未被申请
- * @retval -ENOSYS: 不支持的API
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 {
@@ -246,11 +178,11 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         rc = xwds_soc_grab(soc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_soc_grab;
         }
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
-        if (__xwcc_unlikely(pinmask & (~pinsts))) {
+        if (pinmask & (~pinsts)) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -260,7 +192,7 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_reset;
         }
         xwds_soc_put(soc);
@@ -273,20 +205,6 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：翻转GPIO电平
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
- * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的组合（或运算）
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: GPIO PORT错误
- * @retval -EPERM: GPIO PIN未被申请
- * @retval -ENOSYS: 不支持的API
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 {
@@ -299,11 +217,11 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         rc = xwds_soc_grab(soc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_soc_grab;
         }
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
-        if (__xwcc_unlikely(pinmask & (~pinsts))) {
+        if (pinmask & (~pinsts)) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -313,7 +231,7 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_toggle;
         }
         xwds_soc_put(soc);
@@ -326,22 +244,6 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：同时输出多个GPIO引脚
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
- * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的组合（或运算）
- * @param[in] out: 输出值，取值 @ref xwds_gpio_pin_em 中的任意项的组合（或运算），
- *                 只有被pinmask掩码覆盖的部分有效，未覆盖的pin输出不会发生改变。
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: GPIO PORT错误
- * @retval -EPERM: GPIO PIN未被申请
- * @retval -ENOSYS: 不支持的API
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_gpio_output(struct xwds_soc * soc,
                         xwid_t port, xwsq_t pinmask,
@@ -356,11 +258,11 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         rc = xwds_soc_grab(soc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_soc_grab;
         }
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
-        if (__xwcc_unlikely(pinmask & (~pinsts))) {
+        if (pinmask & (~pinsts)) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -370,7 +272,7 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_out;
         }
         xwds_soc_put(soc);
@@ -383,21 +285,6 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：同时从GPIO端口读取多个引脚的输入值
- * @param[in] soc: SOC对象指针
- * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
- * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的组合（或运算）
- * @param[out] inbuf: 输入缓冲区
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: GPIO PORT错误
- * @retval -EPERM: GPIO PIN未被申请
- * @retval -ENOSYS: 不支持的API
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_gpio_input(struct xwds_soc * soc,
                        xwid_t port, xwsq_t pinmask,
@@ -412,11 +299,11 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         rc = xwds_soc_grab(soc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_soc_grab;
         }
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
-        if (__xwcc_unlikely(pinmask & (~pinsts))) {
+        if (pinmask & (~pinsts)) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -426,7 +313,7 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_in;
         }
         xwds_soc_put(soc);

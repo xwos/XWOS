@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：LIN控制器
+ * @brief 玄武设备栈：LIN：控制器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -25,6 +25,12 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/device.h>
+
+/**
+ * @defgroup xwcd_ds_lin LIN控制器
+ * @ingroup xwcd_ds
+ * @{
+ */
 
 #define XWDS_LIN_DIAG_MSTREQ_MSG        0x3C
 #define XWDS_LIN_DIAG_SLCREP_MSG        0x3D
@@ -116,22 +122,103 @@ struct xwds_linc {
         struct xwos_mtx txlock; /**< 提供多线程访问安全的锁 */
 };
 
+/**
+ * @brief XWDS API：LIN控制器的构造函数
+ * @param[in] linc: LIN控制器对象指针
+ */
 void xwds_linc_construct(struct xwds_linc * linc);
+
+/**
+ * @brief XWDS API：LIN控制器对象的析构函数
+ * @param[in] linc: LIN控制器对象指针
+ */
 void xwds_linc_destruct(struct xwds_linc * linc);
+
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] linc: LIN控制器对象指针
+ */
 xwer_t xwds_linc_grab(struct xwds_linc * linc);
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] linc: LIN控制器对象指针
+ */
 xwer_t xwds_linc_put(struct xwds_linc * linc);
 
+/**
+ * @brief XWDS API：主机节点发送一条LIN消息
+ * @param[in] linc: LIN控制器对象指针
+ * @param[in] id: 主机节点调度消息的ID
+ * @param[in] msg: LIN消息结构体指针
+ * @param[in] to: 期望唤醒的时间点
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 控制器不支持主机模式发送
+ * @note
+ * + 上下文：线程
+ * @details
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ */
 xwer_t xwds_linc_msttx(struct xwds_linc * linc,
                        xwu8_t id, struct xwds_lin_msg * msg,
                        xwtm_t to);
+
+/**
+ * @brief XWDS API：从机节点发送一条LIN消息
+ * @param[in] linc: LIN控制器对象指针
+ * @param[in] msg: LIN消息结构体指针
+ * @param[in,out] to: 期望唤醒的时间点
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 控制器不支持从机模式发送
+ * @note
+ * + 上下文：线程
+ * @details
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ */
 xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
                        struct xwds_lin_msg * msg,
                        xwtm_t to);
+
+/**
+ * @brief XWDS API：接收一条LIN消息
+ * @param[in] linc: LIN控制器对象指针
+ * @param[out] msgbuf: 指向接收消息缓冲区的指针
+ * @param[in,out] to: 期望唤醒的时间点
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 控制器不支持接收
+ * @note
+ * + 上下文：线程
+ * @details
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ */
 xwer_t xwds_linc_rx(struct xwds_linc * linc,
                     struct xwds_lin_msg * msgbuf,
                     xwtm_t to);
+
+/**
+ * @brief XWDS API：通过LIN保护ID查询消息大小
+ * @param[in] linc: LIN控制器对象指针
+ * @param[in] protected_id: 消息的LIN保护ID
+ * @param[out] ret: 指向缓冲区的指针，通过此缓冲区返回消息大小
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @retval -ENODEV: 找不到ID
+ * @note
+ * + 上下文：任意
+ */
 xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
                               xwu8_t protected_id,
                               xwu8_t * ret);
+
+/**
+ * @} xwcd_ds_lin
+ */
 
 #endif /* xwcd/ds/lin/controller.h */

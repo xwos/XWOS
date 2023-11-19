@@ -88,7 +88,7 @@ xwer_t xwds_obj_start(struct xwds_object * obj)
                                 NULL, NULL);
         if (rc < 0) {
                 rc = -EPERM;
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -102,7 +102,7 @@ xwer_t xwds_obj_stop(struct xwds_object * obj)
                                 NULL, NULL);
         if (rc < 0) {
                 rc = -EPERM;
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -116,7 +116,7 @@ xwer_t xwds_obj_suspend(struct xwds_object * obj)
                                 NULL, NULL);
         if (rc < 0) {
                 rc = -EPERM;
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -130,7 +130,7 @@ xwer_t xwds_obj_resume(struct xwds_object * obj)
                                 NULL, NULL);
         if (rc < 0) {
                 rc = -EPERM;
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -142,9 +142,9 @@ xwer_t xwds_obj_grab(struct xwds_object * obj)
         rc = xwaop_tge_then_add(xwsq_t, &obj->xwobj.refcnt,
                                 XWDS_OBJ_REF_RUNNING, 1,
                                 NULL, NULL);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 rc = -EPERM;
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -158,7 +158,7 @@ xwer_t xwds_obj_put(struct xwds_object * obj)
                                 NULL, NULL);
         if (rc < 0) {
                 rc = -EPERM;
-        }/* else {} */
+        }
         return rc;
 }
 

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：SPI外设控制器
+ * @brief 玄武设备栈：SPI：外设
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -26,6 +26,12 @@
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/spi/master.h>
 
+/**
+ * @defgroup xwcd_ds_spi_peripheral SPI外设
+ * @ingroup xwcd_ds_spi
+ * @{
+ */
+
 struct xwds_spip;
 
 /**
@@ -46,9 +52,32 @@ struct xwds_spip {
         xwid_t buscfgid; /**< 总线配置 */
 };
 
+/**
+ * @brief XWDS API：SPI外设控制器对象的构造函数
+ * @param[in] spip: SPI外设控制器对象指针
+ */
 void xwds_spip_construct(struct xwds_spip * spip);
+
+/**
+ * @brief XWDS API：SPI外设控制器对象的析构函数
+ * @param[in] spip: SPI外设控制器对象指针
+ */
 void xwds_spip_destruct(struct xwds_spip * spip);
+
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] spip: SPI外设控制器对象指针
+ */
 xwer_t xwds_spip_grab(struct xwds_spip * spip);
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] spip: SPI外设控制器对象指针
+ */
 xwer_t xwds_spip_put(struct xwds_spip * spip);
+
+/**
+ * @} xwcd_ds_spi_peripheral
+ */
 
 #endif /* xwcd/ds/spi/peripheral.h */

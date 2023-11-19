@@ -53,6 +53,16 @@
  ******** ********            C/C++ Runtime            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_libc                                            1
+#define XWMDCFG_libc_newlibac_SETJMP                            1
+#define XWMDCFG_libc_newlibac_MEM                               1
+#define XWMDCFG_libc_newlibac_SPRINTF                           0
+#define XWMDCFG_libc_newlibac_FOPS                              1
+#define XWMDCFG_libc_newlibac_TIME                              1
+#define XWMDCFG_libc_picolibcac_SETJMP                          1
+#define XWMDCFG_libc_picolibcac_MEM                             1
+#define XWMDCFG_libc_picolibcac_SPRINTF                         0
+#define XWMDCFG_libc_picolibcac_FOPS                            1
+#define XWMDCFG_libc_picolibcac_TIME                            1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            XWRust Runtime            ******** ********

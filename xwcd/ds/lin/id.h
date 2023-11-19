@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：LIN总线ID校验表
+ * @brief 玄武设备栈：LIN：ID校验表
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -24,6 +24,12 @@
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 
+/**
+ * @defgroup xwcd_ds_lin LIN控制器
+ * @ingroup xwcd_ds
+ * @{
+ */
+
 #define LIN_ID_PARITY(id) ((((~(XWBOP_TBIT((id), 1U) ^ XWBOP_TBIT((id), 3U) ^ \
                                 XWBOP_TBIT((id), 4U) ^ XWBOP_TBIT((id), 5U))) << 7U) | \
                             ((XWBOP_TBIT((id), 0U) ^ XWBOP_TBIT((id), 1U) ^ \
@@ -31,6 +37,13 @@
                            0xC0U)
 #define LIN_ID_PARITY_FIELD(id) (LIN_ID_PARITY(id) | ((id) & 0xFFU))
 
+/**
+ * @brief LIN总线ID校验表
+ */
 extern __xwds_rodata const unsigned char xwos_linid_table[64];
+
+/**
+ * @} xwcd_ds_lin
+ */
 
 #endif /* xwcd/ds/lin/id.h */

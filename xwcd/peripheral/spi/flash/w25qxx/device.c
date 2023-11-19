@@ -20,11 +20,13 @@
 
 #include <xwcd/peripheral/spi/flash/w25qxx/device.h>
 
+__xwbsp_api
 void xwds_w25qxx_construct(struct xwds_w25qxx * w25qxx)
 {
         xwds_spip_construct(&w25qxx->spip);
 }
 
+__xwbsp_api
 void xwds_w25qxx_destruct(struct xwds_w25qxx * w25qxx)
 {
         xwds_spip_destruct(&w25qxx->spip);

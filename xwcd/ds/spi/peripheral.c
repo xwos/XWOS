@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：SPI外设控制器
+ * @brief 玄武设备栈：SPI：外设
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -53,10 +53,6 @@ __xwds_rodata const struct xwds_virtual_operation xwds_spip_vop = {
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
-/**
- * @brief XWDS API：SPI外设控制器对象的构造函数
- * @param[in] spip: SPI外设控制器对象指针
- */
 __xwds_api
 void xwds_spip_construct(struct xwds_spip * spip)
 {
@@ -64,31 +60,18 @@ void xwds_spip_construct(struct xwds_spip * spip)
         spip->dev.vop = &xwds_spip_vop;
 }
 
-/**
- * @brief XWDS API：SPI外设控制器对象的析构函数
- * @param[in] spip: SPI外设控制器对象指针
- */
 __xwds_api
 void xwds_spip_destruct(struct xwds_spip * spip)
 {
         xwds_device_destruct(&spip->dev);
 }
 
-
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] spip: SPI外设控制器对象指针
- */
 __xwds_api
 xwer_t xwds_spip_grab(struct xwds_spip * spip)
 {
         return xwds_device_grab(&spip->dev);
 }
 
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] spip: SPI外设控制器对象指针
- */
 __xwds_api
 xwer_t xwds_spip_put(struct xwds_spip * spip)
 {
@@ -106,7 +89,7 @@ xwer_t xwds_spip_vop_probe(struct xwds_spip * spip)
         xwer_t rc;
 
         rc = xwds_device_vop_probe(&spip->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_probe;
         }
         return XWOK;
@@ -127,7 +110,7 @@ xwer_t xwds_spip_vop_remove(struct xwds_spip * spip)
         XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_vop_remove(&spip->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_remove;
         }
         return XWOK;
@@ -150,11 +133,11 @@ xwer_t xwds_spip_vop_start(struct xwds_spip * spip)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_spim_grab;
         }
         rc = xwds_device_vop_start(&spip->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_start;
         }
         return XWOK;
@@ -177,7 +160,7 @@ xwer_t xwds_spip_vop_stop(struct xwds_spip * spip)
         XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_vop_stop(&spip->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_stop;
         }
         xwds_spim_put(spip->bus);
@@ -201,7 +184,7 @@ xwer_t xwds_spip_vop_suspend(struct xwds_spip * spip)
         XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_vop_suspend(&spip->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_suspend;
         }
         xwds_spim_put(spip->bus);
@@ -225,11 +208,11 @@ xwer_t xwds_spip_vop_resume(struct xwds_spip * spip)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_spim_grab;
         }
         rc = xwds_device_vop_resume(&spip->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_resume;
         }
         return XWOK;

@@ -21,6 +21,7 @@
 #include <xwos/standard.h>
 #include <xwcd/peripheral/spi/flash/w25qxx/device.h>
 
+__xwbsp_data
 struct xwds_w25qxx_cmd xwds_w25q128jv_cmd[XWDS_W25QXX_CMD_NUM] = {
         [XWDS_W25QXX_CMD_WRITE_DISABLE] = {
                 .existing = 1,

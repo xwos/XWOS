@@ -31,10 +31,6 @@ static __xwds_code
 void xwds_pm_report_devices_resuming(struct xwds * ds, xwer_t rc);
 #endif
 
-/**
- * @brief XWDS API：初始化设备栈
- * @param[in] ds: 设备栈指针
- */
 __xwds_code
 void xwds_init(struct xwds * ds)
 {
@@ -43,13 +39,6 @@ void xwds_init(struct xwds * ds)
 }
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-/**
- * @brief XWDS API：暂停设备栈
- * @param[in] ds: 设备栈控制块指针
- * @return 错误码
- * @note
- * + 上下文：中断、中断底半部、线程
- */
 __xwds_api
 xwer_t xwds_pm_suspend(struct xwds * ds)
 {
@@ -73,13 +62,6 @@ void xwds_pm_report_devices_suspending(struct xwds * ds, xwer_t rc)
         XWDS_BUG_ON(rc < 0);
 }
 
-/**
- * @brief XWDS API：继续设备栈
- * @param[in] ds: 设备栈控制块指针
- * @return 错误码
- * @note
- * + 上下文：中断
- */
 __xwds_api
 xwer_t xwds_pm_resume(struct xwds * ds)
 {

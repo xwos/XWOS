@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：LIN总线ID校验表
+ * @brief 玄武设备栈：LIN：ID校验表
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -21,9 +21,6 @@
 #include <xwcd/ds/standard.h>
 #include <xwcd/ds/lin/id.h>
 
-/**
- * @brief LIN总线ID校验表
- */
 __xwds_rodata const xwu8_t xwds_linid_table[64] = {
         LIN_ID_PARITY_FIELD(0), /* 0 */
         LIN_ID_PARITY_FIELD(1), /* 1 */

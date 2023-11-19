@@ -25,6 +25,12 @@
 #include <xwos/lib/object.h>
 #include <xwos/lib/bclst.h>
 
+/**
+ * @defgroup xwcd_ds_object 玄武设备栈对象
+ * @ingroup xwcd_ds
+ * @{
+ */
+
 struct xwds;
 
 /**
@@ -62,5 +68,9 @@ xwer_t xwds_obj_put(struct xwds_object * obj);
 xwsq_t xwds_obj_get_refcnt(struct xwds_object * obj);
 xwer_t xwds_obj_add(struct xwds * ds, struct xwds_object * obj);
 xwer_t xwds_obj_del(struct xwds * ds, struct xwds_object * obj);
+
+/**
+ * @} xwcd_ds_object
+ */
 
 #endif /* xwcd/ds/object.h */

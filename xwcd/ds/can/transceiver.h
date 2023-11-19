@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：CAN总线接收器
+ * @brief 玄武设备栈：CAN：总线接收器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -27,6 +27,12 @@
 #include <xwcd/ds/can/controller.h>
 #include <xwcd/ds/i2c/peripheral.h>
 #include <xwcd/ds/spi/peripheral.h>
+
+/**
+ * @defgroup xwcd_ds_can_transceiver CAN总线接收器
+ * @ingroup xwcd_ds_can
+ * @{
+ */
 
 /**
  * @brief CAN接收器模式枚举
@@ -100,12 +106,12 @@ struct xwds_cantrcv_driver {
 struct xwds_cantrcv {
         union {
                 struct xwds_device dev; /**< 继承struct xwds_device */
-#if (defined(MDCFG_ds_I2C_PERIPHERAL) && (1 == MDCFG_ds_I2C_PERIPHERAL) && \
-     defined(MDCFG_ds_CAN_TRANSCEIVER_I2CP) && (1 == MDCFG_ds_CAN_TRANSCEIVER_I2CP))
+#if (defined(XWCDCFG_ds_I2C_PERIPHERAL) && (1 == XWCDCFG_ds_I2C_PERIPHERAL) && \
+     defined(XWCDCFG_ds_CAN_TRANSCEIVER_I2CP) && (1 == XWCDCFG_ds_CAN_TRANSCEIVER_I2CP))
                 struct xwds_i2cp i2cp; /**< 继承struct xwds_i2cp */
 #endif
-#if (defined(MDCFG_ds_SPI_PERIPHERAL) && (1 == MDCFG_ds_SPI_PERIPHERAL) && \
-     defined(MDCFG_ds_CAN_TRANSCEIVER_SPIP) && (1 == MDCFG_ds_CAN_TRANSCEIVER_SPIP))
+#if (defined(XWCDCFG_ds_SPI_PERIPHERAL) && (1 == XWCDCFG_ds_SPI_PERIPHERAL) && \
+     defined(XWCDCFG_ds_CAN_TRANSCEIVER_SPIP) && (1 == XWCDCFG_ds_CAN_TRANSCEIVER_SPIP))
                 struct xwds_spip spip; /**< 继承struct xwds_spip */
 #endif
         } bc; /**< 基类(base class) */
@@ -120,21 +126,118 @@ struct xwds_cantrcv {
         xwsq_t wkuprs; /**< CAN接收器唤醒原因 */
 };
 
+/**
+ * @brief XWDS API：CAN接收器的构造函数
+ * @param[in] cantrcv: CAN接收器对象指针
+ */
 void xwds_cantrcv_construct(struct xwds_cantrcv * cantrcv);
+
+/**
+ * @brief XWDS API：CAN接收器对象的析构函数
+ * @param[in] cantrcv: CAN接收器对象指针
+ */
 void xwds_cantrcv_destruct(struct xwds_cantrcv * cantrcv);
+
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] cantrcv: CAN接收器对象指针
+ */
 xwer_t xwds_cantrcv_grab(struct xwds_cantrcv * cantrcv);
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] cantrcv: CAN接收器对象指针
+ */
 xwer_t xwds_cantrcv_put(struct xwds_cantrcv * cantrcv);
 
+/**
+ * @brief XWDS API：设置CAN接收器的运行模式
+ * @param[in] cantrcv: CAN接收器对象指针
+ * @param[in] opmode: 唤醒模式
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ERANGE: 不支持的模式
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_cantrcv_set_opmode(struct xwds_cantrcv * cantrcv, xwsq_t opmode);
+
+/**
+ * @brief XWDS API：设置CAN接收器的模式
+ * @param[in] cantrcv: CAN接收器对象指针
+ * @param[out] opmode: 指向缓冲区的指针，通过次缓冲区返回模式
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 void xwds_cantrcv_get_opmode(struct xwds_cantrcv * cantrcv, xwsq_t * opmode);
+
+/**
+ * @brief XWDS API：开启CAN接收器的唤醒
+ * @param[in] cantrcv: CAN接收器对象指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -EOPNOTSUPP: 不支持此API
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_cantrcv_enable_wkup(struct xwds_cantrcv * cantrcv);
+
+/**
+ * @brief XWDS API：关闭CAN接收器的唤醒
+ * @param[in] cantrcv: CAN接收器对象指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -EOPNOTSUPP: 不支持此API
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_cantrcv_disable_wkup(struct xwds_cantrcv * cantrcv);
+
+/**
+ * @brief XWDS API：设置唤醒中断的回调函数
+ * @param[in] cantrcv: CAN接收器对象指针
+ * @param[in] isr: 回调函数
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ * @details
+ * 必须调用 `xwds_cantrcv_disable_wkup()` 后才可修改回调函数。
+ */
 void xwds_cantrcv_set_wkup_isr(struct xwds_cantrcv * cantrcv,
                                xwds_cantrcv_wkup_isr_f isr);
+
+/**
+ * @brief XWDS API：获取CAN接收器的唤醒原因
+ * @param[in] cantrcv: CAN接收器对象指针
+ * @param[out] wkuprs: 指向缓冲区的指针，通过次缓冲区返回唤醒原因
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 void xwds_cantrcv_get_wkuprs(struct xwds_cantrcv * cantrcv, xwsq_t * wkuprs);
+
+/**
+ * @brief XWDS API：清除CAN接收器的唤醒原因
+ * @param[in] cantrcv: CAN接收器对象指针
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 void xwds_cantrcv_clear_wkuprs(struct xwds_cantrcv * cantrcv);
 
 /******** ******** Callbacks for Driver ******** ********/
+/**
+ * @brief CAN接收器回调函数：CAN接收器的唤醒通知
+ * @param[in] cantrcv: CAN接收器对象指针
+ * @note
+ * + 上下文：中断、中断底半部
+ * @details
+ * 此回调函数在中断上下文中被调用，用于通知唤醒。
+ */
 void xwds_cantrcv_drvcb_wakeup_notification(struct xwds_cantrcv * cantrcv);
+
+/**
+ * @} xwcd_ds_can_transceiver
+ */
 
 #endif /* xwcd/ds/can/transceiver.h */

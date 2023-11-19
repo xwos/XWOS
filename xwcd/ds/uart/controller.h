@@ -314,7 +314,6 @@ xwsq_t xwds_uartc_drvcb_rxq_fill(struct xwds_uartc * uartc,
  */
 void xwds_uartc_drvcb_rxq_pub(struct xwds_uartc * uartc, xwsq_t tail);
 
-
 /**
  * @} xwcd_ds_uart
  */

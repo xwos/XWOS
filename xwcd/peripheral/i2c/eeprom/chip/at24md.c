@@ -26,22 +26,23 @@
 #include <xwcd/peripheral/i2c/eeprom/device.h>
 #include <xwcd/peripheral/i2c/eeprom/driver.h>
 
-static
+static __xwbsp_code
 xwer_t at24md_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwsq_t addr, xwtm_t to);
 
-static
+static __xwbsp_code
 xwer_t at24md_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwsq_t addr, xwtm_t to);
 
-static
+static __xwbsp_code
 xwer_t at24md_pgwrite(struct xwds_eeprom * eeprom,
                       xwu8_t * data, xwsz_t * size, xwsq_t pgidx,
                       xwtm_t to);
 
-static
+static __xwbsp_code
 xwer_t at24md_pgread(struct xwds_eeprom * eeprom,
                      xwu8_t * buf, xwsz_t * size, xwsq_t pgidx,
                      xwtm_t to);
 
+__xwbsp_rodata
 const struct xwds_eeprom_driver at24md_drv = {
         .i2cp = {
                 .base = {
@@ -62,7 +63,7 @@ const struct xwds_eeprom_driver at24md_drv = {
         .pgread = at24md_pgread,
 };
 
-static
+static __xwbsp_code
 xwer_t at24md_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwsq_t addr, xwtm_t to)
 {
         struct xwds_i2cm * bus;
@@ -87,7 +88,7 @@ xwer_t at24md_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwsq_t addr, xwtm_t
         return rc;
 }
 
-static
+static __xwbsp_code
 xwer_t at24md_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwsq_t addr, xwtm_t to)
 {
         struct xwds_i2cm * bus;
@@ -119,7 +120,7 @@ xwer_t at24md_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwsq_t addr, xwtm_
         return rc;
 }
 
-static
+static __xwbsp_code
 xwer_t at24md_pgwrite(struct xwds_eeprom * eeprom,
                       xwu8_t * data, xwsz_t * size, xwsq_t pgidx,
                       xwtm_t to)
@@ -154,7 +155,7 @@ xwer_t at24md_pgwrite(struct xwds_eeprom * eeprom,
         return rc;
 }
 
-static
+static __xwbsp_code
 xwer_t at24md_pgread(struct xwds_eeprom * eeprom,
                      xwu8_t * buf, xwsz_t * size, xwsq_t pgidx,
                      xwtm_t to)

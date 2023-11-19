@@ -26,6 +26,7 @@
 #include <xwcd/peripheral/spi/flash/w25qxx/driver.h>
 
 /******** ******** base driver ******** ********/
+__xwbsp_code
 xwer_t xwds_w25qxx_drv_start(struct xwds_device * dev)
 {
         struct xwds_w25qxx * w25qxx;
@@ -49,6 +50,7 @@ err_desc_err:
         return rc;
 }
 
+__xwbsp_code
 xwer_t xwds_w25qxx_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
@@ -56,11 +58,13 @@ xwer_t xwds_w25qxx_drv_stop(struct xwds_device * dev)
 }
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+__xwbsp_code
 xwer_t xwds_w25qxx_drv_resume(struct xwds_device * dev)
 {
         return xwds_w25qxx_drv_start(dev);
 }
 
+__xwbsp_code
 xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev)
 {
         return xwds_w25qxx_drv_stop(dev);
@@ -68,6 +72,7 @@ xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev)
 #endif
 
 /******** ******** ******** APIs ******** ******** ********/
+__xwbsp_api
 xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         xwer_t rc;
@@ -91,6 +96,7 @@ err_w25qxx_grab:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                         xwu8_t instruction,
                         xwu8_t address_size, xwu32_t address,
@@ -156,6 +162,7 @@ err_w25qxx_grab:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_reset(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
@@ -191,6 +198,7 @@ err_w25qxx_ctrl:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_init_parameter(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         xwu64_t uid;
@@ -240,6 +248,7 @@ err_read_uid:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_write_enable(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
@@ -279,6 +288,7 @@ err_not_support:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_write_disable(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
@@ -306,6 +316,7 @@ err_not_support:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_read_sr(struct xwds_w25qxx * w25qxx,
                            xwu32_t sridx, xwu8_t * srbuf,
                            xwtm_t to)
@@ -347,6 +358,7 @@ err_not_support:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_check_idle(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         xwer_t rc;
@@ -363,6 +375,7 @@ xwer_t xwds_w25qxx_check_idle(struct xwds_w25qxx * w25qxx, xwtm_t to)
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_wait_idle(struct xwds_w25qxx * w25qxx, xwtm_t period, xwtm_t to)
 {
         xwer_t rc;
@@ -382,6 +395,7 @@ xwer_t xwds_w25qxx_wait_idle(struct xwds_w25qxx * w25qxx, xwtm_t period, xwtm_t 
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_read_uid(struct xwds_w25qxx * w25qxx, xwu64_t * uidbuf, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
@@ -411,6 +425,7 @@ err_not_support:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_read_mid(struct xwds_w25qxx * w25qxx, xwu16_t * midbuf, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
@@ -440,6 +455,7 @@ err_not_support:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_read_jid(struct xwds_w25qxx * w25qxx, xwu32_t * jidbuf, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
@@ -470,6 +486,7 @@ err_not_support:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_read(struct xwds_w25qxx * w25qxx, xwu32_t address,
                         xwu8_t * rxb, xwsz_t * size, xwtm_t to)
 {
@@ -503,6 +520,7 @@ err_not_support:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
                          xwu8_t * txb, xwsz_t * size, xwtm_t to)
 {
@@ -547,6 +565,7 @@ err_we:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
@@ -585,6 +604,7 @@ err_we:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
@@ -623,6 +643,7 @@ err_we:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
@@ -661,6 +682,7 @@ err_we:
         return rc;
 }
 
+__xwbsp_api
 xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;

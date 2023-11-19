@@ -26,6 +26,12 @@
 #include <xwos/osal/lock/seqlock.h>
 
 /**
+ * @defgroup xwcd_ds XWOS的设备栈
+ * @ingroup xwcd
+ * @{
+ */
+
+/**
  * @brief 设备栈
  */
 struct xwds {
@@ -33,11 +39,34 @@ struct xwds {
         struct xwos_sqlk devlistlock; /**< 保护设备栈链表的锁 */
 };
 
+/**
+ * @brief XWDS API：初始化设备栈
+ * @param[in] ds: 设备栈指针
+ */
 void xwds_init(struct xwds * ds);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+/**
+ * @brief XWDS API：暂停设备栈
+ * @param[in] ds: 设备栈控制块指针
+ * @return 错误码
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
 xwer_t xwds_pm_suspend(struct xwds * ds);
+
+/**
+ * @brief XWDS API：继续设备栈
+ * @param[in] ds: 设备栈控制块指针
+ * @return 错误码
+ * @note
+ * + 上下文：中断
+ */
 xwer_t xwds_pm_resume(struct xwds * ds);
 #endif
+
+/**
+ * @} xwcd_ds
+ */
 
 #endif /* xwcd/ds/xwds.h */
