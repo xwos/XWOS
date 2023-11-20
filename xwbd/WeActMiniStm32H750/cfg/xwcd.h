@@ -55,6 +55,9 @@
 #define XWCDCFG_ds_SPI_MASTER                                   1
 #define XWCDCFG_ds_SPI_PERIPHERAL                               1
 
+/******** ******** IO Chip ******** ********/
+#define XWCDCFG_ds_IOCHIP                                       1
+
 /******** ******** LIN Bus ******** ********/
 #define XWCDCFG_ds_LIN                                          1
 #define XWCDCFG_ds_LINID                                        1
@@ -78,6 +81,7 @@
  ******** ******** ********   I2C peripheral  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWCDCFG_peripheral_i2c_eeprom                           1
+#define XWCDCFG_peripheral_i2c_iochip_tca9539                   1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   SPI peripheral  ******** ******** ********

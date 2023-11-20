@@ -112,6 +112,18 @@ struct xwds_resource_dma {
         const char * description; /**< 资源描述 */
 };
 
+struct xwds_iochip;
+
+/**
+ * @brief 设备栈GPIO资源
+ */
+struct xwds_resource_extgpio {
+        struct xwds_iochip * iochip; /**< 芯片 */
+        xwid_t port; /**< port ID */
+        xwsq_t pinmask; /**< pin 掩码 */
+        const char * description; /**< 资源描述 */
+};
+
 /**
  * @brief 设备栈资源
  */
@@ -128,6 +140,8 @@ struct xwds_resources {
         xwsz_t gpiorsc_num; /**< GPIO资源数量 */
         const struct xwds_resource_dma * dmarsc_array; /**< DMA资源数组 */
         xwsz_t dmarsc_num; /**< DMA资源数量 */
+        const struct xwds_resource_extgpio * extgpiorsc_array; /**< 扩展GPIO资源数组 */
+        xwsz_t extgpiorsc_num; /**< 扩展GPIO资源数量 */
 };
 
 /**

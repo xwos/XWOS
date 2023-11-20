@@ -60,6 +60,10 @@ endif
 ifeq ($(XWCDCFG_ds_I2C_PERIPHERAL),y)
     XWMO_CSRCS += i2c/peripheral.c
 endif
+ifeq ($(XWCDCFG_ds_IOCHIP),y)
+    XWMO_CSRCS += iochip/chip.c
+    XWMO_CSRCS += iochip/gpio.c
+endif
 ifeq ($(XWCDCFG_ds_LIN),y)
     XWMO_CSRCS += lin/controller.c
 endif
