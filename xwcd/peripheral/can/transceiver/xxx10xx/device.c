@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief CAN Transceiver TJA1042驱动
+ * @brief 玄武设备栈：CAN收发器：通用型104x/105x系列收发器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,18 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_peripheral_can_transceiver_tja1042_driver_h__
-#define __xwcd_peripheral_can_transceiver_tja1042_driver_h__
-
 #include <xwos/standard.h>
 #include <xwcd/ds/can/transceiver.h>
+#include <xwcd/peripheral/can/transceiver/xxx10xx/device.h>
 
-struct xwds_cantrcv_tja1042_cfg {
-        const struct xwds_resource_gpio *gpiorsc_stb; /**< STANDBY GPIO资源 */
-        const struct xwds_resource_gpio *gpiorsc_eirq; /**< 唤醒外部中断 GPIO资源 */
-        const xwsq_t eirq; /**< 唤醒外部中断资源 */
-};
+__xwbsp_api
+void xwds_cantrcv_xxx10xx_construct(struct xwds_cantrcv_xxx10xx * xxx10xx)
+{
+        xwds_cantrcv_construct(&xxx10xx->cantrcv);
+}
 
-extern const struct xwds_cantrcv_driver tja1042_cantrcv_drv;
-
-void tja1042_cantrcv_eirq_wkup(struct xwds_soc *soc, xwid_t eiid,
-                               xwds_eirq_arg_t arg);
-
-#endif /* xwcd/peripheral/can/transceiver/tja1042/driver.h */
+__xwbsp_api
+void xwds_cantrcv_xxx10xx_destruct(struct xwds_cantrcv_xxx10xx * xxx10xx)
+{
+        xwds_cantrcv_destruct(&xxx10xx->cantrcv);
+}

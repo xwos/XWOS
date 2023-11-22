@@ -21,11 +21,9 @@
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include xwbs/functions.mk
 
-$(eval $(call XwmoReqCfg,XWCDCFG_ds_SOC_GPIO,y))
-$(eval $(call XwmoReqCfg,XWCDCFG_ds_SOC_EIRQ,y))
 $(eval $(call XwmoReqCfg,XWCDCFG_ds_CAN_TRANSCEIVER,y))
 
-XWMO_CSRCS := driver.c
+XWMO_CSRCS := device.c driver.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
 include xwbs/xwmo.mk

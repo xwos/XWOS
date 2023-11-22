@@ -106,12 +106,10 @@ struct xwds_cantrcv_driver {
 struct xwds_cantrcv {
         union {
                 struct xwds_device dev; /**< 继承struct xwds_device */
-#if (defined(XWCDCFG_ds_I2C_PERIPHERAL) && (1 == XWCDCFG_ds_I2C_PERIPHERAL) && \
-     defined(XWCDCFG_ds_CAN_TRANSCEIVER_I2CP) && (1 == XWCDCFG_ds_CAN_TRANSCEIVER_I2CP))
+#if (defined(XWCDCFG_ds_I2C_PERIPHERAL) && (1 == XWCDCFG_ds_I2C_PERIPHERAL))
                 struct xwds_i2cp i2cp; /**< 继承struct xwds_i2cp */
 #endif
-#if (defined(XWCDCFG_ds_SPI_PERIPHERAL) && (1 == XWCDCFG_ds_SPI_PERIPHERAL) && \
-     defined(XWCDCFG_ds_CAN_TRANSCEIVER_SPIP) && (1 == XWCDCFG_ds_CAN_TRANSCEIVER_SPIP))
+#if (defined(XWCDCFG_ds_SPI_PERIPHERAL) && (1 == XWCDCFG_ds_SPI_PERIPHERAL))
                 struct xwds_spip spip; /**< 继承struct xwds_spip */
 #endif
         } bc; /**< 基类(base class) */
