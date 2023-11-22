@@ -1,0 +1,4 @@
+/**
+ * @defgroup xwcd_peripheral_can CAN总线
+ * @ingroup xwcd_peripheral
+ */

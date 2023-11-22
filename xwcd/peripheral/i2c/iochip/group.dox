@@ -1,0 +1,4 @@
+/**
+ * @defgroup xwcd_peripheral_i2c_iochip IO扩展芯片
+ * @ingroup xwcd_peripheral_i2c
+ */

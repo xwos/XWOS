@@ -28,6 +28,11 @@
 #include <xwcd/peripheral/i2c/eeprom/device.h>
 
 /**
+ * @ingroup xwcd_peripheral_i2c_eeprom
+ * @{
+ */
+
+/**
  * @brief EEPROM驱动函数表
  */
 struct xwds_eeprom_driver {
@@ -50,10 +55,24 @@ extern const struct xwds_eeprom_driver at24sd_drv;
 extern const struct xwds_eeprom_driver at24md_drv;
 
 /******** ******** base driver ******** ********/
+/**
+ * @brief EEPROM基本驱动：启动设备
+ */
 xwer_t xwds_eeprom_drv_start(struct xwds_device * dev);
+
+/**
+ * @brief EEPROM基本驱动：停止设备
+ */
 xwer_t xwds_eeprom_drv_stop(struct xwds_device * dev);
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+/**
+ * @brief EEPROM基本驱动：暂停设备
+ */
 xwer_t xwds_eeprom_drv_resume(struct xwds_device * dev);
+
+/**
+ * @brief EEPROM基本驱动：继续设备
+ */
 xwer_t xwds_eeprom_drv_suspend(struct xwds_device * dev);
 #endif
 
@@ -109,7 +128,10 @@ xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom);
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
                         xwu8_t data, xwsq_t addr,
@@ -130,7 +152,10 @@ xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
                         xwu8_t * buf, xwsq_t addr,
@@ -154,7 +179,10 @@ xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
                            xwu8_t * data, xwsz_t * size, xwsq_t pgidx,
@@ -178,7 +206,10 @@ xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
                           xwu8_t * buf, xwsz_t * size, xwsq_t pgidx,
@@ -197,8 +228,15 @@ xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_eeprom_reset(struct xwds_eeprom * eeprom, xwtm_t to);
+
+/**
+ * @} xwcd_peripheral_i2c_eeprom
+ */
 
 #endif /* xwcd/peripheral/i2c/eeprom/driver.h */

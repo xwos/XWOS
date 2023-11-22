@@ -120,7 +120,10 @@ xwer_t xwds_i2cm_put(struct xwds_i2cm * i2cm);
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm,
                       struct xwds_i2c_msg * msg,
@@ -141,11 +144,13 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm,
  * @retval -EADDRNOTAVAIL: 地址无响应
  * @retval -ETIMEDOUT: 超时
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
+ * + 异步函数
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
                        xwu16_t address, xwu16_t addrmode,

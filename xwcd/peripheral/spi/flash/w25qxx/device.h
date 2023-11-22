@@ -30,6 +30,12 @@
 #include <xwos/standard.h>
 #include <xwcd/ds/spi/peripheral.h>
 
+/**
+ * @defgroup xwcd_peripheral_spi_flash_w25qxx SPI Flash W25QXX
+ * @ingroup xwcd_peripheral_spi_flash
+ * @{
+ */
+
 #define XWDS_W25QXX_CMD_MAX_PAYLOAD     256U
 
 /**
@@ -201,5 +207,9 @@ xwer_t xwds_w25qxx_put(struct xwds_w25qxx * w25qxx)
 {
         return xwds_spip_put(&w25qxx->spip);
 }
+
+/**
+ * @} xwcd_peripheral_spi_flash_w25qxx
+ */
 
 #endif /* xwcd/peripheral/spi/flash/w25qxx/device.h */

@@ -707,8 +707,10 @@ xwer_t xwos_cthd_sleep(xwtm_t dur)
  * @note
  * + 上下文：线程
  * @details
- * 调用此CAPI的线程，睡眠到未来的某个时间点 `to` 被唤醒。
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 调用此CAPI的线程，睡眠到未来的某个时间点 `to` 被唤醒：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cthd_sleep_to(xwtm_t to)

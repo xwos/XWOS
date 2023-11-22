@@ -958,6 +958,9 @@ INPUT                  = xwxr/index.md \
                          xwmd/isc/xwssc/protocol.h \
                          xwmd/isc/xwssc/hwifal.h \
                          xwmd/isc/xwssc/hwif/uart.h \
+                         xwcd/group.dox \
+                         xwcd/ds \
+                         xwcd/peripheral \
                          xwem/vm/lua/group.dox \
                          xwem/vm/lua/xwlua/xwos/xwos.h \
                          xwem/vm/lua/xwlua/xwds/soc.h \

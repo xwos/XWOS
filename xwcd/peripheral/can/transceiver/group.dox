@@ -1,3 +1,4 @@
 /**
  * @defgroup xwcd_peripheral_can_transceiver CAN收发器
+ * @ingroup xwcd_peripheral_can
  */

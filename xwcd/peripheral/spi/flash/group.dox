@@ -1,0 +1,4 @@
+/**
+ * @defgroup xwcd_peripheral_spi_flash SPI Flash
+ * @ingroup xwcd_peripheral_spi
+ */

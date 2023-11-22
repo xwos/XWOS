@@ -447,7 +447,6 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * @note
  * + 上下文：线程
  * @details
- * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
  *   实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
  *   + `XWOS_LK_MTX` ：互斥锁
@@ -467,6 +466,10 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
  * + `lkst` 用于返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
  *   但若返回错误码时，锁的状态不确定。
+ * + `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_wait_to(struct xwos_cond * cond,

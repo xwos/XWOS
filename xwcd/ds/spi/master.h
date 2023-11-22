@@ -105,11 +105,12 @@ xwer_t xwds_spim_put(struct xwds_spim * spim);
  * @retval -ECHRNG: 配置ID不在配置表范围内
  * @retval -EFAULT: 无效指针
  * @note
- * + 同步/异步：同步
  * + 上下文：线程
- * + 重入性：可重入
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to);
 
@@ -130,11 +131,12 @@ xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to);
  * @retval -EIO: 传输错误
  * @retval -ETIMEDOUT: 超时
  * @note
- * + 同步/异步：同步
  * + 上下文：线程
- * + 重入性：可重入
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_spim_xfer(struct xwds_spim * spim,
                       const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size,
@@ -149,11 +151,13 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
  * @retval -EINVAL: 设备对象不可引用
  * @retval -ETIMEDOUT: 超时
  * @note
- * + 同步/异步：同步
  * + 上下文：线程
- * + 重入性：可重入
+ * + 异步函数
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_spim_abort(struct xwds_spim * spim, xwtm_t to);
 

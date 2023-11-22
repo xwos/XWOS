@@ -351,7 +351,10 @@ xwer_t xwos_br_wait(struct xwos_br * br)
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
 xwer_t xwos_br_wait_to(struct xwos_br * br, xwtm_t to)

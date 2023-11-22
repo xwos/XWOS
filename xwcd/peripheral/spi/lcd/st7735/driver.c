@@ -287,7 +287,7 @@ xwer_t xwds_st7735_cfgbus(struct xwds_st7735 * st7735, xwtm_t to)
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_st7735_grab;
         }
         rc = xwds_spim_buscfg(st7735->spip.bus, st7735->spip.buscfgid, to);
@@ -312,7 +312,7 @@ xwer_t xwds_st7735_read_id(struct xwds_st7735 * st7735, xwu32_t * id, xwtm_t to)
         XWDS_VALIDATE(id, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_st7735_grab;
         }
         rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDID, (xwu8_t *)id, 4, to);
@@ -334,7 +334,7 @@ xwer_t xwds_st7735_read_status(struct xwds_st7735 * st7735,
         XWDS_VALIDATE(id, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_st7735_grab;
         }
         rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDST, st, 5, to);
@@ -356,7 +356,7 @@ xwer_t xwds_st7735_read_madctl(struct xwds_st7735 * st7735,
         XWDS_VALIDATE(id, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_st7735_grab;
         }
         rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDMADCTL, madctl, 2, to);
@@ -378,7 +378,7 @@ xwer_t xwds_st7735_read_colmod(struct xwds_st7735 * st7735,
         XWDS_VALIDATE(id, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_st7735_grab;
         }
         rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDCOLMOD, colmod, 2, to);

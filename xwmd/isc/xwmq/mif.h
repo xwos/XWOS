@@ -250,11 +250,12 @@ xwer_t xwmq_eq(struct xwmq * mq, xwsq_t topic, void * data);
  * @note
  * + 上下文：线程
  * @details
- * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断或超时。
- *
- * 如果等待被中断，此CAPI将返回 `-EINTR` 。
- *
- * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ * + 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断或超时。
+ * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ * + `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwmq_eq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to);
 
@@ -332,11 +333,12 @@ xwer_t xwmq_jq(struct xwmq * mq, xwsq_t topic, void * data);
  * @note
  * + 上下文：线程
  * @details
- * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断或超时。
- *
- * 如果等待被中断，此CAPI将返回 `-EINTR` 。
- *
- * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ * + 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断或超时。
+ * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ * + `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwmq_jq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to);
 
@@ -416,13 +418,13 @@ xwer_t xwmq_dq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
  * @note
  * + 上下文：线程
  * @details
- * 若接收队列中没有消息，就阻塞接收线程，直到新的消息或被中断或超时。
- *
- * 接收消息后，会释放消息槽。若有发送线程正在等待消息槽，将唤醒发送线程。
- *
- * 如果等待被中断，此CAPI将返回 `-EINTR` 。
- *
- * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ * + 若接收队列中没有消息，就阻塞接收线程，直到新的消息或被中断或超时。
+ * + 接收消息后，会释放消息槽。若有发送线程正在等待消息槽，将唤醒发送线程。
+ * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ * + `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwmq_dq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to);
 
@@ -505,13 +507,13 @@ xwer_t xwmq_rq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
  * @note
  * + 上下文：线程
  * @details
- * 若接收队列中没有消息，就阻塞接收线程，直到新的消息或被中断或超时。
- *
- * 接收消息后，会释放消息槽。若有发送线程正在等待消息槽，将唤醒发送线程。
- *
- * 如果等待被中断，此CAPI将返回 `-EINTR` 。
- *
- * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ * + 若接收队列中没有消息，就阻塞接收线程，直到新的消息或被中断或超时。
+ * + 接收消息后，会释放消息槽。若有发送线程正在等待消息槽，将唤醒发送线程。
+ * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ * + `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwmq_rq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to);
 

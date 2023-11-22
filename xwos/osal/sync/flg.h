@@ -618,11 +618,13 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * @note
  * + 上下文：线程
  * @details
- * + 当没有检测到事件，线程会阻塞等待，等待时会指定一个唤醒时间点 `to` 。
  * + 当检测到事件，线程被唤醒，然后返回 `XWOK` 。
+ * + 当没有检测到事件，线程会阻塞等待，等待时会指定一个唤醒时间点 `to` ，
+ *   `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  * + 当线程阻塞等待被中断时，返回 `-EINTR` 。
- * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- * + 当到达指定的唤醒时间点时，线程被唤醒，并返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_wait_to(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,

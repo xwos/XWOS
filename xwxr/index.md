@@ -41,6 +41,9 @@
     + @subpage xwmd_isc_xwcq
     + @subpage xwmd_isc_xwmq
     + @subpage xwmd_isc_xwssc
++ @subpage xwcd
+  + @subpage xwcd_ds
+  + @subpage xwcd_peripheral
 + @subpage xwlua
   + @subpage xwlua_xwos
   + @subpage xwlua_xwds

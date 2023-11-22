@@ -336,12 +336,13 @@ xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @note
  * + 上下文：线程
  * @details
- * 若循环队列中数据为空，接收线程会阻塞等待，
- * 直到循环队列中有消息可取出，或等待被中断，或等待超时。
- *
- * 如果等待被中断，此CAPI将返回 `-EINTR` 。
- *
- * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ * + 若循环队列中数据为空，接收线程会阻塞等待，
+ *   直到循环队列中有消息可取出，或等待被中断，或等待超时。
+ * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ * + `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwcq_dq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 
@@ -429,12 +430,13 @@ xwer_t xwcq_rq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @note
  * + 上下文：线程
  * @details
- * 若循环队列中数据为空，接收线程会阻塞等待，
- * 直到循环队列中有消息可取出，或等待被中断，或等待超时。
- *
- * 如果等待被中断，此CAPI将返回 `-EINTR` 。
- *
- * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ * + 若循环队列中数据为空，接收线程会阻塞等待，
+ *   直到循环队列中有消息可取出，或等待被中断，或等待超时。
+ * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ * + `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwcq_rq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 
@@ -524,14 +526,14 @@ xwer_t xwcq_pfq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @note
  * + 上下文：线程
  * @details
- * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
- *
- * 若循环队列中数据为空，接收线程会阻塞等待，
- * 直到循环队列中有消息可取出，或等待被中断，或等待超时。
- *
- * 如果等待被中断，此CAPI将返回 `-EINTR` 。
- *
- * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+ * + 若循环队列中数据为空，接收线程会阻塞等待，
+ *   直到循环队列中有消息可取出，或等待被中断，或等待超时。
+ * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ * + `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwcq_pfq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 
@@ -624,14 +626,14 @@ xwer_t xwcq_prq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @note
  * + 上下文：线程
  * @details
- * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
- *
- * 若循环队列中数据为空，接收线程会阻塞等待，
- * 直到循环队列中有消息可取出，或等待被中断，或等待超时。
- *
- * 如果等待被中断，此CAPI将返回 `-EINTR` 。
- *
- * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+ * + 若循环队列中数据为空，接收线程会阻塞等待，
+ *   直到循环队列中有消息可取出，或等待被中断，或等待超时。
+ * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ * + `to` 表示等待超时的时间点：
+ *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *     可以使用 `xwtm_ft(delta)` 表示；
+ *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwcq_prq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 

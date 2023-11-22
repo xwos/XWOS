@@ -190,7 +190,10 @@ xwer_t xwds_uartc_put(struct xwds_uartc * uartc);
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                      xwu8_t * buf, xwsz_t * size,
@@ -230,7 +233,10 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc,
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                      const xwu8_t * data, xwsz_t * size,
@@ -248,7 +254,10 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * `to` 表示等待超时的时间点：
+ * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+ *   可以使用 `xwtm_ft(delta)` 表示；
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
                        const xwu8_t byte,

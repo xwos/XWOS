@@ -24,6 +24,12 @@
 #include <xwos/standard.h>
 #include <xwcd/ds/i2c/peripheral.h>
 
+/**
+ * @defgroup xwcd_peripheral_i2c_eeprom I2C EEPROM
+ * @ingroup xwcd_peripheral_i2c
+ * @{
+ */
+
 struct xwds_eeprom_parameter {
         xwsz_t page_size;
         xwsz_t total;
@@ -62,5 +68,9 @@ xwer_t xwds_eeprom_put(struct xwds_eeprom * eeprom)
 {
         return xwds_i2cp_put(&eeprom->i2cp);
 }
+
+/**
+ * @} xwcd_peripheral_i2c_eeprom
+ */
 
 #endif /* xwcd/peripheral/i2c/eeprom/device.h */

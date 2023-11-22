@@ -1,0 +1,4 @@
+/**
+ * @defgroup xwcd_peripheral_i2c I2C总线
+ * @ingroup xwcd_peripheral
+ */

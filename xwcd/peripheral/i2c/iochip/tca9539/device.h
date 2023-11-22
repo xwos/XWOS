@@ -26,8 +26,8 @@
 #include <xwcd/ds/iochip/chip.h>
 
 /**
- * @defgroup xwcd_peripheral_iochip_tca9539 TCA9539
- * @ingroup xwcd_peripheral_iochip
+ * @defgroup xwcd_peripheral_i2c_iochip_tca9539 TCA9539
+ * @ingroup xwcd_peripheral_i2c_iochip
  * @{
  */
 
@@ -170,7 +170,7 @@ xwer_t xwds_tca9539_put(struct xwds_tca9539 * tca9539)
 }
 
 /**
- * @} xwcd_peripheral_iochip_tca9539
+ * @} xwcd_peripheral_i2c_iochip_tca9539
  */
 
 #endif /* xwcd/peripheral/i2c/iochip/tca9539/device.h */

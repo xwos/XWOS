@@ -31,6 +31,12 @@
 #include <xwcd/ds/spi/peripheral.h>
 
 /**
+ * @defgroup xwcd_peripheral_spi_lcd_st7735 SPI LCD Controller ST7735
+ * @ingroup xwcd_peripheral_spi_lcd
+ * @{
+ */
+
+/**
  * @brief ST7735 ID
  */
 #define XWDS_ST7735_ID  0x5CU
@@ -165,7 +171,16 @@ struct xwds_st7735 {
         struct xwds_st7735_parameter parameter; /**< 参数 */
 };
 
+/**
+ * @brief ST7735 API：ST7735对象的构造函数
+ * @param[in] st7735: ST7735对象指针
+ */
 void xwds_st7735_construct(struct xwds_st7735 * st7735);
+
+/**
+ * @brief ST7735 API：ST7735对象的析构函数
+ * @param[in] st7735: ST7735对象指针
+ */
 void xwds_st7735_destruct(struct xwds_st7735 * st7735);
 
 /**
@@ -191,5 +206,9 @@ xwer_t xwds_st7735_put(struct xwds_st7735 * st7735)
 {
         return xwds_spip_put(&st7735->spip);
 }
+
+/**
+ * @} xwcd_peripheral_spi_lcd_st7735
+ */
 
 #endif /* xwcd/peripheral/spi/lcd/st7735/device.h */
