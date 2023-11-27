@@ -1,5 +1,6 @@
 ---
 BasedOnStyle: Mozilla
+AlignEscapedNewlines: Left
 BinPackArguments: true
 BinPackParameters: true
 BreakBeforeBraces: Custom
@@ -27,7 +28,7 @@ AlwaysBreakAfterReturnType: None
 BreakAfterAttributes: Leave
 BreakBeforeTernaryOperators: false
 
-Cpp11BracedListStyle: true
+Cpp11BracedListStyle: false
 IndentCaseLabels: false
 IndentExternBlock: NoIndent
 IndentGotoLabels: false
