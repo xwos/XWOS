@@ -130,6 +130,15 @@ struct xwmp_skd_pm {
 };
 
 /**
+ * @brief 调度器状态
+ */
+enum xwmp_skd_state_em {
+        XWMP_SKD_STATE_UNINIT, /**< 未初始化 */
+        XWMP_SKD_STATE_INIT, /**< 已初始化 */
+        XWMP_SKD_STATE_START, /**< 开始调度 */
+};
+
+/**
  * @brief XWOS MP 调度器
  */
 struct __xwcc_alignl1cache xwmp_skd {
@@ -137,10 +146,10 @@ struct __xwcc_alignl1cache xwmp_skd {
                                               偏移：0，
                                               汇编代码中会使用这个成员 */
         struct xwmp_skdobj_stack * pstk; /**< 前一个线程的栈信息的指针
-                                              偏移：sizeof(long)，
+                                              偏移：sizeof(void *)，
                                               汇编代码中会使用这个成员 */
         xwid_t id; /**< CPU ID */
-        bool state; /**< 调度器状态 */
+        xwsq_t state; /**< 调度器状态，取值： @ref xwmp_skd_state_em */
         struct {
                 struct xwmp_rtrq rt; /**< 实时就绪队列 */
         } rq; /**< 就绪队列 */
@@ -193,6 +202,7 @@ xwer_t xwmp_skd_wakelock_lock(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_wakelock_unlock(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd);
 
+struct xwmp_skd * xwmp_skd_post_start_lic(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_pre_swcx_lic(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd);

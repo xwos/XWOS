@@ -26,6 +26,7 @@
         .equ            INTC_SSCIR3, 0xFFF48023
 
         .extern         soc_context
+        .extern         xwosplcb_skd_post_start_lic
         .extern         xwosplcb_skd_pre_swcx_lic
         .extern         xwosplcb_skd_post_swcx_lic
         .extern         soc_skd_chk_swcx
@@ -164,6 +165,14 @@ xwospl_skd_isr_swcx_end:
         .align          4
 /* xwer_t xwospl_skd_start(__maybe_unused struct xwos_skd * xwskd) */
 xwospl_skd_start:
+        e_stwu          r1, -32 (r1)
+        se_mflr         r0
+        se_stw          r0, 36 (r1) /* save the lr to caller stack frame */
+        e_bl            xwosplcb_skd_post_start_lic /* r3 = xwosplcb_skd_post_start_lic(xwskd); */
+        se_lwz          r0, 36 (r1)
+        se_mtlr         r0
+        se_addi         r1, 32  /* delete reserved frame (used by compiler) */
+
         se_lwz          r4, 0x0 (r3) /* r4 = xwskd->cstk; */
         se_lwz          r1, 0x0 (r4) /* r1 = r4->sp; */
 

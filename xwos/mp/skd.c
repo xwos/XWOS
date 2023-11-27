@@ -162,7 +162,7 @@ xwer_t xwmp_skd_init_lc(void)
         xwskd->cstk = XWMP_SKD_IDLE_STK(xwskd);
         xwskd->pstk = NULL;
         xwskd->id = id;
-        xwskd->state = false;
+        xwskd->state = (xwsq_t)XWMP_SKD_STATE_INIT;
         xwskd->req_schedule_cnt = (xwsq_t)0;
         xwskd->req_chkpmpt_cnt = (xwsq_t)0;
         xwskd->dis_pmpt_cnt = (xwsq_t)0;
@@ -217,15 +217,18 @@ xwer_t xwmp_skd_start_lc(void)
 
         id = xwmp_skd_get_cpuid_lc();
         xwskd = &xwmp_skd[id];
-        rc = xwmp_syshwt_start(&xwskd->tt.hwt);
-        if (XWOK == rc) {
-                xwskd->state = true;
-                rc = xwospl_skd_start(xwskd);
-                if (rc < 0) {
-                        xwskd->state = false;
-                        // cppcheck-suppress [misra-c2012-17.7]
-                        xwmp_syshwt_stop(&xwskd->tt.hwt);
+        if ((xwsq_t)XWMP_SKD_STATE_INIT == xwskd->state) {
+                xwmp_skd_dspmpt(xwskd);
+                rc = xwmp_syshwt_start(&xwskd->tt.hwt);
+                if (XWOK == rc) {
+                        rc = xwospl_skd_start(xwskd);
+                        if (rc < 0) {
+                                // cppcheck-suppress [misra-c2012-17.7]
+                                xwmp_syshwt_stop(&xwskd->tt.hwt);
+                        }
                 }
+        } else {
+                rc = -EPERM;
         }
         return rc;
 }
@@ -1028,6 +1031,18 @@ xwer_t xwmp_skd_swcx(struct xwmp_skd * xwskd)
  * @param[in] xwskd: XWOS MP调度器的指针
  */
 __xwmp_code
+struct xwmp_skd * xwmp_skd_post_start_lic(struct xwmp_skd * xwskd)
+{
+        xwskd->state = (xwsq_t)XWMP_SKD_STATE_START;
+        xwmp_skd_enpmpt(xwskd);
+        return xwskd;
+}
+
+/**
+ * @brief 切换上下文之前的回调函数
+ * @param[in] xwskd: XWOS MP调度器的指针
+ */
+__xwmp_code
 struct xwmp_skd * xwmp_skd_pre_swcx_lic(struct xwmp_skd * xwskd)
 {
 #if defined(BRDCFG_XWSKD_PRE_SWCX_HOOK) && (1 == BRDCFG_XWSKD_PRE_SWCX_HOOK)
@@ -1532,7 +1547,7 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                 }
         } else {
                 xwskd = xwmp_skd_get_lc();
-                if (xwskd->state) { // cppcheck-suppress [misra-c2012-14.4]
+                if ((xwsq_t)XWMP_SKD_STATE_START == xwskd->state) {
                         if (-EBHCTX == rc) {
                                 ctx = (xwsq_t)XWMP_SKD_CONTEXT_BH;
                         } else if (XWMP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {

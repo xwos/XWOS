@@ -121,7 +121,7 @@ xwer_t xwup_skd_init_lc(void)
         xwskd = &xwup_skd;
         xwskd->cstk = XWUP_SKD_IDLE_STK(xwskd);
         xwskd->pstk = NULL;
-        xwskd->state = false;
+        xwskd->state = XWUP_SKD_STATE_INIT;
         xwskd->req_schedule_cnt = (xwsq_t)0;
         xwskd->req_chkpmpt_cnt = (xwsq_t)0;
         xwskd->dis_pmpt_cnt = (xwsq_t)0;
@@ -169,15 +169,18 @@ xwer_t xwup_skd_start_lc(void)
         xwer_t rc;
 
         xwskd = &xwup_skd;
-        rc = xwup_syshwt_start(&xwskd->tt.hwt);
-        if (XWOK == rc) {
-                xwskd->state = true;
-                rc = xwospl_skd_start(xwskd);
-                if (rc < 0) {
-                        xwskd->state = false;
-                        // cppcheck-suppress [misra-c2012-17.7]
-                        xwup_syshwt_stop(&xwskd->tt.hwt);
+        if ((xwsq_t)XWUP_SKD_STATE_INIT == xwskd->state) {
+                xwup_skd_dspmpt_lc();
+                rc = xwup_syshwt_start(&xwskd->tt.hwt);
+                if (XWOK == rc) {
+                        rc = xwospl_skd_start(xwskd);
+                        if (rc < 0) {
+                                // cppcheck-suppress [misra-c2012-17.7]
+                                xwup_syshwt_stop(&xwskd->tt.hwt);
+                        }
                 }
+        } else {
+                rc = -EPERM;
         }
         return rc;
 }
@@ -898,6 +901,18 @@ xwer_t xwup_skd_swcx(void)
 
 /**
  * @brief 切换上下文之前的回调函数
+ * @param[in] xwskd: XWOS MP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_post_start_lic(struct xwup_skd * xwskd)
+{
+        xwskd->state = (xwsq_t)XWUP_SKD_STATE_START;
+        xwup_skd_enpmpt_lc();
+        return xwskd;
+}
+
+/**
+ * @brief 切换上下文之前的回调函数
  * @param[in] xwskd: XWOS UP调度器的指针
  */
 __xwup_code
@@ -1465,7 +1480,7 @@ void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                 }
         } else {
                 xwskd = xwup_skd_get_lc();
-                if (xwskd->state) {
+                if ((xwsq_t)XWUP_SKD_STATE_START == xwskd->state) {
                         if (-EBHCTX == rc) {
                                 ctx = (xwsq_t)XWUP_SKD_CONTEXT_BH;
                         } else if (XWUP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {

@@ -32,7 +32,7 @@
         .func           soc_esr_xwsc
 soc_esr_xwsc:
 /* xws64_t soc_esr_xwsc(xwsc_f func, xwptr_t argnum, va_list args) */
-        addi	        sp, sp, -32
+        addi            sp, sp, -32
         sw              s2, 0 (sp)
         sw              s3, 4 (sp)
         sw              s4, 8 (sp)
@@ -130,7 +130,7 @@ __call:
         lw              s4, 8 (sp)
         lw              s3, 4 (sp)
         lw              s2, 0 (sp)
-        addi	        sp, sp, 32
+        addi            sp, sp, 32
         ret
         .endfunc
 soc_esr_xwsc_end:

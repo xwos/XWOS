@@ -30,6 +30,9 @@
         .equ SOC_CONTEXT_SIZE, (SOC_CALLER_CONTEXT_SIZE + SOC_CALLEE_CONTEXT_SIZE)
 
         .extern         soc_skd_chk_swcx
+        .extern         xwosplcb_skd_post_start_lic
+        .extern         xwosplcb_skd_pre_swcx_lic
+        .extern         xwosplcb_skd_post_swcx_lic
 
 /**
  * @brief Macro to save callee context
@@ -120,6 +123,12 @@
         .func           xwospl_skd_start
 /* xwer_t xwospl_skd_start(__maybe_unused struct xwos_skd * xwskd) */
 xwospl_skd_start:
+        /* a0 = xwosplcb_skd_post_start_lic(xwskd)  */
+        addi            sp, sp, -16
+        STORE           ra, 3 * REGBYTES (sp)
+        call            xwosplcb_skd_post_start_lic
+        LOAD            ra, 3 * REGBYTES (sp)
+        addi            sp, sp, 16
         /* Load SP */
         LOAD            a0, 0 * REGBYTES (a0) /* a0 = xwskd->cstk */
         LOAD            sp, 0 * REGBYTES (a0) /* sp = cstk->sp */
@@ -168,7 +177,7 @@ xwospl_skd_isr_swcx:
 
         /* epilog */
         LOAD            ra, 3 * REGBYTES (sp)
-        addi	          sp, sp, 16
+        addi            sp, sp, 16
         fence           iorw, iorw
         fence.i
         ret

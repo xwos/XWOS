@@ -228,12 +228,12 @@ void arch_svc_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
         __asm__ volatile("      ldr     r3, [r0, %[__cstk]]"
                          :
                          :[__cstk] "I" (xwcc_offsetof(struct xwospl_skd, cstk))
-                         :);
+                         : "r0", "r3");
         /* get value of stack pointer, r2 = cstk->sp */
         __asm__ volatile("      ldr     r2, [r3, %[__sp]]"
                          :
                          :[__sp] "I" (xwcc_offsetof(struct xwospl_skdobj_stack, sp))
-                         :);
+                         : "r2", "r3");
         /* restore CONTROL */
         __asm__ volatile("      ldr     r1, [r2], #4");
         __asm__ volatile("      msr     control, r1");
@@ -245,14 +245,18 @@ void arch_svc_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
         __asm__ volatile("      add     r2, %[__nvfr]"
                          :
                          :[__nvfr] "I" (ARCH_NVFR_SIZE)
-                         :);
+                         : "r2");
 #endif
         /* set PSP */
         __asm__ volatile("      msr     psp, r2");
+        __asm__ volatile("      push    {lr}");
+        __asm__ volatile("      sub     sp, #4");
+        __asm__ volatile("      bl      xwosplcb_skd_post_start_lic");
         __asm__ volatile("      dsb");
         __asm__ volatile("      isb");
         __asm__ volatile("      clrex");
-        __asm__ volatile("      bx      lr");
+        __asm__ volatile("      add     sp, #4");
+        __asm__ volatile("      pop     {pc}");
 }
 
 /**
@@ -279,13 +283,13 @@ void xwospl_skd_isr_swcx(void)
         __asm__ volatile("      ldr     r3, [r0, %[__pstk]]"
                          :
                          :[__pstk] "I" (xwcc_offsetof(struct xwospl_skd, pstk))
-                         :);
+                         : "r0", "r3");
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         /* save s16-s31 */
         __asm__ volatile("      sub     r2, %[__nvfr]"
                          :
                          :[__nvfr] "I" (ARCH_NVFR_SIZE)
-                         :);
+                         : "r2");
         __asm__ volatile("      vstmia  r2, {s16-s31}");
 #endif
         /* save non-volatile registers: lr, r11-r4 */
@@ -297,19 +301,19 @@ void xwospl_skd_isr_swcx(void)
         __asm__ volatile("      str     r2, [r3, %[__sp]]"
                          :
                          :[__sp] "I" (xwcc_offsetof(struct xwospl_skdobj_stack, sp))
-                         :);
+                         : "r2", "r3");
 
         /* restore current context */
         /* r3 = r0->cstk; */
         __asm__ volatile("      ldr     r3, [r0, %[__cstk]]"
                          :
                          :[__cstk] "I" (xwcc_offsetof(struct xwospl_skd, cstk))
-                         :);
+                         : "r0", "r3");
         /* get value of stack pointer, r2 = cstk->sp */
         __asm__ volatile("      ldr     r2, [r3, %[__sp]]"
                          :
                          :[__sp] "I" (xwcc_offsetof(struct xwospl_skdobj_stack, sp))
-                         :);
+                         : "r2", "r3");
         /* restore CONTROL */
         __asm__ volatile("      ldr     r1, [r2], #4");
         __asm__ volatile("      msr     control, r1");
@@ -321,7 +325,7 @@ void xwospl_skd_isr_swcx(void)
         __asm__ volatile("      add     r2, %[__nvfr]"
                          :
                          :[__nvfr] "I" (ARCH_NVFR_SIZE)
-                         :);
+                         : "r2");
 #endif
         /* set PSP */
         __asm__ volatile("      msr     psp, r2");

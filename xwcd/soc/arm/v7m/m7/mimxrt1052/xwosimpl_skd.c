@@ -47,18 +47,20 @@ __xwbsp_code __xwcc_naked
 xwer_t xwospl_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
 {
         __asm__ volatile(
-                ".syntax       unified");
+                ".syntax        unified");
+        armv7m_dsb();
+        armv7m_isb();
+        arch_cpuirq_enable_lc();
         __asm__ volatile(
-                "      cpsie   i\n"
-                "      svc     9\n"
-                "      bx      lr\n");
+                "      svc      9\n"
+                "      bx       lr\n");
 }
 
 __xwbsp_code __xwcc_naked
 xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
 {
         __asm__ volatile(
-                ".syntax       unified");
+                ".syntax        unified");
         __asm__ volatile(
                 "       svc     10\n"
                 "       bx      lr\n");
@@ -69,7 +71,7 @@ void xwospl_thd_exit_lc(__xwcc_unused struct xwospl_thd * thd,
                         __xwcc_unused xwer_t rc)
 {
         __asm__ volatile(
-                ".syntax       unified");
+                ".syntax        unified");
         __asm__ volatile(
                 "       svc     11\n"
                 "       b       .\n"
@@ -80,7 +82,7 @@ __xwbsp_code __xwcc_naked
 xwer_t xwospl_skd_suspend(__xwcc_unused struct xwospl_skd * xwskd)
 {
         __asm__ volatile(
-                ".syntax       unified");
+                ".syntax        unified");
         __asm__ volatile(
                 "       svc     12\n"
                 "       bx      lr\n");
@@ -90,7 +92,7 @@ __xwbsp_code __xwcc_naked
 xwer_t xwospl_skd_resume(__xwcc_unused struct xwospl_skd * xwskd)
 {
         __asm__ volatile(
-                ".syntax       unified");
+                ".syntax        unified");
         __asm__ volatile(
                 "       svc     13\n"
                 "       bx      lr\n");
@@ -102,7 +104,7 @@ xwer_t xwospl_thd_outmigrate(__xwcc_unused struct xwospl_thd * thd,
                              __xwcc_unused xwid_t cpuid)
 {
         __asm__ volatile(
-                ".syntax       unified");
+                ".syntax        unified");
         __asm__ volatile(
                 "       svc     14\n"
                 "       bx      lr\n");
