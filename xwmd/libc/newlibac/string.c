@@ -29,41 +29,42 @@ void * memcpy(void * restrict dst, const void * restrict src, size_t count);
  * @param[in] c: constant byte
  * @param[in] count: bytes of the memory area
  * @note
- * - newlib中ARMv7m的memset没有对齐访问内存，这会造成产生BUS Fault。
+ * - newlib的memset没有对齐访问内存，这会造成产生BUS Fault。
  *   因此重新实现memset覆盖newlib中的函数。
  */
 void * memset(void * src, int c, size_t count)
 {
         union {
                 xwu8_t * u8;
-                xwu32_t * u32;
+                xwu64_t * u64;
                 xwptr_t val;
         } m;
-        xwu32_t fill32;
+        xwu64_t fill64;
 
         c = c & 0xFF; // cppcheck-suppress [misra-c2012-17.8]
-        fill32 = (xwu32_t)c;
-        fill32 = (fill32 << 8) | fill32;
-        fill32 = (fill32 << 16) | fill32;
+        fill64 = (xwu64_t)c;
+        fill64 = (fill64 << 8) | fill64;
+        fill64 = (fill64 << 16) | fill64;
+        fill64 = (fill64 << 32) | fill64;
         m.u8 = src;
-        while ((m.val & (sizeof(void *) - 1U)) && (0U != count)) {
+        while ((m.val & (sizeof(xwu64_t) - 1U)) && (count > 0U)) {
                 *m.u8 = (xwu8_t)c;
                 m.u8++;
                 count--; // cppcheck-suppress [misra-c2012-17.8]
         }
-        do {
-                if (count < sizeof(void *)) {
-                        while (0U != count) {
+        while (count > 0U) {
+                if (count < sizeof(xwu64_t)) {
+                        while (count > 0U) {
                                 *m.u8 = (xwu8_t)c;
                                 m.u8++;
                                 count--; // cppcheck-suppress [misra-c2012-17.8]
                         }
                 } else {
-                        *m.u32 = fill32;
-                        m.u32++;
-                        count -= sizeof(void *); // cppcheck-suppress [misra-c2012-17.8]
+                        *m.u64 = fill64;
+                        m.u64++;
+                        count -= sizeof(xwu64_t); // cppcheck-suppress [misra-c2012-17.8]
                 }
-        } while (0U != count);
+        }
         return src;
 }
 
