@@ -57,7 +57,7 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
                              "memsize-error",
                              -ESIZE);
 
-        xwssclogf(DEBUG, "[A][START] Starting XWSSC-%s ...\n", XWSSC_VERSION);
+        xwssclogf(xwssc, VERBOSE, "[A][START] Starting XWSSC-%s ...\n", XWSSC_VERSION);
 
         xwos_object_construct(&xwssc->xwobj);
         xwssc->hwifst = XWSSC_HWIFST_CLOSED;
@@ -69,7 +69,7 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
         xwssc->mempool = NULL;
         rc = xwos_object_activate(&xwssc->xwobj, xwssc_gc);
         if (rc < 0) {
-                xwssclogf(ERR, "[A][START] Activate XWSSC ... <rc:%d>\n", rc);
+                xwssclogf(xwssc, ERR, "[A][START] Activate XWSSC ... <rc:%d>\n", rc);
                 goto err_xwobj_activate; // cppcheck-suppress [misra-c2012-15.2]
         }
 
@@ -79,10 +79,10 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
                            (xwptr_t)mem,
                            memsize, XWSSC_MEMBLK_SIZE, XWSSC_MEMBLK_ODR);
         if (rc < 0) {
-                xwssclogf(ERR, "[A][START] Init BMA ... <rc:%d>\n", rc);
+                xwssclogf(xwssc, ERR, "[A][START] Init BMA ... <rc:%d>\n", rc);
                 goto err_bma_init; // cppcheck-suppress [misra-c2012-15.2]
         }
-        xwssclogf(DEBUG, "[A][START] Init BMA ... [OK]\n");
+        xwssclogf(xwssc, VERBOSE, "[A][START] Init BMA ... [OK]\n");
 
         /* 初始化发送状态机 */
         xwssc->txq.cnt = 0;
@@ -103,17 +103,20 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
         xwos_splk_init(&xwssc->txq.qlock);
         rc = xwos_sem_init(&xwssc->txq.qsem, 0, XWSSC_MEMBLK_NUM);
         if (rc < 0) {
-                xwssclogf(ERR, "[A][START] Init TXQ semaphore ... <rc:%d>\n", rc);
+                xwssclogf(xwssc, ERR,
+                          "[A][START] Init TXQ semaphore ... <rc:%d>\n", rc);
                 goto err_txqsem_init; // cppcheck-suppress [misra-c2012-15.2]
         }
         rc = xwos_mtx_init(&xwssc->txq.csmtx, XWOS_SKD_PRIORITY_RT_MIN);
         if (rc < 0) {
-                xwssclogf(ERR, "[A][START] Init xwssc->csmtx ... <rc:%d>\n", rc);
+                xwssclogf(xwssc, ERR,
+                          "[A][START] Init xwssc->csmtx ... <rc:%d>\n", rc);
                 goto err_csmtx_init; // cppcheck-suppress [misra-c2012-15.2]
         }
         rc = xwos_cond_init(&xwssc->txq.cscond);
         if (rc < 0) {
-                xwssclogf(ERR, "[A][START] Init xwssc->cscond ... <rc:%d>\n", rc);
+                xwssclogf(xwssc, ERR,
+                          "[A][START] Init xwssc->cscond ... <rc:%d>\n", rc);
                 goto err_cscond_init; // cppcheck-suppress [misra-c2012-15.2]
         }
         xwssc->txq.remote.ack = 0;
@@ -128,7 +131,7 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
                 xwos_splk_init(&xwssc->rxq.lock[i]);
                 rc = xwos_sem_init(&xwssc->rxq.sem[i], 0, XWSSC_MEMBLK_NUM);
                 if (rc < 0) {
-                        xwssclogf(ERR,
+                        xwssclogf(xwssc, ERR,
                                   "[A][START] Init RXQ semaphore[%d] ... <rc:%d>\n",
                                   i, rc);
                         goto err_rxqsem_init; // cppcheck-suppress [misra-c2012-15.2]
@@ -223,7 +226,8 @@ xwer_t xwssc_gc(struct xwos_object * obj)
                 rc = xwos_thd_stop(xwssc->txthd, &childrc);
                 if (XWOK == rc) {
                         xwssc->txthd = XWOS_THD_NILD;
-                        xwssclogf(INFO, "[A][STOP] Stop XWSSC TX thread... [OK]\n");
+                        xwssclogf(xwssc, INFO,
+                                  "[A][STOP] Stop XWSSC TX thread... [OK]\n");
                 }
         }
 
@@ -231,7 +235,8 @@ xwer_t xwssc_gc(struct xwos_object * obj)
                 rc = xwos_thd_stop(xwssc->rxthd, &childrc);
                 if (XWOK == rc) {
                         xwssc->rxthd = XWOS_THD_NILD;
-                        xwssclogf(INFO, "[A][STOP] Stop XWSSC RX thread... [OK]\n");
+                        xwssclogf(xwssc, INFO,
+                                  "[A][STOP] Stop XWSSC RX thread... [OK]\n");
                 }
         }
 
@@ -308,7 +313,7 @@ void xwssc_txcb_notify(struct xwssc * xwssc, xwssc_txh_t txh, xwer_t rc, void * 
 
         XWOS_UNUSED(xwssc);
         car = txh;
-        xwssclogf(DEBUG, "[A][TXCB] txh:0x%lX, rc:%d\n", (xwptr_t)txh, rc);
+        xwssclogf(xwssc, VERBOSE, "[A][TXCB] txh:0x%lX, rc:%d\n", (xwptr_t)txh, rc);
         if ((xwu32_t)XWSSC_CRS_FINISH == car->state) {
                 cbarg = arg;
                 xwos_splk_lock(&cbarg->splk);
@@ -344,7 +349,7 @@ xwer_t xwssc_tx(struct xwssc * xwssc,
                 goto err_ifnotrdy;
         }
 
-        xwssclogf(DEBUG, "[A][TX] port:%d, size:%ld\n", port, *size);
+        xwssclogf(xwssc, VERBOSE, "[A][TX] port:%d, size:%ld\n", port, *size);
         xwos_splk_init(&cbarg.splk);
         xwos_cond_init(&cbarg.cond);
         cbarg.rc = -EINPROGRESS;
@@ -468,7 +473,7 @@ xwer_t xwssc_rx(struct xwssc * xwssc, xwu8_t port,
         }
 
         bufsize = *size;
-        xwssclogf(DEBUG, "[A][RX] port:%d, size:%ld\n", port, bufsize);
+        xwssclogf(xwssc, VERBOSE, "[A][RX] port:%d, size:%ld\n", port, bufsize);
         rc = xwos_sem_wait_to(&xwssc->rxq.sem[port], to);
         if (rc < 0) {
                 goto err_sem_wait_to;
@@ -480,7 +485,7 @@ xwer_t xwssc_rx(struct xwssc * xwssc, xwu8_t port,
 
         if (bufsize < sdusize) {
                 realsize = bufsize;
-                xwssclogf(WARNING,
+                xwssclogf(xwssc, WARNING,
                           "[A][RX] Buffer is too small(%d)! Expected size is %ld\n",
                           bufsize, sdusize);
         } else {
@@ -527,7 +532,7 @@ xwer_t xwssc_try_rx(struct xwssc * xwssc, xwu8_t port,
         }
 
         bufsize = *size;
-        xwssclogf(DEBUG, "[A][TRYRX] port:%d, size:%ld\n", port, bufsize);
+        xwssclogf(xwssc, VERBOSE, "[A][TRYRX] port:%d, size:%ld\n", port, bufsize);
         rc = xwos_sem_trywait(&xwssc->rxq.sem[port]);
         if (rc < 0) {
                 goto err_sem_trywait;
@@ -539,7 +544,7 @@ xwer_t xwssc_try_rx(struct xwssc * xwssc, xwu8_t port,
 
         if (bufsize < sdusize) {
                 realsize = bufsize;
-                xwssclogf(WARNING,
+                xwssclogf(xwssc, WARNING,
                           "[A][TRYRX] Buffer is too small(%d)! "
                           "Expected size is %d\n",
                           bufsize, sdusize);

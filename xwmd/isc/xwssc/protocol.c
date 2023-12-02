@@ -354,7 +354,7 @@ void xwssc_rxq_pub(struct xwssc * xwssc,
                    union xwssc_slot * slot,
                    xwu8_t port)
 {
-        xwssclogf(DEBUG,
+        xwssclogf(xwssc, DEBUG,
                   "[R][RX][SDU] Publish slot::0x%lX, port:0x%X, frmsize:0x%u\n",
                   (xwptr_t)slot, port, slot->rx.frmsize);
         xwos_splk_lock(&xwssc->rxq.lock[port]);
@@ -404,7 +404,7 @@ xwer_t xwssc_rx_connection(struct xwssc * xwssc, struct xwssc_frm * frm)
         proto[3] = sdupos[3];
         proto[4] = sdupos[4];
         proto[5] = '\0';
-        xwssclogf(DEBUG, "[R][RX][CONN] proto:%s-%d.%d.%d\n",
+        xwssclogf(xwssc, DEBUG, "[R][RX][CONN] proto:%s-%d.%d.%d\n",
                   proto, sdupos[5], sdupos[6], sdupos[7]);
         if ((0 == strcmp(proto, "XWSSC")) &&
             (XWSSC_VERSION_MAJOR == sdupos[5]) &&
@@ -440,7 +440,7 @@ xwer_t xwssc_rx_ack_connection(struct xwssc * xwssc, struct xwssc_frm * frm)
         proto[4] = sdupos[4];
         proto[5] = '\0';
 
-        xwssclogf(DEBUG, "[R][RX][CONNACK] proto:%s-%d.%d.%d\n",
+        xwssclogf(xwssc, DEBUG, "[R][RX][CONNACK] proto:%s-%d.%d.%d\n",
                   proto, sdupos[5], sdupos[6], sdupos[7]);
         xwaop_read(xwsq_t, &xwssc->hwifst, &hwifst);
         if (!((xwsq_t)XWSSC_HWIFST_CONNECT & hwifst)) {
@@ -494,7 +494,7 @@ xwer_t xwssc_rx_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
         rmtid = slot->rx.frm.head.id;
         port = slot->rx.frm.head.port;
         qos = slot->rx.frm.head.qos;
-        xwssclogf(DEBUG,
+        xwssclogf(xwssc, DEBUG,
                   "[R][RX][SDU] slot:0x%lX, port:0x%X, qos:0x%X, frmsize:0x%X, "
                   "Remote ID:0x%X, Local ID:0x%X, Rx counter:0x%X\n",
                   (xwptr_t)slot,
@@ -541,7 +541,7 @@ xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, struct xwssc_frm * frm)
         sdupos = XWSSC_SDUPOS(&frm->head);
         rmtid = XWSSC_ID(frm->head.id);
         ack = sdupos[0];
-        xwssclogf(DEBUG, "[R][SDUACK] ID:0x%X, ACK:0x%X\n", rmtid, ack);
+        xwssclogf(xwssc, DEBUG, "[R][SDUACK] ID:0x%X, ACK:0x%X\n", rmtid, ack);
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (rc < 0) {
                 goto err_mtx_lock;
@@ -590,7 +590,7 @@ xwer_t xwssc_rxfsm(struct xwssc * xwssc)
         }
         qos = stream.frm.head.qos;
         xwssc_decode_sdusize(stream.frm.head.ecsdusz, &sdusize);
-        xwssclogf(DEBUG, "[R][HEAD] port:0x%X, ID:0x%X, qos:0x%X\n",
+        xwssclogf(xwssc, DEBUG, "[R][HEAD] port:0x%X, ID:0x%X, qos:0x%X\n",
                   stream.frm.head.port, stream.frm.head.id, qos);
 
         /* 接收消息体 */
@@ -699,50 +699,51 @@ xwer_t xwssc_rxthd(struct xwssc * xwssc)
         rc = XWOK;
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {
-                        xwssclogf(DEBUG, "[R] Start freezing ...\n");
+                        xwssclogf(xwssc, DEBUG, "[R] Start freezing ...\n");
                         rc = xwos_cthd_freeze();
                         if (rc < 0) {
-                                xwssclogf(DEBUG,
+                                xwssclogf(xwssc, DEBUG,
                                           "[R] Failed to freeze ... <rc:%d>\n",
                                           rc);
                                 xwssc_doze(1); // cppcheck-suppress [misra-c2012-17.7]
                         }
-                        xwssclogf(DEBUG, "[R] Resuming ...\n");
+                        xwssclogf(xwssc, DEBUG, "[R] Resuming ...\n");
                 }
                 rc = xwssc_rxfsm(xwssc);
                 switch (rc) {
                 case XWOK:
                         break;
                 case -EAGAIN:
-                        xwssclogf(WARNING, "[R] Data stream error! Wait for SOF.\n");
+                        xwssclogf(xwssc, WARNING,
+                                  "[R] Data stream error! Wait for SOF.\n");
                         break;
                 case -ETIMEDOUT:
-                        xwssclogf(DEBUG, "[R] Timeout!\n");
+                        xwssclogf(xwssc, DEBUG, "[R] Timeout!\n");
                         break;
                 case -EINTR:
                 case -ERESTARTSYS:
-                        xwssclogf(DEBUG, "[R] Interrupted!\n");
+                        xwssclogf(xwssc, DEBUG, "[R] Interrupted!\n");
                         break;
                 case -ENOMEM:
-                        xwssclogf(DEBUG, "[R] No Memory\n");
+                        xwssclogf(xwssc, DEBUG, "[R] No Memory\n");
                         break;
                 case -EBADMSG:
-                        xwssclogf(WARNING, "[R] Bad Message Frame!\n");
+                        xwssclogf(xwssc, WARNING, "[R] Bad Message Frame!\n");
                         break;
                 case -EPERM:
-                        xwssclogf(ERR, "[R] Protocol not match!\n");
+                        xwssclogf(xwssc, ERR, "[R] Protocol not match!\n");
                         break;
                 case -EALREADY:
-                        xwssclogf(WARNING, "[R] Repeated Message Frame!\n");
+                        xwssclogf(xwssc, WARNING, "[R] Repeated Message Frame!\n");
                         break;
                 case -ECONNRESET:
-                        xwssclogf(WARNING, "[R] Connection Reset!\n");
+                        xwssclogf(xwssc, WARNING, "[R] Connection Reset!\n");
                         break;
                 case -ENOMSG:
-                        xwssclogf(WARNING, "[R] No sending message!\n");
+                        xwssclogf(xwssc, WARNING, "[R] No sending message!\n");
                         break;
                 default:
-                        xwssclogf(CRIT, "[R] BUG!!! xwssc_rxfsm() returns %d!\n", rc);
+                        xwssclogf(xwssc, CRIT, "[R] BUG!!! xwssc_rxfsm() returns %d!\n", rc);
                         XWSSC_BUG();
                         break;
                 }
@@ -859,7 +860,7 @@ xwer_t xwssc_tx_connection(struct xwssc * xwssc)
 {
         xwer_t rc;
 
-        xwssclogf(DEBUG, "[T][TX][CONN] Connecting ...\n");
+        xwssclogf(xwssc, DEBUG, "[T][TX][CONN] Connecting ...\n");
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (XWOK == rc) {
                 rc = xwssc_hwifal_tx(xwssc,
@@ -881,7 +882,7 @@ xwer_t xwssc_tx_ack_connection(struct xwssc * xwssc)
 {
         xwer_t rc;
 
-        xwssclogf(DEBUG, "[R][TX][CONNACK] Connecting ...\n");
+        xwssclogf(xwssc, DEBUG, "[R][TX][CONNACK] Connecting ...\n");
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (XWOK == rc) {
                 rc = xwssc_hwifal_tx(xwssc,
@@ -913,7 +914,7 @@ xwer_t xwssc_tx_ack_sdu(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack
         xwu32_t crc32;
         xwer_t rc;
 
-        xwssclogf(DEBUG, "[R][TX][SDUACK] ACK:0x%X, ID:0x%X\n", ack, id);
+        xwssclogf(xwssc, DEBUG, "[R][TX][SDUACK] ACK:0x%X, ID:0x%X\n", ack, id);
         frm = (struct xwssc_frm *)stream;
         // cppcheck-suppress [misra-c2012-17.7]
         memcpy(stream, xwssc_ackfrm_sdu, sizeof(xwssc_ackfrm_sdu));
@@ -1024,7 +1025,7 @@ xwer_t xwssc_eq_msg(struct xwssc * xwssc,
         slot->tx.frmsize = sizeof(struct xwssc_frm) + ecsize + sdusize +
                            XWSSC_CRC32_SIZE + XWSSC_EOF_SIZE;
 
-        xwssclogf(DEBUG,
+        xwssclogf(xwssc, DEBUG,
                   "[A][EQ] car(0x%lX), slot(0x%lX), "
                   "pri:0x%X, port:0x%X, sdusize:0x%X\n",
                   (xwptr_t)car, (xwptr_t)slot, pri, port, sdusize);
@@ -1130,12 +1131,12 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
 
         ack = xwssc->txq.remote.ack;
         rmtid = xwssc->txq.remote.id;
-        xwssclogf(DEBUG, "[T][>] Remote ACK:0x%X, Remote ID:0x%X\n", ack, rmtid);
+        xwssclogf(xwssc, DEBUG, "[T][>] Remote ACK:0x%X, Remote ID:0x%X\n", ack, rmtid);
         if (rmtid != car->slot->tx.frm.head.id) {
                 xwaop_c0m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_CONNECT, NULL, NULL);
                 xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                 xwssc->txq.tmp = car;
-                xwssclogf(DEBUG, "[T][>] Remote ACK ID error!\n");
+                xwssclogf(xwssc, DEBUG, "[T][>] Remote ACK ID error!\n");
         } else {
                 switch (ack) {
                 case XWSSC_ACK_OK:
@@ -1154,7 +1155,7 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                         xwssc_txq_carrier_free(xwssc, car);
                         break;
                 case XWSSC_ACK_EALREADY:
-                        xwssclogf(DEBUG, "[T][>] Msg is already transmitted!\n");
+                        xwssclogf(xwssc, DEBUG, "[T][>] Msg is already transmitted!\n");
                         xwaop_add(xwu32_t, &xwssc->txq.cnt, 1, NULL, NULL);
                         xwaop_write(xwu32_t, &car->state, XWSSC_CRS_FINISH, NULL);
                         xwos_splk_lock(&xwssc->txq.notiflk);
@@ -1170,14 +1171,14 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                         xwssc_txq_carrier_free(xwssc, car);
                         break;
                 case XWSSC_ACK_ECONNRESET:
-                        xwssclogf(WARNING, "[T][>] Link has been severed!\n");
+                        xwssclogf(xwssc, WARNING, "[T][>] Link has been severed!\n");
                         xwaop_c0m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_CONNECT,
                                   NULL, NULL);
                         xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                         xwssc->txq.tmp = car;
                         break;
                 case XWSSC_ACK_NOMEM:
-                        xwssclogf(WARNING, "[T][>] Remote has no memory!\n");
+                        xwssclogf(xwssc, WARNING, "[T][>] Remote has no memory!\n");
                         xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                         xwssc->txq.tmp = car;
                         xwssc_doze(1); // cppcheck-suppress [misra-c2012-17.7]
@@ -1230,7 +1231,7 @@ xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
             (car->slot->tx.frm.head.qos & (xwu8_t)XWSSC_MSG_QOS_RELIABLE_MSK)) {
                 xwaop_s1m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_TX, NULL, NULL);
                 do { // cppcheck-suppress [misra-c2012-15.4]
-                        xwssclogf(DEBUG,
+                        xwssclogf(xwssc, DEBUG,
                                   "[T][.] carrier(0x%lX), ID:0x%X, cnt:0x%X\n",
                                   (xwptr_t)car, id, cnt);
                         rc = xwssc_hwifal_tx(xwssc,
@@ -1336,7 +1337,7 @@ xwer_t xwssc_txfsm(struct xwssc * xwssc)
                         car = xwssc_txq_choose(xwssc);
                         XWSSC_BUG_ON(is_err(car));
                 }
-                xwssclogf(DEBUG,
+                xwssclogf(xwssc, DEBUG,
                           "[T][<] Choose carrier(0x%lX), port:0x%X, state:%d\n",
                           (xwptr_t)car,
                           car->slot->tx.frm.head.port,
@@ -1404,13 +1405,14 @@ xwer_t xwssc_txthd(struct xwssc * xwssc)
         rc = XWOK;
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {
-                        xwssclogf(DEBUG, "[T] Start freezing ...\n");
+                        xwssclogf(xwssc, DEBUG, "[T] Start freezing ...\n");
                         rc = xwos_cthd_freeze();
                         if (rc < 0) {
-                                xwssclogf(DEBUG, "[T] Failed to freeze ... <rc:%d>\n",
+                                xwssclogf(xwssc, DEBUG,
+                                          "[T] Failed to freeze ... <rc:%d>\n",
                                           rc);
                         }
-                        xwssclogf(DEBUG, "[T] Resuming ...\n");
+                        xwssclogf(xwssc, DEBUG, "[T] Resuming ...\n");
                 }
                 rc = xwssc_txfsm(xwssc);
                 switch (rc) {
@@ -1418,17 +1420,18 @@ xwer_t xwssc_txthd(struct xwssc * xwssc)
                         break;
                 case -EINTR:
                 case -ERESTARTSYS:
-                        xwssclogf(DEBUG, "[T] Interrupted!\n");
+                        xwssclogf(xwssc, DEBUG, "[T] Interrupted!\n");
                         break;
                 case -EOVERFLOW:
-                        xwssclogf(WARNING, "[T] Buffer of HWIF is overflow!\n");
+                        xwssclogf(xwssc, WARNING, "[T] Buffer of HWIF is overflow!\n");
                         xwssc_doze(1); // cppcheck-suppress [misra-c2012-17.7]
                         break;
                 case -ETIMEDOUT:
-                        xwssclogf(WARNING, "[T] Timeout!\n");
+                        xwssclogf(xwssc, WARNING, "[T] Timeout!\n");
                         break;
                 default:
-                        xwssclogf(CRIT, "[T] BUG!!! xwssc_txfsm() returns %d!\n", rc);
+                        xwssclogf(xwssc, CRIT,
+                                  "[T] BUG!!! xwssc_txfsm() returns %d!\n", rc);
                         XWSSC_BUG();
                         break;
                 }

@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/lfq.h>
@@ -54,6 +55,13 @@
 #  include <xwos/up/sync/cond.h>
 #endif
 
+/* #define XWOS_THDLOGF */ /**< 调试日志开关 */
+#ifdef XWOS_THDLOGF
+#  define xwos_thdlogf(lv, thd, fmt, ...) \
+          xwlogf(lv, "Thd:%s", fmt, thd->stack.name, ##__VA_ARGS__)
+#else
+#  define xwos_thdlogf(lv, thd, fmt, ...)
+#endif
 
 #if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
 /**
@@ -582,6 +590,13 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
         attr = *inattr;
         thd->stack.flag = (xwsq_t)0;
         rc = xwup_thd_activate(thd, &attr, thdfunc, arg, xwup_thd_sgc);
+        if (XWOK == rc) {
+                xwos_thdlogf(INFO, thd, "Init Thread, "
+                             "stack: {.base = 0x%lX, .size = 0x%lX}\r\n",
+                             thd->stack.base, thd->stack.size);
+        } else {
+                xwos_thdlogf(ERR, thd, "Init Thread ... %d\r\n", rc);
+        }
         return rc;
 }
 
@@ -647,8 +662,12 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
 
         rc = xwup_thd_activate(thd, &attr, thdfunc, arg, xwup_thd_dgc);
         if (rc < 0) {
+                xwos_thdlogf(ERR, thd, "Activate Thread ... %d\r\n", rc);
                 goto err_thd_activate;
         }
+        xwos_thdlogf(INFO, thd, "Create Thread, "
+                     "stack: {.base = 0x%lX, .size = 0x%lX}\r\n",
+                     thd->stack.base, thd->stack.size);
 
         *thdpbuf = thd;
         return XWOK;
@@ -726,6 +745,7 @@ void xwup_cthd_return(xwer_t rc)
         struct xwup_thd * cthd;
 
         cthd = xwup_skd_get_cthd_lc();
+        xwos_thdlogf(INFO, cthd, "return:%d\r\n", rc);
         xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
 #else
         XWOS_UNUSED(rc);
@@ -741,6 +761,7 @@ void xwup_cthd_exit(xwer_t rc)
         struct xwup_thd * cthd;
 
         cthd = xwup_skd_get_cthd_lc();
+        xwos_thdlogf(INFO, cthd, "exit:%d\r\n", rc);
         xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
 #else
         XWOS_UNUSED(rc);

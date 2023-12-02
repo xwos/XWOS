@@ -20,6 +20,14 @@
 #include <xwos/mm/mempool/page.h>
 #include <xwos/mm/mempool/objcache.h>
 
+/* #define XWMM_MEMPOOLLOGF */ /**< 调试日志开关 */
+#ifdef XWMM_MEMPOOLLOGF
+#  define xwmm_mempoollogf(lv, thd, fmt, ...) \
+          xwlogf(lv, "Thd:%s", fmt, thd->stack.name, ##__VA_ARGS__)
+#else
+#  define xwmm_mempoollogf(lv, thd, fmt, ...)
+#endif
+
 static __xwos_code
 void xwmm_mempool_objcache_page_init(struct xwmm_mempool_objcache * oc,
                                      struct xwmm_mempool_page * pg);

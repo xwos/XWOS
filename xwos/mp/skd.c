@@ -39,11 +39,12 @@
  *   3. _tllk: 是只持有锁xwmp_skd.thdlistlock才可调用的函数。
  */
 
-#include <string.h>
 #include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwaop.h>
+#include <string.h>
 #include <xwos/mm/common.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/tls.h>
@@ -55,6 +56,14 @@
 #include <xwos/mp/tt.h>
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/mp/bh.h>
+#endif
+
+/* #define XWOS_SKDLOGF */ /**< 调试日志开关 */
+#ifdef XWOS_SKDLOGF
+#  define xwos_skdlogf(lv, xwskd, fmt, ...) \
+          xwlogf(lv, "XWSKD.%d", fmt, xwskd->id, ##__VA_ARGS__)
+#else
+#  define xwos_skdlogf(lv, xwskd, fmt, ...)
 #endif
 
 /**
@@ -192,6 +201,21 @@ xwer_t xwmp_skd_init_lc(void)
         if (rc < 0) {
                 goto err_skd_init;
         }
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+        xwos_skdlogf(INFO, xwskd,
+                     "Init scheduler@CPU%d, "
+                     "IDLE Stack: {.base = 0x%lX, .size = 0x%lX}, "
+                     "BH Stack: {.base = 0x%lX, .size = 0x%lX}\r\n",
+                     xwskd->id,
+                     (xwptr_t)xwskd->idle.base, xwskd->idle.size,
+                     (xwptr_t)xwskd->bh.base, xwskd->bh.size);
+#else
+        xwos_skdlogf(INFO, xwskd,
+                     "Init scheduler@CPU%d, "
+                     "IDLE Stack: {.base = 0x%lX, .size = 0x%lX}\r\n",
+                     xwskd->id,
+                     (xwptr_t)xwskd->idle.base, xwskd->idle.size);
+#endif
         return XWOK;
 
 err_skd_init:
@@ -430,6 +454,9 @@ xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd)
         return XWOK;
 }
 
+static __xwmp_rodata
+const char xwmp_skd_idled_name[] = "IDLE";
+
 /**
  * @brief 初始化空闲线程栈
  * @param[in] xwskd: XWOS MP调度器的指针
@@ -437,7 +464,7 @@ xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd)
 static __xwmp_code
 void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
 {
-        xwskd->idle.name = NULL;
+        xwskd->idle.name = xwmp_skd_idled_name;
         xwskd->idle.main = (xwmp_thd_f)xwmp_skd_idled;
         xwskd->idle.arg = xwskd;
         xwskd->idle.size = XWOSCFG_SKD_IDLE_STACK_SIZE;
@@ -497,6 +524,9 @@ xwer_t xwmp_skd_bhd(struct xwmp_skd * xwskd)
         return XWOK;
 }
 
+static __xwmp_rodata
+const char xwmp_skd_bhd_name[] = "BH";
+
 /**
  * @brief 初始化中断底半部栈
  * @param[in] xwskd: XWOS MP调度器的指针
@@ -504,7 +534,7 @@ xwer_t xwmp_skd_bhd(struct xwmp_skd * xwskd)
 static __xwmp_code
 void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
 {
-        xwskd->bh.name = NULL;
+        xwskd->bh.name = xwmp_skd_bhd_name;
         xwskd->bh.main = (xwmp_thd_f)xwmp_skd_bhd;
         xwskd->bh.arg = xwskd;
         xwskd->bh.size = XWOSCFG_SKD_BH_STACK_SIZE;

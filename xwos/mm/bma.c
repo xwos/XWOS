@@ -18,6 +18,13 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 
+/* #define XWMM_BMA_LOG */ /**< 调试日志开关  */
+#if defined(XWMM_BMA_LOG)
+#  define xwmm_bmalogf(lv, fmt, ...) xwlogf(lv, "BMA", fmt, ##__VA_ARGS__)
+#else
+#  define xwmm_bmalogf(lv, fmt, ...)
+#endif
+
 static __xwos_code
 struct xwmm_bma_bcb * xwmm_bma_mem_to_bcb(struct xwmm_bma * bma, void * mem);
 

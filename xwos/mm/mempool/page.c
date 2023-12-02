@@ -19,6 +19,14 @@
 #include <xwos/mm/mempool/i_allocator.h>
 #include <xwos/mm/mempool/page.h>
 
+/* #define XWMM_MEMPOOLLOGF */ /**< 调试日志开关 */
+#ifdef XWMM_MEMPOOLLOGF
+#  define xwmm_mempoollogf(lv, thd, fmt, ...) \
+          xwlogf(lv, "Thd:%s", fmt, thd->stack.name, ##__VA_ARGS__)
+#else
+#  define xwmm_mempoollogf(lv, thd, fmt, ...)
+#endif
+
 static __xwos_code
 xwer_t xwmm_mempool_page_i_a_malloc(void * this, xwsz_t size, void ** membuf);
 

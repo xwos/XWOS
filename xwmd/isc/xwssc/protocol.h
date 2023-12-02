@@ -59,10 +59,10 @@
 #define XWSSC_RXTHD_STACK       (4096U)
 
 #if defined(XWMDCFG_isc_xwssc_LOG) && (1 == XWMDCFG_isc_xwssc_LOG)
-#  define XWSSC_LOGTAG                  "XWSSC"
-#  define xwssclogf(lv, fmt, ...)       xwlogf(lv, XWSSC_LOGTAG, fmt, ##__VA_ARGS__)
+#  define xwssclogf(xwssc, lv, fmt, ...) xwlogf(lv, "%s", \
+                                                fmt, xwssc->name, ##__VA_ARGS__)
 #else
-#  define xwssclogf(lv, fmt, ...)
+#  define xwssclogf(xwssc, lv, fmt, ...)
 #endif
 
 #define XWSSC_BUG()     XWOS_BUG()

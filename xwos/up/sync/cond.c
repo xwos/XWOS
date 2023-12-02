@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
@@ -40,6 +41,13 @@
 #endif
 #include <xwos/up/sync/cond.h>
 
+/* #define XWOS_CONDLOGF */ /**< 调试日志开关 */
+#ifdef XWOS_CONDLOGF
+#  define xwos_condlogf(lv, thd, fmt, ...) \
+          xwlogf(lv, "Thd:%s", fmt, thd->stack.name, ##__VA_ARGS__)
+#else
+#  define xwos_condlogf(lv, thd, fmt, ...)
+#endif
 
 #if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
 /**

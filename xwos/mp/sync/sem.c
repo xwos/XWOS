@@ -17,6 +17,7 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
@@ -43,6 +44,13 @@
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/sem.h>
 
+/* #define XWOS_SEMLOGF */ /**< 调试日志开关 */
+#ifdef XWOS_SEMLOGF
+#  define xwos_semlogf(lv, thd, fmt, ...) \
+          xwlogf(lv, "Thd:%s", fmt, thd->stack.name, ##__VA_ARGS__)
+#else
+#  define xwos_semlogf(lv, thd, fmt, ...)
+#endif
 
 #if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
 /**

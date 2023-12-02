@@ -46,13 +46,6 @@
 #define XWMM_BMA_ORDER_MASK             ((xwu8_t)0x7F) /**< 阶的掩码 */
 #define XWMM_BMA_INUSED                 ((xwu8_t)0x80) /**< 块正在被使用 */
 
-/* #define XWMM_BMA_LOG */ /**< 调试日志开关，若在中断中使用BMA，需关闭此宏 */
-#if defined(XWMM_BMA_LOG)
-#  define xwmm_bmalogf(lv, fmt, ...) xwlogf(lv, "[BMA]", fmt, ##__VA_ARGS__)
-#else
-#  define xwmm_bmalogf(lv, fmt, ...)
-#endif
-
 /**
  * @brief 定义伙伴算法内存块分配器结构体类型
  * @param[in] name: 结构体名

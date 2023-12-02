@@ -17,6 +17,14 @@
 #include <xwos/mm/mempool/page.h>
 #include <xwos/mm/mempool/allocator.h>
 
+/* #define XWMM_MEMPOOLLOGF */ /**< 调试日志开关 */
+#ifdef XWMM_MEMPOOLLOGF
+#  define xwmm_mempoollogf(lv, thd, fmt, ...) \
+          xwlogf(lv, "Thd:%s", fmt, thd->stack.name, ##__VA_ARGS__)
+#else
+#  define xwmm_mempoollogf(lv, thd, fmt, ...)
+#endif
+
 /**
  * @brief 构建内存池
  * @param[in] mp: 内存池的指针

@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
 #include <xwos/lib/object.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
@@ -31,6 +32,14 @@
 #include <xwos/mp/mtxtree.h>
 #include <xwos/mp/thd.h>
 #include <xwos/mp/lock/mtx.h>
+
+/* #define XWOS_MTXLOGF */ /**< 调试日志开关 */
+#ifdef XWOS_MTXLOGF
+#  define xwos_mtxlogf(lv, thd, fmt, ...) \
+          xwlogf(lv, "Thd:%s", fmt, thd->stack.name, ##__VA_ARGS__)
+#else
+#  define xwos_mtxlogf(lv, thd, fmt, ...)
+#endif
 
 
 #if defined(XWOSCFG_LOCK_MTX_MEMPOOL) && (1 == XWOSCFG_LOCK_MTX_MEMPOOL)

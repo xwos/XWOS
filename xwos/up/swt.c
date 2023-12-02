@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
 #include <xwos/lib/object.h>
 #include <xwos/mm/common.h>
 #if defined(XWOSCFG_SKD_SWT_MEMPOOL) && (1 == XWOSCFG_SKD_SWT_MEMPOOL)
@@ -27,6 +28,13 @@
 #include <xwos/up/tt.h>
 #include <xwos/up/swt.h>
 
+/* #define XWOS_SWTLOGF */ /**< 调试日志开关 */
+#ifdef XWOS_SWTLOGF
+#  define xwos_swtlogf(lv, thd, fmt, ...) \
+          xwlogf(lv, "Thd:%s", fmt, thd->stack.name, ##__VA_ARGS__)
+#else
+#  define xwos_swtlogf(lv, thd, fmt, ...)
+#endif
 
 #if defined(XWOSCFG_SKD_SWT_MEMPOOL) && (1 == XWOSCFG_SKD_SWT_MEMPOOL)
 /**
