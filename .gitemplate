@@ -1,7 +1,7 @@
 
 #
 # [标题] <type>(<scope>): :emoji: <subject>
-# - type: feat, fix, perf, refactor, style, revert, docs, test,
+# - type: feat, fix, perf, refactor, style, revert, docs, test, ci,
 #         chore, milestone, release, revision, alpha, beta, rc
 # - scope: 可为空
 # - subject: 以动词开始的短语，结尾无句号

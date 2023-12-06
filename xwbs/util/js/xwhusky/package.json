@@ -9,8 +9,8 @@
   "author": "Roy Sun",
   "license": "Apache-2.0",
   "dependencies": {
-    "@commitlint/cli": "^16.0.1",
-    "@commitlint/config-conventional": "^16.0.0",
-    "husky": "^7.0.4"
+    "@commitlint/cli": "^18",
+    "@commitlint/config-conventional": "^18",
+    "husky": "^8"
   }
 }
