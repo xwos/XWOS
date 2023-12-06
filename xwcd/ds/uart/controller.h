@@ -32,14 +32,33 @@
 /**
  * @defgroup xwcd_ds_uart 串口控制器
  * @ingroup xwcd_ds
- * ## 接收缓冲区
- * XWOS设备栈串口控制器框架内定义了大小为 `XWCDCFG_ds_UART_RXQ_SIZE`
- * 的 **接收缓冲区** ， `rxq.idx` 用于向 **接收缓冲区** 内填充数据，
- * `rxq.pos` 和 `rxq.tail` 用于向 **接收缓冲区** 获取数据。
+ * ## 接收
+ *
+ * XWDS串口控制器框架内定义了大小为 `XWCDCFG_ds_UART_RXQ_SIZE` 的 **接收缓冲区** ，
+ * CAPI `xwds_uartc_rx()` 与 `xwds_uartc_try_rx()` 用于从 **接收缓冲区** 获取数据。
+ *
+ *
+ * ## 异步发送
+ *
+ * 异步发送 `xwds_uartc_eq()` 只会将数据拷贝到发送缓冲区，
+ * 不会等待发送结果，可在中断中使用。
+ *
+ *
+ * ## 同步发送
+ *
+ * 同步发送 `xwds_uartc_tx()` 会阻塞调用者，等待发送结果，因此只能在线程中使用。
+ *
+ *
+ * ## **BSP驱动层** 的适配工作
+ *
+ * ### 适配接收缓冲区
  *
  * **接收缓冲区** 是一个循环队列，当 `overflow` 时，最新的数据会将最旧的数据覆盖掉。
  *
- * ### **中断模式** 中使用接收缓冲区
+ * `rxq.idx` 用于向 **接收缓冲区** 内填充数据，
+ * `rxq.pos` 和 `rxq.tail` 用于向 **接收缓冲区** 获取数据。
+ *
+ * #### **中断模式** 中使用接收缓冲区
  *
  * 当使用 **中断模式** 的UART硬件控制器时，需在中断函数内
  * 调用 `xwds_uartc_drvcb_rxq_fill()` 填充 **接收缓冲区** ，
@@ -50,7 +69,7 @@
  *
  * 出现错误时，需要使用 `xwds_uartc_drvcb_rxq_flush()` 重置 **接收缓冲区** 。
  *
- * ### **DMA模式** 中使用接收缓冲区
+ * #### **DMA模式** 中使用接收缓冲区
  *
  * 当使用 **DMA模式** 的UART硬件控制器时，需将DMA的接收地址
  * 设置为 **接收缓冲区** 的首地址，DMA引擎会自动填充 **接收缓冲区** ，
@@ -59,6 +78,22 @@
  * 此外需要使用一个 **接收超时定时器** 定期发布数据。
  *
  * 出现错误时，需要使用 `xwds_uartc_drvcb_rxq_flush()` 重置 **接收缓冲区** 。
+ *
+ * ### 适配 `xwds_uartc_tx()`
+ *
+ * 同步发送 `xwds_uartc_tx()` 需要 **BSP驱动层** 实现 `xwds_uartc_driver.tx` 函数。
+ *
+ * ### 适配 `xwds_uartc_eq()`
+ *
+ * 异步发送 `xwds_uartc_eq()` 需要 **BSP驱动层** 实现 `xwds_uartc_driver.eq` 函数。
+ * **BSP驱动层** 可根据需要实现 **发送缓冲区** ，有些SOC提供很大的 **TX FIFO** ，
+ * 可替代发送缓冲区。
+ *
+ * DMA模式的发送则必须提供 **发送缓冲区** 作为DMA的内存。
+ *
+ * **BSP驱动层** 还需要实现一个 **BUSY** 标志，此CAPI不阻塞，当检测到BUSY标志时
+ * 需要立即返回 `-EBUSY` 。
+ *
  *
  * @{
  */
@@ -139,9 +174,12 @@ struct xwds_uartc_driver {
                        const struct xwds_uart_cfg * /*cfg*/); /**< 配置UART控制器 */
         xwer_t (* tx)(struct xwds_uartc * /*uartc*/,
                       const xwu8_t * /*data*/, xwsz_t * /*size*/,
-                      xwtm_t /*to*/); /**< 配置DMA通道并发送 */
+                      xwtm_t /*to*/); /**< 发送，并等待发送结果 */
         xwer_t (* putc)(struct xwds_uartc * /*uartc*/,
                         const xwu8_t /*byte*/); /**< 发送一个字节 */
+        xwer_t (* eq)(struct xwds_uartc * /*uartc*/,
+                      const xwu8_t * /*data*/,
+                      xwsz_t * /*size*/); /**< 发送，但不等待发送结果 */
 };
 
 /**
@@ -241,6 +279,29 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc,
 xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                      const xwu8_t * data, xwsz_t * size,
                      xwtm_t to);
+
+/**
+ * @brief XWDS API：将发送数据拷贝到UART的发送缓冲区，不等待发送结果
+ * @param[in] uartc: UART控制器对象指针
+ * @param[in] data: 待发送的数据的缓冲区
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
+ * + (O) 作为输出时，返回实际拷贝到缓冲区的数据大小
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 不支持此操作
+ * @retval -EBUSY: 端口繁忙
+ * @note
+ * + 上下文：任意
+ * @details
+ * + 此CAPI仅将待发送的数据拷贝到发送缓冲区就返回，不会等待发送结果。
+ *   如果设备正在发送其他数据，就以 `-EBUSY` 返回。
+ *   此CAPI可在中断中使用。
+ * + 如果发送数据超过缓冲区大小，返回时， `*size` 会返回实际拷贝到缓冲区的数据大小。
+ */
+xwer_t xwds_uartc_eq(struct xwds_uartc * uartc,
+                     const xwu8_t * data, xwsz_t * size);
 
 /**
  * @brief XWDS API：直接发送一个字节（非DMA模式）
