@@ -272,11 +272,12 @@ __xwup_isr
 xwer_t xwup_tt_check_deadline(struct xwup_tt * xwtt)
 {
         struct xwup_ttn * leftmost;
+        xwreg_t cpuirq;
         xwtm_t tick;
         xwer_t rc;
 
         rc = XWOK;
-        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         for (tick = xwup_syshwt_get_timetick(&xwtt->hwt);
              ((NULL != xwtt->leftmost) && (xwtm_cmp(xwtt->deadline, tick) <= 0));
              tick = xwup_syshwt_get_timetick(&xwtt->hwt)) {
@@ -285,7 +286,7 @@ xwer_t xwup_tt_check_deadline(struct xwup_tt * xwtt)
                 xwlib_bclst_insseg_tail(&xwtt->timeout, &leftmost->rbb);
                 rc = -ETIMEDOUT;
         }
-        xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         return rc;
 }
 
@@ -297,19 +298,20 @@ static __xwup_bh
 void xwup_tt_bh(struct xwup_tt * xwtt)
 {
         struct xwup_ttn * ttn;
+        xwreg_t cpuirq;
         xwup_tt_cb_f cb;
 
-        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         xwlib_bclst_itr_prev_entry_del(ttn, &xwtt->timeout, struct xwup_ttn, rbb) {
                 xwlib_bclst_del_init(&ttn->rbb);
                 cb = ttn->cb;
                 ttn->wkuprs = (xwsq_t)XWUP_TTN_WKUPRS_TIMEDOUT;
                 ttn->cb = NULL;
-                xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 cb(ttn);
                 xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
         }
-        xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         xwup_skd_chkpmpt();
 }
 
