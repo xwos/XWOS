@@ -96,7 +96,6 @@ xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd);
  * @brief XWOS移植层：触发切换上下文的软中断
  * @param[in] xwskd: 调度器的指针
  */
-static __xwbsp_inline
 void xwospl_skd_req_swcx(struct xwospl_skd * xwskd);
 
 /**

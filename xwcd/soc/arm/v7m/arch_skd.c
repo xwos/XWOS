@@ -357,7 +357,7 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
 
         xwskd = xwosplcb_skd_get_lc();
         pstk = xwskd->pstk;
-        stkbtn = (xwstk_t *)pstk->base;
+        stkbtn = pstk->guard_base;
         guard = pstk->guard;
         cm_get_psp(&psp);
 #  if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
@@ -394,7 +394,7 @@ struct xwospl_skd * arch_skd_chk_stk(void)
 
         xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
-        stkbtn = (xwstk_t *)cstk->base;
+        stkbtn = cstk->guard_base;
         guard = cstk->guard;
         cm_get_psp(&stk.value);
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)

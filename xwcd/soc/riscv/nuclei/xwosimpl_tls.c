@@ -63,6 +63,7 @@ void xwospl_tls_init(struct xwospl_skdobj_stack * stk)
         xwsz_t tls_size;
 
         tls_size = (xwsz_t)tbss_vma_end - (xwsz_t)tdata_vma_base;
-        stk->guard += XWBOP_ALIGN(tls_size, (xwsz_t)tls_align);
+        stk->guard_base = (xwstk_t *)((xwptr_t)stk->base +
+                                      XWBOP_ALIGN(tls_size, (xwsz_t)tls_align));
         soc_tls_relocate(stk->tls);
 }

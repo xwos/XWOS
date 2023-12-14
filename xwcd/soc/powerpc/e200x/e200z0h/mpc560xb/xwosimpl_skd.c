@@ -240,7 +240,7 @@ struct xwospl_skd * soc_skd_chk_swcx(void)
 
         xwskd = xwosplcb_skd_get_lc();
         pstk = xwskd->pstk;
-        stkbtn = (xwstk_t *)pstk->base;
+        stkbtn = pstk->guard_base;
         guard = pstk->guard;
         sp = (xwptr_t)soc_context.thd_sp;
         if ((sp - SOC_STKFRAME_SIZE) < ((xwptr_t)stkbtn + guard)) {
@@ -268,7 +268,7 @@ struct xwospl_skd * soc_skd_chk_stk(void)
 
         xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
-        stkbtn = (xwstk_t *)cstk->base;
+        stkbtn = cstk->guard_base;
         guard = cstk->guard;
         sp = (xwptr_t)soc_context.thd_sp;
         if ((sp - SOC_STKFRAME_SIZE) < ((xwptr_t)stkbtn + guard)) {

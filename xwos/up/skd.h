@@ -85,6 +85,7 @@ struct xwup_skdobj_stack {
         void * tls; /**< TLS变量区的基地址 */
         xwstk_t * base; /**< 栈基地址 */
         xwsz_t size; /**< 栈大小，单位：字节 */
+        xwstk_t * guard_base; /**< 栈内存警戒线的基地址 */
         xwsz_t guard; /**< 栈内存警戒线，单位：字节 */
         xwup_thd_f main; /**< 主函数 */
         void * arg; /**< 主函数的参数 */

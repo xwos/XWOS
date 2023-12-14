@@ -499,6 +499,7 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
 #else
 #  error "Unknown stack type!"
 #endif
+        thd->stack.guard_base = thd->stack.tls;
         thd->stack.guard = attr->stack_guard_size;
 
 #if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)

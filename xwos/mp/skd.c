@@ -484,6 +484,7 @@ void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
 #else
 #  error "Unknown stack type!"
 #endif
+        xwskd->idle.guard_base = xwskd->idle.tls;
         xwskd->idle.guard = (xwsz_t)XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->idle.flag = (xwsq_t)XWMP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->idle, xwmp_cthd_return);
@@ -554,6 +555,7 @@ void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
 #  else
 #    error "Unknown stack type!"
 #  endif
+        xwskd->bh.guard_base = xwskd->bh.tls;
         xwskd->bh.guard = (xwsz_t)XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->bh.flag = (xwsq_t)XWMP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->bh, xwmp_cthd_return);
