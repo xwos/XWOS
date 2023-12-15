@@ -166,6 +166,11 @@ struct xwds_uart_cfg {
 struct xwds_uartc;
 
 /**
+ * @brief 异步发送的回调函数类型
+ */
+typedef void (* xwds_uartc_eqcb_f)(struct xwds_uartc *, xwer_t);
+
+/**
  * @brief BSP中需要提供的UART控制器驱动函数表
  */
 struct xwds_uartc_driver {
@@ -175,11 +180,11 @@ struct xwds_uartc_driver {
         xwer_t (* tx)(struct xwds_uartc * /*uartc*/,
                       const xwu8_t * /*data*/, xwsz_t * /*size*/,
                       xwtm_t /*to*/); /**< 发送，并等待发送结果 */
+        xwer_t (* eq)(struct xwds_uartc * /*uartc*/,
+                      const xwu8_t * /*data*/, xwsz_t * /*size*/,
+                      xwds_uartc_eqcb_f /*cb*/); /**< 发送，但不等待发送结果 */
         xwer_t (* putc)(struct xwds_uartc * /*uartc*/,
                         const xwu8_t /*byte*/); /**< 发送一个字节 */
-        xwer_t (* eq)(struct xwds_uartc * /*uartc*/,
-                      const xwu8_t * /*data*/,
-                      xwsz_t * /*size*/); /**< 发送，但不等待发送结果 */
 };
 
 /**
@@ -255,7 +260,7 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc,
                          xwu8_t * buf, xwsz_t * size);
 
 /**
- * @brief XWDS API：配置UART的DMA通道发送数据
+ * @brief XWDS API：同步发送
  * @param[in] uartc: UART控制器对象指针
  * @param[in] data: 待发送的数据的缓冲区
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -281,12 +286,13 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                      xwtm_t to);
 
 /**
- * @brief XWDS API：将发送数据拷贝到UART的发送缓冲区，不等待发送结果
+ * @brief XWDS API：异步发送
  * @param[in] uartc: UART控制器对象指针
  * @param[in] data: 待发送的数据的缓冲区
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
  * + (O) 作为输出时，返回实际拷贝到缓冲区的数据大小
+ * @param[in] cb: 发送结束后的回调函数，可为 `NULL`
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -301,7 +307,8 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
  * + 如果发送数据超过缓冲区大小，返回时， `*size` 会返回实际拷贝到缓冲区的数据大小。
  */
 xwer_t xwds_uartc_eq(struct xwds_uartc * uartc,
-                     const xwu8_t * data, xwsz_t * size);
+                     const xwu8_t * data, xwsz_t * size,
+                     xwds_uartc_eqcb_f cb);
 
 /**
  * @brief XWDS API：直接发送一个字节（非DMA模式）
