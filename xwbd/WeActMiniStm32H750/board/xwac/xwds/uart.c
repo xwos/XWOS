@@ -50,6 +50,11 @@ xwer_t stm32xwds_usart1_drv_tx(struct xwds_uartc * uartc,
                                xwtm_t to);
 
 static
+xwer_t stm32xwds_usart1_drv_eq(struct xwds_uartc * uartc,
+                               const xwu8_t * data, xwsz_t * size,
+                               xwds_uartc_eqcb_f cb);
+
+static
 xwer_t stm32xwds_usart1_drv_putc(struct xwds_uartc * uartc,
                                  const xwu8_t byte);
 
@@ -67,6 +72,7 @@ const struct xwds_uartc_driver stm32xwds_usart1_drv = {
         },
         .cfg = stm32xwds_usart1_drv_cfg,
         .tx = stm32xwds_usart1_drv_tx,
+        .eq = stm32xwds_usart1_drv_eq,
         .putc = stm32xwds_usart1_drv_putc,
 };
 
@@ -154,13 +160,19 @@ xwer_t stm32xwds_usart1_drv_tx(struct xwds_uartc * uartc,
 
         wrsz = *size;
         drvdata = uartc->dev.data;
+
+        rc = xwos_sem_wait_to(&drvdata->tx.available, to);
+        if (rc < 0) {
+                goto err_sem_wait_to;
+        }
+
         MX_USART1_TXDMA_Prepare(data, wrsz);
         ulk.osal.splk = &drvdata->tx.splk;
         xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &cpuirq);
         drvdata->tx.rc = -EINPROGRESS;
         rc = MX_USART1_TXDMA_Start();
         if (XWOK == rc) {
-                rc = xwos_cond_wait_to(&drvdata->tx.cond,
+                rc = xwos_cond_wait_to(&drvdata->tx.completion,
                                        ulk, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
                 if (XWOK == rc) {
@@ -183,6 +195,42 @@ xwer_t stm32xwds_usart1_drv_tx(struct xwds_uartc * uartc,
         if (rc < 0) {
                 *size = (xwsz_t)0;
         }
+
+err_sem_wait_to:
+        return rc;
+}
+
+static
+xwer_t stm32xwds_usart1_drv_eq(struct xwds_uartc * uartc,
+                               const xwu8_t * data, xwsz_t * size,
+                               xwds_uartc_eqcb_f cb)
+{
+        struct MX_UART_DriverData * drvdata;
+        xwreg_t cpuirq;
+        xwsz_t wrsz;
+        xwer_t rc;
+
+        wrsz = *size;
+        drvdata = uartc->dev.data;
+
+        rc = xwos_sem_trywait(&drvdata->tx.available);
+        if (rc < 0) {
+                goto err_sem_trywait;
+        }
+
+        MX_USART1_TXDMA_Prepare(data, wrsz);
+        xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &cpuirq);
+        drvdata->tx.rc = -EINPROGRESS;
+        drvdata->tx.asyncb = cb;
+        rc = MX_USART1_TXDMA_Start();
+        if (rc < 0) {
+                drvdata->tx.asyncb = NULL;
+                drvdata->tx.rc = -ECANCELED;
+                *size = 0;
+        }
+        xwos_splk_unlock_cpuirqrs(&drvdata->tx.splk, cpuirq);
+
+err_sem_trywait:
         return rc;
 }
 
@@ -190,15 +238,22 @@ void stm32xwds_usart1_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
 {
         struct MX_UART_DriverData * drvdata;
         xwreg_t cpuirq;
+        xwds_uartc_eqcb_f cb = NULL;
 
         drvdata = uartc->dev.data;
         xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &cpuirq);
         if (-ECANCELED != drvdata->tx.rc) {
                 drvdata->tx.rc = dmarc;
+                cb = drvdata->tx.asyncb;
         } else {
         }
+        drvdata->tx.asyncb = NULL;
         xwos_splk_unlock_cpuirqrs(&drvdata->tx.splk, cpuirq);
-        xwos_cond_broadcast(&drvdata->tx.cond);
+        xwos_cond_broadcast(&drvdata->tx.completion);
+        if (NULL != cb) {
+                cb(uartc, dmarc);
+        }
+        xwos_sem_post(&drvdata->tx.available);
 }
 
 static
@@ -261,6 +316,11 @@ xwer_t stm32xwds_usart3_drv_tx(struct xwds_uartc * uartc,
                                xwtm_t to);
 
 static
+xwer_t stm32xwds_usart3_drv_eq(struct xwds_uartc * uartc,
+                               const xwu8_t * data, xwsz_t * size,
+                               xwds_uartc_eqcb_f cb);
+
+static
 xwer_t stm32xwds_usart3_drv_putc(struct xwds_uartc * uartc,
                                  const xwu8_t byte);
 
@@ -278,6 +338,7 @@ const struct xwds_uartc_driver stm32xwds_usart3_drv = {
         },
         .cfg = stm32xwds_usart3_drv_cfg,
         .tx = stm32xwds_usart3_drv_tx,
+        .eq = stm32xwds_usart3_drv_eq,
         .putc = stm32xwds_usart3_drv_putc,
 };
 
@@ -365,13 +426,19 @@ xwer_t stm32xwds_usart3_drv_tx(struct xwds_uartc * uartc,
 
         wrsz = *size;
         drvdata = uartc->dev.data;
+
+        rc = xwos_sem_wait_to(&drvdata->tx.available, to);
+        if (rc < 0) {
+                goto err_sem_wait_to;
+        }
+
         MX_USART3_TXDMA_Prepare(data, wrsz);
         ulk.osal.splk = &drvdata->tx.splk;
         xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &cpuirq);
         drvdata->tx.rc = -EINPROGRESS;
         rc = MX_USART3_TXDMA_Start();
         if (XWOK == rc) {
-                rc = xwos_cond_wait_to(&drvdata->tx.cond,
+                rc = xwos_cond_wait_to(&drvdata->tx.completion,
                                        ulk, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
                 if (XWOK == rc) {
@@ -394,6 +461,42 @@ xwer_t stm32xwds_usart3_drv_tx(struct xwds_uartc * uartc,
         if (rc < 0) {
                 *size = 0;
         }
+
+err_sem_wait_to:
+        return rc;
+}
+
+static
+xwer_t stm32xwds_usart3_drv_eq(struct xwds_uartc * uartc,
+                               const xwu8_t * data, xwsz_t * size,
+                               xwds_uartc_eqcb_f cb)
+{
+        struct MX_UART_DriverData * drvdata;
+        xwreg_t cpuirq;
+        xwsz_t wrsz;
+        xwer_t rc;
+
+        wrsz = *size;
+        drvdata = uartc->dev.data;
+
+        rc = xwos_sem_trywait(&drvdata->tx.available);
+        if (rc < 0) {
+                goto err_sem_trywait;
+        }
+
+        MX_USART3_TXDMA_Prepare(data, wrsz);
+        xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &cpuirq);
+        drvdata->tx.rc = -EINPROGRESS;
+        drvdata->tx.asyncb = cb;
+        rc = MX_USART3_TXDMA_Start();
+        if (rc < 0) {
+                drvdata->tx.asyncb = NULL;
+                drvdata->tx.rc = -ECANCELED;
+                *size = 0;
+        }
+        xwos_splk_unlock_cpuirqrs(&drvdata->tx.splk, cpuirq);
+
+err_sem_trywait:
         return rc;
 }
 
@@ -401,15 +504,22 @@ void stm32xwds_usart3_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
 {
         struct MX_UART_DriverData * drvdata;
         xwreg_t cpuirq;
+        xwds_uartc_eqcb_f cb = NULL;
 
         drvdata = uartc->dev.data;
         xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &cpuirq);
         if (-ECANCELED != drvdata->tx.rc) {
                 drvdata->tx.rc = dmarc;
+                cb = drvdata->tx.asyncb;
         } else {
         }
+        drvdata->tx.asyncb = NULL;
         xwos_splk_unlock_cpuirqrs(&drvdata->tx.splk, cpuirq);
-        xwos_cond_broadcast(&drvdata->tx.cond);
+        xwos_cond_broadcast(&drvdata->tx.completion);
+        if (NULL != cb) {
+                cb(uartc, dmarc);
+        }
+        xwos_sem_post(&drvdata->tx.available);
 }
 
 static

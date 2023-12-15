@@ -206,9 +206,11 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
   /* USER CODE BEGIN USART1_MspInit 1 */
     huart1_drvdata.halhdl = &huart1;
     xwos_splk_init(&huart1_drvdata.tx.splk);
-    xwos_cond_init(&huart1_drvdata.tx.cond);
+    xwos_sem_init(&huart1_drvdata.tx.available, 1, 1);
+    xwos_cond_init(&huart1_drvdata.tx.completion);
     huart1_drvdata.tx.rc = -ECANCELED;
     huart1_drvdata.tx.size = 0;
+    huart1_drvdata.tx.asyncb = NULL;
   /* USER CODE END USART1_MspInit 1 */
   }
   else if(uartHandle->Instance==USART3)
@@ -284,9 +286,11 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
   /* USER CODE BEGIN USART3_MspInit 1 */
     huart3_drvdata.halhdl = &huart3;
     xwos_splk_init(&huart3_drvdata.tx.splk);
-    xwos_cond_init(&huart3_drvdata.tx.cond);
+    xwos_sem_init(&huart3_drvdata.tx.available, 1, 1);
+    xwos_cond_init(&huart3_drvdata.tx.completion);
     huart3_drvdata.tx.rc = -ECANCELED;
     huart3_drvdata.tx.size = 0;
+    huart3_drvdata.tx.asyncb = NULL;
   /* USER CODE END USART3_MspInit 1 */
   }
 }
@@ -297,7 +301,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   if(uartHandle->Instance==USART1)
   {
   /* USER CODE BEGIN USART1_MspDeInit 0 */
-    xwos_cond_fini(&huart1_drvdata.tx.cond);
+    xwos_cond_fini(&huart1_drvdata.tx.completion);
+    xwos_sem_fini(&huart1_drvdata.tx.available);
   /* USER CODE END USART1_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_USART1_CLK_DISABLE();
@@ -321,7 +326,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   else if(uartHandle->Instance==USART3)
   {
   /* USER CODE BEGIN USART3_MspDeInit 0 */
-    xwos_cond_fini(&huart3_drvdata.tx.cond);
+    xwos_cond_fini(&huart3_drvdata.tx.completion);
+    xwos_sem_fini(&huart3_drvdata.tx.available);
   /* USER CODE END USART3_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_USART3_CLK_DISABLE();
