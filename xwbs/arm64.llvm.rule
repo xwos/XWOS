@@ -1,0 +1,202 @@
+#! /bin/make -f
+# @file
+# @brief Makefile规则：armllvm
+# @author
+# + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+# @copyright
+# + Copyright © 2015 xwos.tech, All Rights Reserved.
+# > Licensed under the Apache License, Version 2.0 (the "License");
+# > you may not use this file except in compliance with the License.
+# > You may obtain a copy of the License at
+# >
+# >         http://www.apache.org/licenses/LICENSE-2.0
+# >
+# > Unless required by applicable law or agreed to in writing, software
+# > distributed under the License is distributed on an "AS IS" BASIS,
+# > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# > See the License for the specific language governing permissions and
+# > limitations under the License.
+#
+
+TARGET ?= XWOS
+XWTC ?= $(shell xwtcwd)
+XWTC := $(subst \,/,$(XWTC))
+export XWTC
+ARMTOOLS ?= $(XWTC)/arm
+SYSROOT ?= $(ARMTOOLS)/lib/clang-runtimes/aarch64-none-elf/$(SYSROOT_llvm)
+CC := $(ARMTOOLS)/bin/clang
+CXX := $(ARMTOOLS)/bin/clang++
+AS := $(CC) -x assembler-with-cpp
+OBJCOPY := $(ARMTOOLS)/bin/aarch64-none-elf-objcopy
+OD := $(ARMTOOLS)/bin/llvm-objdump
+AR := $(ARMTOOLS)/bin/llvm-ar
+LD := $(CC)
+SIZE := $(ARMTOOLS)/bin/llvm-size
+LUA2HEX := python3 xwbs/util/py/lua2hex.py
+CP := cp -ap
+RM := -rm
+MSG := echo -e
+
+ARCH_INCDIRS += $(ARCH_INCDIRS_llvm)
+ARCH_AFLAGS += $(ARCH_AFLAGS_llvm)
+ARCH_CFLAGS += $(ARCH_CFLAGS_llvm)
+ARCH_CXXFLAGS += $(ARCH_CXXFLAGS_llvm)
+ARCH_LDFLAGS += $(ARCH_LDFLAGS_llvm)
+ARCH_ASRCS += $(ARCH_ASRCS_llvm)
+ARCH_CSRCS += $(ARCH_CSRCS_llvm)
+ARCH_CXXSRCS += $(ARCH_CXXSRCS_llvm)
+ARCH_EOBJS += $(ARCH_EOBJS_llvm)
+
+CPU_INCDIRS += $(CPU_INCDIRS_llvm)
+CPU_AFLAGS += $(CPU_AFLAGS_llvm)
+CPU_CFLAGS += $(CPU_CFLAGS_llvm)
+CPU_CXXFLAGS += $(CPU_CXXFLAGS_llvm)
+CPU_LDFLAGS += $(CPU_LDFLAGS_llvm)
+CPU_ASRCS += $(CPU_ASRCS_llvm)
+CPU_CSRCS += $(CPU_CSRCS_llvm)
+CPU_CXXSRCS += $(CPU_CXXSRCS_llvm)
+CPU_EOBJS += $(CPU_EOBJS_llvm)
+
+SOC_INCDIRS += $(SOC_INCDIRS_llvm)
+SOC_AFLAGS += $(SOC_AFLAGS_llvm)
+SOC_CFLAGS += $(SOC_CFLAGS_llvm)
+SOC_CXXFLAGS += $(SOC_CXXFLAGS_llvm)
+SOC_LDFLAGS += $(SOC_LDFLAGS_llvm)
+SOC_ASRCS += $(SOC_ASRCS_llvm)
+SOC_CSRCS += $(SOC_CSRCS_llvm)
+SOC_CXXSRCS += $(SOC_CXXSRCS_llvm)
+SOC_EOBJS += $(SOC_EOBJS_llvm)
+
+BRD_INCDIRS += $(BRD_INCDIRS_llvm)
+BRD_AFLAGS += $(BRD_AFLAGS_llvm)
+BRD_CFLAGS += $(BRD_CFLAGS_llvm)
+BRD_CXXFLAGS += $(BRD_CXXFLAGS_llvm)
+BRD_LDFLAGS += $(BRD_LDFLAGS_llvm)
+BRD_ASRCS += $(BRD_ASRCS_llvm)
+BRD_CSRCS += $(BRD_CSRCS_llvm)
+BRD_CXXSRCS += $(BRD_CXXSRCS_llvm)
+BRD_EOBJS += $(BRD_EOBJS_llvm)
+
+EINCDIRS += $(EINCDIRS_llvm)
+ELIBS += $(ELIBS_llvm)
+
+ifeq ($(ARCHCFG_LITTLE_ENDIAN),y)
+  ENDIAN := little-endian
+else
+  ENDIAN := big-endian
+endif
+D ?= 1
+WARN := -Wall -Wextra -Werror -Wundef -Wsign-conversion
+WARN += -Wno-incompatible-pointer-types -Wno-error=unused-parameter
+INCDIRS = -I. \
+          -I$(XWOS_ARCH_DIR) \
+          -I$(XWOS_CPU_DIR) \
+          -I$(XWOS_SOC_DIR) \
+          -I$(XWOS_BRD_DIR)
+
+PERDEF = -D__XWOS__
+
+AFLAGS = -m$(ENDIAN) -nostdinc -nostdlib \
+         -mstrict-align \
+         -ffunction-sections -fdata-sections -ftls-model=local-exec \
+         -g -g3 -gdwarf-4 \
+         $(WARN) $(PERDEF)
+
+CFLAGS = -std=gnu18 --sysroot=$(SYSROOT) -m$(ENDIAN) \
+         -mstrict-align \
+         -ffunction-sections -fdata-sections -ftls-model=local-exec \
+         -g -g3 -gdwarf-4 -fverbose-asm \
+         $(WARN) $(PERDEF)
+
+CXXFLAGS = -std=gnu++17 --sysroot=$(SYSROOT) -m$(ENDIAN) \
+           -mstrict-align \
+           -ffunction-sections -fdata-sections -ftls-model=local-exec \
+           -g -g3 -gdwarf-4 -fverbose-asm \
+           $(WARN) $(PERDEF)
+
+MMFLAGS = -MM -MP
+
+ifeq ($(O),)
+  ifeq ($(D),0)
+    O := 1
+  else
+    O := g
+  endif
+endif
+
+CFLAGS += -O$(O)
+CXXFLAGS += -O$(O)
+
+LDFLAGS = -m$(ENDIAN) --sysroot=$(SYSROOT) -nostdlib \
+          -L$(XWOS_SOC_DIR) -T$(XWOS_BRD_DIR)/$(XWCFG_LDSCRIPT) \
+          -Wl,--allow-multiple-definition -Wl,--gc-sections -Wl,-z,norelro \
+          -Wl,-Map=$(XWOS_WKSPC_DIR)/$(TARGET).map,--cref
+
+# colorfully build
+SHOW_CPP =
+SHOW_CC =
+SHOW_CXX =
+SHOW_APP =
+SHOW_AS =
+SHOW_OD =
+SHOW_OBJCOPY =
+SHOW_MM =
+SHOW_AR =
+SHOW_LD =
+SHOW_SIZE =
+SHOW_LUA2HEX =
+SHOW_CP =
+
+ifeq ($(XWCFG_HOSTOS),gnu/linux)
+  ifneq ($(V),1)
+    SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+    SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+    SHOW_CXX = @$(MSG) "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+    SHOW_APP = @$(MSG) "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+    SHOW_AS = @$(MSG) "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+    SHOW_OD = @$(MSG) "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+    SHOW_OBJCOPY = @$(MSG) "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
+    SHOW_MM = @$(MSG) "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+    SHOW_AR = @$(MSG) "\e[1m\e[42;38m[ar] "$@" \e[0m";
+    SHOW_LD = @$(MSG) "\e[1m\e[47;34m[ld] "$@" \e[0m";
+    SHOW_SIZE = @$(MSG) "\e[1m\e[47;34m[size] "$@" \e[0m";
+    SHOW_LUA2HEX = @$(MSG) "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @$(MSG) "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
+  endif
+endif
+
+ifeq ($(XWCFG_HOSTOS),darwin)
+  ifneq ($(V),1)
+    SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+    SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+    SHOW_CXX = @$(MSG) "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+    SHOW_APP = @$(MSG) "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+    SHOW_AS = @$(MSG) "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+    SHOW_OD = @$(MSG) "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+    SHOW_OBJCOPY = @$(MSG) "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
+    SHOW_MM = @$(MSG) "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+    SHOW_AR = @$(MSG) "\e[1m\e[42;38m[ar] "$@" \e[0m";
+    SHOW_LD = @$(MSG) "\e[1m\e[47;34m[ld] "$@" \e[0m";
+    SHOW_SIZE = @$(MSG) "\e[1m\e[47;34m[size] "$@" \e[0m";
+    SHOW_LUA2HEX = @$(MSG) "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @$(MSG) "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
+  endif
+endif
+
+ifeq ($(XWCFG_HOSTOS),windows-nt)
+  ifneq ($(V),1)
+    SHOW_CPP = @$(MSG) "[cc -E] "$<" -> "$@;
+    SHOW_CC = @$(MSG) "[cc] "$<" -> "$@;
+    SHOW_CXX = @$(MSG) "[c++] "$<" -> "$@;
+    SHOW_APP = @$(MSG) "[as -E] "$<" -> "$@;
+    SHOW_AS = @$(MSG) "[as] "$<" -> "$@;
+    SHOW_OD = @$(MSG) "[od] "$<" -> "$@;
+    SHOW_OBJCOPY = @$(MSG) "[objcopy] "$<" -> "$@;
+    SHOW_MM = @$(MSG) "[mm] "$<" -> "$@;
+    SHOW_AR = @$(MSG) "[ar] "$@;
+    SHOW_LD = @$(MSG) "[ld] "$@;
+    SHOW_SIZE = @$(MSG) "[size] "$@;
+    SHOW_LUA2HEX = @$(MSG) "[lua2hex] "$@;
+    SHOW_CP = @$(MSG) "[cp] "$@;
+  endif
+endif
