@@ -50,10 +50,10 @@ xwer_t xwospl_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
                 ".syntax        unified");
         armv7m_dsb();
         armv7m_isb();
-        arch_cpuirq_enable_lc();
         __asm__ volatile(
-                "      svc      9\n"
-                "      bx       lr\n");
+                "       cpsie   i\n"
+                "       svc     9\n"
+                "       bx      lr\n");
 }
 
 __xwbsp_code __xwcc_naked
