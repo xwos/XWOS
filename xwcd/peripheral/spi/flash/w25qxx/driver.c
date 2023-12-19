@@ -73,30 +73,6 @@ xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev)
 
 /******** ******** ******** APIs ******** ******** ********/
 __xwbsp_api
-xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t to)
-{
-        xwer_t rc;
-
-        XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-
-        rc = xwds_w25qxx_grab(w25qxx);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_w25qxx_grab;
-        }
-        rc = xwds_spim_buscfg(w25qxx->spip.bus, w25qxx->spip.buscfgid, to);
-        if (rc < 0) {
-                goto err_spim_buscfg;
-        }
-        xwds_w25qxx_put(w25qxx);
-        return XWOK;
-
-err_spim_buscfg:
-        xwds_w25qxx_put(w25qxx);
-err_w25qxx_grab:
-        return rc;
-}
-
-__xwbsp_api
 xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                         xwu8_t instruction,
                         xwu8_t address_size, xwu32_t address,

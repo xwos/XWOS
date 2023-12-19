@@ -69,18 +69,6 @@ xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev);
 
 /******** ******** ******** APIs ******** ******** ********/
 /**
- * @brief W25QXX API：配置SPI总线满足W25QXX的时序
- * @param[in] w25qxx: W25QXX对象指针
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @note
- * + 上下文：线程
- * @details
- * 时序由 `w25qxx->spip.buscfgid` 定义。
- */
-xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t to);
-
-/**
  * @brief W25QXX API：向W25QXX发送指令
  * @param[in] w25qxx: W25QXX对象指针
  * @param[in] instruction: 指令

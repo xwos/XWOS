@@ -280,30 +280,6 @@ xwer_t xwds_st7735_drv_suspend(struct xwds_device * dev)
 
 /******** ******** ******** APIs ******** ******** ********/
 __xwbsp_api
-xwer_t xwds_st7735_cfgbus(struct xwds_st7735 * st7735, xwtm_t to)
-{
-        xwer_t rc;
-
-        XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-
-        rc = xwds_st7735_grab(st7735);
-        if (rc < 0) {
-                goto err_st7735_grab;
-        }
-        rc = xwds_spim_buscfg(st7735->spip.bus, st7735->spip.buscfgid, to);
-        if (rc < 0) {
-                goto err_spim_buscfg;
-        }
-        xwds_st7735_put(st7735);
-        return XWOK;
-
-err_spim_buscfg:
-        xwds_st7735_put(st7735);
-err_st7735_grab:
-        return rc;
-}
-
-__xwbsp_api
 xwer_t xwds_st7735_read_id(struct xwds_st7735 * st7735, xwu32_t * id, xwtm_t to)
 {
         xwer_t rc;

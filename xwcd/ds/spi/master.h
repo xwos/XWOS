@@ -44,10 +44,7 @@ struct xwds_spim;
  */
 struct xwds_spim_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
-        xwer_t (* buscfg)(struct xwds_spim * /*spim*/,
-                          xwid_t /*cfgid*/,
-                          xwtm_t /*to*/); /**< 配置总线参数 */
-        xwer_t (* xfer)(struct xwds_spim * /*spim*/,
+        xwer_t (* xfer)(struct xwds_spim * /*spim*/, xwid_t /*cfgid*/,
                         const xwu8_t[] /*txd*/, xwu8_t * /*rxb*/,
                         xwsz_t * /*size*/, xwtm_t /*to*/); /**< 传输消息 */
         xwer_t (* abort)(struct xwds_spim * /*spim*/,
@@ -95,28 +92,9 @@ xwer_t xwds_spim_grab(struct xwds_spim * spim);
 xwer_t xwds_spim_put(struct xwds_spim * spim);
 
 /**
- * @brief XWDS API：配置总线
- * @param[in] spim: SPI主机模式控制器对象指针
- * @param[in] cfgid: 总线配置ID
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ENOSYS: 不支持配置总线操作
- * @retval -ECHRNG: 配置ID不在配置表范围内
- * @retval -EFAULT: 无效指针
- * @note
- * + 上下文：线程
- * @details
- * `to` 表示等待超时的时间点：
- * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
- *   可以使用 `xwtm_ft(delta)` 表示；
- * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
-xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to);
-
-/**
  * @brief XWDS API：启动SPI总线传输
  * @param[in] spim: SPI主机模式控制器对象指针
+ * @param[in] cfgid: SPI总线配置的ID
  * @param[in] txd: 发送数据缓冲区，可为NULL表示不发送数据
  * @param[out] rxb: 接收数据缓冲区，可为NULL表示不接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -126,9 +104,11 @@ xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to);
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
+ * @retval -ECHRNG: 配置ID不在配置表范围内
  * @retval -EINVAL: 参数错误
  * @retval -EBUSY: 总线繁忙
  * @retval -EIO: 传输错误
+ * @retval -ECANCELED: 传输被取消
  * @retval -ETIMEDOUT: 超时
  * @note
  * + 上下文：线程
@@ -138,7 +118,7 @@ xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to);
  *   可以使用 `xwtm_ft(delta)` 表示；
  * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
-xwer_t xwds_spim_xfer(struct xwds_spim * spim,
+xwer_t xwds_spim_xfer(struct xwds_spim * spim, xwid_t cfgid,
                       const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size,
                       xwtm_t to);
 

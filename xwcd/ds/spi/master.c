@@ -190,57 +190,9 @@ xwer_t xwds_spim_vop_resume(struct xwds_spim * spim)
 }
 #endif
 
-/******** ******** ******** SPI Master Device APIs ******** ******** ********/
+/******** ******** ******** SPI Master mode APIs ******** ******** ********/
 __xwds_api
-xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to)
-{
-        const struct xwds_spim_driver * drv;
-        xwer_t rc;
-
-        XWDS_VALIDATE(spim, "nullptr", -EFAULT);
-
-        rc = xwds_spim_grab(spim);
-        if (rc < 0) {
-                goto err_spim_grab;
-        }
-        if (NULL == spim->buscfg) {
-                rc = -ENOSYS;
-                goto err_nosys;
-        }
-        if (cfgid >= spim->buscfg_num) {
-                rc = -ECHRNG;
-                goto err_chrng;
-        }
-
-        rc = xwos_mtx_lock_to(&spim->xfer.apimtx, to);
-        if (rc < 0) {
-                goto err_spim_lock;
-        }
-        drv = xwds_cast(const struct xwds_spim_driver *, spim->dev.drv);
-        if ((drv) && (drv->buscfg)) {
-                rc = drv->buscfg(spim, cfgid, to);
-        } else {
-                rc = -ENOSYS;
-        }
-        if (rc < 0) {
-                goto err_drv_buscfg;
-        }
-        xwos_mtx_unlock(&spim->xfer.apimtx);
-        xwds_spim_put(spim);
-        return XWOK;
-
-err_drv_buscfg:
-        xwos_mtx_unlock(&spim->xfer.apimtx);
-err_spim_lock:
-err_chrng:
-err_nosys:
-        xwds_spim_put(spim);
-err_spim_grab:
-        return rc;
-}
-
-__xwds_api
-xwer_t xwds_spim_xfer(struct xwds_spim * spim,
+xwer_t xwds_spim_xfer(struct xwds_spim * spim, xwid_t cfgid,
                       const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size,
                       xwtm_t to)
 {
@@ -255,13 +207,17 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
         if (rc < 0) {
                 goto err_spim_grab;
         }
+        if (cfgid >= spim->buscfg_num) {
+                rc = -ECHRNG;
+                goto err_chrng;
+        }
         rc = xwos_mtx_lock_to(&spim->xfer.apimtx, to);
         if (rc < 0) {
                 goto err_spim_lock;
         }
         drv = xwds_cast(const struct xwds_spim_driver *, spim->dev.drv);
         if ((drv) && (drv->xfer)) {
-                rc = drv->xfer(spim, txd, rxb, size, to);
+                rc = drv->xfer(spim, cfgid, txd, rxb, size, to);
         } else {
                 rc = -ENOSYS;
         }
@@ -275,6 +231,7 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
 err_drv_xfer:
         xwos_mtx_unlock(&spim->xfer.apimtx);
 err_spim_lock:
+err_chrng:
         xwds_spim_put(spim);
 err_spim_grab:
         return rc;

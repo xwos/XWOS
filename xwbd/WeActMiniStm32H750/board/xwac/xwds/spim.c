@@ -40,12 +40,7 @@ xwer_t stm32xwds_spi1m_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32xwds_spi1m_drv_buscfg(struct xwds_spim * spim,
-                                  xwid_t cfgid,
-                                  xwtm_t to);
-
-static
-xwer_t stm32xwds_spi1m_drv_xfer(struct xwds_spim * spim,
+xwer_t stm32xwds_spi1m_drv_xfer(struct xwds_spim * spim, xwid_t cfgid,
                                 const xwu8_t txd[], xwu8_t * rxb,
                                 xwsz_t * size, xwtm_t to);
 
@@ -61,7 +56,6 @@ const struct xwds_spim_driver stm32xwds_spi1m_drv = {
                 .resume =  stm32xwds_spi1m_drv_resume,
 #endif
         },
-        .buscfg = stm32xwds_spi1m_drv_buscfg,
         .xfer = stm32xwds_spi1m_drv_xfer,
 };
 
@@ -75,7 +69,7 @@ struct xwds_spim stm32xwds_spi1m = {
                 .data = (void *)&hspi1_drvdata,
         },
         .buscfg = NULL,
-        .buscfg_num = 0,
+        .buscfg_num = 1,
 };
 
 static
@@ -115,28 +109,7 @@ xwer_t stm32xwds_spi1m_drv_suspend(struct xwds_device * dev)
 #endif
 
 static
-xwer_t stm32xwds_spi1m_drv_buscfg(struct xwds_spim * spim,
-                                  xwid_t cfgid,
-                                  xwtm_t to)
-{
-        const SPI_InitTypeDef ** buscfg;
-        const SPI_InitTypeDef * cfg;
-        xwer_t rc;
-
-        XWOS_UNUSED(to);
-
-        buscfg = spim->buscfg;
-        if (buscfg) {
-                cfg = buscfg[cfgid];
-                rc = MX_SPI1_ReInit(cfg);
-        } else {
-                rc = -ENOSYS;
-        }
-        return rc;
-}
-
-static
-xwer_t stm32xwds_spi1m_drv_xfer(struct xwds_spim * spim,
+xwer_t stm32xwds_spi1m_drv_xfer(struct xwds_spim * spim, xwid_t cfgid,
                                 const xwu8_t txd[], xwu8_t * rxb,
                                 xwsz_t * size, xwtm_t to)
 {
@@ -146,6 +119,7 @@ xwer_t stm32xwds_spi1m_drv_xfer(struct xwds_spim * spim,
         xwsq_t lkst;
         xwer_t rc;
 
+        XWOS_UNUSED(cfgid);
         drvdata = spim->dev.data;
         ulk.osal.splk = &drvdata->splk;
         xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
@@ -205,12 +179,7 @@ xwer_t stm32xwds_spi4m_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32xwds_spi4m_drv_buscfg(struct xwds_spim * spim,
-                                  xwid_t cfgid,
-                                  xwtm_t to);
-
-static
-xwer_t stm32xwds_spi4m_drv_xfer(struct xwds_spim * spim,
+xwer_t stm32xwds_spi4m_drv_xfer(struct xwds_spim * spim, xwid_t cfgid,
                                 const xwu8_t txd[], xwu8_t * rxb,
                                 xwsz_t * size, xwtm_t to);
 
@@ -226,7 +195,6 @@ const struct xwds_spim_driver stm32xwds_spi4m_drv = {
                 .resume =  stm32xwds_spi4m_drv_resume,
 #endif
         },
-        .buscfg = stm32xwds_spi4m_drv_buscfg,
         .xfer = stm32xwds_spi4m_drv_xfer,
 };
 
@@ -240,7 +208,7 @@ struct xwds_spim stm32xwds_spi4m = {
                 .data = (void *)&hspi4_drvdata,
         },
         .buscfg = NULL,
-        .buscfg_num = 0,
+        .buscfg_num = 1,
 };
 
 static
@@ -280,28 +248,7 @@ xwer_t stm32xwds_spi4m_drv_suspend(struct xwds_device * dev)
 #endif
 
 static
-xwer_t stm32xwds_spi4m_drv_buscfg(struct xwds_spim * spim,
-                                  xwid_t cfgid,
-                                  xwtm_t to)
-{
-        const SPI_InitTypeDef ** buscfg;
-        const SPI_InitTypeDef * cfg;
-        xwer_t rc;
-
-        XWOS_UNUSED(to);
-
-        buscfg = spim->buscfg;
-        if (buscfg) {
-                cfg = buscfg[cfgid];
-                rc = MX_SPI4_ReInit(cfg);
-        } else {
-                rc = -ENOSYS;
-        }
-        return rc;
-}
-
-static
-xwer_t stm32xwds_spi4m_drv_xfer(struct xwds_spim * spim,
+xwer_t stm32xwds_spi4m_drv_xfer(struct xwds_spim * spim, xwid_t cfgid,
                                 const xwu8_t txd[], xwu8_t * rxb,
                                 xwsz_t * size, xwtm_t to)
 {
@@ -311,6 +258,7 @@ xwer_t stm32xwds_spi4m_drv_xfer(struct xwds_spim * spim,
         xwsq_t lkst;
         xwer_t rc;
 
+        XWOS_UNUSED(cfgid);
         drvdata = spim->dev.data;
         ulk.osal.splk = &drvdata->splk;
         xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);

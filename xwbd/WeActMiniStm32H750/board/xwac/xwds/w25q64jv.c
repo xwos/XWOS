@@ -146,7 +146,7 @@ xwer_t stm32xwds_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
         pos = 0;
         while (pos < xfsz) {
                 rest = xfsz - pos;
-                rc = xwds_spim_xfer(w25qxx->spip.bus,
+                rc = xwds_spim_xfer(w25qxx->spip.bus, w25qxx->spip.buscfgid,
                                     &txq[pos], &rxq[pos], &rest,
                                     to);
                 if (rc < 0) {

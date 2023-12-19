@@ -31,6 +31,8 @@ XWLUA模块：SPI主机模式控制器
 
 @tparam userdata spim (**in**) C代码中注册的SPI主机模式控制器控制器
 
+@tparam number cfgid (**in**) 总线配置ID
+
 @tparam string txd (**in**) 待发送的数据
 
 @tparam boolean rx (**in**) 是否接收数据
@@ -52,18 +54,18 @@ XWLUA模块：SPI主机模式控制器
 @usage
 -- 打包{88, 87, 79, 83}
 txd = string.pack("BBBB", 88, 87, 79, 83)
--- 发送数据，返回接收到的数据，期望等待时间2s
-rc, size, rxd = spim1:xfer(spi1m, txd, true, #txd, xwtm.ft(xwtm.s(2)))
+-- 设置总线参数为配置0，发送数据，返回接收到的数据，期望等待时间2s
+rc, size, rxd = spim1:xfer(spi1m, 0, txd, true, #txd, xwtm.ft(xwtm.s(2)))
 
 @usage
 -- 打包{88, 87, 79, 83}
 txd = string.pack("BBBB", 88, 87, 79, 83)
--- 发送数据，不接收数据，期望等待时间2s
-rc, size = spim1:xfer(spi1m, txd, false, #txd, xwtm.ft(xwtm.s(2)))
+-- 设置总线参数为配置0，发送数据，不接收数据，期望等待时间2s
+rc, size = spim1:xfer(spi1m, 0, txd, false, #txd, xwtm.ft(xwtm.s(2)))
 
 @usage
--- 不发送数据，接收数据，接收缓冲区8字节，期望等待时间2s
-rc, size, rxd = spim1:xfer(spi1m, nil, true, 8, xwtm.ft(xwtm.s(2)))
+-- 设置总线参数为配置0，不发送数据，接收数据，接收缓冲区8字节，期望等待时间2s
+rc, size, rxd = spim1:xfer(spi1m, 0, nil, true, 8, xwtm.ft(xwtm.s(2)))
 ]]
 function xfer(spim, txd, rx, size, time)
 end

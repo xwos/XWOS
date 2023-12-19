@@ -56,6 +56,7 @@ int xwlua_spim_xfer(lua_State * L)
         int top;
         struct xwlua_spim * luaspim;
         int txdtype;
+        xwid_t cfgid;
         const xwu8_t * txd;
         int isrx;
         luaL_Buffer b;
@@ -67,26 +68,27 @@ int xwlua_spim_xfer(lua_State * L)
 
         top = lua_gettop(L);
         luaspim = (struct xwlua_spim *)luaL_checkudata(L, 1, "xwlua_spim");
-        txdtype =  lua_type(L, 2);
+        cfgid = (xwid_t)luaL_checkinteger(L, 2);
+        txdtype =  lua_type(L, 3);
         if (LUA_TSTRING == txdtype) {
-                txd = (xwu8_t *)luaL_checkstring(L, 2);
+                txd = (xwu8_t *)luaL_checkstring(L, 3);
         } else {
                 txd = NULL;
         }
-        isrx = lua_toboolean(L, 3);
-        size = (xwsz_t)luaL_checkinteger(L, 4);
+        isrx = lua_toboolean(L, 4);
+        size = (xwsz_t)luaL_checkinteger(L, 5);
         if (isrx) {
                 luaL_buffinit(L, &b);
                 rxb = (xwu8_t *)luaL_prepbuffsize(&b, size);
         } else {
                 rxb = NULL;
         }
-        if (top >= 5) {
-                time = (xwtm_t)luaL_checknumber(L, 5);
+        if (top >= 6) {
+                time = (xwtm_t)luaL_checknumber(L, 6);
         } else {
                 time = XWTM_MAX;
         }
-        rc = xwds_spim_xfer(luaspim->spim, txd, rxb, &size, time);
+        rc = xwds_spim_xfer(luaspim->spim, cfgid, txd, rxb, &size, time);
         if (isrx) {
                 luaL_addsize(&b, size);
         }
