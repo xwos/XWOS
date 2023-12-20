@@ -54,7 +54,7 @@ struct MX_UART_DriverData {
     xwer_t rc; /**< 返回值 */
     xwu8_t mem[HAL_UART_TXMEM_MAXSIZE] __xwcc_alignl1cache; /**< 发送缓冲区 */
     xwu32_t size; /**< 待发送的数据大小 */
-    xwds_uartc_eqcb_f asyncb; /**< 异步发送的回调函数 */
+    xwds_uartc_eqcb_f eqcb; /**< 异步发送的回调函数 */
   } tx;
 };
 
@@ -67,28 +67,17 @@ void MX_USART1_UART_Init(void);
 void MX_USART3_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void MX_USART1_UART_DeInit(void);
-void MX_USART1_Timer_Init(void);
-void MX_USART1_Timer_DeInit(void);
-void MX_USART1_Timer_Start(void);
-void MX_USART1_Timer_Stop(void);
-xwer_t MX_USART1_RXDMA_Start(xwu8_t * mem, xwsz_t size);
-xwsq_t MX_USART1_RXDMA_GetCounter(void);
-void MX_USART1_TXDMA_Prepare(const xwu8_t * mem, xwsz_t size);
-xwer_t MX_USART1_TXDMA_Start(void);
-xwer_t MX_USART1_Putc(xwu8_t byte);
-
-void MX_USART3_UART_DeInit(void);
-void MX_USART3_Timer_Init(void);
-void MX_USART3_Timer_DeInit(void);
-void MX_USART3_Timer_Start(void);
-void MX_USART3_Timer_Stop(void);
-xwer_t MX_USART3_RXDMA_Start(xwu8_t * mem, xwsz_t size);
-xwsq_t MX_USART3_RXDMA_GetCounter(void);
-void MX_USART3_TXDMA_Prepare(const xwu8_t * mem, xwsz_t size);
-xwer_t MX_USART3_TXDMA_Start(void);
-xwer_t MX_USART3_Putc(xwu8_t byte);
-
+void MX_USART_UART_Init(xwu32_t hwid);
+void MX_USART_UART_DeInit(xwu32_t hwid);
+void MX_USART_Timer_Init(xwu32_t hwid);
+void MX_USART_Timer_DeInit(xwu32_t hwid);
+void MX_USART_Timer_Start(xwu32_t hwid);
+void MX_USART_Timer_Stop(xwu32_t hwid);
+xwer_t MX_USART_RXDMA_Start(xwu32_t hwid, xwu8_t * mem, xwsz_t size);
+xwsq_t MX_USART_RXDMA_GetCounter(xwu32_t hwid);
+void MX_USART_TXDMA_Prepare(xwu32_t hwid, const xwu8_t * mem, xwsz_t size);
+xwer_t MX_USART_TXDMA_Start(xwu32_t hwid);
+xwer_t MX_USART_Putc(xwu32_t hwid, xwu8_t byte);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

@@ -27,8 +27,13 @@
 #include <xwos/lib/xwbop.h>
 #include "board/xwac/xwds/uart.h"
 
-struct MX_UART_DriverData huart1_drvdata;
-struct MX_UART_DriverData huart3_drvdata;
+struct MX_UART_DriverData huart1_drvdata = {
+        .halhdl = &huart1,
+};
+
+struct MX_UART_DriverData huart3_drvdata = {
+        .halhdl = &huart3,
+};
 
 /* USER CODE END 0 */
 
@@ -204,13 +209,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     HAL_NVIC_SetPriority(USART1_IRQn, 6, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
   /* USER CODE BEGIN USART1_MspInit 1 */
-    huart1_drvdata.halhdl = &huart1;
     xwos_splk_init(&huart1_drvdata.tx.splk);
     xwos_sem_init(&huart1_drvdata.tx.available, 1, 1);
     xwos_cond_init(&huart1_drvdata.tx.completion);
     huart1_drvdata.tx.rc = -ECANCELED;
     huart1_drvdata.tx.size = 0;
-    huart1_drvdata.tx.asyncb = NULL;
+    huart1_drvdata.tx.eqcb = NULL;
   /* USER CODE END USART1_MspInit 1 */
   }
   else if(uartHandle->Instance==USART3)
@@ -284,13 +288,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     HAL_NVIC_SetPriority(USART3_IRQn, 4, 0);
     HAL_NVIC_EnableIRQ(USART3_IRQn);
   /* USER CODE BEGIN USART3_MspInit 1 */
-    huart3_drvdata.halhdl = &huart3;
     xwos_splk_init(&huart3_drvdata.tx.splk);
     xwos_sem_init(&huart3_drvdata.tx.available, 1, 1);
     xwos_cond_init(&huart3_drvdata.tx.completion);
     huart3_drvdata.tx.rc = -ECANCELED;
     huart3_drvdata.tx.size = 0;
-    huart3_drvdata.tx.asyncb = NULL;
+    huart3_drvdata.tx.eqcb = NULL;
   /* USER CODE END USART3_MspInit 1 */
   }
 }
@@ -405,7 +408,7 @@ void MX_USART1_RxHalfCpltCallback(UART_HandleTypeDef * huart)
                                  XWBOP_ALIGN(sizeof(huart1_drvdata.uartc->rxq.mem),
                                              CPUCFG_L1_CACHELINE_SIZE));
 #endif
-    stm32xwds_usart1_cb_rxdma_halfcplt(huart1_drvdata.uartc);
+    stm32xwds_usart_cb_rxdma_halfcplt(huart1_drvdata.uartc);
   } else {
   }
 }
@@ -421,7 +424,7 @@ void MX_USART1_RxCpltCallback(UART_HandleTypeDef * huart)
                                  XWBOP_ALIGN(sizeof(huart1_drvdata.uartc->rxq.mem),
                                              CPUCFG_L1_CACHELINE_SIZE));
 #endif
-    stm32xwds_usart1_cb_rxdma_cplt(huart1_drvdata.uartc);
+    stm32xwds_usart_cb_rxdma_cplt(huart1_drvdata.uartc);
   } else {
   }
 }
@@ -464,7 +467,7 @@ xwer_t MX_USART1_TXDMA_Start(void)
 
 void MX_USART1_TxCpltCallback(UART_HandleTypeDef * huart)
 {
-  stm32xwds_usart1_cb_txdma_cplt(huart1_drvdata.uartc, XWOK);
+  stm32xwds_usart_cb_txdma_cplt(huart1_drvdata.uartc, XWOK);
 }
 
 xwer_t MX_USART1_Putc(xwu8_t byte)
@@ -490,13 +493,13 @@ void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_DMA)) {
     huart->ErrorCode &= ~(HAL_UART_ERROR_DMA);
     if (HAL_UART_STATE_READY == huart->RxState) {
-      stm32xwds_usart1_cb_rxdma_restart(huart1_drvdata.uartc);
+      stm32xwds_usart_cb_rxdma_restart(huart1_drvdata.uartc);
     }
   }
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_ORE)) {
     huart->ErrorCode &= ~(HAL_UART_ERROR_ORE);
     if (HAL_UART_STATE_READY == huart->RxState) {
-      stm32xwds_usart1_cb_rxdma_restart(huart1_drvdata.uartc);
+      stm32xwds_usart_cb_rxdma_restart(huart1_drvdata.uartc);
     }
   }
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_FE)) {
@@ -515,7 +518,7 @@ void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
                                  XWBOP_ALIGN(sizeof(huart1_drvdata.uartc->rxq.mem),
                                              CPUCFG_L1_CACHELINE_SIZE));
 #endif
-    stm32xwds_usart1_cb_rxdma_timer(huart1_drvdata.uartc);
+    stm32xwds_usart_cb_rxdma_timer(huart1_drvdata.uartc);
   }
 }
 
@@ -573,7 +576,7 @@ void MX_USART3_RxHalfCpltCallback(UART_HandleTypeDef * huart)
                                  XWBOP_ALIGN(sizeof(huart3_drvdata.uartc->rxq.mem),
                                              CPUCFG_L1_CACHELINE_SIZE));
 #endif
-    stm32xwds_usart3_cb_rxdma_halfcplt(huart3_drvdata.uartc);
+    stm32xwds_usart_cb_rxdma_halfcplt(huart3_drvdata.uartc);
   } else {
   }
 }
@@ -589,7 +592,7 @@ void MX_USART3_RxCpltCallback(UART_HandleTypeDef * huart)
                                  XWBOP_ALIGN(sizeof(huart3_drvdata.uartc->rxq.mem),
                                              CPUCFG_L1_CACHELINE_SIZE));
 #endif
-    stm32xwds_usart3_cb_rxdma_cplt(huart3_drvdata.uartc);
+    stm32xwds_usart_cb_rxdma_cplt(huart3_drvdata.uartc);
   } else {
   }
 }
@@ -632,7 +635,7 @@ xwer_t MX_USART3_TXDMA_Start(void)
 
 void MX_USART3_TxCpltCallback(UART_HandleTypeDef * huart)
 {
-  stm32xwds_usart3_cb_txdma_cplt(huart3_drvdata.uartc, XWOK);
+  stm32xwds_usart_cb_txdma_cplt(huart3_drvdata.uartc, XWOK);
 }
 
 xwer_t MX_USART3_Putc(xwu8_t byte)
@@ -658,13 +661,13 @@ void MX_USART3_ErrorCallback(UART_HandleTypeDef * huart)
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_DMA)) {
     huart->ErrorCode &= ~(HAL_UART_ERROR_DMA);
     if (HAL_UART_STATE_READY == huart->RxState) {
-      stm32xwds_usart3_cb_rxdma_restart(huart3_drvdata.uartc);
+      stm32xwds_usart_cb_rxdma_restart(huart3_drvdata.uartc);
     }
   }
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_ORE)) {
     huart->ErrorCode &= ~(HAL_UART_ERROR_ORE);
     if (HAL_UART_STATE_READY == huart->RxState) {
-      stm32xwds_usart3_cb_rxdma_restart(huart3_drvdata.uartc);
+      stm32xwds_usart_cb_rxdma_restart(huart3_drvdata.uartc);
     }
   }
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_FE)) {
@@ -683,7 +686,7 @@ void MX_USART3_ErrorCallback(UART_HandleTypeDef * huart)
                                  XWBOP_ALIGN(sizeof(huart3_drvdata.uartc->rxq.mem),
                                              CPUCFG_L1_CACHELINE_SIZE));
 #endif
-    stm32xwds_usart3_cb_rxdma_timer(huart3_drvdata.uartc);
+    stm32xwds_usart_cb_rxdma_timer(huart3_drvdata.uartc);
   }
 }
 
@@ -722,6 +725,178 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef * huart)
   } else if (huart == &huart3) {
     MX_USART3_ErrorCallback(huart);
   }
+}
+
+
+/* Unified XWDS to HAL interfaces */
+void MX_USART_UART_Init(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1:
+      MX_USART1_UART_Init();
+      break;
+    case 3:
+      MX_USART3_UART_Init();
+      break;
+    default:
+      break;
+  }
+}
+
+void MX_USART_UART_DeInit(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1:
+      MX_USART1_UART_DeInit();
+      break;
+    case 3:
+      MX_USART3_UART_DeInit();
+      break;
+    default:
+      break;
+  }
+}
+
+void MX_USART_Timer_Init(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1:
+      MX_USART1_Timer_Init();
+      break;
+    case 3:
+      MX_USART3_Timer_Init();
+      break;
+    default:
+      break;
+  }
+}
+
+void MX_USART_Timer_DeInit(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1:
+      MX_USART1_Timer_DeInit();
+      break;
+    case 3:
+      MX_USART3_Timer_DeInit();
+      break;
+    default:
+      break;
+  }
+}
+
+void MX_USART_Timer_Start(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1:
+      MX_USART1_Timer_Start();
+      break;
+    case 3:
+      MX_USART3_Timer_Start();
+      break;
+    default:
+      break;
+  }
+}
+
+void MX_USART_Timer_Stop(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1:
+      MX_USART1_Timer_Stop();
+      break;
+    case 3:
+      MX_USART3_Timer_Stop();
+      break;
+    default:
+      break;
+  }
+}
+
+xwer_t MX_USART_RXDMA_Start(xwu32_t hwid, xwu8_t * mem, xwsz_t size)
+{
+  xwer_t rc;
+
+  switch (hwid) {
+    case 1:
+      rc = MX_USART1_RXDMA_Start(mem, size);
+      break;
+    case 3:
+      rc = MX_USART3_RXDMA_Start(mem, size);
+      break;
+    default:
+      rc = -ENXIO;
+      break;
+  }
+  return rc;
+}
+
+xwsq_t MX_USART_RXDMA_GetCounter(xwu32_t hwid)
+{
+  xwsq_t cnt;
+
+  switch (hwid) {
+    case 1:
+      cnt = MX_USART1_RXDMA_GetCounter();
+      break;
+    case 3:
+      cnt = MX_USART3_RXDMA_GetCounter();
+      break;
+    default:
+      cnt = 0;
+      break;
+  }
+  return cnt;
+}
+
+void MX_USART_TXDMA_Prepare(xwu32_t hwid, const xwu8_t * mem, xwsz_t size)
+{
+  switch (hwid) {
+    case 1:
+      MX_USART1_TXDMA_Prepare(mem, size);
+      break;
+    case 3:
+      MX_USART3_TXDMA_Prepare(mem, size);
+      break;
+    default:
+      break;
+  }
+}
+
+xwer_t MX_USART_TXDMA_Start(xwu32_t hwid)
+{
+  xwer_t rc;
+
+  switch (hwid) {
+    case 1:
+      rc = MX_USART1_TXDMA_Start();
+      break;
+    case 3:
+      rc = MX_USART3_TXDMA_Start();
+      break;
+    default:
+      rc = -ENXIO;
+      break;
+  }
+  return rc;
+}
+
+xwer_t MX_USART_Putc(xwu32_t hwid, xwu8_t byte)
+{
+  xwer_t rc;
+
+  switch (hwid) {
+    case 1:
+      rc = MX_USART1_Putc(byte);
+      break;
+    case 3:
+      rc = MX_USART3_Putc(byte);
+      break;
+    default:
+      rc = -ENXIO;
+      break;
+  }
+  return rc;
 }
 
 /* USER CODE END 1 */
