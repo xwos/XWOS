@@ -33,7 +33,7 @@
  *
  * ### 获取当前代码的中断号
  *
- * + `xwos_irq_get_id()` ：获取当前中断的中断号，亦可用于判断上下文
+ * + `xwos_irq_get_id()` ：获取当前中断的中断号，亦可用于判断是否在中断上下文
  *
  * ### 外设中断的其他CAPI
  *
@@ -123,8 +123,7 @@ xwer_t xwos_irq_restore(xwirq_t irqn, xwreg_t flag)
  * + 可为NULL，表示不需要返回中断号
  * @return 错误码
  * @retval XWOK: 当前上下文为中断
- * @retval -ETHDCTX: 当前上下文为线程
- * @retval -EBHCTX: 当前上下文为中断底半部
+ * @retval -ENOTISRCTX: 当前上下文不为中断
  * @note
  * + 上下文：任意
  */
