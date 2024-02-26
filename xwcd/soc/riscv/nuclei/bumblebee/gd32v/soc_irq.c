@@ -148,7 +148,7 @@ xwer_t soc_irq_request(xwirq_t irqn, xwisr_f isrfunc)
         const struct soc_ivt * ivt;
 
         ivt = &soc_ivt;
-        if ((irqn >= 0) && (eclic_ivt_lma_base != eclic_ivt_vma_base)) {
+        if ((irqn >= 0) && (&eclic_ivt_lma_base[0] != &eclic_ivt_vma_base[0])) {
                 ivt->irq[irqn] = isrfunc;
         } else {
         }
@@ -161,7 +161,7 @@ xwer_t soc_irq_release(xwirq_t irqn)
         const struct soc_ivt * ivt;
 
         ivt = &soc_ivt;
-        if ((irqn >= 0) && (eclic_ivt_lma_base != eclic_ivt_vma_base)) {
+        if ((irqn >= 0) && (&eclic_ivt_lma_base[0] != &eclic_ivt_vma_base[0])) {
                 ivt->irq[irqn] = soc_isr_noop;
         } else {
         }
