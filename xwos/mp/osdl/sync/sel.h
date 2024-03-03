@@ -119,7 +119,7 @@ xwer_t xwosdl_sel_select(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel->type == XWMP_EVT_TYPE_SEL), "type-error", -ETYPE);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwmp_sel_select(sel, msk, trg);
 }
@@ -132,7 +132,7 @@ xwer_t xwosdl_sel_select_to(struct xwosdl_sel * sel,
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel->type == XWMP_EVT_TYPE_SEL), "type-error", -ETYPE);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwmp_sel_select_to(sel, msk, trg, to);
 }

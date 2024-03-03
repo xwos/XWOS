@@ -93,7 +93,7 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_unlock(struct xwosdl_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwup_mtx_unlock(mtx);
 }
@@ -102,7 +102,7 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_lock(struct xwosdl_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwup_mtx_lock(mtx);
 }
@@ -119,7 +119,7 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_lock_unintr(struct xwosdl_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwup_mtx_lock_unintr(mtx);
 }
@@ -128,7 +128,7 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_trylock(struct xwosdl_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwup_mtx_trylock(mtx);
 }

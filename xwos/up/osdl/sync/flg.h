@@ -203,7 +203,7 @@ xwer_t xwosdl_flg_wait(struct xwosdl_flg * flg,
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
         XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwup_flg_wait(flg, trigger, action, origin, msk);
 }
@@ -220,7 +220,7 @@ xwer_t xwosdl_flg_wait_to(struct xwosdl_flg * flg,
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
         XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwup_flg_wait_to(flg, trigger, action, origin, msk, to);
 }

@@ -160,7 +160,7 @@ xwer_t xwosdl_cond_wait(struct xwosdl_cond * cond,
         XWOS_VALIDATE((((NULL == lock.anon) && (XWOS_LK_NONE == lktype)) ||
                        ((lock.anon) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwup_cond_wait(cond,
                               lock.anon, lktype, lkdata,
@@ -178,7 +178,7 @@ xwer_t xwosdl_cond_wait_to(struct xwosdl_cond * cond,
         XWOS_VALIDATE((((NULL == lock.anon) && (XWOS_LK_NONE == lktype)) ||
                        ((lock.anon) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwup_cond_wait_to(cond,
                                  lock.anon, lktype, lkdata,
@@ -196,7 +196,7 @@ xwer_t xwosdl_cond_wait_unintr(struct xwosdl_cond * cond,
         XWOS_VALIDATE((((NULL == lock.anon) && (XWOS_LK_NONE == lktype)) ||
                        ((lock.anon) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
         return xwup_cond_wait_unintr(cond,
                                      lock.anon, lktype, lkdata,
