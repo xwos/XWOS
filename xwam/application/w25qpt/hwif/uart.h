@@ -18,12 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_application_w25qrpt_hwif_uart_h__
-#define __xwam_application_w25qrpt_hwif_uart_h__
+#ifndef __xwam_application_w25qpt_hwif_uart_h__
+#define __xwam_application_w25qpt_hwif_uart_h__
 
-#include <xwam/application/w25qrpt/hwifal.h>
+#include <xwam/application/w25qpt/hwifal.h>
 
 extern
-const struct w25qrpt_hwifal_operations w25qrptif_uart_ops;
+const struct w25qpt_hwifal_operations w25qptif_uart_ops;
 
-#endif /* xwam/application/w25qrpt/hwif/uart.h */
+#endif /* xwam/application/w25qpt/hwif/uart.h */

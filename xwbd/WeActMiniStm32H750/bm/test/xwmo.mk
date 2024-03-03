@@ -24,7 +24,7 @@ include xwbs/functions.mk
 
 # 增加源代码文件
 XWMO_CSRCS :=
-XWMO_CSRCS += xwssc.c eeprom.c
+XWMO_CSRCS += xwssc.c eeprom.c w25qxx.h
 
 # 定义编译选项
 XWMO_CFLAGS :=

@@ -21,7 +21,7 @@
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include xwbs/functions.mk
 
-XWMO_CSRCS := w25qrpt.c hwifal.c hwif/uart.c
+XWMO_CSRCS := w25qpt.c hwifal.c hwif/uart.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
 include xwbs/xwmo.mk

@@ -18,21 +18,21 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_application_w25qrpt_mif_h__
-#define __xwam_application_w25qrpt_mif_h__
+#ifndef __xwam_application_w25qpt_mif_h__
+#define __xwam_application_w25qpt_mif_h__
 
 #include <xwos/standard.h>
 #include <xwcd/peripheral/spi/flash/w25qxx/device.h>
-#include <xwam/application/w25qrpt/w25qrpt.h>
-#include <xwam/application/w25qrpt/hwifal.h>
-#include <xwam/application/w25qrpt/hwif/uart.h>
+#include <xwam/application/w25qpt/w25qpt.h>
+#include <xwam/application/w25qpt/hwifal.h>
+#include <xwam/application/w25qpt/hwif/uart.h>
 
-xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
-                     const char * name,
-                     struct xwds_w25qxx * flash,
-                     const struct w25qrpt_hwifal_operations * hwifops,
-                     void * hwifcb);
+xwer_t w25qpt_start(struct w25qpt * w25qpt,
+                    const char * name,
+                    struct xwds_w25qxx * flash,
+                    const struct w25qpt_hwifal_operations * hwifops,
+                    void * hwifcb);
 
-xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt);
+xwer_t w25qpt_stop(struct w25qpt * w25qpt);
 
-#endif /* xwam/application/w25qrpt/mif.h */
+#endif /* xwam/application/w25qpt/mif.h */

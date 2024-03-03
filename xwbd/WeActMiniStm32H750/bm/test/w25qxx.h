@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief 板级描述层：测试程序：W25QXX
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_test_eeprom_h__
-#define __bm_test_eeprom_h__
+#ifndef __bm_test_w25qxx_h__
+#define __bm_test_w25qxx_h__
 
 #include "board/std.h"
 
-void tst_eeprom_init(void);
+void tst_w25qxx_init(void);
 
-#endif /* bm/test/eeprom.h */
+#endif /* bm/test/w25qxx.h */

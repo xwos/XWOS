@@ -20,69 +20,69 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <xwam/application/w25qrpt/w25qrpt.h>
-#include <xwam/application/w25qrpt/protocol.h>
-#include <xwam/application/w25qrpt/hwifal.h>
+#include <xwam/application/w25qpt/w25qpt.h>
+#include <xwam/application/w25qpt/protocol.h>
+#include <xwam/application/w25qpt/hwifal.h>
 
 /**
  * @brief 打开硬件接口
- * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] w25qpt: W25QPT对象的指针
  * @return 错误码
  */
-xwer_t w25qrpt_hwifal_open(struct w25qrpt * w25qrpt, void * hwifcb)
+xwer_t w25qpt_hwifal_open(struct w25qpt * w25qpt, void * hwifcb)
 {
         xwer_t rc;
 
-        w25qrpt->hwifcb = hwifcb;
-        if ((w25qrpt->hwifops) && (w25qrpt->hwifops->open)) {
-                rc = w25qrpt->hwifops->open(w25qrpt);
+        w25qpt->hwifcb = hwifcb;
+        if ((w25qpt->hwifops) && (w25qpt->hwifops->open)) {
+                rc = w25qpt->hwifops->open(w25qpt);
         } else {
                 rc = XWOK;
         }
         if (XWOK == rc) {
-                w25qrpt->hwifst = W25QRPT_HWIFST_OPENED;
+                w25qpt->hwifst = W25QPT_HWIFST_OPENED;
         }
         return rc;
 }
 
 /**
  * @brief 关闭硬件接口
- * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] w25qpt: W25QPT对象的指针
  * @return 错误码
  */
-xwer_t w25qrpt_hwifal_close(struct w25qrpt * w25qrpt)
+xwer_t w25qpt_hwifal_close(struct w25qpt * w25qpt)
 {
         xwer_t rc;
 
-        if ((w25qrpt->hwifops) && (w25qrpt->hwifops->close)) {
-                rc = w25qrpt->hwifops->close(w25qrpt);
+        if ((w25qpt->hwifops) && (w25qpt->hwifops->close)) {
+                rc = w25qpt->hwifops->close(w25qpt);
         } else {
                 rc = XWOK;
         }
         if (XWOK == rc) {
-                w25qrpt->hwifst = W25QRPT_HWIFST_CLOSED;
+                w25qpt->hwifst = W25QPT_HWIFST_CLOSED;
         }
-        w25qrpt->hwifcb = NULL;
+        w25qpt->hwifcb = NULL;
         return rc;
 }
 
 /**
  * @brief 通过硬件接口发送消息
- * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] w25qpt: W25QPT对象的指针
  * @param[in] msg: 指向发送帧缓冲区的指针
  * @return 错误码
  */
-xwer_t w25qrpt_hwifal_tx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
+xwer_t w25qpt_hwifal_tx(struct w25qpt * w25qpt, struct w25qpt_msg * msg)
 {
         xwsz_t txsize;
 
-        txsize = W25QRPT_SOF_SIZE + W25QRPT_HEAD_SIZE + W25QRPT_ADDRESS_SIZE +
-                 w25qrpt_get_sdu_size(msg) + W25QRPT_CHKSUM_SIZE +
-                 W25QRPT_EOF_SIZE;
-        return w25qrpt->hwifops->tx(w25qrpt, (const xwu8_t *)msg, &txsize, XWTM_MAX);
+        txsize = W25QPT_SOF_SIZE + W25QPT_HEAD_SIZE + W25QPT_ADDRESS_SIZE +
+                        w25qpt_get_sdu_size(msg) + W25QPT_CHKSUM_SIZE +
+                        W25QPT_EOF_SIZE;
+        return w25qpt->hwifops->tx(w25qpt, (const xwu8_t *)msg, &txsize, XWTM_MAX);
 }
 
-void w25qrpt_fill_msg_parity(struct w25qrpt_msg * msg)
+void w25qpt_fill_msg_parity(struct w25qpt_msg * msg)
 {
         xwu8_t parity;
 
@@ -94,11 +94,11 @@ void w25qrpt_fill_msg_parity(struct w25qrpt_msg * msg)
                   ((xwu8_t)(msg->sdusize[0] >> 2U) & 3U) ^
                   ((xwu8_t)(msg->sdusize[0] >> 4U) & 3U));
         parity <<= 6U;
-        msg->sdusize[0] &= W25QRPT_SDU_SIZE_HBYTE_MSK;
+        msg->sdusize[0] &= W25QPT_SDU_SIZE_HBYTE_MSK;
         msg->sdusize[0] |= parity;
 }
 
-xwer_t w25qrpt_chk_size_parity(xwu8_t * size)
+xwer_t w25qpt_chk_size_parity(xwu8_t * size)
 {
         xwer_t rc;
         xwu8_t parity;
@@ -119,29 +119,29 @@ xwer_t w25qrpt_chk_size_parity(xwu8_t * size)
         return rc;
 }
 
-xwsz_t w25qrpt_get_sdu_size(struct w25qrpt_msg * msg)
+xwsz_t w25qpt_get_sdu_size(struct w25qpt_msg * msg)
 {
         xwsz_t size;
 
-        size = ((xwsz_t)(msg->sdusize[0] & W25QRPT_SDU_SIZE_HBYTE_MSK)) << 8U;
+        size = ((xwsz_t)(msg->sdusize[0] & W25QPT_SDU_SIZE_HBYTE_MSK)) << 8U;
         size |= (xwsz_t)msg->sdusize[1];
         return size;
 }
 
 /**
  * @brief 通过硬件接口接收消息
- * @param[in] w25qrpt: W25QRPT对象的指针
- * @param[out] msgbuf: 指向缓冲区的指针，通过此缓冲区返回struct w25qrpt_msg
+ * @param[in] w25qpt: W25QPT对象的指针
+ * @param[out] msgbuf: 指向缓冲区的指针，通过此缓冲区返回struct w25qpt_msg
  * @return 错误码
  */
-xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)
+xwer_t w25qpt_hwifal_rx(struct w25qpt * w25qpt, struct w25qpt_msg * msgbuf)
 {
         union {
-                xwu8_t sof[W25QRPT_SOF_SIZE];
-                xwu8_t eof[W25QRPT_EOF_SIZE];
+                xwu8_t sof[W25QPT_SOF_SIZE];
+                xwu8_t eof[W25QPT_EOF_SIZE];
         } delimiter;
         union {
-                xwu8_t data[W25QRPT_HEAD_SIZE];
+                xwu8_t data[W25QPT_HEAD_SIZE];
                 struct __xwcc_packed {
                         xwu8_t rpc;
                         xwu8_t oprc;
@@ -161,39 +161,39 @@ xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)
         sofcnt = 0;
         do {
                 rxsize = 1;
-                rc = w25qrpt->hwifops->rx(w25qrpt, delimiter.sof, &rxsize, XWTM_MAX);
-                if (__xwcc_unlikely(rc < 0)) {
+                rc = w25qpt->hwifops->rx(w25qpt, delimiter.sof, &rxsize, XWTM_MAX);
+                if (rc < 0) {
                         goto err_sof_ifrx;
                 }
-                if (W25QRPT_HWIFAL_SOF == delimiter.sof[0]) {
+                if (W25QPT_HWIFAL_SOF == delimiter.sof[0]) {
                         sofcnt++;
                 } else {
                         break;
                 }
         } while (true);
-        if (sofcnt < W25QRPT_SOF_SIZE) {
+        if (sofcnt < W25QPT_SOF_SIZE) {
                 rc = -EAGAIN;
                 goto err_sof_ifrx;
         }
-        for (i = 0; i < W25QRPT_SOF_SIZE; i++) {
-                msgbuf->sof[i] = W25QRPT_HWIFAL_SOF;
+        for (i = 0; i < W25QPT_SOF_SIZE; i++) {
+                msgbuf->sof[i] = W25QPT_HWIFAL_SOF;
         }
 
         /* 接收Head */
-        total = W25QRPT_HEAD_SIZE;
+        total = W25QPT_HEAD_SIZE;
         rest = (xwssz_t)total - 1;
         stream.data[0] = delimiter.sof[0];
         do {
                 rxsize = (xwsz_t)rest;
-                rc = w25qrpt->hwifops->rx(w25qrpt,
-                                          &stream.data[total - rxsize],
-                                          &rxsize, XWTM_MAX);
-                if (__xwcc_unlikely(rc < 0)) {
+                rc = w25qpt->hwifops->rx(w25qpt,
+                                         &stream.data[total - rxsize],
+                                         &rxsize, XWTM_MAX);
+                if (rc < 0) {
                         goto err_head_ifrx;
                 }
                 rest -= (xwssz_t)rxsize;
         } while (rest > 0);
-        rc = w25qrpt_chk_size_parity(stream.head.sdusize);
+        rc = w25qpt_chk_size_parity(stream.head.sdusize);
         if (rc < 0) {
                 rc = -EAGAIN;
                 goto err_head_ifrx;
@@ -202,8 +202,8 @@ xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)
         msgbuf->oprc = stream.head.oprc;
         msgbuf->sdusize[0] = stream.head.sdusize[0];
         msgbuf->sdusize[1] = stream.head.sdusize[1];
-        sdusize = w25qrpt_get_sdu_size(msgbuf);
-        if (sdusize > W25QRPT_SDU_MAXSIZE) {
+        sdusize = w25qpt_get_sdu_size(msgbuf);
+        if (sdusize > W25QPT_SDU_MAXSIZE) {
                 rc = -EAGAIN;
                 goto err_head_ifrx;
         }
@@ -213,33 +213,33 @@ xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)
         rest = (xwssz_t)total;
         do {
                 rxsize = (xwsz_t)rest;
-                rc = w25qrpt->hwifops->rx(w25qrpt,
-                                          &msgbuf->address[total - rxsize],
-                                          &rxsize, XWTM_MAX);
-                if (__xwcc_unlikely(rc < 0)) {
+                rc = w25qpt->hwifops->rx(w25qpt,
+                                         &msgbuf->address[total - rxsize],
+                                         &rxsize, XWTM_MAX);
+                if (rc < 0) {
                         goto err_body_ifrx;
                 }
                 rest -= (xwssz_t)rxsize;
         } while (rest > 0);
 
         /* 接收帧尾定界符 */
-        total = W25QRPT_EOF_SIZE;
+        total = W25QPT_EOF_SIZE;
         rest = (xwssz_t)total;
         do {
                 rxsize = (xwsz_t)rest;
-                rc = w25qrpt->hwifops->rx(w25qrpt, delimiter.eof, &rxsize, XWTM_MAX);
-                if (__xwcc_unlikely(rc < 0)) {
+                rc = w25qpt->hwifops->rx(w25qpt, delimiter.eof, &rxsize, XWTM_MAX);
+                if (rc < 0) {
                         goto err_eof_ifrx;
                 }
                 rest -= (xwssz_t)rxsize;
         } while (rest > 0);
-        eofpos = &msgbuf->sdu[sdusize + W25QRPT_CHKSUM_SIZE];
-        for (i = 0; i < W25QRPT_EOF_SIZE; i++) {
-                if (W25QRPT_HWIFAL_EOF != delimiter.eof[i]) {
+        eofpos = &msgbuf->sdu[sdusize + W25QPT_CHKSUM_SIZE];
+        for (i = 0; i < W25QPT_EOF_SIZE; i++) {
+                if (W25QPT_HWIFAL_EOF != delimiter.eof[i]) {
                         rc = -EAGAIN;
                         goto err_eof_ifrx;
                 }
-                eofpos[i] = W25QRPT_HWIFAL_EOF;
+                eofpos[i] = W25QPT_HWIFAL_EOF;
         }
         return XWOK;
 

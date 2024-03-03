@@ -26,7 +26,7 @@
 
 #define LOGTAG "TST|EEPROM"
 
-void board_eeprom_test(void)
+void tst_eeprom_init(void)
 {
         xwu8_t rdbuf[64];
         xwsz_t rdsz;
