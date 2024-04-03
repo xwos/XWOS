@@ -20,7 +20,7 @@
 
 MSG := echo -e
 CPPCHECK := cppcheck
-J ?= 1
+J ?= 8
 CPPCHECK_CLANG ?= $(XWTC)/armllvm/bin/clang --sysroot=$(XWTC)/armllvm/lib/clang-runtimes/arm-none-eabi/$(SYSROOT_llvm)
 CPPCHECK_OUT ?= $(XWOS_WKSPC_DIR)/cppcheck
 CPPCHECK_INCDIRS = -I. -I$(XWOS_ARCH_DIR) -I$(XWOS_CPU_DIR) -I$(XWOS_SOC_DIR) -I$(XWOS_BRD_DIR)

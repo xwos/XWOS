@@ -57,3 +57,5 @@ ifeq ($(XWCFG_LIBC),picolibc)
   BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/picolibc)
 endif
 BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwrust)
+
+BRD_CPPCHECK_TARGET :=
