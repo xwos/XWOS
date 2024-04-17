@@ -20,7 +20,7 @@
 #
 
 import argparse
-import hwif
+from hwif import hwif
 
 msg_read_uid = bytearray([0xAA, 0xAA, 0xAA, 0xAA,
                           0x00, 0x00, 0x00, 0x00,
@@ -40,24 +40,9 @@ msg_read_jid = bytearray([0xAA, 0xAA, 0xAA, 0xAA,
                           0x27, 0x07, 0xD8, 0x14,
                           0x55, 0x55])
 
-def parse_arg():
-    parser = argparse.ArgumentParser(description="W25Qxx编程器：ID读取工具")
-    parser.add_argument("-p", "--port",
-                        action="store", dest="port", default="/dev/ttyUSB0",
-                        help="串口端口")
-    parser.add_argument("-b", "--baudrate",
-                        action="store", dest="baudrate", type=int, default=1000000,
-                        help="波特率")
-    parser.add_argument('id',
-                        metavar='ID',
-                        help="ID类型：uid,mid,jid")
-    return parser
 
-def main():
-    parser = parse_arg()
-    args = parser.parse_args()
-    hwport = hwif.HwIf(port=args.port, baudrate=args.baudrate)
-    if args.id == "uid":
+def read_uid(port: str, baudrate: int):
+    with hwif.HwIf(port = port, baudrate = baudrate) as hwport:
         txsz = hwport.tx(msg_read_uid)
         if txsz == len(msg_read_uid):
             rxb = hwport.rx()
@@ -71,7 +56,10 @@ def main():
                     print("读取UID... -ETIMEDOUT")
                 else:
                     print("读取UID... -EIO")
-    elif args.id == "mid":
+
+
+def read_mid(port: str, baudrate: int):
+    with hwif.HwIf(port = port, baudrate = baudrate) as hwport:
         txsz = hwport.tx(msg_read_mid)
         if txsz == len(msg_read_mid):
             rxb = hwport.rx()
@@ -85,7 +73,10 @@ def main():
                     print("读取MID... -ETIMEDOUT")
                 else:
                     print("读取MID... -EIO")
-    elif args.id == "jid":
+
+
+def read_jid(port: str, baudrate: int):
+    with hwif.HwIf(port = port, baudrate = baudrate) as hwport:
         txsz = hwport.tx(msg_read_jid)
         if txsz == len(msg_read_jid):
             rxb = hwport.rx()
@@ -99,6 +90,31 @@ def main():
                     print("读取JID... -ETIMEDOUT")
                 else:
                     print("读取JID... -EIO")
+
+
+def parse_arg():
+    parser = argparse.ArgumentParser(description="W25Qxx编程器：ID读取工具")
+    parser.add_argument("-p", "--port",
+                        action="store", dest="port", default="/dev/ttyUSB0",
+                        help="串口端口")
+    parser.add_argument("-b", "--baudrate",
+                        action="store", dest="baudrate", type=int, default=1000000,
+                        help="波特率")
+    parser.add_argument('id',
+                        metavar='ID',
+                        help="ID类型：uid,mid,jid")
+    return parser
+
+
+def main():
+    parser = parse_arg()
+    args = parser.parse_args()
+    if args.id == "uid":
+        read_uid(args.port, args.baudrate)
+    elif args.id == "mid":
+        read_mid(args.port, args.baudrate)
+    elif args.id == "jid":
+        read_jid(args.port, args.baudrate)
 
 if __name__ == "__main__":
     main()

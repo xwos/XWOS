@@ -49,7 +49,7 @@ xwer_t w25qpt_start(struct w25qpt * w25qpt,
         struct xwos_thd_attr attr;
 
         XWOS_VALIDATE((w25qpt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((w25qpt), "flash", -EFAULT);
+        XWOS_VALIDATE((flash), "flash", -EFAULT);
         XWOS_VALIDATE((hwifops), "nullptr", -EFAULT);
         XWOS_VALIDATE((hwifops->tx), "nullptr", -EFAULT);
         XWOS_VALIDATE((hwifops->rx), "nullptr", -EFAULT);

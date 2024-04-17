@@ -38,6 +38,13 @@ class HwIf:
         self.uart = serial.Serial(port=self.port, baudrate=self.baudrate,
                                   parity=serial.PARITY_NONE,
                                   stopbits=serial.STOPBITS_ONE)
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type:
+            print(f"Exception: {exc_type} {exc_value}")
+        self.close()
 
     def is_opened(self):
         return self.uart.is_open
