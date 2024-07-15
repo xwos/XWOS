@@ -67,5 +67,5 @@ rc, size = spim1:xfer(spi1m, 0, txd, false, #txd, xwtm.ft(xwtm.s(2)))
 -- 设置总线参数为配置0，不发送数据，接收数据，接收缓冲区8字节，期望等待时间2s
 rc, size, rxd = spim1:xfer(spi1m, 0, nil, true, 8, xwtm.ft(xwtm.s(2)))
 ]]
-function xfer(spim, txd, rx, size, time)
+function xfer(spim, cfgid, txd, rx, size, time)
 end
