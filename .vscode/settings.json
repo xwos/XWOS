@@ -1,6 +1,6 @@
 {
     "C_Cpp.clang_format_style": "file",
-    "editor.tabSize": 8,
+    "editor.tabSize": 4,
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
     "editor.formatOnPaste": true,
@@ -11,10 +11,15 @@
     "files.associations": {
         "*.h": "c",
         "*.c": "c",
-        "*.hpp": "c++",
-        "*.cpp": "c++",
-        "*.hxx": "c",
-        "*.cxx": "c++",
+        "*.hpp": "cpp",
+        "*.cpp": "cpp",
+        "*.hxx": "cpp",
+        "*.cxx": "cpp",
+        "*.h++": "cpp",
+        "*.c++": "cpp",
+        "*.hh": "cpp",
+        "*.cc": "cpp",
     },
-    "files.eol": "\n"
+    "files.eol": "\n",
+    "cmake.configureOnOpen": false
 }
