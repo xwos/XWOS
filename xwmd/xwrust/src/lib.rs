@@ -1,22 +1,62 @@
-//! XWOS Rust Framework
+//! XWOS RUST
 //! ========
 //!
 //! # 简介
 //!
-//! XWOS RUST是基于XWOS的CAPI编写的RUST语言 `#![no_std]` 环境的框架，
-//! 可让XWOS从C语言的RTOS进化成RUST语言的RTOS。
+//! XWOS RUST是Rust语言 `#![no_std]` 环境下的XWOS框架，可让用户使用RUST语言开发RTOS的应用。
 //!
-//! 在编写XWOS RUST时，作者充分阅读并参考了RUST的std库的代码，
-//! 尽量仿照std库的形式提供API。使得熟悉RUST语言的朋友更容易掌握如何使用XWOS RUST。
+//! 在编写XWOS RUST时，作者充分阅读并参考了RUST语言std库的代码，尽量仿照std库的形式提供API。
 //!
 //!
 //! 传统RUST程序的入口是 `main.rs` 的 `fn main()` ，
 //! XWOS RUST的入口是 `pub unsafe extern "C" fn xwrust_main()` 。
-//! 用户需要在工程目录（例如电路板模块 `bm` 文件夹 或 `OEM` 文件夹）建立一个独立的 [**玄武模块**](../../docs/user-manual/build-system/#玄武模块) 来定义此函数。
+//!
+//!
+//! 编写XWOS RUST的应用时，需要以下步骤：
+//!
+//! + 1. 在工程目录（例如电路板模块 `bm` 文件夹 或 `$(OEM)` 文件夹）建立一个独立的 [**玄武模块**](../../Docs/TechRefManual/BuildSystem/#玄武模块) ，
+//!   并创建 `makefile` 。
+//!
+//! ```makefile
+//! include $(XWOS_WKSPC_DIR)/XWOS.cfg
+//! include xwbs/functions.mk
+//! include xwbs/xwmo.rust.mk
+//! ```
+//!
+//! + 2. 创建 `Cargo.toml` 。
+//!
+//! ```toml
+//! [package]
+//! name = "rustapp"
+//! version = "0.1.0"
+//! edition = "2021"
+//!
+//! [lib]
+//! name = "rustapp"
+//! crate-type = ["staticlib"]
+//!
+//! [dependencies]
+//! cortex-m = "0.7"
+//! xwrust = {path = "../../../../xwmd/xwrust"}
+//! ```
+//!
+//! + 3. 创建 `.cargo/config.toml` 。
+//!
+//! ```toml
+//! [build]
+//! rustflags = [
+//!  "--cfg", "unix",
+//!  "--cfg", "target_env=\"newlib\"",
+//! ]
+//! target-dir = "target"
+//!
+//! [unstable]
+//! build-std = ["core", "alloc"]
+//! ```
+//!
+//! + 4. 在 `src/lib.rs` 中实现 `pub unsafe extern "C" fn xwrust_main()` 。
 //!
 //! ```rust
-//! // bm/rustapp/src/lib.rs
-//! // crate-type = ["staticlib"]
 //! #![no_std]
 //!
 //! use xwrust::xwmm::allocator::AllocatorMempool;
@@ -30,7 +70,7 @@
 //! }
 //! ```
 //!
-//! 然后在XWOS的C语言入口 `xwos_main()` 中创建一个线程来调用 `xwrust_main()` 。
+//! + 5. 在XWOS的C语言入口 `xwos_main()` 中创建一个线程来调用 `xwrust_main()` 。
 //!
 //! ```C
 //! extern void xwrust_main(void);
@@ -51,25 +91,12 @@
 //!         xwos_thd_create(&xwrust_thd, &attr, xwrust_task, NULL);
 //! }
 //!
-//! // 独立的RUST线程
 //! xwer_t xwrust_task(void * arg)
 //! {
 //!         xwrust_main();
 //! }
 //! ```
 //!
-//! 因为需要与C语言编写的内核进行静态链接，用户应该创建的是基于 `lib.rs` 的静态库而非 `main.rs` 。
-//!
-//! ```toml
-//! [package]
-//! name = "rustapp"
-//! version = "0.1.0"
-//! edition = "2021"
-//!
-//! [lib]
-//! name = "rustapp"
-//! crate-type = ["staticlib"]
-//! ```
 //!
 //! # XWOS RUST 的功能
 //!
