@@ -18,14 +18,13 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc_init.h>
 #include <xwos/ospl/skd.h>
-#include <soc.h>
-#include <soc_wdg.h>
-#include <soc_osc.h>
-#include <soc_ics.h>
-#include <soc_sim.h>
-#include <soc_init.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc_wdg.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc_osc.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc_ics.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc_sim.h>
 
 struct soc_flash_cfgs {
         xwu8_t backdoor_key[8]; /**< Backdoor Comparison Key 0 ~ 7, offset: 0x0 */
@@ -67,7 +66,7 @@ void soc_relocate_ivt(void)
                         dst[i] = src[i];
                 }
         }
-        cm_scs.scb.vtor.u32 = (xwu32_t)armv6m_ivt_vma_base;
+        armv6m_scs.scb.vtor.u32 = (xwu32_t)armv6m_ivt_vma_base;
 }
 
 extern xwu8_t data_lma_base[];

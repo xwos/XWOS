@@ -18,14 +18,10 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
+#include <xwcd/soc/arm/v7m/m7/mimxrt1052/soc_init.h>
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
-#include <armv7m_isa.h>
-#include <arch_nvic.h>
-#include <soc.h>
-#include <soc_init.h>
-
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
 
 extern xwu8_t armv7m_ivt_lma_base[];
 extern xwu8_t armv7m_ivt_vma_base[];

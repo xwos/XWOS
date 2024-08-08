@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/lfq.h>
-#include <armv7m_isa.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
 
 __xwbsp_code
 void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
@@ -28,11 +28,11 @@ void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
         register xwlfq_t * next;
 
         do {
-                next = (xwlfq_t *)cm_ldrex(h);
+                next = (xwlfq_t *)armv7m_ldrex(h);
                 xwmb_mp_mb();
                 *n = (xwlfq_t)next;
                 xwmb_mp_mb();
-        } while (cm_strex(h, (xwu32_t)n));
+        } while (armv7m_strex(h, (xwu32_t)n));
 }
 
 __xwbsp_code
@@ -43,12 +43,12 @@ xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h)
         xwer_t rc;
 
         do {
-                top = (xwlfq_t *)cm_ldrex(h);
+                top = (xwlfq_t *)armv7m_ldrex(h);
                 xwmb_mp_mb();
                 if (top) {
                         next = (xwlfq_t *)(*top);
                         xwmb_mp_mb();
-                        rc = cm_strex(h, (xwu32_t)next);
+                        rc = armv7m_strex(h, (xwu32_t)next);
                 } else {
                         break;
                 }

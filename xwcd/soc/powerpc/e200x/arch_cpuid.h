@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_cpuid_h__
-#define __arch_cpuid_h__
+#ifndef __xwcd_soc_powerpc_e200x_arch_cpuid_h__
+#define __xwcd_soc_powerpc_e200x_arch_cpuid_h__
 
 #include <xwos/standard.h>
 
@@ -29,4 +29,4 @@ xwid_t arch_cpu_get_id(void)
         return 0;
 }
 
-#endif /* arch_cpuid.h */
+#endif /* xwcd/soc/powerpc/e200x/arch_cpuid.h */

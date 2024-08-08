@@ -18,17 +18,16 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_skd_h__
-#define __arch_skd_h__
+#ifndef __xwcd_soc_arm_v7m_arch_skd_h__
+#define __xwcd_soc_arm_v7m_arch_skd_h__
 
 #include <xwos/standard.h>
 #include <xwos/ospl/skd.h>
 
 void arch_skd_init_pendsv(void);
-void arch_skd_init_stack(struct xwospl_skdobj_stack * stk,
-                         void (* exit)(xwer_t));
+void arch_skd_init_stack(struct xwospl_skdobj_stack * stk, void (* exit)(xwer_t));
 void arch_svc_skd_start(struct xwospl_skd * xwskd);
 struct xwospl_skd * arch_skd_chk_stk(void);
 void xwospl_skd_isr_swcx(void);
 
-#endif /* arch_skd.h */
+#endif /* xwcd/soc/arm/v7m/arch_skd.h */

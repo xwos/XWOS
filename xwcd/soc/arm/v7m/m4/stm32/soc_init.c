@@ -18,8 +18,7 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <soc_init.h>
+#include <xwcd/soc/arm/v7m/m4/stm32/soc_init.h>
 
 extern xwu8_t armv7m_ivt_lma_base[];
 extern xwu8_t armv7m_ivt_vma_base[];

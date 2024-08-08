@@ -567,7 +567,6 @@ endif
 ARCH_CSRCS += arch_init.c
 ARCH_CSRCS += arch_firmware.c arch_irq.c xwosimpl_soc_lfq.c xwosimpl_soc_xwsc.c
 ARCH_CSRCS += arch_skd.c arch_systick.c
-ARCH_CSRCS += arch_nvic.c
 ifeq ($(ARCHCFG_FPU),y)
   ARCH_CSRCS += arch_fpu.c
 endif

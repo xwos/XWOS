@@ -155,4 +155,4 @@ typedef signed long xwsid_t; /**< ID (有符号) */
 #define BITS_PER_XWSID_T        BITS_PER_LONG
 #define XWSID_T_SHIFT           LONG_SHIFT
 
-#endif /* xwosimpl_soc_type.h */
+#endif /* xwcd/soc/powerpc/e200x/xwosimpl_soc_type.h */

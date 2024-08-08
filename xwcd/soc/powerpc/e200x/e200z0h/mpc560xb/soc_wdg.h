@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_wdg_h__
-#define __soc_wdg_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_wdg_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_wdg_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 void soc_wdg_init(xwu32_t deadline);
 void soc_wdg_start(void);
@@ -30,4 +30,4 @@ void soc_wdg_stop(void);
 void soc_wdg_feed(void);
 void soc_wdg_force_reset_system(void);
 
-#endif /* soc_wdg.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_wdg.h */

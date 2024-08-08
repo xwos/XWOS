@@ -22,8 +22,8 @@
 #define __xwosimpl_irq_h__
 
 #include <xwos/standard.h>
-#include <arch_irq.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/arch_irq.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 #ifndef __xwos_ospl_irq_h__
 #  error "This file should be included from <xwos/ospl/irq.h>."
@@ -53,4 +53,4 @@ void xwospl_cpuirq_save_lc(xwreg_t * cpuirq)
         arch_cpuirq_save_lc(cpuirq);
 }
 
-#endif /* xwosimpl_irq.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/xwosimpl_irq.h */

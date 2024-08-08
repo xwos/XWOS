@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_init_h__
-#define __arch_init_h__
+#ifndef __xwcd_soc_powerpc_e200x_arch_init_h__
+#define __xwcd_soc_powerpc_e200x_arch_init_h__
 
 #include <xwos/standard.h>
 
 void arch_init(void);
 
-#endif /* arch_init.h */
+#endif /* xwcd/soc/powerpc/e200x/arch_init.h */

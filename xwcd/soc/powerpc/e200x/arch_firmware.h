@@ -12,8 +12,8 @@
  * >         <http://www.apache.org/licenses/LICENSE-2.0/>.
  */
 
-#ifndef __arch_firmware_h__
-#define __arch_firmware_h__
+#ifndef __xwcd_soc_powerpc_e200x_arch_firmware_h__
+#define __xwcd_soc_powerpc_e200x_arch_firmware_h__
 
 #include <xwos/standard.h>
 
@@ -31,4 +31,4 @@ struct __xwcc_aligned(32) firmware_tail {
 
 xwer_t arch_boot_firmware(void * firmware, xwsz_t info_offset, const char * tailflag);
 
-#endif /* arch_firmware.h */
+#endif /* xwcd/soc/powerpc/e200x/arch_firmware.h */

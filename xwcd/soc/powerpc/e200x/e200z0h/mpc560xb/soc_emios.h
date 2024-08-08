@@ -18,10 +18,10 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_emios_h__
-#define __soc_emios_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_emios_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_emios_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
-#endif /* soc_emios.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_emios.h */

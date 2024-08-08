@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_i2c_h__
-#define __soc_i2c_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_i2c_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_i2c_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 /******** ********Inter-integrated Circuit Interface ******** ********/
 /******** SOC_I2C_IBCR register ********/
@@ -41,4 +41,4 @@ struct soc_i2c_private_cfg {
         xwu8_t bfdr;
 };
 
-#endif /* soc_i2c.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_i2c.h */

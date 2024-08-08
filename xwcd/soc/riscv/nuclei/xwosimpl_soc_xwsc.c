@@ -19,7 +19,6 @@
  */
 
 #include <xwos/standard.h>
-#include <soc.h>
 
 __xwbsp_code
 xws64_t xwsc(xwsc_f func, xwptr_t argnum, ...)

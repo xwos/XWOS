@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_irq_h__
-#define __arch_irq_h__
+#ifndef __xwcd_soc_arm_v6m_arch_irq_h__
+#define __xwcd_soc_arm_v6m_arch_irq_h__
 
 #include <xwos/standard.h>
-#include <armv6m_nvic.h>
+#include <xwcd/soc/arm/v6m/armv6m_nvic.h>
 
 void arch_init_sysirqs(void);
 void arch_isr_reset(void);
@@ -41,7 +41,7 @@ void arch_isr_noop(void);
 static __xwbsp_inline
 void arch_cpuirq_enable_lc(void)
 {
-        cm_nvic_enable_interrupts();
+        armv6m_nvic_enable_interrupts();
 }
 
 /**
@@ -50,7 +50,7 @@ void arch_cpuirq_enable_lc(void)
 static __xwbsp_inline
 void arch_cpuirq_disable_lc(void)
 {
-        cm_nvic_disable_interrupts();
+        armv6m_nvic_disable_interrupts();
 }
 
 /**
@@ -59,7 +59,7 @@ void arch_cpuirq_disable_lc(void)
 static __xwbsp_inline
 void arch_cpuirq_restore_lc(xwreg_t cpuirq)
 {
-        cm_set_primask(cpuirq);
+        armv6m_set_primask(cpuirq);
 }
 
 /**
@@ -68,8 +68,17 @@ void arch_cpuirq_restore_lc(xwreg_t cpuirq)
 static __xwbsp_inline
 void arch_cpuirq_save_lc(xwreg_t * cpuirq)
 {
-        cm_get_primask(cpuirq);
-        cm_nvic_disable_interrupts();
+        armv6m_get_primask(cpuirq);
+        armv6m_nvic_disable_interrupts();
 }
 
-#endif /* arch_irq.h */
+xwer_t arch_nvic_irq_get_id(xwirq_t * irqnbuf);
+xwer_t arch_nvic_irq_enable(xwirq_t irqn);
+xwer_t arch_nvic_irq_disable(xwirq_t irqn);
+xwer_t arch_nvic_irq_save(xwirq_t irqn, xwreg_t * flag);
+xwer_t arch_nvic_irq_restore(xwirq_t irqn, xwreg_t flag);
+xwer_t arch_nvic_irq_pend(xwirq_t irqn);
+xwer_t arch_nvic_irq_clear(xwirq_t irqn);
+xwer_t arch_nvic_irq_tst(xwirq_t irqn, bool * pending);
+
+#endif /* xwcd/soc/arm/v6m/arch_irq.h */

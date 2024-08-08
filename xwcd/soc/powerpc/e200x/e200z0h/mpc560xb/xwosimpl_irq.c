@@ -21,8 +21,8 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/ospl/skd.h>
-#include <soc.h>
-#include <soc_irq.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_irq.h>
 
 __xwbsp_code
 xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf)

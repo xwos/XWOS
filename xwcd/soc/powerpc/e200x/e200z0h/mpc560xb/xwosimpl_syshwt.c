@@ -22,8 +22,8 @@
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/syshwt.h>
-#include <soc.h>
-#include <soc_irq.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_irq.h>
 
 #define SYSHWT_CH               SOCCFG_SYSHWT_CHANNEL
 #define SYSHWT_SRCCLK           SOCCFG_SYSHWT_SRCCLK

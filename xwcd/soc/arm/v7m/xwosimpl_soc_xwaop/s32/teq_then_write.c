@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <armv7m_isa.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
@@ -32,10 +32,10 @@ xwer_t xwaop__xws32_t__teq_then_write(atomic_xws32_t * a,
         xwer_t rc;
 
         do {
-                o = (xws32_t)cm_ldrex(a);
+                o = (xws32_t)armv7m_ldrex(a);
                 if (o == t) {
                         xwmb_mp_mb();
-                        rc = cm_strex(a, (xwu32_t)v);
+                        rc = armv7m_strex(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
                         xwmb_ddb();

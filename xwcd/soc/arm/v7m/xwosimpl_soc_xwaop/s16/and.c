@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <armv7m_isa.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
@@ -31,10 +31,10 @@ void xwaop__xws16_t__and(atomic_xws16_t * a,
         xws16_t o;
 
         do {
-                o = (xws16_t)cm_ldrexh(a);
+                o = (xws16_t)armv7m_ldrexh(a);
                 n = o & v;
                 xwmb_mp_mb();
-        } while (cm_strexh(a, (xwu16_t)n));
+        } while (armv7m_strexh(a, (xwu16_t)n));
         if (nv) {
                 *nv = n;
         }

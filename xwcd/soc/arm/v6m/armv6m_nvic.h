@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_armv6m_nvic_h__
-#define __arch_armv6m_nvic_h__
+#ifndef __xwcd_soc_arm_v6m_armv6m_nvic_h__
+#define __xwcd_soc_arm_v6m_armv6m_nvic_h__
 
 #include <xwos/standard.h>
-#include <armv6m_isa.h>
+#include <xwcd/soc/arm/v6m/armv6m_isa.h>
 
 #ifndef SOCCFG_NVIC_PRIO_BITNUM
 #  error "SOCCFG_NVIC_PRIO_BITNUM is not defined!"
@@ -142,33 +142,33 @@ struct cortexm_nvic_irq_cfg {
 /**
  * @brief Enable all interrupts
  */
-#define cm_nvic_enable_interrupts()     \
-        __asm__ volatile(               \
-        "       cpsie i"                \
+#define armv6m_nvic_enable_interrupts() \
+        __asm__ volatile( \
+        "       cpsie i" \
         ::: "memory", "cc")
 
 /**
  * @brief Disable all interrupts
  */
-#define cm_nvic_disable_interrupts()    \
-        __asm__ volatile(               \
-        "       cpsid i"                \
+#define armv6m_nvic_disable_interrupts() \
+        __asm__ volatile( \
+        "       cpsid i" \
         ::: "memory", "cc")
 
 /**
  * @brief Enable all faults
  */
-#define cm_nvic_enable_faults()         \
-        __asm__ volatile(               \
-        "       cpsie f"                \
+#define armv6m_nvic_enable_faults() \
+        __asm__ volatile( \
+        "       cpsie f" \
         ::: "memory", "cc")
 
 /**
  * @brief Disable all faults
  */
-#define cm_nvic_disable_faults()        \
-        __asm__ volatile(               \
-        "       cpsid f"                \
+#define armv6m_nvic_disable_faults() \
+        __asm__ volatile( \
+        "       cpsid f" \
         ::: "memory", "cc")
 
 /**
@@ -180,26 +180,26 @@ struct cortexm_nvic_irq_cfg {
  *   sequence.
  */
 static __xwbsp_inline
-void cm_nvic_set_prioritygrouping(xwu32_t prigroup)
+void armv6m_nvic_set_prioritygrouping(xwu32_t prigroup)
 {
         xwu32_t val;
 
-        val = cm_scs.scb.aircr.u32;
+        val = armv6m_scs.scb.aircr.u32;
         val &= ~(SCB_AIRCR_VECTKEY_MSK | SCB_AIRCR_PRIGROUP_MSK);
         val = (val |
                ((xwu32_t)0x5FA << SCB_AIRCR_VECTKEY_POS) |
                ((prigroup & (xwu32_t)0x07) << SCB_AIRCR_PRIGROUP_POS));
-        cm_scs.scb.aircr.u32 = val;
+        armv6m_scs.scb.aircr.u32 = val;
 }
 
 /**
  * @brief Get Priority Grouping
- * @return Priority grouping field (cm_scs.scb.aircr [10:8] PRIGROUP field).
+ * @return Priority grouping field (armv6m_scs.scb.aircr [10:8] PRIGROUP field).
  */
 static __xwbsp_inline
-xwu32_t cm_nvic_get_prioritygrouping(void)
+xwu32_t armv6m_nvic_get_prioritygrouping(void)
 {
-        return ((cm_scs.scb.aircr.u32 & SCB_AIRCR_PRIGROUP_MSK) >>
+        return ((armv6m_scs.scb.aircr.u32 & SCB_AIRCR_PRIGROUP_MSK) >>
                 SCB_AIRCR_PRIGROUP_POS);
 }
 
@@ -207,9 +207,9 @@ xwu32_t cm_nvic_get_prioritygrouping(void)
  * @brief Get current irq number
  */
 static __xwbsp_inline
-xwu32_t cm_nvic_get_irq_num(void)
+xwu32_t armv6m_nvic_get_irq_num(void)
 {
-        return cm_scs.ictr.u32 << (xwu32_t)5;
+        return (armv6m_scs.ictr.u32 << (xwu32_t)5);
 }
 
 /******** ******** ******** external interrupts ******** ******** ********/
@@ -218,10 +218,10 @@ xwu32_t cm_nvic_get_irq_num(void)
  * @param[in] irq: interrupt number
  */
 static __xwbsp_inline
-void cm_nvic_enable_irq(xwirq_t irq)
+void armv6m_nvic_enable_irq(xwirq_t irq)
 {
-        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
-        cm_scs.nvic.iser[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
+        xwu32_t idx = ((xwu32_t)irq >> (xwu32_t)5);
+        armv6m_scs.nvic.iser[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -229,10 +229,10 @@ void cm_nvic_enable_irq(xwirq_t irq)
  * @param[in] irq: interrupt number
  */
 static __xwbsp_inline
-void cm_nvic_disable_irq(xwirq_t irq)
+void armv6m_nvic_disable_irq(xwirq_t irq)
 {
-        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
-        cm_scs.nvic.icer[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
+        xwu32_t idx = ((xwu32_t)irq >> (xwu32_t)5);
+        armv6m_scs.nvic.icer[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -241,10 +241,10 @@ void cm_nvic_disable_irq(xwirq_t irq)
  * @param[out] flag: buffer to save flag
  */
 static __xwbsp_inline
-void cm_nvic_save_irq(xwirq_t irq, xwreg_t * flag)
+void armv6m_nvic_save_irq(xwirq_t irq, xwreg_t * flag)
 {
-        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
-        *flag = ((cm_scs.nvic.iser[idx].u32) &
+        xwu32_t idx = ((xwu32_t)irq >> (xwu32_t)5);
+        *flag = ((armv6m_scs.nvic.iser[idx].u32) &
                  ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F)));
 }
 
@@ -254,15 +254,15 @@ void cm_nvic_save_irq(xwirq_t irq, xwreg_t * flag)
  * @param[in] flag: flag to restore
  */
 static __xwbsp_inline
-void cm_nvic_restore_irq(xwirq_t irq, xwreg_t flag)
+void armv6m_nvic_restore_irq(xwirq_t irq, xwreg_t flag)
 {
-        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
+        xwu32_t idx = ((xwu32_t)irq >> (xwu32_t)5);
         if (0U != flag) {
-                cm_scs.nvic.iser[idx].u32 = ((xwu32_t)1 <<
-                                             ((xwu32_t)irq & (xwu32_t)0x1F));
+                armv6m_scs.nvic.iser[idx].u32 = ((xwu32_t)1 <<
+                                                 ((xwu32_t)irq & (xwu32_t)0x1F));
         } else {
-                cm_scs.nvic.icer[idx].u32 = ((xwu32_t)1 <<
-                                             ((xwu32_t)irq & (xwu32_t)0x1F));
+                armv6m_scs.nvic.icer[idx].u32 = ((xwu32_t)1 <<
+                                                 ((xwu32_t)irq & (xwu32_t)0x1F));
         }
 }
 
@@ -271,9 +271,9 @@ void cm_nvic_restore_irq(xwirq_t irq, xwreg_t flag)
  * @param[in] irq: interrupt number.
  */
 static __xwbsp_inline
-void cm_nvic_software_trigger_irq(xwirq_t irq)
+void armv6m_nvic_software_trigger_irq(xwirq_t irq)
 {
-        cm_scs.stir.u32 = ((xwu32_t)irq & (xwu32_t)0x1FF);
+        armv6m_scs.stir.u32 = ((xwu32_t)irq & (xwu32_t)0x1FF);
 }
 
 /**
@@ -283,10 +283,10 @@ void cm_nvic_software_trigger_irq(xwirq_t irq)
  * @retval true: Interrupt status is pending.
  */
 static __xwbsp_inline
-bool cm_nvic_tst_irq(xwirq_t irq)
+bool armv6m_nvic_tst_irq(xwirq_t irq)
 {
-        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
-        return !!(cm_scs.nvic.ispr[idx].u32 >> ((xwu32_t)irq & (xwu32_t)0x1F));
+        xwu32_t idx = ((xwu32_t)irq >> (xwu32_t)5);
+        return !!(armv6m_scs.nvic.ispr[idx].u32 >> ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -294,10 +294,10 @@ bool cm_nvic_tst_irq(xwirq_t irq)
  * @param[in] irq: interrupt number.
  */
 static __xwbsp_inline
-void cm_nvic_pend_irq(xwirq_t irq)
+void armv6m_nvic_pend_irq(xwirq_t irq)
 {
-        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
-        cm_scs.nvic.ispr[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
+        xwu32_t idx = ((xwu32_t)irq >> (xwu32_t)5);
+        armv6m_scs.nvic.ispr[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -305,10 +305,10 @@ void cm_nvic_pend_irq(xwirq_t irq)
  * @param[in] irq: interrupt number.
  */
 static __xwbsp_inline
-void cm_nvic_clear_irq(xwirq_t irq)
+void armv6m_nvic_clear_irq(xwirq_t irq)
 {
-        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
-        cm_scs.nvic.icpr[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
+        xwu32_t idx = ((xwu32_t)irq >> (xwu32_t)5);
+        armv6m_scs.nvic.icpr[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -318,10 +318,10 @@ void cm_nvic_clear_irq(xwirq_t irq)
  * @retval true: Interrupt status is active.
  */
 static __xwbsp_inline
-bool cm_nvic_get_irq_active(xwirq_t irq)
+bool armv6m_nvic_get_irq_active(xwirq_t irq)
 {
-        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
-        return (cm_scs.nvic.iabr[idx].u32 >> ((xwu32_t)irq & (xwu32_t)0x1F));
+        xwu32_t idx = ((xwu32_t)irq >> (xwu32_t)5);
+        return (armv6m_scs.nvic.iabr[idx].u32 >> ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -330,11 +330,11 @@ bool cm_nvic_get_irq_active(xwirq_t irq)
  * @param[in] priority: priority to set.
  */
 static __xwbsp_inline
-void cm_nvic_set_irq_priority(xwirq_t irq, xwpr_t priority)
+void armv6m_nvic_set_irq_priority(xwirq_t irq, xwpr_t priority)
 {
-        cm_scs.nvic.ipr[irq].u8 = (((xwu8_t)priority <<
-                                    ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM)) &
-                                   (xwu8_t)0xFF);
+        armv6m_scs.nvic.ipr[irq].u8 = (((xwu8_t)priority <<
+                                        ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM)) &
+                                       (xwu8_t)0xFF);
 }
 
 /**
@@ -343,9 +343,10 @@ void cm_nvic_set_irq_priority(xwirq_t irq, xwpr_t priority)
  * @return interrupt priority
  */
 static __xwbsp_inline
-xwpr_t cm_nvic_get_irq_priority(xwirq_t irq)
+xwpr_t armv6m_nvic_get_irq_priority(xwirq_t irq)
 {
-        return (cm_scs.nvic.ipr[irq].u8 >> ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM));
+        return (armv6m_scs.nvic.ipr[irq].u8 >>
+                ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM));
 }
 
 /******** ******** ******** system irqs ******** ******** ********/
@@ -354,18 +355,18 @@ xwpr_t cm_nvic_get_irq_priority(xwirq_t irq)
  * @brief Pend NMI
  */
 static __xwbsp_inline
-void cm_nvic_pend_nmi(void)
+void armv6m_nvic_pend_nmi(void)
 {
-        cm_scs.scb.icsr.bit.nmipend_set = 1;
+        armv6m_scs.scb.icsr.bit.nmipend_set = 1;
 }
 
 /**
  * @brief Get NMI active-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_nmi_active(void)
+bool armv6m_nvic_get_nmi_active(void)
 {
-        return !!(cm_scs.scb.icsr.bit.nmipend_set);
+        return !!(armv6m_scs.scb.icsr.bit.nmipend_set);
 }
 
 /******** pendsv ********/
@@ -373,36 +374,36 @@ bool cm_nvic_get_nmi_active(void)
  * @brief Pend pendsv
  */
 static __xwbsp_inline
-void cm_nvic_pend_pendsv(void)
+void armv6m_nvic_pend_pendsv(void)
 {
-        cm_scs.scb.icsr.bit.pendsv_set = 1;
+        armv6m_scs.scb.icsr.bit.pendsv_set = 1;
 }
 
 /**
  * @brief Clear pendsv
  */
 static __xwbsp_inline
-void cm_nvic_clear_pendsv(void)
+void armv6m_nvic_clear_pendsv(void)
 {
-        cm_scs.scb.icsr.bit.pendsv_clr = 1;
+        armv6m_scs.scb.icsr.bit.pendsv_clr = 1;
 }
 
 /**
  * @brief Test pendsv pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_tst_pendsv(void)
+bool armv6m_nvic_tst_pendsv(void)
 {
-        return !!(cm_scs.scb.icsr.bit.pendsv_set);
+        return !!(armv6m_scs.scb.icsr.bit.pendsv_set);
 }
 
 /**
  * @brief Get pendsv active-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_pendsv_active(void)
+bool armv6m_nvic_get_pendsv_active(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.pendsv_act);
+        return !!(armv6m_scs.scb.shcsr.bit.pendsv_act);
 }
 
 /******** systick ********/
@@ -410,36 +411,36 @@ bool cm_nvic_get_pendsv_active(void)
  * @brief Pend systick
  */
 static __xwbsp_inline
-void cm_nvic_pend_systick(void)
+void armv6m_nvic_pend_systick(void)
 {
-        cm_scs.scb.icsr.bit.pendst_set = 1;
+        armv6m_scs.scb.icsr.bit.pendst_set = 1;
 }
 
 /**
  * @brief Clear systick
  */
 static __xwbsp_inline
-void cm_nvic_clear_systick(void)
+void armv6m_nvic_clear_systick(void)
 {
-        cm_scs.scb.icsr.bit.pendst_clr = 1;
+        armv6m_scs.scb.icsr.bit.pendst_clr = 1;
 }
 
 /**
  * @brief Test systick pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_tst_systick(void)
+bool armv6m_nvic_tst_systick(void)
 {
-        return !!(cm_scs.scb.icsr.bit.pendst_set);
+        return !!(armv6m_scs.scb.icsr.bit.pendst_set);
 }
 
 /**
  * @brief Get systick active-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_systick_active(void)
+bool armv6m_nvic_get_systick_active(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.systick_act);
+        return !!(armv6m_scs.scb.shcsr.bit.systick_act);
 }
 
 /******** usage fault ********/
@@ -447,54 +448,54 @@ bool cm_nvic_get_systick_active(void)
  * @brief Enable usage fault
  */
 static __xwbsp_inline
-void cm_nvic_enable_usgfault(void)
+void armv6m_nvic_enable_usgfault(void)
 {
-        cm_scs.scb.shcsr.bit.usgfault_en = 1;
+        armv6m_scs.scb.shcsr.bit.usgfault_en = 1;
 }
 
 /**
  * @brief Disable usage fault
  */
 static __xwbsp_inline
-void cm_nvic_disable_usgfault(void)
+void armv6m_nvic_disable_usgfault(void)
 {
-        cm_scs.scb.shcsr.bit.usgfault_en = 0;
+        armv6m_scs.scb.shcsr.bit.usgfault_en = 0;
 }
 
 /**
  * @brief Save usage fault flag and disable it
  */
 static __xwbsp_inline
-void cm_nvic_save_usgfault(xwreg_t * flag)
+void armv6m_nvic_save_usgfault(xwreg_t * flag)
 {
-        *flag = cm_scs.scb.shcsr.u32 & SCB_SHCSR_USGFAULTENA_MSK;
+        *flag = (armv6m_scs.scb.shcsr.u32 & SCB_SHCSR_USGFAULTENA_MSK);
 }
 
 /**
  * @brief restore usage fault flag
  */
 static __xwbsp_inline
-void cm_nvic_restore_usgfault(xwreg_t flag)
+void armv6m_nvic_restore_usgfault(xwreg_t flag)
 {
-        cm_scs.scb.shcsr.u32 |= (flag & SCB_SHCSR_USGFAULTENA_MSK);
+        armv6m_scs.scb.shcsr.u32 |= (flag & SCB_SHCSR_USGFAULTENA_MSK);
 }
 
 /**
  * @brief Test usagefault pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_tst_usgfault(void)
+bool armv6m_nvic_tst_usgfault(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.usgfault_pended);
+        return !!(armv6m_scs.scb.shcsr.bit.usgfault_pended);
 }
 
 /**
  * @brief Get usagefault active-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_usgfault_active(void)
+bool armv6m_nvic_get_usgfault_active(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.usgfault_act);
+        return !!(armv6m_scs.scb.shcsr.bit.usgfault_act);
 }
 
 /******** bus fault ********/
@@ -502,54 +503,54 @@ bool cm_nvic_get_usgfault_active(void)
  * @brief Enable bus fault
  */
 static __xwbsp_inline
-void cm_nvic_enable_busfault(void)
+void armv6m_nvic_enable_busfault(void)
 {
-        cm_scs.scb.shcsr.bit.busfault_en = 1;
+        armv6m_scs.scb.shcsr.bit.busfault_en = 1;
 }
 
 /**
  * @brief Disable bus fault
  */
 static __xwbsp_inline
-void cm_nvic_disable_busfault(void)
+void armv6m_nvic_disable_busfault(void)
 {
-        cm_scs.scb.shcsr.bit.busfault_en = 0;
+        armv6m_scs.scb.shcsr.bit.busfault_en = 0;
 }
 
 /**
  * @brief Save bus fault flag and disable it
  */
 static __xwbsp_inline
-void cm_nvic_save_busfault(xwreg_t * flag)
+void armv6m_nvic_save_busfault(xwreg_t * flag)
 {
-        *flag = cm_scs.scb.shcsr.u32 & SCB_SHCSR_USGFAULTENA_MSK;
+        *flag = (armv6m_scs.scb.shcsr.u32 & SCB_SHCSR_USGFAULTENA_MSK);
 }
 
 /**
  * @brief restore bus fault flag
  */
 static __xwbsp_inline
-void cm_nvic_restore_busfault(xwreg_t flag)
+void armv6m_nvic_restore_busfault(xwreg_t flag)
 {
-        cm_scs.scb.shcsr.u32 |= (flag & SCB_SHCSR_USGFAULTENA_MSK);
+        armv6m_scs.scb.shcsr.u32 |= (flag & SCB_SHCSR_USGFAULTENA_MSK);
 }
 
 /**
  * @brief Test busfault pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_tst_busfault(void)
+bool armv6m_nvic_tst_busfault(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.busfault_pended);
+        return !!(armv6m_scs.scb.shcsr.bit.busfault_pended);
 }
 
 /**
  * @brief Get busfault active-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_busfault_active(void)
+bool armv6m_nvic_get_busfault_active(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.busfault_act);
+        return !!(armv6m_scs.scb.shcsr.bit.busfault_act);
 }
 
 /******** mem fault ********/
@@ -557,54 +558,54 @@ bool cm_nvic_get_busfault_active(void)
  * @brief Enable memfault
  */
 static __xwbsp_inline
-void cm_nvic_enable_memfault(void)
+void armv6m_nvic_enable_memfault(void)
 {
-        cm_scs.scb.shcsr.bit.memfault_en = 1;
+        armv6m_scs.scb.shcsr.bit.memfault_en = 1;
 }
 
 /**
  * @brief Disable memfault
  */
 static __xwbsp_inline
-void cm_nvic_disable_memfault(void)
+void armv6m_nvic_disable_memfault(void)
 {
-        cm_scs.scb.shcsr.bit.memfault_en = 0;
+        armv6m_scs.scb.shcsr.bit.memfault_en = 0;
 }
 
 /**
  * @brief Save memfault flag and disable it
  */
 static __xwbsp_inline
-void cm_nvic_save_memfault(xwreg_t * flag)
+void armv6m_nvic_save_memfault(xwreg_t * flag)
 {
-        *flag = cm_scs.scb.shcsr.u32 & SCB_SHCSR_MEMFAULTENA_MSK;
+        *flag = (armv6m_scs.scb.shcsr.u32 & SCB_SHCSR_MEMFAULTENA_MSK);
 }
 
 /**
  * @brief restore memfault flag
  */
 static __xwbsp_inline
-void cm_nvic_restore_memfault(xwreg_t flag)
+void armv6m_nvic_restore_memfault(xwreg_t flag)
 {
-        cm_scs.scb.shcsr.u32 |= (flag & SCB_SHCSR_MEMFAULTENA_MSK);
+        armv6m_scs.scb.shcsr.u32 |= (flag & SCB_SHCSR_MEMFAULTENA_MSK);
 }
 
 /**
  * @brief Test memfault pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_tst_memfault(void)
+bool armv6m_nvic_tst_memfault(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.memfault_pended);
+        return !!(armv6m_scs.scb.shcsr.bit.memfault_pended);
 }
 
 /**
  * @brief Get memfault active-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_memfault_active(void)
+bool armv6m_nvic_get_memfault_active(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.memfault_act);
+        return !!(armv6m_scs.scb.shcsr.bit.memfault_act);
 }
 
 /******** svc ********/
@@ -612,18 +613,18 @@ bool cm_nvic_get_memfault_active(void)
  * @brief Test svccall pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_tst_svccall(void)
+bool armv6m_nvic_tst_svccall(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.svcall_pended);
+        return !!(armv6m_scs.scb.shcsr.bit.svcall_pended);
 }
 
 /**
  * @brief Get svccall active-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_svccall_active(void)
+bool armv6m_nvic_get_svccall_active(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.svcall_act);
+        return !!(armv6m_scs.scb.shcsr.bit.svcall_act);
 }
 
 /******** debug monitor ********/
@@ -631,9 +632,9 @@ bool cm_nvic_get_svccall_active(void)
  * @brief Get monitor active-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_monitor_active(void)
+bool armv6m_nvic_get_monitor_active(void)
 {
-        return !!(cm_scs.scb.shcsr.bit.monitor_act);
+        return !!(armv6m_scs.scb.shcsr.bit.monitor_act);
 }
 
 /**
@@ -642,12 +643,12 @@ bool cm_nvic_get_monitor_active(void)
  * @param[in] priority: priority to set.
  */
 static __xwbsp_inline
-void cm_nvic_set_sysirq_priority(xwirq_t irq, xwpr_t priority)
+void armv6m_nvic_set_sysirq_priority(xwirq_t irq, xwpr_t priority)
 {
         xwu32_t idx = (((xwu32_t)irq) & (xwu32_t)0xF) - (xwu32_t)4;
-        cm_scs.scb.shpr[idx].u8 = (((xwu8_t)priority <<
-                                    ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM)) &
-                                   (xwu8_t)0xFF);
+        armv6m_scs.scb.shpr[idx].u8 = (((xwu8_t)priority <<
+                                        ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM)) &
+                                       (xwu8_t)0xFF);
 }
 
 /**
@@ -656,10 +657,11 @@ void cm_nvic_set_sysirq_priority(xwirq_t irq, xwpr_t priority)
  * @return interrupt priority
  */
 static __xwbsp_inline
-xwpr_t cm_nvic_get_sysirq_priority(xwirq_t irq)
+xwpr_t armv6m_nvic_get_sysirq_priority(xwirq_t irq)
 {
         xwu32_t idx = (((xwu32_t)irq) & (xwu32_t)0xF) - (xwu32_t)4;
-        return (cm_scs.scb.shpr[idx].u8 >> ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM));
+        return (armv6m_scs.scb.shpr[idx].u8 >>
+                ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM));
 }
 
-#endif /* armv6m_nvic.h */
+#endif /* xwcd/soc/arm/v6m//armv6m_nvic.h */

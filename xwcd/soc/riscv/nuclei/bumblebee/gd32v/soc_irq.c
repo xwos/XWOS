@@ -18,9 +18,8 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <soc.h>
 #include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_irq.h>
+#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc.h>
 
 extern void soc_isr_entry(void);
 

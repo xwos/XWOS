@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_irq_h__
-#define __arch_irq_h__
+#ifndef __xwcd_soc_powerpc_e200x_arch_irq_h__
+#define __xwcd_soc_powerpc_e200x_arch_irq_h__
 
 #include <xwos/standard.h>
-#include <e200x_isa.h>
+#include <xwcd/soc/powerpc/e200x/e200x_isa.h>
 
 #define SOC_EXC_CRITICAL_INPUT                  (-9)
 #define SOC_EXC_MACHINE_CHECK                   (-8)
@@ -74,4 +74,4 @@ void arch_cpuirq_restore_lc(xwreg_t cpuirq)
         );
 }
 
-#endif  /* arch_irq.h */
+#endif  /* xwcd/soc/powerpc/e200x/arch_irq.h */

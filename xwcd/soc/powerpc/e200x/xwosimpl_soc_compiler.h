@@ -33,4 +33,4 @@
 #  error "Unknown compiler!"
 #endif
 
-#endif /* xwosimpl_soc_compiler.h */
+#endif /* xwcd/soc/powerpc/e200x/xwosimpl_soc_compiler.h */

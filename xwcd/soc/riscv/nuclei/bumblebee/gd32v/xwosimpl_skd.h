@@ -33,4 +33,4 @@ void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
         soc_skd_req_swcx(xwskd);
 }
 
-#endif /* xwosimpl_skd.h */
+#endif /* xwcd/soc/riscv/nuclei/bumblebee/gd32v/xwosimpl_skd.h */

@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_sc_trap_h__
-#define __arch_sc_trap_h__
+#ifndef __xwcd_soc_powerpc_e200x_arch_sc_trap_h__
+#define __xwcd_soc_powerpc_e200x_arch_sc_trap_h__
 
 #ifndef __ASM__
 #  include <xwos/standard.h>
@@ -32,4 +32,4 @@
 xws64_t arch_systemcall(xwid_t sc_no, xwreg_t arg1, xwreg_t arg2);
 #endif
 
-#endif /* arch_sc_trap.h */
+#endif /* xwcd/soc/powerpc/e200x/arch_sc_trap.h */

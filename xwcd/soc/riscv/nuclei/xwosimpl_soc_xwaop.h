@@ -25,4 +25,4 @@
 #  error "This file should be included from <xwos/ospl/soc/xwaop.h>."
 #endif
 
-#endif /* xwosimpl_soc_xwaop.h */
+#endif /* xwcd/soc/riscv/nuclei/xwosimpl_soc_xwaop.h */

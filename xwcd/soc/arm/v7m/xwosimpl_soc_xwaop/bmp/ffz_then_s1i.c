@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <armv7m_isa.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
 
 __xwlib_code
 xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
@@ -45,7 +45,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
                         } else {
                                 msk = ~(xwbmp_t)0;
                         }
-                        ov = cm_ldrex((xwu32_t *)&bmp[i]);
+                        ov = armv7m_ldrex((xwu32_t *)&bmp[i]);
                         tmp = (~ov) & msk;
                         if (tmp) {
                                 pos = xwbop_ffs(xwbmp_t, tmp);
@@ -62,7 +62,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
                         nv = ov | m;
                         pos += (xwssq_t)(i * BITS_PER_XWBMP_T);
                         xwmb_mp_mb();
-                        rc = cm_strex((xwu32_t *)&bmp[i], nv);
+                        rc = armv7m_strex((xwu32_t *)&bmp[i], nv);
                 }
         } while (rc);
         return pos;

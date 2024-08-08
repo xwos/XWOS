@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <armv7m_isa.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code

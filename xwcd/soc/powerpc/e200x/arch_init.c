@@ -18,10 +18,9 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <e200x_isa.h>
-#include <arch_firmware.h>
-#include <arch_init.h>
+#include <xwcd/soc/powerpc/e200x/arch_init.h>
+#include <xwcd/soc/powerpc/e200x/e200x_isa.h>
+#include <xwcd/soc/powerpc/e200x/arch_firmware.h>
 
 extern __xwbsp_init_code
 void arch_ivpr_init(void);

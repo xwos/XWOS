@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_flash_h__
-#define __soc_flash_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_flash_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_flash_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 #define SOC_FLASH_LMS_BLK_TS_MSK        0x00100000U
 #define SOC_FLASH_LMS_BLK_7_MSK         0x00020000U
@@ -57,4 +57,4 @@ void soc_cflash_program_shadow_test_block(xwu32_t * addr, xwu32_t data0, xwu32_t
 void soc_cflash_lock(void);
 void soc_flsopc_relocate(void);
 
-#endif /* soc_flash.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_flash.h */

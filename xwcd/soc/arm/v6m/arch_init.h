@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_init_h__
-#define __arch_init_h__
+#ifndef __xwcd_soc_arm_v6m_arch_init_h__
+#define __xwcd_soc_arm_v6m_arch_init_h__
 
 #include <xwos/standard.h>
 
@@ -27,4 +27,4 @@ void arch_lowlevel_init(void);
 void arch_init(void);
 void arch_relocate(void);
 
-#endif /* arch_init.h */
+#endif /* xwcd/soc/arm/v6m/arch_init.h */

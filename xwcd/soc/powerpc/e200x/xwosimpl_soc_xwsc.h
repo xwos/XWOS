@@ -25,4 +25,4 @@
 #  error "This file should be included from <xwos/ospl/soc/xwsc.h>."
 #endif
 
-#endif /* xwosimpl_soc_xwsc.h */
+#endif /* xwcd/soc/powerpc/e200x/xwosimpl_soc_xwsc.h */

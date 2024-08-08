@@ -20,8 +20,8 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_h__
-#define __soc_h__
+#ifndef __xwcd_soc_riscv_nuclei_bumblebee_gd32v_soc_h__
+#define __xwcd_soc_riscv_nuclei_bumblebee_gd32v_soc_h__
 
 #include <xwos/standard.h>
 
@@ -92,4 +92,4 @@ typedef enum IRQn {
 
 /** @} */ /* End of group Nuclei */
 
-#endif /* soc.h */
+#endif /* xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc.h */

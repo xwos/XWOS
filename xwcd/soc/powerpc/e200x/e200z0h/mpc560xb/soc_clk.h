@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_clk_h__
-#define __soc_clk_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_clk_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_clk_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 enum mpc560xb_clk_em {
         MPC560XB_CLK_FXOSC = 0,
@@ -78,4 +78,4 @@ enum mpc560xb_clk_em {
         MPC560XB_CLK_NUM,
 };
 
-#endif /* soc_clk.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_clk.h */

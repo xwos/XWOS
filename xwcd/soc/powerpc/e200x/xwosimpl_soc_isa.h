@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_powerpc_e200x_xwosimpl_soc_isa_h__
-#define __xwcd_soc_powerpc_e200x_xwosimpl_soc_isa_h__
+#ifndef __xwosimpl_soc_isa_h__
+#define __xwosimpl_soc_isa_h__
 
 #ifndef __xwos_ospl_soc_isa_h__
 #  error "This file should be included from <xwos/ospl/soc/isa.h>."

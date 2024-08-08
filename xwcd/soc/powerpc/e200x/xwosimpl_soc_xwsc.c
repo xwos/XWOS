@@ -19,8 +19,8 @@
  */
 
 #include <xwos/standard.h>
-#include <e200x_isa.h>
-#include <arch_sc_trap.h>
+#include <xwcd/soc/powerpc/e200x/e200x_isa.h>
+#include <xwcd/soc/powerpc/e200x/arch_sc_trap.h>
 
 /**
  * @brief Real entry to start supervisor call

@@ -18,8 +18,10 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_irq_h__
-#define __soc_irq_h__
+#ifndef __xwcd_soc_riscv_nuclei_bumblebee_gd32v_soc_irq_h__
+#define __xwcd_soc_riscv_nuclei_bumblebee_gd32v_soc_irq_h__
+
+#include <xwos/standard.h>
 
 /**
  * @brief IRQ Number Enumeration (For NMSIS)
@@ -139,4 +141,4 @@ xwer_t soc_irq_tst(xwirq_t irqn, bool * pending);
 xwer_t soc_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
 xwer_t soc_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
 
-#endif /* soc_irq.h */
+#endif /* xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_irq.h */

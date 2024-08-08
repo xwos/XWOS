@@ -25,7 +25,7 @@
 #  error "This file should be included from <xwos/ospl/irq.h>."
 #endif
 
-#include <arch_irq.h>
+#include <xwcd/soc/arm/v7m/arch_irq.h>
 
 static __xwbsp_inline
 void xwospl_cpuirq_enable_lc(void)
@@ -51,4 +51,4 @@ void xwospl_cpuirq_save_lc(xwreg_t * cpuirq)
         arch_cpuirq_save_lc(cpuirq);
 }
 
-#endif /* xwosimpl_irq.h */
+#endif /* xwcd/soc/arm/v7m/m7/stm32/xwosimpl_irq.h */

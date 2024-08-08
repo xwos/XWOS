@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <arch_irq.h>
+#include <xwcd/soc/arm/v7m/arch_irq.h>
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code

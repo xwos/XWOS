@@ -18,11 +18,10 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
+#include <xwcd/soc/arm/v6m/arch_skd.h>
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
-#include <armv6m_isa.h>
-#include <arch_skd.h>
+#include <xwcd/soc/arm/v6m/armv6m_isa.h>
 
 #define SOC_EXC_SWCX_PRIO                               (SOC_IRQ_PRIO_LOWEST)
 
@@ -49,7 +48,7 @@ void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
 __xwbsp_code
 void arch_skd_init_pendsv(void)
 {
-        cm_nvic_set_sysirq_priority(SOC_EXC_PENDSV, SOC_EXC_SWCX_PRIO);
+        armv6m_nvic_set_sysirq_priority(SOC_EXC_PENDSV, SOC_EXC_SWCX_PRIO);
 }
 
 /**
@@ -272,7 +271,7 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
         pstk = xwskd->pstk;
         stkbtn = pstk->guard_base;
         guard = pstk->guard;
-        cm_get_psp(&psp);
+        armv6m_get_psp(&psp);
         if ((psp - ARCH_NVGR_SIZE) < ((xwptr_t)stkbtn + guard)) {
                 arch_skd_report_stk_overflow(pstk);
         }
@@ -303,7 +302,7 @@ struct xwospl_skd * arch_skd_chk_stk(void)
         cstk = xwskd->cstk;
         stkbtn = cstk->guard_base;
         guard = cstk->guard;
-        cm_get_psp(&stk.value);
+        armv6m_get_psp(&stk.value);
         if ((stk.value - ARCH_NVGR_SIZE) < ((xwptr_t)stkbtn + guard)) {
                 arch_skd_report_stk_overflow(cstk);
         }

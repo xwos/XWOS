@@ -19,9 +19,9 @@
  */
 
 #include <xwos/standard.h>
-#include <soc_wdg.h>
-#include <soc_me.h>
-#include <soc_reset.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_wdg.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_me.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_reset.h>
 
 /**
  * @brief Hard reset SOC

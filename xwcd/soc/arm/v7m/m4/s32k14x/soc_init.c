@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <soc_init.h>
+#include <xwcd/soc/arm/v7m/m4/s32k14x/soc_init.h>
 
 struct soc_flash_cfg {
         xwu8_t backdoor_key[8];

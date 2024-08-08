@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_sim_h__
-#define __soc_sim_h__
+#ifndef __xwcd_soc_arm_v6m_m0p_kea_soc_sim_h__
+#define __xwcd_soc_arm_v6m_m0p_kea_soc_sim_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc.h>
 
 struct soc_sim_reg {
         union {
@@ -201,4 +201,4 @@ struct soc_sim_reg {
 #define SOC_SIM_BASE    (0x40048000U)
 #define soc_sim         (*((volatile struct soc_sim_reg *)SOC_SIM_BASE))
 
-#endif /* soc_sim.h */
+#endif /* xwcd/soc/arm/v6m/m0p/kea/soc_sim.h */

@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_fpu_h__
-#define __arch_fpu_h__
+#ifndef __xwcd_soc_arm_v7m_arch_arch_fpu_h__
+#define __xwcd_soc_arm_v7m_arch_arch_fpu_h__
 
 #include <xwos/standard.h>
 
@@ -107,4 +107,4 @@
 
 void arch_fpu_init(void);
 
-#endif /* arch_fpu.h */
+#endif /* xwcd/soc/arm/v7m/arch_fpu.h */

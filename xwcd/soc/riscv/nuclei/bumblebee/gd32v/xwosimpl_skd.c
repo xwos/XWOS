@@ -21,8 +21,8 @@
 #include <xwos/standard.h>
 #include <xwos/ospl/soc/xwsc.h>
 #include <xwos/ospl/skd.h>
-#include <soc.h>
-#include <soc_irq.h>
+#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc.h>
+#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_irq.h>
 
 #ifndef __riscv_32e
 #  define SOC_CALLER_CONTEXT_SIZE (20 * REGBYTES)

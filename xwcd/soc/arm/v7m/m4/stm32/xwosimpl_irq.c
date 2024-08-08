@@ -19,8 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <arch_irq.h>
-#include <arch_nvic.h>
+#include <xwcd/soc/arm/v7m/arch_irq.h>
 
 __xwbsp_code
 xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf)

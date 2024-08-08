@@ -18,10 +18,9 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
+#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_init.h>
 #include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc.h>
 #include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_irq.h>
-#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_init.h>
 
 
 extern xwu8_t data_lma_base[];

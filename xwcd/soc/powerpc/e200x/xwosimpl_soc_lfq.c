@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <e200x_isa.h>
+#include <xwcd/soc/powerpc/e200x/e200x_isa.h>
 #include <xwos/lib/lfq.h>
 
 __xwbsp_code

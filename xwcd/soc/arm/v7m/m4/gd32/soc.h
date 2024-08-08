@@ -18,9 +18,9 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_h__
-#define __soc_h__
+#ifndef __xwcd_soc_arm_v7m_m4_gd32_soc_h__
+#define __xwcd_soc_arm_v7m_m4_gd32_soc_h__
 
 #include <xwos/standard.h>
 
-#endif /* soc.h */
+#endif /* xwcd/soc/arm/v7m/m4/gd32/soc.h */

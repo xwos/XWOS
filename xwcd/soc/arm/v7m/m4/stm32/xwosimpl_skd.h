@@ -18,22 +18,22 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_skd_h__
-#define __xwosimpl_skd_h__
+#ifndef __xwcd_soc_arm_v7m_m4_stm32_xwosimpl_skd_h__
+#define __xwcd_soc_arm_v7m_m4_stm32_xwosimpl_skd_h__
 
 #ifndef __xwos_ospl_skd_h__
 #  error "This file should be included from <xwos/ospl/skd.h>."
 #endif
 
-#include <armv7m_nvic.h>
+#include <xwcd/soc/arm/v7m/armv7m_nvic.h>
 
 static __xwbsp_inline
 void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
-        cm_nvic_pend_pendsv();
+        armv7m_nvic_pend_pendsv();
         armv7m_dsb();
         armv7m_isb();
 }
 
-#endif /* xwosimpl_skd.h */
+#endif /* xwcd/soc/arm/v7m/m4/stm32/xwosimpl_skd.h */

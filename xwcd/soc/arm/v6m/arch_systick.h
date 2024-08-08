@@ -18,12 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_systick_h__
-#define __arch_systick_h__
+#ifndef __xwcd_soc_arm_v6m_arch_systick_h__
+#define __xwcd_soc_arm_v6m_arch_systick_h__
 
 #include <xwos/standard.h>
 #include <xwos/ospl/syshwt.h>
-#include <arch_irq.h>
+#include <xwcd/soc/arm/v6m/arch_irq.h>
 
 #define SOC_EXC_TICK_PRIO (SOC_IRQ_PRIO_LOWEST)
 
@@ -32,4 +32,4 @@ xwer_t arch_systick_start(struct xwospl_syshwt * hwt);
 xwer_t arch_systick_stop(struct xwospl_syshwt * hwt);
 xwtm_t arch_systick_get_timeconfetti(struct xwospl_syshwt * hwt);
 
-#endif /* arch_systick.h */
+#endif /* xwcd/soc/arm/v6m/arch_systick.h */

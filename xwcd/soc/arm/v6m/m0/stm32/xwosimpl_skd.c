@@ -20,8 +20,8 @@
 
 #include <xwos/standard.h>
 #include <xwos/ospl/skd.h>
-#include <arch_irq.h>
-#include <arch_skd.h>
+#include <xwcd/soc/arm/v6m/arch_irq.h>
+#include <xwcd/soc/arm/v6m/arch_skd.h>
 
 __xwbsp_code
 xwer_t xwospl_skd_init(__unused struct xwospl_skd * xwskd)

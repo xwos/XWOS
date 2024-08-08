@@ -18,12 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_gpio_h__
-#define __soc_gpio_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_gpio_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_gpio_h__
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 #define SOC_GPIOA_0     (xwu16_t)0
 #define SOC_GPIOA_1     (xwu16_t)1
@@ -303,4 +303,4 @@ struct soc_gpio_pincfg {
         xwu8_t dout; /**< default output level */
 };
 
-#endif /* soc_gpio.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_gpio.h */

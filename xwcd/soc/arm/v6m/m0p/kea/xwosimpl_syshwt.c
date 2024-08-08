@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/ospl/syshwt.h>
-#include <arch_systick.h>
+#include <xwcd/soc/arm/v6m/arch_systick.h>
 
 __xwbsp_code
 xwer_t xwospl_syshwt_init(struct xwospl_syshwt * hwt)

@@ -25,4 +25,4 @@
 #  error "This file should be included from <xwos/ospl/soc/lfq.h>."
 #endif
 
-#endif /* xwosimpl_soc_lfq.h */
+#endif /* xwcd/soc/arm/v6m/xwosimpl_soc_lfq.h */

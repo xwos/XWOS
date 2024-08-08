@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_me_h__
-#define __soc_me_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_me_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_me_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 #define MPC5_ME_MCTL_KEY        0x5AF0U
 #define MPC5_ME_MCTL_KEY_INV    0xA50FU
@@ -62,4 +62,4 @@
 
 void soc_me_enter_mode(xwu32_t mode);
 
-#endif /* soc_me.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_me.h */

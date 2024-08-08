@@ -18,13 +18,13 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_reset_h__
-#define __soc_reset_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_reset_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_reset_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 void soc_reset_hard(void);
 void soc_reset_soft(void);
 
-#endif /* soc_reset.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_reset.h */

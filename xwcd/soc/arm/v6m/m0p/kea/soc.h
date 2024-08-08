@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_h__
-#define __soc_h__
+#ifndef __xwcd_soc_arm_v6m_m0p_kea_soc_h__
+#define __xwcd_soc_arm_v6m_m0p_kea_soc_h__
 
 #include <xwos/standard.h>
 
@@ -35,4 +35,4 @@
 
 #define __flscfg __xwcc_section(".flash.cfg")
 
-#endif /* soc.h */
+#endif /* xwcd/soc/arm/v6m/m0p/kea/soc.h */

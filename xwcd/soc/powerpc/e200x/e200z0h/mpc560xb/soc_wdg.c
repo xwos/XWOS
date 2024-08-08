@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <soc_wdg.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_wdg.h>
 
 #define SOC_WDG_CLK     (128000U)
 

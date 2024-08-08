@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_wdg_h__
-#define __soc_wdg_h__
+#ifndef __xwcd_soc_arm_v6m_m0p_kea_soc_wdg_h__
+#define __xwcd_soc_arm_v6m_m0p_kea_soc_wdg_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc.h>
 
 /* CS1 Bit Fields */
 #define SOC_WDG_CS1_STOP_MASK           0x1U
@@ -112,4 +112,4 @@ struct soc_wdg_reg {
 #define SOC_WDG_BASE    (0x40052000U)
 #define soc_wdg         (*((volatile struct soc_wdg_reg *)SOC_WDG_BASE))
 
-#endif /* soc_wdg.h */
+#endif /* xwcd/soc/arm/v6m/m0p/kea/soc_wdg.h */

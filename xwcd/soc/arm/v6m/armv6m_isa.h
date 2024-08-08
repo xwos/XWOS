@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __armv6m_isa_h__
-#define __armv6m_isa_h__
+#ifndef __xwcd_soc_arm_v6m_armv6m_isa_h__
+#define __xwcd_soc_arm_v6m_armv6m_isa_h__
 
 #include <xwos/standard.h>
 
@@ -49,7 +49,7 @@
  * @brief program status register
  * @note little-endian
  */
-union cm_xpsr_reg {
+union armv6m_xpsr_reg {
         struct {
                 xwu32_t reserved0:16; /**< bit0~15 Reserved */
                 __xw_io xwu32_t ge:4; /**< bit16~19 Greater than or Equal flags */
@@ -87,7 +87,7 @@ union cm_xpsr_reg {
 /**
  *@brief Control Registers (CONTROL).
  */
-union cm_control_reg {
+union armv6m_control_reg {
         struct {
                 __xw_io xwu32_t npriv:1; /**< b0: Execution privilege in Thread mode */
                 __xw_io xwu32_t spsel:1; /**< b1: Stack to be used */
@@ -100,7 +100,7 @@ union cm_control_reg {
 /**
  * @brief System Control Space (offset: 0xE000E000)
  */
-struct cm_scs_reg {
+struct armv6m_scs_reg {
         union {
                 __xw_io xwu32_t u32;
         } mcr; /**< offset:0x000(r/w) master control register */
@@ -671,7 +671,7 @@ struct cm_scs_reg {
 /**
  * @brief Instrumentation Trace Macrocell Register (ITM).
  */
-struct cm_itm_reg {
+struct armv6m_itm_reg {
         union {
                 __xw_io xwu8_t u8; /**< ( /W) ITM Stimulus Port 8-bit */
                 __xw_io xwu16_t u16; /**< ( /W) ITM Stimulus Port 16-bit */
@@ -791,7 +791,7 @@ struct cm_itm_reg {
 /**
  * @brief Data Watchpoint and Trace Register (DWT)
  */
-struct cm_dwt_reg {
+struct armv6m_dwt_reg {
         union {
                 __xw_io xwu32_t u32;
         } ctrl; /**< Offset: 0x000 (R/W) Control Register */
@@ -882,7 +882,7 @@ struct cm_dwt_reg {
 /**
  * @brief Trace Port Interface Register (TPI).
  */
-struct cm_tpiu_reg {
+struct armv6m_tpiu_reg {
         union {
                 __xw_i xwu32_t u32;
         } sspsr; /**< Offset: 0x000 (R/ ) Supported Parallel Port Size Register */
@@ -994,10 +994,10 @@ struct cm_tpiu_reg {
 #define ARMv6m_DWT_BASE         (0xE0001000U) /**< DWT Base Address */
 #define ARMv6m_TPI_BASE         (0xE0040000U) /**< TPI Base Address */
 
-#define cm_scs                  (*((__xw_io struct cm_scs_reg *)ARMv6m_SCS_BASE))
-#define cm_itm                  (*((__xw_io struct cm_itm_reg *)ARMv6m_ITM_BASE))
-#define cm_dwt                  (*((__xw_io struct cm_dwt_reg *)ARMv6m_DWT_BASE))
-#define cm_tpiu                 (*((__xw_io struct cm_tpiu_reg *)ARMv6m_TPI_BASE))
+#define armv6m_scs                  (*((__xw_io struct armv6m_scs_reg *)ARMv6m_SCS_BASE))
+#define armv6m_itm                  (*((__xw_io struct armv6m_itm_reg *)ARMv6m_ITM_BASE))
+#define armv6m_dwt                  (*((__xw_io struct armv6m_dwt_reg *)ARMv6m_DWT_BASE))
+#define armv6m_tpiu                 (*((__xw_io struct armv6m_tpiu_reg *)ARMv6m_TPI_BASE))
 
 /******** ******** special registers ******** ********/
 /**
@@ -1005,7 +1005,7 @@ struct cm_tpiu_reg {
  * @param[out] xpsr: buffer to return result
  */
 static __xwbsp_inline
-void cm_get_xpsr(xwu32_t * xpsr)
+void armv6m_get_xpsr(xwu32_t * xpsr)
 {
         __asm__ volatile(
         "mrs    %[__xpsr], xpsr"
@@ -1020,7 +1020,7 @@ void cm_get_xpsr(xwu32_t * xpsr)
  * @param[in] xpsr: new value
  */
 static __xwbsp_inline
-void cm_set_xpsr(xwu32_t xpsr)
+void armv6m_set_xpsr(xwu32_t xpsr)
 {
         __asm__ volatile(
         "msr    xpsr, %[__xpsr]"
@@ -1035,7 +1035,7 @@ void cm_set_xpsr(xwu32_t xpsr)
  * @param[out] apsr: buffer to return result
  */
 static __xwbsp_inline
-void cm_get_apsr(xwu32_t * apsr)
+void armv6m_get_apsr(xwu32_t * apsr)
 {
         __asm__ volatile(
         "mrs    %[__apsr], apsr"
@@ -1050,7 +1050,7 @@ void cm_get_apsr(xwu32_t * apsr)
  * @param[in] apsr: new value
  */
 static __xwbsp_inline
-void cm_set_apsr(xwu32_t apsr)
+void armv6m_set_apsr(xwu32_t apsr)
 {
         __asm__ volatile(
         "msr    apsr, %[__apsr]"
@@ -1065,7 +1065,7 @@ void cm_set_apsr(xwu32_t apsr)
  * @param[out] ipsr: buffer to return result
  */
 static __xwbsp_inline
-void cm_get_ipsr(xwu32_t * ipsr)
+void armv6m_get_ipsr(xwu32_t * ipsr)
 {
         __asm__ volatile(
         "mrs    %[__ipsr], ipsr"
@@ -1080,7 +1080,7 @@ void cm_get_ipsr(xwu32_t * ipsr)
  * @param[in] ipsr: new value
  */
 static __xwbsp_inline
-void cm_set_ipsr(xwu32_t ipsr)
+void armv6m_set_ipsr(xwu32_t ipsr)
 {
         __asm__ volatile(
         "msr    ipsr, %[__ipsr]"
@@ -1095,7 +1095,7 @@ void cm_set_ipsr(xwu32_t ipsr)
  * @param[out] epsr: buffer to return result
  */
 static __xwbsp_inline
-void cm_get_epsr(xwu32_t * epsr)
+void armv6m_get_epsr(xwu32_t * epsr)
 {
         __asm__ volatile(
         "mrs    %[__epsr], epsr"
@@ -1110,7 +1110,7 @@ void cm_get_epsr(xwu32_t * epsr)
  * @param[in] epsr: new value
  */
 static __xwbsp_inline
-void cm_set_epsr(xwu32_t epsr)
+void armv6m_set_epsr(xwu32_t epsr)
 {
         __asm__ volatile(
         "msr    epsr, %[__epsr]"
@@ -1125,7 +1125,7 @@ void cm_set_epsr(xwu32_t epsr)
  * @param[out] msp: buffer to return result
  */
 static __xwbsp_inline
-void cm_get_msp(xwptr_t * msp)
+void armv6m_get_msp(xwptr_t * msp)
 {
         __asm__ volatile(
         "mrs    %[__msp], msp"
@@ -1140,7 +1140,7 @@ void cm_get_msp(xwptr_t * msp)
  * @param[in] msp: new value
  */
 static __xwbsp_inline
-void cm_set_msp(xwptr_t msp)
+void armv6m_set_msp(xwptr_t msp)
 {
         __asm__ volatile(
         "msr    msp, %[__msp]"
@@ -1155,7 +1155,7 @@ void cm_set_msp(xwptr_t msp)
  * @param[out] psp: buffer to return result
  */
 static __xwbsp_inline
-void cm_get_psp(xwptr_t * psp)
+void armv6m_get_psp(xwptr_t * psp)
 {
         __asm__ volatile(
         "mrs    %[__psp], psp"
@@ -1170,7 +1170,7 @@ void cm_get_psp(xwptr_t * psp)
  * @param[in] psp: new value
  */
 static __xwbsp_inline
-void cm_set_psp(xwptr_t psp)
+void armv6m_set_psp(xwptr_t psp)
 {
         __asm__ volatile(
         "msr    psp, %[__psp]"
@@ -1185,7 +1185,7 @@ void cm_set_psp(xwptr_t psp)
  * @param[out] primask: buffer to return result
  */
 static __xwbsp_inline
-void cm_get_primask(xwu32_t * primask)
+void armv6m_get_primask(xwu32_t * primask)
 {
         __asm__ volatile(
         "mrs    %[__primask], primask"
@@ -1200,7 +1200,7 @@ void cm_get_primask(xwu32_t * primask)
  * @param[in] primask: new value
  */
 static __xwbsp_inline
-void cm_set_primask(xwu32_t primask)
+void armv6m_set_primask(xwu32_t primask)
 {
         __asm__ volatile(
         "msr    primask, %[__primask]"
@@ -1215,7 +1215,7 @@ void cm_set_primask(xwu32_t primask)
  * @param[out] faultmask: buffer to return result
  */
 static __xwbsp_inline
-void cm_get_faultmask(xwu32_t * faultmask)
+void armv6m_get_faultmask(xwu32_t * faultmask)
 {
         __asm__ volatile(
         "mrs    %[__faultmask], faultmask"
@@ -1230,7 +1230,7 @@ void cm_get_faultmask(xwu32_t * faultmask)
  * @param[in] faultmask: new value
  */
 static __xwbsp_inline
-void cm_set_faultmask(xwu32_t faultmask)
+void armv6m_set_faultmask(xwu32_t faultmask)
 {
         __asm__ volatile(
         "msr    faultmask, %[__faultmask]"
@@ -1245,7 +1245,7 @@ void cm_set_faultmask(xwu32_t faultmask)
  * @param[out] control: buffer to return result
  */
 static __xwbsp_inline
-void cm_get_control(xwu32_t * control)
+void armv6m_get_control(xwu32_t * control)
 {
         __asm__ volatile(
         "mrs    %[__control], control"
@@ -1260,7 +1260,7 @@ void cm_get_control(xwu32_t * control)
  * @param[in] control: new value
  */
 static __xwbsp_inline
-void cm_set_control(xwu32_t control)
+void armv6m_set_control(xwu32_t control)
 {
         __asm__ volatile(
         "msr    control, %[__control]"
@@ -1276,13 +1276,13 @@ void cm_set_control(xwu32_t control)
  * @param[in] c: byte
  */
 static __xwbsp_inline
-void cm_itm_putc(xwu32_t port, const char c)
+void armv6m_itm_putc(xwu32_t port, const char c)
 {
-        if (__xwcc_likely((cm_itm.tcr.bit.itmena) &&
-                     (cm_itm.ter[port >> 5].u32 & (1U << (port & 0x1FU))))) {
-                while (0 == cm_itm.port[port].u32) {
+        if (__xwcc_likely((armv6m_itm.tcr.bit.itmena) &&
+                     (armv6m_itm.ter[port >> 5].u32 & (1U << (port & 0x1FU))))) {
+                while (0 == armv6m_itm.port[port].u32) {
                 }
-                cm_itm.port[port].u8 = (xwu8_t)c;
+                armv6m_itm.port[port].u8 = (xwu8_t)c;
         }
 }
 
@@ -1291,13 +1291,13 @@ void cm_itm_putc(xwu32_t port, const char c)
  * @param[in] s: string
  */
 static __xwbsp_inline
-xwssz_t cm_itm_puts(xwu32_t port, const char * s)
+xwssz_t armv6m_itm_puts(xwu32_t port, const char * s)
 {
         xwssz_t i;
 
         i = 0;
         while (s[i]) {
-                cm_itm_putc(port, s[i]);
+                armv6m_itm_putc(port, s[i]);
                 i++;
         }
         return i;
@@ -1309,13 +1309,13 @@ xwssz_t cm_itm_puts(xwu32_t port, const char * s)
  * @param[in] n: max length
  */
 static __xwbsp_inline
-xwssz_t cm_itm_putns(xwu32_t port, const char * s, xwsz_t n)
+xwssz_t armv6m_itm_putns(xwu32_t port, const char * s, xwsz_t n)
 {
         xwssz_t i;
 
         i = 0;
         while ((s[i]) && ((xwsz_t)i < n)) {
-                cm_itm_putc(port, s[i]);
+                armv6m_itm_putc(port, s[i]);
                 i++;
         }
         return i;
@@ -1330,12 +1330,12 @@ xwssz_t cm_itm_putns(xwu32_t port, const char * s, xwsz_t n)
  * @brief System Resets
  */
 static __xwbsp_inline
-void cm_reset_system(void)
+void armv6m_reset_system(void)
 {
         armv6m_dsb(); /* Ensure all outstanding memory accesses
                          included buffered write are completed before reset */
-        cm_scs.scb.aircr.u32  = (xwu32_t)((0x5FA << SCB_AIRCR_VECTKEY_POS) |
-                                          (cm_scs.scb.aircr.u32 &
+        armv6m_scs.scb.aircr.u32  = (xwu32_t)((0x5FA << SCB_AIRCR_VECTKEY_POS) |
+                                          (armv6m_scs.scb.aircr.u32 &
                                            SCB_AIRCR_PRIGROUP_MSK) |
                                           SCB_AIRCR_SYSRESETREQ_MSK); /* Keep priority
                                                                          group */
@@ -1348,7 +1348,7 @@ void cm_reset_system(void)
  * @brief Clear exclusive
  */
 static __xwbsp_inline
-void cm_clrex(void)
+void armv6m_clrex(void)
 {
         __asm__ volatile("clrex\n" : : : "memory");
 }
@@ -1359,7 +1359,7 @@ void cm_clrex(void)
  * @return word in the address
  */
 static __xwbsp_inline
-xwu32_t cm_ldrex(volatile void * addr)
+xwu32_t armv6m_ldrex(volatile void * addr)
 {
         xwu32_t tmp;
 
@@ -1381,7 +1381,7 @@ xwu32_t cm_ldrex(volatile void * addr)
  * @retval 0: OK
  */
 static __xwbsp_inline
-xwer_t cm_strex(volatile void * addr, xwu32_t value)
+xwer_t armv6m_strex(volatile void * addr, xwu32_t value)
 {
         xwer_t rc;
 
@@ -1401,7 +1401,7 @@ xwer_t cm_strex(volatile void * addr, xwu32_t value)
  * @return byte in the address
  */
 static __xwbsp_inline
-xwu8_t cm_ldrexb(volatile void * addr)
+xwu8_t armv6m_ldrexb(volatile void * addr)
 {
         xwu8_t tmp;
 
@@ -1423,7 +1423,7 @@ xwu8_t cm_ldrexb(volatile void * addr)
  * @retval 0: OK
  */
 static __xwbsp_inline
-xwer_t cm_strexb(volatile void * addr, xwu8_t value)
+xwer_t armv6m_strexb(volatile void * addr, xwu8_t value)
 {
         xwer_t rc;
 
@@ -1443,7 +1443,7 @@ xwer_t cm_strexb(volatile void * addr, xwu8_t value)
  * @return half-word in the address
  */
 static __xwbsp_inline
-xwu16_t cm_ldrexh(volatile void * addr)
+xwu16_t armv6m_ldrexh(volatile void * addr)
 {
         xwu16_t tmp;
 
@@ -1464,7 +1464,7 @@ xwu16_t cm_ldrexh(volatile void * addr)
  * @retval 0: OK
  */
 static __xwbsp_inline
-xwer_t cm_strexh(volatile void * addr, xwu16_t value)
+xwer_t armv6m_strexh(volatile void * addr, xwu16_t value)
 {
         xwer_t rc;
 
@@ -1483,7 +1483,7 @@ xwer_t cm_strexh(volatile void * addr, xwu16_t value)
  * @param[in] addr: address
  */
 static __xwbsp_inline
-void cm_prefetch(const volatile void * addr)
+void armv6m_prefetch(const volatile void * addr)
 {
         __asm__ volatile(
         "pld    [%[__addr], #0]\n"
@@ -1497,7 +1497,7 @@ void cm_prefetch(const volatile void * addr)
  * @brief Wait for event
  */
 static __xwbsp_inline
-void cm_wfe(void)
+void armv6m_wfe(void)
 {
         __asm__ volatile("wfe");
 }
@@ -1506,7 +1506,7 @@ void cm_wfe(void)
  * @brief Wait for interrupt
  */
 static __xwbsp_inline
-void cm_wfi(void)
+void armv6m_wfi(void)
 {
         __asm__ volatile("wfi");
 }
@@ -1515,9 +1515,9 @@ void cm_wfi(void)
  * @brief Send event
  */
 static __xwbsp_inline
-void cm_sev(void)
+void armv6m_sev(void)
 {
         __asm__ volatile("sev");
 }
 
-#endif /* armv6m_isa.h */
+#endif /* xwcd/soc/arm/v6m/armv6m_isa.h */

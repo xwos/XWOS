@@ -21,8 +21,7 @@
  *   code to the RAM and run it in RAM.
  */
 
-#include <xwos/standard.h>
-#include <soc_flash.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_flash.h>
 
 extern xwu8_t flsopc_lma_base[];
 extern xwu8_t flsopc_vma_base[];

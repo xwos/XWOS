@@ -26,7 +26,7 @@ __xwos_code
 void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
-        cm_wfi();
+        armv7m_wfi();
 }
 
 extern

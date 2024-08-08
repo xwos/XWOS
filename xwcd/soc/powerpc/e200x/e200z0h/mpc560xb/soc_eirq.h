@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_eirq_h__
-#define __soc_eirq_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_eirq_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_eirq_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 /**
  * @brief soc external IRQ enumerations
@@ -86,4 +86,4 @@ enum soc_eirq_em {
         SOC_EIRQ_NUM = SOC_EIRQ_MAX - SOC_EIRQ_MIN + 1,
 };
 
-#endif /* soc_eirq.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_eirq.h */

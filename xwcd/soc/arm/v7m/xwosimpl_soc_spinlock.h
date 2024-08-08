@@ -25,7 +25,7 @@
 #  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
 #endif
 
-#include <armv7m_isa.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
 
 #define SOC_SPLK_TICKET_SHIFT          16
 
@@ -63,7 +63,7 @@ void soc_splk_lock(struct soc_splk * socsplk)
         xwu32_t newval;
         struct soc_splk tmp;
 
-        cm_prefetch(socsplk);
+        armv7m_prefetch(socsplk);
         __asm__ volatile(
         "1:\n"
         "       ldrex   %[__tmp], [%[__lock]]\n"
@@ -80,7 +80,7 @@ void soc_splk_lock(struct soc_splk * socsplk)
         );
 
         while (tmp.v.tickets.next != tmp.v.tickets.curr) {
-                cm_wfe();
+                armv7m_wfe();
                 tmp.v.tickets.curr = xwmb_access(xwu16_t, socsplk->v.tickets.curr);
         }
         xwmb_mp_mb();
@@ -93,7 +93,7 @@ xwer_t soc_splk_trylock(struct soc_splk * socsplk)
         xwu32_t contended;
         struct soc_splk tmp;
 
-        cm_prefetch(socsplk);
+        armv7m_prefetch(socsplk);
         do {
                 __asm__ volatile(
                 "       ldrex   %[__tmp], [%[__lock]]\n"
@@ -126,8 +126,8 @@ void soc_splk_unlock(struct soc_splk * socsplk)
         xwmb_mp_mb();
         socsplk->v.tickets.curr++;
         armv7m_dsb();
-        cm_sev();
+        armv7m_sev();
 }
 #endif
 
-#endif /* xwosimpl_soc_spinlock.h */
+#endif /* xwcd/soc/arm/v7m/xwosimpl_soc_spinlock.h */

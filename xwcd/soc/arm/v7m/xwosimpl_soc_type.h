@@ -155,4 +155,4 @@ typedef xws32_t xwsid_t; /**< ID (有符号) */
 #define BITS_PER_XWSID_T        BITS_PER_XWS32_T
 #define XWSID_T_SHIFT           XWS32_T_SHIFT
 
-#endif /* xwosimpl_soc_type.h */
+#endif /* xwcd/soc/arm/v7m/xwosimpl_soc_type.h */

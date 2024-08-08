@@ -18,8 +18,7 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <soc_me.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_me.h>
 
 __xwbsp_code
 void soc_me_enter_mode(xwu32_t mode)

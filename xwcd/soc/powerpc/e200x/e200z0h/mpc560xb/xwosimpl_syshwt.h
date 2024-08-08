@@ -25,4 +25,4 @@
 #  error "This file should be included from <xwos/ospl/syshwt.h>."
 #endif
 
-#endif /* xwosimpl_syshwt.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/xwosimpl_syshwt.h */

@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_init_h__
-#define __soc_init_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_init_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_init_h__
 
 #include <xwos/standard.h>
 
@@ -33,4 +33,4 @@ void soc_relocate_ivt(void);
 void soc_lowlevel_init(void);
 void soc_init(void);
 
-#endif /* soc_init.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_init.h */

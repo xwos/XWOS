@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_uart_h__
-#define __soc_uart_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_uart_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_uart_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 /**
  * @brief mpc560xb DMA UART private configurations
@@ -32,4 +32,4 @@ struct soc_uart_private_cfg {
 };
 
 
-#endif /* soc_uart.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_uart.h */

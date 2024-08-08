@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_ics_h__
-#define __soc_ics_h__
+#ifndef __xwcd_soc_arm_v6m_m0p_kea_soc_ics_h__
+#define __xwcd_soc_arm_v6m_m0p_kea_soc_ics_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc.h>
 
 #define SOC_CLKM_FEI            0
 #define SOC_CLKM_FEE            1
@@ -82,4 +82,4 @@ struct soc_ics_reg {
 #define SOC_ICS_BASE    (0x40064000U)
 #define soc_ics         (*((volatile struct soc_ics_reg *)SOC_ICS_BASE))
 
-#endif /* soc_ics.h */
+#endif /* xwcd/soc/arm/v6m/m0p/kea/soc_ics.h */

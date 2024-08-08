@@ -18,8 +18,7 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <arch_sc_trap.h>
+#include <xwcd/soc/powerpc/e200x/arch_sc_trap.h>
 
 /**
  * @brief system call entry

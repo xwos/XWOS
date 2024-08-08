@@ -35,4 +35,4 @@ void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
         soc_skd_req_swcx(xwskd);
 }
 
-#endif /* xwosimpl_skd.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/xwosimpl_skd.h */

@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_init_h__
-#define __soc_init_h__
+#ifndef __xwcd_soc_riscv_nuclei_bumblebee_gd32v_soc_init_h__
+#define __xwcd_soc_riscv_nuclei_bumblebee_gd32v_soc_init_h__
 
 #include <xwos/standard.h>
 
@@ -27,4 +27,4 @@ void soc_relocate_data(void);
 void soc_relocate_ivt(void);
 void soc_init(void);
 
-#endif /* soc_init.h */
+#endif /* xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_init.h */

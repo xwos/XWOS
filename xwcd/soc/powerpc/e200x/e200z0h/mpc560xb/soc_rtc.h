@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_rtc_h__
-#define __soc_rtc_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_rtc_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_rtc_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 /**
  * @brief Counter Enable enumerations
@@ -119,4 +119,4 @@ struct soc_rtc_private_cfg {
         } u;
 };
 
-#endif /* soc_rtc.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_rtc.h */

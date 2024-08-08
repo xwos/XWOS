@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_h__
-#define __soc_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_h__
 
 #include <xwos/standard.h>
 #if ((defined(SOCCFG_CHIP_MPC5602D)) && (1 == SOCCFG_CHIP_MPC5602D))
@@ -368,4 +368,4 @@ struct soc_wkup_flags {
 extern __xwbsp_data struct soc_reset_flags soc_reset_flags;
 extern __xwbsp_data struct soc_wkup_flags soc_wkup_flags;
 
-#endif /* soc.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h */

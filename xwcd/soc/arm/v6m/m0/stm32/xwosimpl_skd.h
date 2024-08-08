@@ -25,15 +25,15 @@
 #  error "This file should be included from <xwos/ospl/skd.h>."
 #endif
 
-#include <armv6m_nvic.h>
+#include <xwcd/soc/arm/v6m/armv6m_nvic.h>
 
 static __xwbsp_inline
 void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
-        cm_nvic_pend_pendsv();
+        armv6m_nvic_pend_pendsv();
         armv6m_dsb();
         armv6m_isb();
 }
 
-#endif /* xwosimpl_skd.h */
+#endif /* xwcd/soc/arm/v6m/m0/stm32/xwosimpl_skd.h */

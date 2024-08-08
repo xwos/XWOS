@@ -18,10 +18,10 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_irq_h__
-#define __soc_irq_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_irq_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_irq_h__
 
-#include <arch_irq.h>
+#include <xwcd/soc/powerpc/e200x/arch_irq.h>
 
 #define SOC_IRQC_MAX_PRIO       (0xFU)
 #define SOC_IRQC_OS_PRIO        (0x8U)
@@ -312,4 +312,4 @@ xwer_t soc_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf);
 
 void soc_skd_isr_swi(void);
 
-#endif /* soc_irq.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_irq.h */

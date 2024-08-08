@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __compiler_gcc_h__
-#define __compiler_gcc_h__
+#ifndef __xwcd_soc_riscv_nuclei_compiler_gcc_h__
+#define __xwcd_soc_riscv_nuclei_compiler_gcc_h__
 
 #include <cfg/project.h>
 

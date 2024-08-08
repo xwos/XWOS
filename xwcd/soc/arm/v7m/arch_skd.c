@@ -18,11 +18,10 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
+#include <xwcd/soc/arm/v7m/arch_skd.h>
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
-#include <armv7m_isa.h>
-#include <arch_skd.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
 
 #define SOC_EXC_SWCX_PRIO (SOC_IRQ_PRIO_LOWEST | SOC_IRQ_SUBPRIO_LOWEST)
 
@@ -51,7 +50,7 @@ void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
 __xwbsp_code
 void arch_skd_init_pendsv(void)
 {
-        cm_nvic_set_sysirq_priority(SOC_EXC_PENDSV, SOC_EXC_SWCX_PRIO);
+        armv7m_nvic_set_sysirq_priority(SOC_EXC_PENDSV, SOC_EXC_SWCX_PRIO);
 }
 
 /**
@@ -359,7 +358,7 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
         pstk = xwskd->pstk;
         stkbtn = pstk->guard_base;
         guard = pstk->guard;
-        cm_get_psp(&psp);
+        armv7m_get_psp(&psp);
 #  if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         if ((psp - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) < ((xwptr_t)stkbtn + guard)) {
                 arch_skd_report_stk_overflow(pstk);
@@ -396,7 +395,7 @@ struct xwospl_skd * arch_skd_chk_stk(void)
         cstk = xwskd->cstk;
         stkbtn = cstk->guard_base;
         guard = cstk->guard;
-        cm_get_psp(&stk.value);
+        armv7m_get_psp(&stk.value);
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         if ((stk.value - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
             ((xwptr_t)stkbtn + guard)) {

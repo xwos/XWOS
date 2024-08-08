@@ -566,7 +566,7 @@ endif
 
 ARCH_CSRCS += arch_init.c
 ARCH_CSRCS += arch_firmware.c arch_irq.c xwosimpl_soc_lfq.c
-ARCH_CSRCS += arch_skd.c arch_systick.c arch_nvic.c
+ARCH_CSRCS += arch_skd.c arch_systick.c
 ARCH_CSRCS += xwosimpl_tls.c
 
 ARCH_AFLAGS_llvm := --target=armv6m-none-eabi

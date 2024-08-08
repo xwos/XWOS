@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_dma_h__
-#define __soc_dma_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_dma_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_dma_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 #if ((defined(SOCCFG_CHIP_MPC5607B)) && (1 == SOCCFG_CHIP_MPC5607B))
 #  define SOC_DMAC_CHANNEL_NUM          (16U)
@@ -166,4 +166,4 @@ struct soc_dmach_private_cfg {
         union soc_dma_tcd * tcds;
 };
 
-#endif /* soc_dma.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_dma.h */

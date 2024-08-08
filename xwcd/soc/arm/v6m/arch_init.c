@@ -18,10 +18,9 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <armv6m_isa.h>
-#include <arch_irq.h>
-#include <arch_init.h>
+#include <xwcd/soc/arm/v6m/arch_init.h>
+#include <xwcd/soc/arm/v6m/armv6m_isa.h>
+#include <xwcd/soc/arm/v6m/arch_irq.h>
 
 /**
  * @brief Init architecture
@@ -29,7 +28,7 @@
 __xwbsp_init_code
 void arch_init(void)
 {
-        cm_scs.scb.ccr.bit.stkalign = 1;
-        cm_scs.scb.ccr.bit.unalign_trp = 1; /* enable unalign trap */
+        armv6m_scs.scb.ccr.bit.stkalign = 1;
+        armv6m_scs.scb.ccr.bit.unalign_trp = 1; /* enable unalign trap */
         arch_init_sysirqs();
 }

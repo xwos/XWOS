@@ -18,14 +18,12 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <armv7m_isa.h>
-#include <arch_irq.h>
+#include <xwcd/soc/arm/v7m/arch_init.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
+#include <xwcd/soc/arm/v7m/arch_irq.h>
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
-#  include <arch_fpu.h>
+#  include <xwcd/soc/arm/v7m/arch_fpu.h>
 #endif
-#include <arch_nvic.h>
-#include <arch_init.h>
 
 /**
  * @brief Init Architecture
@@ -33,9 +31,9 @@
 __xwbsp_init_code
 void arch_init(void)
 {
-        cm_scs.scb.ccr.bit.stkalign = 1; /* stack aligned to 8-byte */
-        cm_scs.scb.ccr.bit.bp = 1; /* enable branch prediction */
-        cm_scs.scb.ccr.bit.div_0_trp = 1; /* enable divide by 0 trap */
+        armv7m_scs.scb.ccr.bit.stkalign = 1; /* stack aligned to 8-byte */
+        armv7m_scs.scb.ccr.bit.bp = 1; /* enable branch prediction */
+        armv7m_scs.scb.ccr.bit.div_0_trp = 1; /* enable divide by 0 trap */
         arch_nvic_init();
 #if (ARCHCFG_FPU == 1)
         arch_fpu_init();

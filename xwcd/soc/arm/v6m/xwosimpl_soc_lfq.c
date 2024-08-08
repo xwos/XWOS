@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <arch_irq.h>
+#include <xwcd/soc/arm/v6m/arch_irq.h>
 
 void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
@@ -40,7 +40,7 @@ xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h)
         top = (xwlfq_t *)(*h);
         if (top) {
                 *h = *top;
-        }/* else {} */
+        }
         arch_cpuirq_restore_lc(flag);
         return top;
 }

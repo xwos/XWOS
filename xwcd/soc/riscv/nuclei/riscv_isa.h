@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __riscv_isa_h__
-#define __riscv_isa_h__
+#ifndef __xwcd_soc_riscv_nuclei_riscv_isa_h__
+#define __xwcd_soc_riscv_nuclei_riscv_isa_h__
 
 #include <xwos/standard.h>
 
@@ -118,4 +118,4 @@ void rv_wfi(void)
         __asm__ volatile("wfi");
 }
 
-#endif /* riscv_isa.h */
+#endif /* xwcd/soc/riscv/nuclei/riscv_isa.h */

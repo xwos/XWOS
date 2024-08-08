@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
-#include <e200x_isa.h>
+#include <xwcd/soc/powerpc/e200x/e200x_isa.h>
 
 __xwlib_code
 bool xwbmpaop_t1i(atomic_xwbmp_t * bmp, xwsq_t idx)

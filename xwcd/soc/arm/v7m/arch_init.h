@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_init_h__
-#define __arch_init_h__
+#ifndef __xwcd_soc_arm_v7m_arch_init_h__
+#define __xwcd_soc_arm_v7m_arch_init_h__
 
 #include <xwos/standard.h>
 
 void arch_init(void);
 
-#endif /* arch_init.h */
+#endif /* xwcd/soc/arm/v7m/arch_init.h */

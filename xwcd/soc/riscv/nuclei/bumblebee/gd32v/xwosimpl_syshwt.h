@@ -25,4 +25,4 @@
 #  error "This file should be included from <xwos/ospl/syshwt.h>."
 #endif
 
-#endif /* xwosimpl_syshwt.h */
+#endif /* xwcd/soc/riscv/nuclei/bumblebee/gd32v/xwosimpl_syshwt.h */

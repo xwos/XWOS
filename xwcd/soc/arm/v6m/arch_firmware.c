@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <string.h>
-#include <arch_firmware.h>
+#include <xwcd/soc/arm/v6m/arch_firmware.h>
 
 static __xwbsp_code __xwcc_naked
 void arch_goto_firmware(__xwcc_unused void (*entry)(void), __xwcc_unused xwstk_t * sp)

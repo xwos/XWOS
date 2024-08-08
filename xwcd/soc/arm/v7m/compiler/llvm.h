@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __compiler_llvm_h__
-#define __compiler_llvm_h__
+#ifndef __xwcd_soc_arm_v7m_compiler_llvm_h__
+#define __xwcd_soc_arm_v7m_compiler_llvm_h__
 
 #include <cfg/project.h>
 

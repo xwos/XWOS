@@ -18,9 +18,8 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
+#include <xwcd/soc/arm/v7m/m7/s32k3xx/soc_init.h>
 #include <xwos/ospl/skd.h>
-#include <soc_init.h>
 
 struct s32k3_image_vector_table {
         xwu32_t boot_marker;

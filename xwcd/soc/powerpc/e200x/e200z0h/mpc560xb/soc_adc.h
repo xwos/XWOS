@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_adc_h__
-#define __soc_adc_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_adc_h__
+#define __xwcd_soc_powerpc_e200x_e200z0h_mpc560xb_soc_adc_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
 
 /* Overwrite enable tags */
 #define SOC_ADC_MCR_OVERWRITE_DS                0
@@ -69,4 +69,4 @@ struct soc_adc_private_cfg {
         } ctr[3]; /* Conversion timing registers */
 };
 
-#endif /* soc_adc.h */
+#endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_adc.h */

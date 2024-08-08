@@ -22,7 +22,7 @@
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/syshwt.h>
-#include <soc.h>
+#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc.h>
 
 #define SYSHWT_SRCCLK           BRDCFG_SYSHWT_SRCCLK
 

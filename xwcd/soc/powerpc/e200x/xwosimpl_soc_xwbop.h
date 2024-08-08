@@ -25,4 +25,4 @@
 #  error "This file should be included from <xwos/ospl/soc/xwbop.h>."
 #endif
 
-#endif /* xwosimpl_soc_xwbop.h */
+#endif /* xwcd/soc/powerpc/e200x/xwosimpl_soc_xwbop.h */

@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_e200x_isa_h__
-#define __arch_e200x_isa_h__
+#ifndef __xwcd_soc_powerpc_e200x_e200x_isa_h__
+#define __xwcd_soc_powerpc_e200x_e200x_isa_h__
 
 #ifndef __ASM__
 #  include <xwos/standard.h>
@@ -74,4 +74,4 @@ xwu16_t lhbrx(volatile xwu16_t * addr);
 
 #endif
 
-#endif /* e200x_isa.h */
+#endif /* xwcd/soc/powerpc/e200x/e200x_isa.h */

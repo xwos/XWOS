@@ -18,12 +18,11 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <soc.h>
-#include <soc_clk.h>
-#include <soc_me.h>
-#include <soc_irq.h>
-#include <soc_init.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_init.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_clk.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_me.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_irq.h>
 
 extern xwu8_t e200z0h_ivt_lma_base[];
 extern xwu8_t e200z0h_ivt_vma_base[];

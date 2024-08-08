@@ -27,6 +27,6 @@
  */
 void board_reset(void)
 {
-        cm_nvic_disable_faults();
-        cm_reset_system();
+        armv7m_nvic_disable_faults();
+        armv7m_reset_system();
 }

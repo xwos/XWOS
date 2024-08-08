@@ -69,7 +69,7 @@ void xwosac_pmcb_wakeup(void * arg)
 void xwosac_pmcb_sleep(void * arg)
 {
         XWOS_UNUSED(arg);
-        cm_wfi(); /* 通过 WFI 指令进入STOP模式 */
+        armv7m_wfi(); /* 通过 WFI 指令进入STOP模式 */
 }
 
 void xwosac_pmcb_init(void)

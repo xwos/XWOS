@@ -33,4 +33,4 @@
 
 typedef xwstk_t soc_jmpbuf_b[SOC_JMPBUF_DEPTH];
 
-#endif /* xwosimpl_soc_setjmp.h */
+#endif /* xwcd/soc/arm/v7m/xwosimpl_soc_setjmp.h */

@@ -18,14 +18,13 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
+#include <xwcd/soc/arm/v7m/arch_systick.h>
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/syshwt.h>
-#include <armv7m_isa.h>
-#include <arch_irq.h>
-#include <arch_skd.h>
-#include <arch_systick.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
+#include <xwcd/soc/arm/v7m/arch_irq.h>
+#include <xwcd/soc/arm/v7m/arch_skd.h>
 
 #ifdef BRDCFG_SYSHWT_SRCCLK
 #  define ARCH_SYSHWT_SRCCLK BRDCFG_SYSHWT_SRCCLK
@@ -42,28 +41,28 @@ void arch_systick_init(struct xwospl_syshwt * hwt)
 {
         hwt->irqrsc = armv7m_systick_irqrsc;
         hwt->irqs_num = 1;
-        cm_nvic_set_sysirq_priority(SOC_EXC_SYSTICK, SOC_EXC_TICK_PRIO);
+        armv7m_nvic_set_sysirq_priority(SOC_EXC_SYSTICK, SOC_EXC_TICK_PRIO);
 
-        cm_scs.systick.rvr.u32 = (ARCH_SYSHWT_SRCCLK / XWOSPL_SYSHWT_HZ) - 1;
-        cm_scs.systick.cvr.u32 = 0x0; /* clear value */
+        armv7m_scs.systick.rvr.u32 = (ARCH_SYSHWT_SRCCLK / XWOSPL_SYSHWT_HZ) - 1;
+        armv7m_scs.systick.cvr.u32 = 0x0; /* clear value */
 #ifdef BRDCFG_SYSHWT_SRCCLK
-        cm_scs.systick.csr.u32 = 0x2;/* external clk, enable interrupt */
+        armv7m_scs.systick.csr.u32 = 0x2;/* external clk, enable interrupt */
 #else
-        cm_scs.systick.csr.u32 = 0x6;/* processor clk, enable interrupt */
+        armv7m_scs.systick.csr.u32 = 0x6;/* processor clk, enable interrupt */
 #endif
 }
 
 __xwbsp_code
 xwer_t arch_systick_start(__xwcc_unused struct xwospl_syshwt * hwt)
 {
-        cm_scs.systick.csr.bit.en = 1;
+        armv7m_scs.systick.csr.bit.en = 1;
         return XWOK;
 }
 
 __xwbsp_code
 xwer_t arch_systick_stop(__xwcc_unused struct xwospl_syshwt * hwt)
 {
-        cm_scs.systick.csr.bit.en = 0;
+        armv7m_scs.systick.csr.bit.en = 0;
         return XWOK;
 }
 
@@ -73,7 +72,7 @@ xwtm_t arch_systick_get_timeconfetti(__xwcc_unused struct xwospl_syshwt * hwt)
         xwu32_t delta;
         xwu32_t confetti;
 
-        delta = cm_scs.systick.rvr.u32 - cm_scs.systick.cvr.u32 + (xwu32_t)1;
+        delta = armv7m_scs.systick.rvr.u32 - armv7m_scs.systick.cvr.u32 + (xwu32_t)1;
         confetti = (delta / ((xwu32_t)ARCH_SYSHWT_SRCCLK / (xwu32_t)xwtm_ms(1)) *
                     (xwu32_t)xwtm_us(1));
         return (xwtm_t)confetti;
@@ -85,7 +84,8 @@ void xwospl_syshwt_isr(void)
         struct xwospl_skd * xwskd;
         __xwcc_unused xwu32_t csr;
 
-        xwmb_read(xwu32_t, csr, &cm_scs.systick.csr.u32); /* read to clear COUNTFLAG */
+        /* read to clear COUNTFLAG */
+        xwmb_read(xwu32_t, csr, &armv7m_scs.systick.csr.u32);
         xwskd = xwosplcb_skd_get_lc();
         xwosplcb_syshwt_task(&xwskd->tt.hwt);
 }

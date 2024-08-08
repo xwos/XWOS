@@ -39,4 +39,4 @@ void soc_splk_lock(struct soc_splk * socsplk);
 xwer_t soc_splk_trylock(struct soc_splk * socsplk);
 void soc_splk_unlock(struct soc_splk * socsplk);
 
-#endif /* xwosimpl_soc_spinlock.h */
+#endif /* xwcd/soc/powerpc/e200x/xwosimpl_soc_spinlock.h */

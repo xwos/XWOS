@@ -18,9 +18,8 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <armv7m_isa.h>
-#include <arch_fpu.h>
+#include <xwcd/soc/arm/v7m/arch_fpu.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
 
 /**
  * @brief Init architecture fpu
@@ -29,17 +28,17 @@ __xwbsp_init_code
 void arch_fpu_init(void)
 {
         /* enable access of CP10 & CP11 */
-        cm_scs.scb.cpacr.bit.cp10 = 3;
-        cm_scs.scb.cpacr.bit.cp11 = 3;
+        armv7m_scs.scb.cpacr.bit.cp10 = 3;
+        armv7m_scs.scb.cpacr.bit.cp11 = 3;
 
         /* Hardware automatically preserves FP context on exception entry and restores
            it on exception return */
-        cm_scs.scb.fpu.fpccr.bit.aspen = 1;
-        /* cm_scs.scb.fpu.fpccr.bit.lspen = 1; */
+        armv7m_scs.scb.fpu.fpccr.bit.aspen = 1;
+        /* armv7m_scs.scb.fpu.fpccr.bit.lspen = 1; */
 
         /* FPU can pend fault */
-        cm_scs.scb.fpu.fpccr.bit.monrdy = 1;
-        cm_scs.scb.fpu.fpccr.bit.bfrdy = 1;
-        cm_scs.scb.fpu.fpccr.bit.mmrdy = 1;
-        cm_scs.scb.fpu.fpccr.bit.hfrdy = 1;
+        armv7m_scs.scb.fpu.fpccr.bit.monrdy = 1;
+        armv7m_scs.scb.fpu.fpccr.bit.bfrdy = 1;
+        armv7m_scs.scb.fpu.fpccr.bit.mmrdy = 1;
+        armv7m_scs.scb.fpu.fpccr.bit.hfrdy = 1;
 }

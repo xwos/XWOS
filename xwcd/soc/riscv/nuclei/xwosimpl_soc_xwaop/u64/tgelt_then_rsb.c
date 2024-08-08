@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <riscv_isa.h>
+#include <xwcd/soc/riscv/nuclei/riscv_isa.h>
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code

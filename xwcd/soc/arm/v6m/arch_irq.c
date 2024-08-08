@@ -19,11 +19,10 @@
  */
 
 #include <xwos/standard.h>
-#include <armv6m_isa.h>
-#include <armv6m_nvic.h>
-#include <arch_irq.h>
-#include <arch_skd.h>
-#include <arch_nvic.h>
+#include <xwcd/soc/arm/v6m/armv6m_isa.h>
+#include <xwcd/soc/arm/v6m/armv6m_nvic.h>
+#include <xwcd/soc/arm/v6m/arch_irq.h>
+#include <xwcd/soc/arm/v6m/arch_skd.h>
 
 #define SOC_EXC_FAULT_PRIO (SOC_IRQ_PRIO_HIGHEST)
 #define SOC_EXC_SVC_PRIO (SOC_IRQ_PRIO_HIGHEST)
@@ -35,18 +34,18 @@ __xwbsp_init_code
 void arch_init_sysirqs(void)
 {
         /* init faults */
-        cm_nvic_set_sysirq_priority(SOC_EXC_MMFAULT, SOC_EXC_FAULT_PRIO);
-        cm_nvic_enable_memfault();
+        armv6m_nvic_set_sysirq_priority(SOC_EXC_MMFAULT, SOC_EXC_FAULT_PRIO);
+        armv6m_nvic_enable_memfault();
 
-        cm_nvic_set_sysirq_priority(SOC_EXC_BUSFAULT, SOC_EXC_FAULT_PRIO);
-        cm_nvic_enable_busfault();
+        armv6m_nvic_set_sysirq_priority(SOC_EXC_BUSFAULT, SOC_EXC_FAULT_PRIO);
+        armv6m_nvic_enable_busfault();
 
-        cm_nvic_set_sysirq_priority(SOC_EXC_USGFAULT, SOC_EXC_FAULT_PRIO);
-        cm_nvic_enable_usgfault();
+        armv6m_nvic_set_sysirq_priority(SOC_EXC_USGFAULT, SOC_EXC_FAULT_PRIO);
+        armv6m_nvic_enable_usgfault();
 
-        cm_nvic_enable_faults();
+        armv6m_nvic_enable_faults();
 
-        cm_nvic_set_sysirq_priority(SOC_EXC_SVCALL, SOC_EXC_SVC_PRIO);
+        armv6m_nvic_set_sysirq_priority(SOC_EXC_SVCALL, SOC_EXC_SVC_PRIO);
 }
 
 /**
@@ -69,9 +68,9 @@ void arch_isr_reset(void)
 __xwbsp_isr
 void arch_isr_nmi(void)
 {
-        __xwcc_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct armv6m_scs_reg * scs;
 
-        scs = &cm_scs;
+        scs = &armv6m_scs;
         while (true) {
         }
 }
@@ -82,9 +81,9 @@ void arch_isr_nmi(void)
 __xwbsp_isr
 void arch_isr_hardfault(void)
 {
-        __xwcc_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct armv6m_scs_reg * scs;
 
-        scs = &cm_scs;
+        scs = &armv6m_scs;
         arch_skd_chk_stk();
         while (true) {
         }
@@ -96,9 +95,9 @@ void arch_isr_hardfault(void)
 __xwbsp_isr
 void arch_isr_mm(void)
 {
-        __xwcc_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct armv6m_scs_reg * scs;
 
-        scs = &cm_scs;
+        scs = &armv6m_scs;
         arch_skd_chk_stk();
         while (true) {
         }
@@ -110,9 +109,9 @@ void arch_isr_mm(void)
 __xwbsp_isr
 void arch_isr_busfault(void)
 {
-        __xwcc_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct armv6m_scs_reg * scs;
 
-        scs = &cm_scs;
+        scs = &armv6m_scs;
         arch_skd_chk_stk();
         while (true) {
         }
@@ -124,9 +123,9 @@ void arch_isr_busfault(void)
 __xwbsp_isr
 void arch_isr_usagefault(void)
 {
-        __xwcc_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct armv6m_scs_reg * scs;
 
-        scs = &cm_scs;
+        scs = &armv6m_scs;
         arch_skd_chk_stk();
         while (true) {
         }
@@ -138,9 +137,9 @@ void arch_isr_usagefault(void)
 __xwbsp_isr
 void arch_isr_dbgmon(void)
 {
-        __xwcc_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct armv6m_scs_reg * scs;
 
-        scs = &cm_scs;
+        scs = &armv6m_scs;
         while (true) {
         }
 }
@@ -260,12 +259,160 @@ void arch_isr_svc(void)
 __xwbsp_isr
 void arch_isr_noop(void)
 {
-        __xwcc_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct armv6m_scs_reg * scs;
         __xwcc_unused xwer_t rc;
         __xwcc_unused xwirq_t irqn;
 
         rc = arch_nvic_irq_get_id(&irqn);
-        scs = &cm_scs;
+        scs = &armv6m_scs;
         while (true) {
         }
+}
+
+__xwbsp_code
+xwer_t arch_nvic_irq_get_id(xwirq_t * irqnbuf)
+{
+        xwirq_t curr;
+        xwer_t rc;
+
+        curr = armv6m_scs.scb.icsr.bit.vect_active;
+        if (0 == curr) {
+                rc = -ENOTISRCTX;
+        } else {
+                curr -= 16;
+                rc = XWOK;
+        }
+        if (!is_err_or_null(irqnbuf)) {
+                *irqnbuf = curr;
+        }
+        return rc;
+}
+
+__xwbsp_code
+xwer_t arch_nvic_irq_enable(__xwcc_unused xwirq_t irqn)
+{
+        if (irqn >= 0) {
+                armv6m_nvic_enable_irq(irqn);
+        } else if (SOC_EXC_MMFAULT == irqn) {
+                armv6m_nvic_enable_memfault();
+        } else if (SOC_EXC_BUSFAULT == irqn) {
+                armv6m_nvic_enable_busfault();
+        } else if (SOC_EXC_USGFAULT == irqn) {
+                armv6m_nvic_enable_usgfault();
+        }/* else {} */
+        return XWOK;
+}
+
+__xwbsp_code
+xwer_t arch_nvic_irq_disable(__xwcc_unused xwirq_t irqn)
+{
+        if (irqn >= 0) {
+                armv6m_nvic_disable_irq(irqn);
+        } else if (SOC_EXC_MMFAULT == irqn) {
+                armv6m_nvic_disable_memfault();
+        } else if (SOC_EXC_BUSFAULT == irqn) {
+                armv6m_nvic_disable_busfault();
+        } else if (SOC_EXC_USGFAULT == irqn) {
+                armv6m_nvic_disable_usgfault();
+        }/* else {} */
+        return XWOK;
+}
+
+__xwbsp_code
+xwer_t arch_nvic_irq_save(xwirq_t irqn, xwreg_t *flag)
+{
+        xwer_t rc = XWOK;
+
+        if (irqn >= 0) {
+                armv6m_nvic_save_irq(irqn, flag);
+                armv6m_nvic_disable_irq(irqn);
+        } else if (SOC_EXC_MMFAULT == irqn) {
+                armv6m_nvic_save_memfault(flag);
+                armv6m_nvic_disable_memfault();
+        } else if (SOC_EXC_BUSFAULT == irqn) {
+                armv6m_nvic_save_busfault(flag);
+                armv6m_nvic_disable_busfault();
+        } else if (SOC_EXC_USGFAULT == irqn) {
+                armv6m_nvic_save_usgfault(flag);
+                armv6m_nvic_disable_usgfault();
+        } else {
+                rc = -EPERM;
+        }
+        return rc;
+}
+
+__xwbsp_code
+xwer_t arch_nvic_irq_restore(xwirq_t irqn, xwreg_t flag)
+{
+        xwer_t rc;
+
+        rc = XWOK;
+        if (irqn >= 0) {
+                armv6m_nvic_restore_irq(irqn, flag);
+        } else if (SOC_EXC_MMFAULT == irqn) {
+                armv6m_nvic_restore_memfault(flag);
+        } else if (SOC_EXC_BUSFAULT == irqn) {
+                armv6m_nvic_restore_busfault(flag);
+        } else if (SOC_EXC_USGFAULT == irqn) {
+                armv6m_nvic_restore_usgfault(flag);
+        } else {
+                rc = -EPERM;
+        }
+        return rc;
+}
+
+__xwbsp_code
+xwer_t arch_nvic_irq_pend(xwirq_t irqn)
+{
+        xwer_t rc;
+
+        rc = XWOK;
+        if (irqn >= 0) {
+                armv6m_nvic_software_trigger_irq(irqn);
+        } else if (SOC_EXC_NMI == irqn) {
+                armv6m_nvic_pend_nmi();
+        } else if (SOC_EXC_PENDSV == irqn) {
+                armv6m_nvic_pend_pendsv();
+        } else if (SOC_EXC_SYSTICK == irqn) {
+                armv6m_nvic_pend_systick();
+        } else {
+                rc = -EPERM;
+        }
+        return rc;
+}
+
+__xwbsp_code
+xwer_t arch_nvic_irq_clear(xwirq_t irqn)
+{
+        xwer_t rc;
+
+        rc = XWOK;
+        if (irqn >= 0) {
+                armv6m_nvic_clear_irq(irqn);
+        } else if (SOC_EXC_PENDSV == irqn) {
+                armv6m_nvic_clear_systick();
+        } else if (SOC_EXC_SYSTICK == irqn) {
+                armv6m_nvic_clear_systick();
+        } else {
+                rc = -EPERM;
+        }
+        return rc;
+}
+
+__xwbsp_code
+xwer_t arch_nvic_irq_tst(xwirq_t irqn, bool * pending)
+{
+        xwer_t rc;
+
+        rc = XWOK;
+        if (irqn >= 0) {
+                *pending = armv6m_nvic_tst_irq(irqn);
+        } else if (SOC_EXC_PENDSV == irqn) {
+                *pending = armv6m_nvic_tst_pendsv();
+        } else if (SOC_EXC_SYSTICK == irqn) {
+                *pending = armv6m_nvic_tst_systick();
+        } else {
+                rc = -EPERM;
+        }
+        return rc;
 }
