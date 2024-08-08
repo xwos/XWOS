@@ -1,0 +1,15 @@
+# XWOS boot config
+# for option pls see:https://www.raspberrypi.org/documentation/configuration/config-txt/boot.md
+#
+
+[pi4]
+arm_64bit=1
+arm_peri_high=1
+kernel=loop.bin
+enable_gic=1
+enable_uart=1
+uart_2ndstage=1
+gpio=22-27=np
+enable_jtag_gpio=1
+init_uart_clock=48000000
+init_uart_baud=115200
