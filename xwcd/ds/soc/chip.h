@@ -50,6 +50,8 @@ struct xwds_dma_cfg;
  */
 struct xwds_soc_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
+        xwer_t (* get_reset_reason)(struct xwds_soc * /*soc*/,
+                                    xwu64_t * /*reason*/); /**< 获取复位原因 */
 #if defined(XWCDCFG_ds_SOC_CLK) && (1 == XWCDCFG_ds_SOC_CLK)
         xwer_t (* clk_req)(struct xwds_soc * /*soc*/,
                            xwid_t /*id*/); /**< 申请时钟 */
@@ -220,6 +222,13 @@ xwer_t xwds_soc_grab(struct xwds_soc * soc);
  * @param[in] soc: SOC对象指针
  */
 xwer_t xwds_soc_put(struct xwds_soc * soc);
+
+/**
+ * @brief XWDS API：获取复位原因
+ * @param[in] soc: SOC对象指针
+ * @param[out] reason: 返回复位原因的缓冲区
+ */
+xwer_t xwds_soc_get_reset_reason(struct xwds_soc * soc, xwu64_t * reason);
 
 /**
  * @} xwcd_ds_soc

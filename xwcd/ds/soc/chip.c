@@ -79,6 +79,31 @@ xwer_t xwds_soc_put(struct xwds_soc * soc)
         return xwds_device_put(&soc->dev);
 }
 
+__xwds_api
+xwer_t xwds_soc_get_reset_reason(struct xwds_soc * soc, xwu64_t * reason)
+{
+        const struct xwds_soc_driver * drv;
+        xwer_t rc;
+
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(reason, "nullptr", -EFAULT);
+
+        rc = xwds_soc_grab(soc);
+        if (rc < 0) {
+                goto err_soc_grab;
+        }
+        drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
+        if ((drv) && (drv->get_reset_reason)) {
+                rc = drv->get_reset_reason(soc, reason);
+        } else {
+                rc = -ENOSYS;
+        }
+        xwds_soc_put(soc);
+err_soc_grab:
+        return rc;
+}
+
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测SOC
