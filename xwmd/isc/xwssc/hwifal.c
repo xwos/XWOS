@@ -59,12 +59,12 @@ xwer_t xwssc_hwifal_open(struct xwssc * xwssc, void * hwifcb)
         }
 
         xwaop_write(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_RX, NULL);
-        xwssclogf(xwssc, INFO, "[HWIFAL] Open HWIF ... [OK]\r\n");
+        xwssclogf(xwssc, I, "[HWIFAL] Open HWIF ... [OK]\r\n");
         return rc;
 
 err_hwifops_open:
         xwssc->hwifcb = NULL;
-        xwssclogf(xwssc, INFO, "[HWIFAL] Failed to open HWIF ... <rc:%d>\r\n", rc);
+        xwssclogf(xwssc, I, "[HWIFAL] Failed to open HWIF ... <rc:%d>\r\n", rc);
         return rc;
 }
 
@@ -93,13 +93,13 @@ xwer_t xwssc_hwifal_close(struct xwssc * xwssc)
                 goto err_hwifops_close;
         }
         xwssc->hwifcb = NULL;
-        xwssclogf(xwssc, INFO, "[HWIFAL] close HWIF ... [OK]\r\n");
+        xwssclogf(xwssc, I, "[HWIFAL] close HWIF ... [OK]\r\n");
         return XWOK;
 
 err_hwifops_close:
         xwaop_s1m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_RX, NULL, NULL);
 err_xwssc_clear_hwifst:
-        xwssclogf(xwssc, INFO, "[HWIFAL] Open HWIF ... <rc:%d>\r\n", rc);
+        xwssclogf(xwssc, I, "[HWIFAL] Open HWIF ... <rc:%d>\r\n", rc);
         return rc;
 }
 
