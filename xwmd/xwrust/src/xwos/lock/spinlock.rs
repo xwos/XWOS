@@ -21,7 +21,7 @@
 //!
 //! # 创建
 //!
-//! XWOS RUST的互斥锁可使用 [`Spinlock::new()`] 创建：
+//! XWOS RUST的自旋锁可使用 [`Spinlock::new()`] 创建：
 //!
 //! + 可以创建具有静态生命周期 [`static`] 约束的全局变量：
 //!
@@ -41,18 +41,6 @@
 //!
 //! pub fn xwrust_example_spinlock() {
 //!     let spinlock: Arc<Spinlock<u32>> = Arc::new(Spinlock::new(0));
-//! }
-//! ```
-//!
-//!
-//! # 初始化
-//!
-//! 无论以何种方式创建的自旋锁，都必须在使用前调用 [`Spinlock::init()`] 进行初始化：
-//!
-//! ```rust
-//! pub fn xwrust_example_spinlock() {
-//!     GLOBAL_SPINLOCK.init();
-//!     spinlock.init();
 //! }
 //! ```
 //!
@@ -100,7 +88,6 @@ use core::option::Option;
 use core::ops::Drop;
 use core::ops::Deref;
 use core::ops::DerefMut;
-use core::sync::atomic::*;
 use core::ptr;
 
 use crate::types::*;
@@ -127,8 +114,6 @@ extern "C" {
 /// 自旋锁的错误码
 #[derive(Debug)]
 pub enum SpinlockError {
-    /// 自旋锁没有初始化
-    NotInit(XwEr),
     /// 尝试上锁失败
     Again(XwEr),
     /// 未知错误
@@ -139,7 +124,6 @@ impl SpinlockError {
     /// 消费掉 `SpinlockError` 自身，返回内部的错误码。
     pub fn unwrap(self) -> XwEr {
         match self {
-            Self::NotInit(rc) => rc,
             Self::Again(rc) => rc,
             Self::Unknown(rc) => rc,
         }
@@ -175,8 +159,6 @@ pub(crate) struct XwosSplk {
 }
 
 /// 用于构建自旋锁的内存数组常量
-///
-/// 此常量的作用是告诉编译器自旋锁需要多大的内存。
 pub(crate) const XWOS_SPLK_INITIALIZER: XwosSplk = XwosSplk {
     obj: [0; SIZEOF_XWOS_SPLK],
 };
@@ -184,10 +166,8 @@ pub(crate) const XWOS_SPLK_INITIALIZER: XwosSplk = XwosSplk {
 
 /// 自旋锁结构体
 pub struct Spinlock<T: ?Sized> {
-    /// 用于初始化XWOS自旋锁的内存空间
+    /// XWOS自旋锁
     pub(crate) splk: UnsafeCell<XwosSplk>,
-    /// 初始化完成标记
-    pub(crate) init: AtomicBool,
     /// 上锁方式
     pub(crate) mode: UnsafeCell<SpinlockMode>,
     /// 用户数据
@@ -211,7 +191,6 @@ impl<T> Spinlock<T> {
     pub const fn new(t: T) -> Self {
         Self {
             splk: UnsafeCell::new(XWOS_SPLK_INITIALIZER),
-            init: AtomicBool::new(false),
             mode: UnsafeCell::new(SpinlockMode::Lock),
             data: UnsafeCell::new(t),
         }
@@ -219,33 +198,6 @@ impl<T> Spinlock<T> {
 }
 
 impl<T: ?Sized> Spinlock<T> {
-    /// 初始化自旋锁
-    ///
-    /// 自旋锁必须调用此方法一次，方可正常使用。
-    ///
-    /// # 示例
-    ///
-    /// ```rust
-    /// use xwrust::xwos::lock::spinlock::*;
-    ///
-    /// static GLOBAL_SPINLOCK: Spinlock<u32>  = Spinlock::new(0);
-    ///
-    /// pub fn xwrust_example_spinlock() {
-    ///     // ...省略...
-    ///     GLOBAL_SPINLOCK.init();
-    ///     // 从此处开始 GLOBAL_SPINLOCK 可正常使用
-    /// }
-    /// ```
-    pub fn init(&self) {
-        match self.init.compare_exchange(false, true,
-                                         Ordering::AcqRel, Ordering::Relaxed) {
-            Ok(_) => unsafe {
-                xwrustffi_splk_init(self.splk.get());
-            },
-            Err(_) => {}
-        }
-    }
-
     /// 获取自旋锁，若线程无法获取自旋锁，就阻塞等待，直到能获得锁为止
     ///
     /// + 若成功获取自旋锁，将返回 **RAII Guard** ： [`SpinlockGuard`] ，用于提供 **Scoped Lock** 机制。
@@ -260,10 +212,6 @@ impl<T: ?Sized> Spinlock<T> {
     ///   + [`SpinlockMode::LockCpuirq`] 关闭抢占、中断底半部和中断
     ///   + [`SpinlockMode::LockCpuirqSave(None)`] 关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
-    /// # 错误码
-    ///
-    /// + [`SpinlockError::NotInit`] 自旋锁未被初始化
-    ///
     /// # 示例
     ///
     /// ```rust
@@ -272,46 +220,36 @@ impl<T: ?Sized> Spinlock<T> {
     ///
     /// pub fn xwrust_example_spinlock() {
     ///     // ...省略...
-    ///     GLOBAL_SPINLOCK.init();
-    ///     match GLOBAL_SPINLOCK.lock() {
-    ///         Ok(mut guard) => { // 上锁成功
-    ///             *guard = 1; // 访问共享变量
-    ///         } // guard 生命周期结束，自动解锁
-    ///         Err(e) => {
-    ///             // 上锁失败
-    ///         }
-    ///     }
+    ///     let mut guard = GLOBAL_SPINLOCK.lock();
+    ///     *guard = 1; // 访问共享变量
+    ///     drop(guard); // 解锁
     /// }
     /// ```
     ///
     /// [`SpinlockMode::LockCpuirqSave(None)`]: SpinlockMode::LockCpuirqSave
     /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
-    pub fn lock(&self, mode: SpinlockMode) -> Result<SpinlockGuard<'_, T>, SpinlockError> {
-        if self.init.load(Ordering::Acquire) {
-            unsafe {
-                match mode {
-                    SpinlockMode::Lock => {
-                        xwrustffi_splk_lock(self.splk.get());
-                        *self.mode.get() = SpinlockMode::Lock;
-                    },
-                    SpinlockMode::LockCpuirq => {
-                        xwrustffi_splk_lock_cpuirq(self.splk.get());
-                        *self.mode.get() = SpinlockMode::LockCpuirq;
-                    },
-                    SpinlockMode::LockCpuirqSave(_) => {
-                        let mut cpuirq: XwReg = 0;
-                        xwrustffi_splk_lock_cpuirqsv(self.splk.get(), &mut cpuirq);
-                        *self.mode.get() = SpinlockMode::LockCpuirqSave(Some(cpuirq));
-                    },
-                    SpinlockMode::LockBh => {
-                        xwrustffi_splk_lock_bh(self.splk.get());
-                        *self.mode.get() = SpinlockMode::LockBh;
-                    },
-                }
-                Ok(SpinlockGuard::new(self))
+    pub fn lock(&self, mode: SpinlockMode) -> SpinlockGuard<'_, T> {
+        unsafe {
+            match mode {
+                SpinlockMode::Lock => {
+                    xwrustffi_splk_lock(self.splk.get());
+                    *self.mode.get() = SpinlockMode::Lock;
+                },
+                SpinlockMode::LockCpuirq => {
+                    xwrustffi_splk_lock_cpuirq(self.splk.get());
+                    *self.mode.get() = SpinlockMode::LockCpuirq;
+                },
+                SpinlockMode::LockCpuirqSave(_) => {
+                    let mut cpuirq: XwReg = 0;
+                    xwrustffi_splk_lock_cpuirqsv(self.splk.get(), &mut cpuirq);
+                    *self.mode.get() = SpinlockMode::LockCpuirqSave(Some(cpuirq));
+                },
+                SpinlockMode::LockBh => {
+                    xwrustffi_splk_lock_bh(self.splk.get());
+                    *self.mode.get() = SpinlockMode::LockBh;
+                },
             }
-        } else {
-            Err(SpinlockError::NotInit(-ENILOBJD))
+            SpinlockGuard::new(self)
         }
     }
 
@@ -331,7 +269,6 @@ impl<T: ?Sized> Spinlock<T> {
     ///
     /// # 错误码
     ///
-    /// + [`SpinlockError::NotInit`] 自旋锁未被初始化
     /// + [`SpinlockError::Again`] 尝试获取锁失败
     ///
     /// # 示例
@@ -341,7 +278,6 @@ impl<T: ?Sized> Spinlock<T> {
     ///
     /// pub fn xwrust_example_spinlock() {
     ///     // ...省略...
-    ///     GLOBAL_SPINLOCK.init();
     ///     match GLOBAL_SPINLOCK.trylock() {
     ///         Ok(mut guard) => { // 上锁成功
     ///             *guard = 1; // 访问共享变量
@@ -356,63 +292,59 @@ impl<T: ?Sized> Spinlock<T> {
     /// [`SpinlockMode::LockCpuirqSave(None)`]: SpinlockMode::LockCpuirqSave
     /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
     pub fn trylock(&self, mode: SpinlockMode) -> Result<SpinlockGuard<'_, T>, SpinlockError> {
-        if self.init.load(Ordering::Acquire) {
-            unsafe {
-                let rc: XwEr;
-                match mode {
-                    SpinlockMode::Lock => {
-                        rc = xwrustffi_splk_trylock(self.splk.get());
-                        if 0 == rc {
-                            *self.mode.get() = SpinlockMode::Lock;
-                            Ok(SpinlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SpinlockError::Again(rc))
-                        } else {
-                            Err(SpinlockError::Unknown(rc))
-                        }
-                    },
-                    SpinlockMode::LockCpuirq => {
-                        rc = xwrustffi_splk_trylock_cpuirq(self.splk.get());
-                        if 0 == rc {
-                            *self.mode.get() = SpinlockMode::LockCpuirq;
-                            Ok(SpinlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SpinlockError::Again(rc))
-                        } else {
-                            Err(SpinlockError::Unknown(rc))
-                        }
-                    },
-                    SpinlockMode::LockCpuirqSave(_) => {
-                        let mut cpuirq: XwReg = 0;
-                        rc = xwrustffi_splk_trylock_cpuirqsv(self.splk.get(), &mut cpuirq);
-                        if 0 == rc {
-                            *self.mode.get() = SpinlockMode::LockCpuirqSave(Some(cpuirq));
-                            Ok(SpinlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SpinlockError::Again(rc))
-                        } else {
-                            Err(SpinlockError::Unknown(rc))
-                        }
-                    },
-                    SpinlockMode::LockBh => {
-                        rc = xwrustffi_splk_trylock_bh(self.splk.get());
-                        if 0 == rc {
-                            *self.mode.get() = SpinlockMode::LockBh;
-                            Ok(SpinlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SpinlockError::Again(rc))
-                        } else {
-                            Err(SpinlockError::Unknown(rc))
-                        }
-                    },
-                }
+        unsafe {
+            let rc: XwEr;
+            match mode {
+                SpinlockMode::Lock => {
+                    rc = xwrustffi_splk_trylock(self.splk.get());
+                    if 0 == rc {
+                        *self.mode.get() = SpinlockMode::Lock;
+                        Ok(SpinlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SpinlockError::Again(rc))
+                    } else {
+                        Err(SpinlockError::Unknown(rc))
+                    }
+                },
+                SpinlockMode::LockCpuirq => {
+                    rc = xwrustffi_splk_trylock_cpuirq(self.splk.get());
+                    if 0 == rc {
+                        *self.mode.get() = SpinlockMode::LockCpuirq;
+                        Ok(SpinlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SpinlockError::Again(rc))
+                    } else {
+                        Err(SpinlockError::Unknown(rc))
+                    }
+                },
+                SpinlockMode::LockCpuirqSave(_) => {
+                    let mut cpuirq: XwReg = 0;
+                    rc = xwrustffi_splk_trylock_cpuirqsv(self.splk.get(), &mut cpuirq);
+                    if 0 == rc {
+                        *self.mode.get() = SpinlockMode::LockCpuirqSave(Some(cpuirq));
+                        Ok(SpinlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SpinlockError::Again(rc))
+                    } else {
+                        Err(SpinlockError::Unknown(rc))
+                    }
+                },
+                SpinlockMode::LockBh => {
+                    rc = xwrustffi_splk_trylock_bh(self.splk.get());
+                    if 0 == rc {
+                        *self.mode.get() = SpinlockMode::LockBh;
+                        Ok(SpinlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SpinlockError::Again(rc))
+                    } else {
+                        Err(SpinlockError::Unknown(rc))
+                    }
+                },
             }
-        } else {
-            Err(SpinlockError::NotInit(-ENILOBJD))
         }
     }
 
-    /// 释放 [`SpinlockGuard`]，并在 [`drop()`] 方法中解锁自旋锁
+    /// 解锁自旋锁，并释放 [`SpinlockGuard`]
     ///
     /// # 示例
     ///
@@ -422,16 +354,9 @@ impl<T: ?Sized> Spinlock<T> {
     ///
     /// pub fn xwrust_example_spinlock() {
     ///     // ...省略...
-    ///     GLOBAL_SPINLOCK.init();
-    ///     match GLOBAL_SPINLOCK.lock() {
-    ///         Ok(mut guard) => { // 上锁成功
-    ///             *guard = 1; // 访问共享变量
-    ///             Spinlock::unlock(guard); // 主动解锁
-    ///         }
-    ///         Err(e) => {
-    ///             // 上锁失败
-    ///         }
-    ///     }
+    ///     let mut guard = GLOBAL_SPINLOCK.lock();
+    ///     *guard = 1; // 访问共享变量
+    ///     Spinlock::unlock(guard); // 主动解锁
     /// }
     /// ```
     ///
@@ -463,7 +388,6 @@ impl<T: ?Sized + Default> Default for Spinlock<T> {
 
 impl<T: ?Sized> Drop for Spinlock<T> {
     fn drop(&mut self) {
-        self.init.store(false, Ordering::Release);
     }
 }
 
@@ -531,7 +455,6 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     ///
     /// pub fn xwrust_example_spinlock() {
     ///     let pair = Arc::new((Spinlock::new(true), Cond::new()));
-    ///     pair.0.init();
     ///     pair.1.init();
     ///     let pair_c = pair.clone();
     ///
@@ -540,34 +463,24 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     ///         .spawn(move |_| { // 子线程闭包
     ///             cthd::sleep(xwtm::ms(500));
     ///             let (lock, cvar) = &*pair_c;
-    ///             match lock_child.lock() {
-    ///                 Ok(mut guard) => {
-    ///                     *guard = false; // 设置共享数据
-    ///                     drop(guard); // 先解锁再触发条件可提高效率
-    ///                     cvar.broadcast();
-    ///                 },
-    ///                 Err(e) => { // 子线程上锁失败
-    ///                 },
-    ///             }
+    ///             let mut guard = lock_child.lock();
+    ///             *guard = false; // 设置共享数据
+    ///             drop(guard); // 先解锁再触发条件可提高效率
+    ///             cvar.broadcast();
     ///         });
     ///     let (lock, cvar) = &*pair;
-    ///     let mut guard;
-    ///     match lock.lock() {
-    ///         Ok(g) => {
-    ///             guard = g;
-    ///             while *guard {
-    ///                 match guard.wait(cvar) {
-    ///                     Ok(g) => { // 唤醒
-    ///                         guard = g;
-    ///                     },
-    ///                     Err(e) => { // 等待条件量失败
-    ///                         break;
-    ///                     },
-    ///                 }
+    ///     {
+    ///         let mut guard = lock.lock();
+    ///         while *guard {
+    ///             match guard.wait(cvar) {
+    ///                 Ok(g) => { // 唤醒
+    ///                     guard = g; // 重新捕获守卫
+    ///                 },
+    ///                 Err(e) => { // 等待条件量失败
+    ///                     break;
+    ///                 },
     ///             }
-    ///         },
-    ///         Err(e) => { // 上锁失败
-    ///         },
+    ///         }
     ///     }
     /// }
     /// ```
@@ -638,7 +551,6 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     ///
     /// pub fn xwrust_example_spinlock() {
     ///     let pair = Arc::new((Spinlock::new(true), Cond::new()));
-    ///     pair.0.init();
     ///     pair.1.init();
     ///     let pair_c = pair.clone();
     ///
@@ -647,34 +559,24 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     ///         .spawn(move |_| { // 子线程闭包
     ///             cthd::sleep(xwtm::ms(500));
     ///             let (lock, cvar) = &*pair_c;
-    ///             match lock_child.lock() {
-    ///                 Ok(mut guard) => {
-    ///                     *guard = false; // 设置共享数据
-    ///                     drop(guard); // 先解锁再触发条件可提高效率
-    ///                     cvar.broadcast();
-    ///                 },
-    ///                 Err(e) => { // 子线程上锁失败
-    ///                 },
-    ///             }
+    ///             let mut guard = lock_child.lock();
+    ///             *guard = false; // 设置共享数据
+    ///             drop(guard); // 先解锁再触发条件可提高效率
+    ///             cvar.broadcast();
     ///         });
     ///     let (lock, cvar) = &*pair;
-    ///     let mut guard;
-    ///     match lock.lock() {
-    ///         Ok(g) => {
-    ///             guard = g;
-    ///             while *guard {
-    ///                 match guard.wait_to(cvar, xwtm::ft(xwtm::s(2))) {
-    ///                     Ok(g) => { // 唤醒
-    ///                         guard = g;
-    ///                     },
-    ///                     Err(e) => { // 等待条件量失败
-    ///                         break;
-    ///                     },
-    ///                 }
+    ///     {
+    ///         let mut guard = lock.lock();
+    ///         while *guard {
+    ///             match guard.wait_to(cvar, xwtm::ft(xwtm::s(2))) {
+    ///                 Ok(g) => { // 唤醒
+    ///                     guard = g; // 重新捕获守卫
+    ///                 },
+    ///                 Err(e) => { // 等待条件量失败
+    ///                     break;
+    ///                 },
     ///             }
-    ///         },
-    ///         Err(e) => { // 上锁失败
-    ///         },
+    ///         }
     ///     }
     /// }
     /// ```
@@ -743,7 +645,6 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     ///
     /// pub fn xwrust_example_spinlock() {
     ///     let pair = Arc::new((Spinlock::new(true), Cond::new()));
-    ///     pair.0.init();
     ///     pair.1.init();
     ///     let pair_c = pair.clone();
     ///
@@ -752,34 +653,24 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     ///         .spawn(move |_| { // 子线程闭包
     ///             cthd::sleep(xwtm::ms(500));
     ///             let (lock, cvar) = &*pair_c;
-    ///             match lock_child.lock() {
-    ///                 Ok(mut guard) => {
-    ///                     *guard = false; // 设置共享数据
-    ///                     drop(guard); // 先解锁再触发条件可提高效率
-    ///                     cvar.broadcast();
-    ///                 },
-    ///                 Err(e) => { // 子线程上锁失败
-    ///                 },
-    ///             }
+    ///             let mut guard = lock_child.lock();
+    ///             *guard = false; // 设置共享数据
+    ///             drop(guard); // 先解锁再触发条件可提高效率
+    ///             cvar.broadcast();
     ///         });
     ///     let (lock, cvar) = &*pair;
-    ///     let mut guard;
-    ///     match lock.lock() {
-    ///         Ok(g) => {
-    ///             guard = g;
-    ///             while *guard {
-    ///                 match guard.wait_unintr(cvar) {
-    ///                     Ok(g) => { // 唤醒
-    ///                         guard = g;
-    ///                     },
-    ///                     Err(e) => { // 等待条件量失败
-    ///                         break;
-    ///                     },
-    ///                 }
+    ///     {
+    ///         let mut guard = lock.lock();
+    ///         while *guard {
+    ///             match guard.wait_unintr(cvar) {
+    ///                 Ok(g) => { // 唤醒
+    ///                     guard = g; // 重新捕获守卫
+    ///                 },
+    ///                 Err(e) => { // 等待条件量失败
+    ///                     break;
+    ///                 },
     ///             }
-    ///         },
-    ///         Err(e) => { // 上锁失败
-    ///         },
+    ///         }
     ///     }
     /// }
     /// ```

@@ -51,10 +51,8 @@ pub fn xwrust_example_cond() {
         };
 
     let (lock, cvar) = &*pair;
-    let mut guard;
     match lock.lock() {
-        Ok(g) => {
-            guard = g;
+        Ok(mut guard) => {
             while *guard {
                 match guard.wait(cvar) {
                     Ok(g) => {

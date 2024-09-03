@@ -41,7 +41,7 @@
 //!
 //! # 创建
 //!
-//! XWOS RUST的互斥锁可使用 [`Seqlock::new()`] 创建。
+//! XWOS RUST的顺序锁可使用 [`Seqlock::new()`] 创建。
 //!
 //! + 可以创建具有静态生命周期 [`static`] 约束的全局变量：
 //!
@@ -61,18 +61,6 @@
 //!
 //! pub fn xwrust_example_seqlock() {
 //!     let seqlock: Arc<Seqlock<u32>> = Arc::new(Seqlock::new(0));
-//! }
-//! ```
-//!
-//!
-//! # 初始化
-//!
-//! 无论以何种方式创建的自旋锁，都必须在使用前调用 [`Seqlock::init()`] 进行初始化：
-//!
-//! ```rust
-//! pub fn xwrust_example_seqlock() {
-//!     GLOBAL_SEQLOCK.init();
-//!     seqlock.init();
 //! }
 //! ```
 //!
@@ -120,7 +108,6 @@ use core::option::Option;
 use core::ops::Drop;
 use core::ops::Deref;
 use core::ops::DerefMut;
-use core::sync::atomic::*;
 use core::ptr;
 
 use crate::types::*;
@@ -164,8 +151,6 @@ extern "C" {
 /// 顺序锁的错误码
 #[derive(Debug)]
 pub enum SeqlockError {
-    /// 顺序锁没有初始化
-    NotInit(XwEr),
     /// 尝试上锁失败
     Again(XwEr),
     /// 未知错误
@@ -176,7 +161,6 @@ impl SeqlockError {
     /// 消费掉 `SeqlockError` 自身，返回内部的错误码。
     pub fn unwrap(self) -> XwEr {
         match self {
-            Self::NotInit(rc) => rc,
             Self::Again(rc) => rc,
             Self::Unknown(rc) => rc,
         }
@@ -229,10 +213,8 @@ pub(crate) const XWOS_SQLK_INITIALIZER: XwosSqlk = XwosSqlk {
 
 /// 顺序锁结构体
 pub struct Seqlock<T: ?Sized> {
-    /// 用于初始化XWOS顺序锁的内存空间
+    /// XWOS顺序锁
     pub(crate) sqlk: UnsafeCell<XwosSqlk>,
-    /// 初始化完成标记
-    pub(crate) init: AtomicBool,
     /// 上锁方式
     pub(crate) mode: UnsafeCell<SeqlockMode>,
     /// 用户数据
@@ -256,7 +238,6 @@ impl<T> Seqlock<T> {
     pub const fn new(t: T) -> Self {
         Self {
             sqlk: UnsafeCell::new(XWOS_SQLK_INITIALIZER),
-            init: AtomicBool::new(false),
             mode: UnsafeCell::new(SeqlockMode::WriteLock),
             data: UnsafeCell::new(t),
         }
@@ -264,33 +245,6 @@ impl<T> Seqlock<T> {
 }
 
 impl<T: ?Sized> Seqlock<T> {
-    /// 初始化顺序锁
-    ///
-    /// 顺序锁必须调用此方法一次，方可正常使用。
-    ///
-    /// # 示例
-    ///
-    /// ```rust
-    /// use xwrust::xwos::lock::seqlock::*;
-    ///
-    /// static GLOBAL_SEQLOCK: Seqlock<u32>  = Seqlock::new(0);
-    ///
-    /// pub fn xwrust_example_seqlock() {
-    ///     // ...省略...
-    ///     GLOBAL_SEQLOCK.init();
-    ///     // 从此处开始 GLOBAL_SEQLOCK 可正常使用
-    /// }
-    /// ```
-    pub fn init(&self) {
-        match self.init.compare_exchange(false, true,
-                                         Ordering::AcqRel, Ordering::Relaxed) {
-            Ok(_) => unsafe {
-                xwrustffi_sqlk_init(self.sqlk.get());
-            },
-            Err(_) => {}
-        }
-    }
-
     /// 开启共享读临界区
     ///
     /// 若其他CPU正在访问写临界区，此方法会一直 **自旋** 测试是否可进入 **共享读临界区** 。
@@ -299,28 +253,17 @@ impl<T: ?Sized> Seqlock<T> {
     ///
     /// ```rust
     /// loop {
-    ///     let res = sqlk.read_begin();
-    ///     match res {
-    ///         Ok(guard) => {
-    ///             let val = *guard; // 读值
-    ///             if !guard.read_retry() {
-    ///                 break;
-    ///             }
-    ///         },
-    ///         Err(e) => {
-    ///             break;
-    ///         },
+    ///     let guard = sqlk.read_begin();
+    ///     let val = *guard; // 读取
+    ///     if !guard.read_retry() {
+    ///         break;
     ///     }
     /// }
     /// ```
-    pub fn read_begin(&self) -> Result<SeqlockReadGuard<'_, T>, SeqlockError> {
-        if self.init.load(Ordering::Acquire) {
-            unsafe {
-                let start = xwrustffi_sqlk_rd_begin(self.sqlk.get());
-                Ok(SeqlockReadGuard::new(self, start))
-            }
-        } else {
-            Err(SeqlockError::NotInit(-ENILOBJD))
+    pub fn read_begin(&self) -> SeqlockReadGuard<'_, T> {
+        unsafe {
+            let start = xwrustffi_sqlk_rd_begin(self.sqlk.get());
+            SeqlockReadGuard::new(self, start)
         }
     }
 
@@ -348,10 +291,6 @@ impl<T: ?Sized> Seqlock<T> {
     ///   + [`SeqlockMode::ReadExclusiveLockCpuirq`] 独占读，关闭抢占、中断底半部和中断
     ///   + [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`] 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
-    /// # 错误码
-    ///
-    /// + [`SeqlockError::NotInit`] 顺序锁未被初始化
-    ///
     /// # 示例
     ///
     /// ```rust
@@ -360,66 +299,56 @@ impl<T: ?Sized> Seqlock<T> {
     ///
     /// pub fn xwrust_example_seqlock() {
     ///     // ...省略...
-    ///     GLOBAL_SEQLOCK.init();
-    ///     match GLOBAL_SEQLOCK.lock(SeqlockMode::ReadExclusiveLockCpuirqSave(None)) {
-    ///         Ok(mut guard) => { // 上锁成功
-    ///             *guard = 1; // 写共享变量
-    ///         } // guard 生命周期结束，自动解锁，并恢复中断标志
-    ///         Err(e) => {
-    ///             // 上锁失败
-    ///         }
-    ///     }
+    ///     let mut guard GLOBAL_SEQLOCK.lock(SeqlockMode::ReadExclusiveLockCpuirqSave(None));
+    ///     *guard = 1; // 写共享变量
+    ///     drop(guard); // guard 生命周期结束，自动解锁，并恢复中断标志
     /// }
     /// ```
     ///
     /// [`SeqlockMode::WriteLockCpuirqSave(None)`]: SeqlockMode::WriteLockCpuirqSave
     /// [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]: SeqlockMode::ReadExclusiveLockCpuirqSave
     /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
-    pub fn lock(&self, mode: SeqlockMode) -> Result<SeqlockGuard<'_, T>, SeqlockError> {
-        if self.init.load(Ordering::Acquire) {
-            unsafe {
-                match mode {
-                    SeqlockMode::ReadExclusiveLock => {
-                        xwrustffi_sqlk_rdex_lock(self.sqlk.get());
-                        *self.mode.get() = SeqlockMode::ReadExclusiveLock;
-                    },
-                    SeqlockMode::ReadExclusiveLockCpuirq => {
-                        xwrustffi_sqlk_rdex_lock_cpuirq(self.sqlk.get());
-                        *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirq;
-                    },
-                    SeqlockMode::ReadExclusiveLockCpuirqSave(_) => {
-                        let mut cpuirq: XwReg = 0;
-                        xwrustffi_sqlk_rdex_lock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
-                        *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirqSave(Some(cpuirq));
-                    },
-                    SeqlockMode::ReadExclusiveLockBh => {
-                        xwrustffi_sqlk_rdex_lock_bh(self.sqlk.get());
-                        *self.mode.get() = SeqlockMode::ReadExclusiveLockBh;
-                    },
+    pub fn lock(&self, mode: SeqlockMode) -> SeqlockGuard<'_, T> {
+        unsafe {
+            match mode {
+                SeqlockMode::ReadExclusiveLock => {
+                    xwrustffi_sqlk_rdex_lock(self.sqlk.get());
+                    *self.mode.get() = SeqlockMode::ReadExclusiveLock;
+                },
+                SeqlockMode::ReadExclusiveLockCpuirq => {
+                    xwrustffi_sqlk_rdex_lock_cpuirq(self.sqlk.get());
+                    *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirq;
+                },
+                SeqlockMode::ReadExclusiveLockCpuirqSave(_) => {
+                    let mut cpuirq: XwReg = 0;
+                    xwrustffi_sqlk_rdex_lock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
+                    *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirqSave(Some(cpuirq));
+                },
+                SeqlockMode::ReadExclusiveLockBh => {
+                    xwrustffi_sqlk_rdex_lock_bh(self.sqlk.get());
+                    *self.mode.get() = SeqlockMode::ReadExclusiveLockBh;
+                },
 
 
-                    SeqlockMode::WriteLock => {
-                        xwrustffi_sqlk_wr_lock(self.sqlk.get());
-                        *self.mode.get() = SeqlockMode::WriteLock;
-                    },
-                    SeqlockMode::WriteLockCpuirq => {
-                        xwrustffi_sqlk_wr_lock_cpuirq(self.sqlk.get());
-                        *self.mode.get() = SeqlockMode::WriteLockCpuirq;
-                    },
-                    SeqlockMode::WriteLockCpuirqSave(_) => {
-                        let mut cpuirq: XwReg = 0;
-                        xwrustffi_sqlk_wr_lock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
-                        *self.mode.get() = SeqlockMode::WriteLockCpuirqSave(Some(cpuirq));
-                    },
-                    SeqlockMode::WriteLockBh => {
-                        xwrustffi_sqlk_wr_lock_bh(self.sqlk.get());
-                        *self.mode.get() = SeqlockMode::WriteLockBh;
-                    },
-                }
-                Ok(SeqlockGuard::new(self))
+                SeqlockMode::WriteLock => {
+                    xwrustffi_sqlk_wr_lock(self.sqlk.get());
+                    *self.mode.get() = SeqlockMode::WriteLock;
+                },
+                SeqlockMode::WriteLockCpuirq => {
+                    xwrustffi_sqlk_wr_lock_cpuirq(self.sqlk.get());
+                    *self.mode.get() = SeqlockMode::WriteLockCpuirq;
+                },
+                SeqlockMode::WriteLockCpuirqSave(_) => {
+                    let mut cpuirq: XwReg = 0;
+                    xwrustffi_sqlk_wr_lock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
+                    *self.mode.get() = SeqlockMode::WriteLockCpuirqSave(Some(cpuirq));
+                },
+                SeqlockMode::WriteLockBh => {
+                    xwrustffi_sqlk_wr_lock_bh(self.sqlk.get());
+                    *self.mode.get() = SeqlockMode::WriteLockBh;
+                },
             }
-        } else {
-            Err(SeqlockError::NotInit(-ENILOBJD))
+            SeqlockGuard::new(self)
         }
     }
 
@@ -444,7 +373,6 @@ impl<T: ?Sized> Seqlock<T> {
     ///
     /// # 错误码
     ///
-    /// + [`SeqlockError::NotInit`] 顺序锁未被初始化
     /// + [`SeqlockError::Again`] 尝试获取锁失败
     ///
     /// # 示例
@@ -454,7 +382,6 @@ impl<T: ?Sized> Seqlock<T> {
     ///
     /// pub fn xwrust_example_seqlock() {
     ///     // ...省略...
-    ///     GLOBAL_SEQLOCK.init();
     ///     match GLOBAL_SEQLOCK.trylock(SeqlockMode::ReadExclusiveLockCpuirq) {
     ///         Ok(mut guard) => { // 上锁成功
     ///             *guard = 1; // 写共享变量
@@ -470,109 +397,105 @@ impl<T: ?Sized> Seqlock<T> {
     /// [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]: SeqlockMode::ReadExclusiveLockCpuirqSave
     /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
     pub fn trylock(&self, mode: SeqlockMode) -> Result<SeqlockGuard<'_, T>, SeqlockError> {
-        if self.init.load(Ordering::Acquire) {
-            unsafe {
-                let rc: XwEr;
-                match mode {
-                    SeqlockMode::ReadExclusiveLock => {
-                        rc = xwrustffi_sqlk_rdex_trylock(self.sqlk.get());
-                        if 0 == rc {
-                            *self.mode.get() = SeqlockMode::ReadExclusiveLock;
-                            Ok(SeqlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again(rc))
-                        } else {
-                            Err(SeqlockError::Unknown(rc))
-                        }
-                    },
-                    SeqlockMode::ReadExclusiveLockCpuirq => {
-                        rc = xwrustffi_sqlk_rdex_trylock_cpuirq(self.sqlk.get());
-                        if 0 == rc {
-                            *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirq;
-                            Ok(SeqlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again(rc))
-                        } else {
-                            Err(SeqlockError::Unknown(rc))
-                        }
-                    },
-                    SeqlockMode::ReadExclusiveLockCpuirqSave(_) => {
-                        let mut cpuirq: XwReg = 0;
-                        rc = xwrustffi_sqlk_rdex_trylock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
-                        if 0 == rc {
-                            *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirqSave(Some(cpuirq));
-                            Ok(SeqlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again(rc))
-                        } else {
-                            Err(SeqlockError::Unknown(rc))
-                        }
-                    },
-                    SeqlockMode::ReadExclusiveLockBh => {
-                        rc = xwrustffi_sqlk_rdex_trylock_bh(self.sqlk.get());
-                        if 0 == rc {
-                            *self.mode.get() = SeqlockMode::ReadExclusiveLockBh;
-                            Ok(SeqlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again(rc))
-                        } else {
-                            Err(SeqlockError::Unknown(rc))
-                        }
-                    },
+        unsafe {
+            let rc: XwEr;
+            match mode {
+                SeqlockMode::ReadExclusiveLock => {
+                    rc = xwrustffi_sqlk_rdex_trylock(self.sqlk.get());
+                    if 0 == rc {
+                        *self.mode.get() = SeqlockMode::ReadExclusiveLock;
+                        Ok(SeqlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SeqlockError::Again(rc))
+                    } else {
+                        Err(SeqlockError::Unknown(rc))
+                    }
+                },
+                SeqlockMode::ReadExclusiveLockCpuirq => {
+                    rc = xwrustffi_sqlk_rdex_trylock_cpuirq(self.sqlk.get());
+                    if 0 == rc {
+                        *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirq;
+                        Ok(SeqlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SeqlockError::Again(rc))
+                    } else {
+                        Err(SeqlockError::Unknown(rc))
+                    }
+                },
+                SeqlockMode::ReadExclusiveLockCpuirqSave(_) => {
+                    let mut cpuirq: XwReg = 0;
+                    rc = xwrustffi_sqlk_rdex_trylock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
+                    if 0 == rc {
+                        *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirqSave(Some(cpuirq));
+                        Ok(SeqlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SeqlockError::Again(rc))
+                    } else {
+                        Err(SeqlockError::Unknown(rc))
+                    }
+                },
+                SeqlockMode::ReadExclusiveLockBh => {
+                    rc = xwrustffi_sqlk_rdex_trylock_bh(self.sqlk.get());
+                    if 0 == rc {
+                        *self.mode.get() = SeqlockMode::ReadExclusiveLockBh;
+                        Ok(SeqlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SeqlockError::Again(rc))
+                    } else {
+                        Err(SeqlockError::Unknown(rc))
+                    }
+                },
 
-                    SeqlockMode::WriteLock => {
-                        rc = xwrustffi_sqlk_wr_trylock(self.sqlk.get());
-                        if 0 == rc {
-                            *self.mode.get() = SeqlockMode::WriteLock;
-                            Ok(SeqlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again(rc))
-                        } else {
-                            Err(SeqlockError::Unknown(rc))
-                        }
-                    },
-                    SeqlockMode::WriteLockCpuirq => {
-                        rc = xwrustffi_sqlk_wr_trylock_cpuirq(self.sqlk.get());
-                        if 0 == rc {
-                            *self.mode.get() = SeqlockMode::WriteLockCpuirq;
-                            Ok(SeqlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again(rc))
-                        } else {
-                            Err(SeqlockError::Unknown(rc))
-                        }
-                    },
-                    SeqlockMode::WriteLockCpuirqSave(_) => {
-                        let mut cpuirq: XwReg = 0;
-                        rc = xwrustffi_sqlk_wr_trylock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
-                        if 0 == rc {
-                            *self.mode.get() = SeqlockMode::WriteLockCpuirqSave(Some(cpuirq));
-                            Ok(SeqlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again(rc))
-                        } else {
-                            Err(SeqlockError::Unknown(rc))
-                        }
-                    },
-                    SeqlockMode::WriteLockBh => {
-                        rc = xwrustffi_sqlk_wr_trylock_bh(self.sqlk.get());
-                        if 0 == rc {
-                            *self.mode.get() = SeqlockMode::WriteLockBh;
-                            Ok(SeqlockGuard::new(self))
-                        } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again(rc))
-                        } else {
-                            Err(SeqlockError::Unknown(rc))
-                        }
-                    },
-                }
+                SeqlockMode::WriteLock => {
+                    rc = xwrustffi_sqlk_wr_trylock(self.sqlk.get());
+                    if 0 == rc {
+                        *self.mode.get() = SeqlockMode::WriteLock;
+                        Ok(SeqlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SeqlockError::Again(rc))
+                    } else {
+                        Err(SeqlockError::Unknown(rc))
+                    }
+                },
+                SeqlockMode::WriteLockCpuirq => {
+                    rc = xwrustffi_sqlk_wr_trylock_cpuirq(self.sqlk.get());
+                    if 0 == rc {
+                        *self.mode.get() = SeqlockMode::WriteLockCpuirq;
+                        Ok(SeqlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SeqlockError::Again(rc))
+                    } else {
+                        Err(SeqlockError::Unknown(rc))
+                    }
+                },
+                SeqlockMode::WriteLockCpuirqSave(_) => {
+                    let mut cpuirq: XwReg = 0;
+                    rc = xwrustffi_sqlk_wr_trylock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
+                    if 0 == rc {
+                        *self.mode.get() = SeqlockMode::WriteLockCpuirqSave(Some(cpuirq));
+                        Ok(SeqlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SeqlockError::Again(rc))
+                    } else {
+                        Err(SeqlockError::Unknown(rc))
+                    }
+                },
+                SeqlockMode::WriteLockBh => {
+                    rc = xwrustffi_sqlk_wr_trylock_bh(self.sqlk.get());
+                    if 0 == rc {
+                        *self.mode.get() = SeqlockMode::WriteLockBh;
+                        Ok(SeqlockGuard::new(self))
+                    } else if -EAGAIN == rc {
+                        Err(SeqlockError::Again(rc))
+                    } else {
+                        Err(SeqlockError::Unknown(rc))
+                    }
+                },
             }
-        } else {
-            Err(SeqlockError::NotInit(-ENILOBJD))
         }
     }
 
-    /// 释放 [`SeqlockGuard`]，并在 [`drop()`] 方法中解锁顺序锁
+    /// 解锁顺序锁，并释放 [`SeqlockGuard`]
     ///
     /// # 示例
     ///
@@ -582,7 +505,6 @@ impl<T: ?Sized> Seqlock<T> {
     ///
     /// pub fn xwrust_example_seqlock() {
     ///     // ...省略...
-    ///     GLOBAL_SEQLOCK.init();
     ///     match GLOBAL_SEQLOCK.lock() {
     ///         Ok(mut guard) => { // 上锁成功
     ///             *guard = 1; // 访问共享变量
@@ -623,7 +545,6 @@ impl<T: ?Sized + Default> Default for Seqlock<T> {
 
 impl<T: ?Sized> Drop for Seqlock<T> {
     fn drop(&mut self) {
-        self.init.store(false, Ordering::Release);
     }
 }
 
@@ -657,16 +578,10 @@ impl<'a, T: ?Sized> SeqlockReadGuard<'a, T> {
     ///
     /// ```rust
     /// loop {
-    ///     match sqlk.read_begin() {
-    ///         Ok(guard) => {
-    ///             let val = *guard;
-    ///             if !guard.read_retry() {
-    ///                 break;
-    ///             }
-    ///         },
-    ///         Err(e) => {
-    ///             break;
-    ///         },
+    ///     let guard = sqlk.read_begin();
+    ///     let val = *guard;
+    ///     if !guard.read_retry() {
+    ///         break;
     ///     }
     /// }
     /// ```
@@ -775,7 +690,6 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     ///
     /// pub fn xwrust_example_seqlock() {
     ///     let pair = Arc::new((Seqlock::new(true), Cond::new()));
-    ///     pair.0.init();
     ///     pair.1.init();
     ///     let pair_c = pair.clone();
     ///
@@ -784,34 +698,24 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     ///         .spawn(move |_| { // 子线程闭包
     ///             cthd::sleep(xwtm::ms(500));
     ///             let (lock, cvar) = &*pair_c;
-    ///             match lock_child.lock(SeqlockMode::WriteLockCpuirqSave(None)) {
-    ///                 Ok(mut guard) => {
-    ///                     *guard = false; // 设置共享数据
-    ///                     drop(guard); // 先解锁再触发条件可提高效率
-    ///                     cvar.broadcast();
-    ///                 },
-    ///                 Err(e) => { // 子线程上锁失败
-    ///                 },
-    ///             }
+    ///             let mut guard = lock_child.lock(SeqlockMode::WriteLockCpuirqSave(None));
+    ///             *guard = false; // 设置共享数据
+    ///             drop(guard); // 先解锁再触发条件可提高效率
+    ///             cvar.broadcast();
     ///         });
     ///     let (lock, cvar) = &*pair;
-    ///     let mut guard;
-    ///     match lock.lock(SeqlockMode::WriteLockCpuirqSave(None)) {
-    ///         Ok(g) => {
-    ///             guard = g;
-    ///             while *guard {
-    ///                 match guard.wait(cvar) {
-    ///                     Ok(g) => { // 唤醒
-    ///                         guard = g;
-    ///                     },
-    ///                     Err(e) => { // 等待条件量失败
-    ///                         break;
-    ///                     },
-    ///                 }
+    ///     {
+    ///         let mut guard = lock.lock(SeqlockMode::WriteLockCpuirqSave(None));
+    ///         while *guard {
+    ///             match guard.wait(cvar) {
+    ///                 Ok(g) => { // 唤醒
+    ///                     guard = g;
+    ///                 },
+    ///                 Err(e) => { // 等待条件量失败
+    ///                     break;
+    ///                 },
     ///             }
-    ///         },
-    ///         Err(e) => { // 上锁失败
-    ///         },
+    ///         }
     ///     }
     /// }
     /// ```
@@ -896,7 +800,6 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     ///
     /// pub fn xwrust_example_seqlock() {
     ///     let pair = Arc::new((Seqlock::new(true), Cond::new()));
-    ///     pair.0.init();
     ///     pair.1.init();
     ///     let pair_c = pair.clone();
     ///
@@ -905,34 +808,24 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     ///         .spawn(move |_| { // 子线程闭包
     ///             cthd::sleep(xwtm::ms(500));
     ///             let (lock, cvar) = &*pair_c;
-    ///             match lock_child.lock(SeqlockMode::WriteLockCpuirqSave(None)) {
-    ///                 Ok(mut guard) => {
-    ///                     *guard = false; // 设置共享数据
-    ///                     drop(guard); // 先解锁再触发条件可提高效率
-    ///                     cvar.broadcast();
-    ///                 },
-    ///                 Err(e) => { // 子线程上锁失败
-    ///                 },
-    ///             }
+    ///             let mut guard = lock_child.lock(SeqlockMode::WriteLockCpuirqSave(None));
+    ///             *guard = false; // 设置共享数据
+    ///             drop(guard); // 先解锁再触发条件可提高效率
+    ///             cvar.broadcast();
     ///         });
     ///     let (lock, cvar) = &*pair;
-    ///     let mut guard;
-    ///     match lock.lock(SeqlockMode::WriteLockCpuirqSave(None)) {
-    ///         Ok(g) => {
-    ///             guard = g;
-    ///             while *guard {
-    ///                 match guard.wait_to(cvar, xwtm::ft(xwtm::s(2))) {
-    ///                     Ok(g) => { // 唤醒
-    ///                         guard = g;
-    ///                     },
-    ///                     Err(e) => { // 等待条件量失败
-    ///                         break;
-    ///                     },
-    ///                 }
+    ///     {
+    ///         let mut guard = lock.lock(SeqlockMode::WriteLockCpuirqSave(None));
+    ///         while *guard {
+    ///             match guard.wait_to(cvar, xwtm::ft(xwtm::s(2))) {
+    ///                 Ok(g) => { // 唤醒
+    ///                     guard = g;
+    ///                 },
+    ///                 Err(e) => { // 等待条件量失败
+    ///                     break;
+    ///                 },
     ///             }
-    ///         },
-    ///         Err(e) => { // 上锁失败
-    ///         },
+    ///         }
     ///     }
     /// }
     /// ```
@@ -1015,7 +908,6 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     ///
     /// pub fn xwrust_example_seqlock() {
     ///     let pair = Arc::new((Seqlock::new(true), Cond::new()));
-    ///     pair.0.init();
     ///     pair.1.init();
     ///     let pair_c = pair.clone();
     ///
@@ -1024,34 +916,24 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     ///         .spawn(move |_| { // 子线程闭包
     ///             cthd::sleep(xwtm::ms(500));
     ///             let (lock, cvar) = &*pair_c;
-    ///             match lock_child.lock(SeqlockMode::ReadExclusiveLockCpuirqSave(None)) {
-    ///                 Ok(mut guard) => {
-    ///                     *guard = false; // 设置共享数据
-    ///                     drop(guard); // 先解锁再触发条件可提高效率
-    ///                     cvar.broadcast();
-    ///                 },
-    ///                 Err(e) => { // 子线程上锁失败
-    ///                 },
-    ///             }
+    ///             let mut guard = lock_child.lock(SeqlockMode::ReadExclusiveLockCpuirqSave(None));
+    ///             *guard = false; // 设置共享数据
+    ///             drop(guard); // 先解锁再触发条件可提高效率
+    ///             cvar.broadcast();
     ///         });
     ///     let (lock, cvar) = &*pair;
-    ///     let mut guard;
-    ///     match lock.lock(SeqlockMode::ReadExclusiveLockCpuirqSave(None)) {
-    ///         Ok(g) => {
-    ///             guard = g;
-    ///             while *guard {
-    ///                 match guard.wait_unintr(cvar) {
-    ///                     Ok(g) => { // 唤醒
-    ///                         guard = g;
-    ///                     },
-    ///                     Err(e) => { // 等待条件量失败
-    ///                         break;
-    ///                     },
-    ///                 }
+    ///     {
+    ///         let mut guard = lock.lock(SeqlockMode::ReadExclusiveLockCpuirqSave(None));
+    ///         while *guard {
+    ///             match guard.wait_unintr(cvar) {
+    ///                 Ok(g) => { // 唤醒
+    ///                     guard = g;
+    ///                 },
+    ///                 Err(e) => { // 等待条件量失败
+    ///                     break;
+    ///                 },
     ///             }
-    ///         },
-    ///         Err(e) => { // 上锁失败
-    ///         },
+    ///         }
     ///     }
     /// }
     /// ```
