@@ -1580,10 +1580,12 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
         } else {
                 xwskd = xwmp_skd_get_lc();
                 if ((xwsq_t)XWMP_SKD_STATE_START == xwskd->state) {
-                        if (-EBHCTX == rc) {
-                                ctx = (xwsq_t)XWMP_SKD_CONTEXT_BH;
-                        } else if (XWMP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
+                        if (XWMP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
                                 ctx = (xwsq_t)XWMP_SKD_CONTEXT_IDLE;
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+                        } else if (XWMP_SKD_BH_STK(xwskd) == xwskd->cstk) {
+                                ctx = (xwsq_t)XWMP_SKD_CONTEXT_BH;
+#endif
                         } else {
                                 ctx = (xwsq_t)XWMP_SKD_CONTEXT_THD;
                         }
