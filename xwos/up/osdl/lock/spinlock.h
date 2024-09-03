@@ -18,6 +18,8 @@
 
 typedef struct xwup_splk xwosdl_splk_t;
 
+#define XWOSDL_SPLK_INITIALIZER XWUP_SPLK_INITIALIZER
+
 static __xwcc_inline
 void xwosdl_splk_init(xwosdl_splk_t * ossl)
 {

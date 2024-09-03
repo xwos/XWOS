@@ -29,6 +29,8 @@ struct soc_splk {
         xwu32_t lockval;
 };
 
+#define SOC_SPLK_INITIALIZER { .lockval = 0x1, }
+
 static __xwbsp_inline
 void soc_splk_init(struct soc_splk * socsplk)
 {

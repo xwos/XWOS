@@ -21,7 +21,7 @@
 /**
  * @defgroup xwos_lock_mtx 互斥锁
  * @ingroup xwos_lock
- * 技术参考手册： [互斥锁](../docs/TechRefManual/Lock/Mutex)
+ * 技术参考手册： [互斥锁](../Docs/TechRefManual/Lock/Mutex)
  *
  *
  * ## 互斥锁的静态初始化、销毁

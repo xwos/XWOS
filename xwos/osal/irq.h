@@ -19,7 +19,7 @@
 /**
  * @defgroup xwos_irq 中断
  * @ingroup xwos
- * 技术参考手册： [中断管理](../docs/TechRefManual/Irq)
+ * 技术参考手册： [中断管理](../Docs/TechRefManual/Irq)
  *
  * ## CPU中断开关
  *

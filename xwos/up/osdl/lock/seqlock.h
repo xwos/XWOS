@@ -16,9 +16,11 @@
 #include <xwos/up/osdl/irq.h>
 #include <xwos/up/lock/seqlock.h>
 
-#define XWOSDL_SQLK_GRANULARITY         XWUP_SQLK_GRANULARITY
+#define XWOSDL_SQLK_GRANULARITY XWUP_SQLK_GRANULARITY
 
 typedef struct xwup_sqlk xwosdl_sqlk_t;
+
+#define XWOSDL_SQLK_INITIALIZER XWUP_SQLK_INITIALIZER
 
 static __xwcc_inline
 void xwosdl_sqlk_init(xwosdl_sqlk_t * ossql)

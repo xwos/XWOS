@@ -44,6 +44,8 @@ struct soc_splk {
         } v;
 };
 
+#define SOC_SPLK_INITIALIZER { .v.tickets.curr = 0, .v.tickets.next = 0, }
+
 /**
  * @brief Initialize a spinlock
  * @parem socsplk: SOC Spinlock
@@ -51,8 +53,8 @@ struct soc_splk {
 static __xwbsp_inline
 void soc_splk_init(struct soc_splk * socsplk)
 {
-        socsplk->v.tickets.next = 1;
-        socsplk->v.tickets.curr = 1;
+        socsplk->v.tickets.next = 0;
+        socsplk->v.tickets.curr = 0;
 }
 
 #if (CPUCFG_CPU_NUM > 1)

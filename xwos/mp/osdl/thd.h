@@ -16,9 +16,9 @@
 #include <xwos/mp/thd.h>
 
 #if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM)
-#  define XWOSDL_THD_LOCAL_DATA_NUM             XWOSCFG_SKD_THD_LOCAL_DATA_NUM
+#  define XWOSDL_THD_LOCAL_DATA_NUM XWOSCFG_SKD_THD_LOCAL_DATA_NUM
 #else
-#  define XWOSDL_THD_LOCAL_DATA_NUM            (0U)
+#  define XWOSDL_THD_LOCAL_DATA_NUM (0U)
 #endif
 
 #define xwosdl_thd_attr xwmp_thd_attr

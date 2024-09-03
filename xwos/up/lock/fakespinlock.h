@@ -26,6 +26,11 @@ struct xwup_splk {
         struct xwup_sqlk fake;
 };
 
+/**
+ * @brief 虚假自旋锁的初始值
+ */
+#define XWUP_SPLK_INITIALIZER { .fake = XWUP_SQLK_INITIALIZER, }
+
 static __xwup_inline_api
 void xwup_splk_init(struct xwup_splk * splk)
 {

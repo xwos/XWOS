@@ -30,6 +30,11 @@ struct xwmp_sqlk {
         xwsq_t seq; /**< 顺序值 */
 };
 
+/**
+ * @brief 顺序锁的初始值
+ */
+#define XWMP_SQLK_INITIALIZER { .splk = XWMP_SPLK_INITIALIZER, .seq = 0, }
+
 static __xwmp_inline_api
 void xwmp_sqlk_init(struct xwmp_sqlk * sql)
 {

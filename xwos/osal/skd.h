@@ -20,7 +20,7 @@
 /**
  * @defgroup xwos_skd 调度器
  * @ingroup xwos
- * 技术参考手册： [调度器](../docs/TechRefManual/Skd)
+ * 技术参考手册： [调度器](../Docs/TechRefManual/Skd)
  *
  *
  * ## 调度优先级

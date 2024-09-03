@@ -24,6 +24,11 @@ struct xwup_sqlk {
         xwsq_t seq; /* 顺序值 */
 };
 
+/**
+ * @brief 顺序锁的初始值
+ */
+#define XWUP_SQLK_INITIALIZER { .seq = 0, }
+
 void xwup_sqlk_init(struct xwup_sqlk * sql);
 xwsq_t xwup_sqlk_rd_begin(struct xwup_sqlk * sql);
 bool xwup_sqlk_rd_retry(struct xwup_sqlk * sql, xwsq_t start);

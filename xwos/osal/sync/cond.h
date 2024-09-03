@@ -22,7 +22,7 @@
 /**
  * @defgroup xwos_sync_cond 条件量
  * @ingroup xwos_sync
- * 技术参考手册： [条件量](../docs/TechRefManual/Sync/Cond)
+ * 技术参考手册： [条件量](../Docs/TechRefManual/Sync/Cond)
  *
  *
  * ## 条件量的静态初始化、销毁
@@ -58,8 +58,8 @@
  *
  * ## 使用信号选择器选择条件量
  *
- * + `xwos_cond_bind()` ：将条件量绑定到 [信号选择器](../docs/TechRefManual/Sync/Sel) 上
- * + `xwos_cond_unbind()` ：从 [信号选择器](../docs/TechRefManual/Sync/Sel) 上解绑
+ * + `xwos_cond_bind()` ：将条件量绑定到 [信号选择器](../Docs/TechRefManual/Sync/Sel) 上
+ * + `xwos_cond_unbind()` ：从 [信号选择器](../Docs/TechRefManual/Sync/Sel) 上解绑
  *
  *
  * ## 条件量对象的生命周期管理

@@ -21,7 +21,7 @@
 /**
  * @defgroup xwos_thd 线程
  * @ingroup xwos
- * 技术参考手册： [线程](../docs/TechRefManual/Thd)
+ * 技术参考手册： [线程](../Docs/TechRefManual/Thd)
  *
  *
  * ## 线程属性
@@ -79,7 +79,7 @@
  * ## 线程自身的冻结
  *
  * 线程可以通过 `xwos_cthd_shld_frz()` 判断自身是否
- * 需要 [冻结](../docs/TechRefManual/Thd#线程的冻结与解冻) 。
+ * 需要 [冻结](../Docs/TechRefManual/Thd#线程的冻结与解冻) 。
  * 需要冻结时可调用 `xwos_cthd_freeze()` 进行冻结。
  *
  * `xwos_cthd_frz_shld_stop()` 等价于

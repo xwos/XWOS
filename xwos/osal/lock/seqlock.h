@@ -20,7 +20,7 @@
 /**
  * @defgroup xwos_lock_seqlock 顺序锁
  * @ingroup xwos_lock
- * 技术参考手册： [顺序锁](../docs/TechRefManual/Lock/Seqlock)
+ * 技术参考手册： [顺序锁](../Docs/TechRefManual/Lock/Seqlock)
  *
  *
  * ## 顺序锁的初始化
@@ -114,9 +114,14 @@ struct xwos_sqlk {
 };
 
 /**
+ * @brief XWOS API：顺序锁的初始值
+ */
+#define XWOS_SQLK_INITIALIZER { .ossql = XWOSDL_SQLK_INITIALIZER, }
+
+/**
  * @brief 操作系统抽象层：顺序锁顺序值的粒度
  */
-#define XWOS_SQLK_GRANULARITY   XWOSDL_SQLK_GRANULARITY
+#define XWOS_SQLK_GRANULARITY XWOSDL_SQLK_GRANULARITY
 
 /**
  * @brief XWOS API：初始化顺序锁

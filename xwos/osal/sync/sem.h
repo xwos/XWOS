@@ -21,7 +21,7 @@
 /**
  * @defgroup xwos_sync_sem 信号量
  * @ingroup xwos_sync
- * 技术参考手册： [信号量](../docs/TechRefManual/Sync/Sem)
+ * 技术参考手册： [信号量](../Docs/TechRefManual/Sync/Sem)
  *
  *
  * ## 信号量的静态初始化、销毁
@@ -63,8 +63,8 @@
  *
  * ## 使用信号选择器选择信号量
  *
- * + `xwos_sem_bind()` ：将信号量绑定到 [信号选择器](../docs/TechRefManual/Sync/Sel) 上
- * + `xwos_sem_unbind()` ：从 [信号选择器](../docs/TechRefManual/Sync/Sel) 上解绑
+ * + `xwos_sem_bind()` ：将信号量绑定到 [信号选择器](../Docs/TechRefManual/Sync/Sel) 上
+ * + `xwos_sem_unbind()` ：从 [信号选择器](../Docs/TechRefManual/Sync/Sel) 上解绑
  *
  *
  * ## 信号量对象的生命周期管理

@@ -20,7 +20,7 @@
 /**
  * @defgroup xwos_lock_spinlock 自旋锁
  * @ingroup xwos_lock
- * 技术参考手册： [自旋锁](../docs/TechRefManual/Lock/Spinlock)
+ * 技术参考手册： [自旋锁](../Docs/TechRefManual/Lock/Spinlock)
  *
  *
  * ## 自旋锁的初始化
@@ -73,6 +73,11 @@
 struct xwos_splk {
         xwosdl_splk_t osspl;
 };
+
+/**
+ * @brief XWOS API：自旋锁的初始值
+ */
+#define XWOS_SPLK_INITIALIZER { .osspl = XWOSDL_SPLK_INITIALIZER, }
 
 /**
  * @brief XWOS API：初始化自旋锁

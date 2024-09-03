@@ -21,7 +21,7 @@
 /**
  * @defgroup xwos_sync_br 线程栅栏
  * @ingroup xwos_sync
- * 技术参考手册： [线程栅栏](../docs/TechRefManual/Sync/Br)
+ * 技术参考手册： [线程栅栏](../Docs/TechRefManual/Sync/Br)
  *
  *
  * ## 线程栅栏的静态初始化、销毁
@@ -49,8 +49,8 @@
  *
  * ## 使用信号选择器选择线程栅栏
  *
- * + `xwos_br_bind()` ：将线程栅栏绑定到 [信号选择器](../docs/TechRefManual/Sync/Sel) 上
- * + `xwos_br_unbind()` ：从 [信号选择器](../docs/TechRefManual/Sync/Sel) 上解绑
+ * + `xwos_br_bind()` ：将线程栅栏绑定到 [信号选择器](../Docs/TechRefManual/Sync/Sel) 上
+ * + `xwos_br_unbind()` ：从 [信号选择器](../Docs/TechRefManual/Sync/Sel) 上解绑
  *
  *
  * ## 线程栅栏对象的生命周期管理

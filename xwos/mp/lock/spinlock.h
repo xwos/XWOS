@@ -17,11 +17,16 @@
 #include <xwos/ospl/soc/spinlock.h>
 
 /**
- * @brief XWOS的自旋锁
+ * @brief 自旋锁
  */
 struct xwmp_splk {
         struct soc_splk socsplk; /**< 架构描述层中的自旋锁结构体 */
 };
+
+/**
+ * @brief 自旋锁的初始值
+ */
+#define XWMP_SPLK_INITIALIZER { .socsplk = SOC_SPLK_INITIALIZER, }
 
 void xwmp_rawly_lock(struct xwmp_splk * spl);
 xwer_t xwmp_rawly_trylock(struct xwmp_splk * spl);
