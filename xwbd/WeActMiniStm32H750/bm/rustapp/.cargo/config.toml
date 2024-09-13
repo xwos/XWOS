@@ -1,8 +1,4 @@
 [build]
-rustflags = [
-  "--cfg", "unix",
-  "--cfg", "target_env=\"newlib\"",
-]
 target-dir = "target"
 
 [unstable]

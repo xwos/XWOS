@@ -1,0 +1,29 @@
+{
+  "abi": "eabihf",
+  "arch": "arm",
+  "c-enum-min-bits": 8,
+  "crt-objects-fallback": "false",
+  "data-layout": "e-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64",
+  "emit-debug-gdb-scripts": false,
+  "features": "+vfp4d16sp",
+  "frame-pointer": "always",
+  "is-builtin": false,
+  "linker": "rust-lld",
+  "linker-flavor": "gnu-lld",
+  "llvm-target": "thumbv7em-none-eabihf",
+  "max-atomic-width": 32,
+  "metadata": {
+    "description": "Bare ARMv7E-M, hardfloat",
+    "host_tools": false,
+    "std": false,
+    "tier": 2
+  },
+  "panic-strategy": "abort",
+  "relocation-model": "static",
+  "target-pointer-width": "32",
+  "os": "xwos",
+  "env": "newlib",
+  "target-family": [
+      "unix"
+  ]
+}

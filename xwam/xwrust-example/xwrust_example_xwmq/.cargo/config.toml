@@ -1,8 +1,0 @@
-[build]
-rustflags = [
-  "--cfg", "unix",
-  "--cfg", "target_env=\"newlib\"",
-]
-
-[unstable]
-build-std = ["core", "alloc"]

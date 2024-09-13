@@ -19,7 +19,7 @@
  */
 
 #include "board/std.h"
-#include <xwcd/soc/arm64/v8a/a76_a55/uis7870/soc_init.h>
+#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_init.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/lib/xwaop.h>
 #include "board/xwac/xwds/device.h"

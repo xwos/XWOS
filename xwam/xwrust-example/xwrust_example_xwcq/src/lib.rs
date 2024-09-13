@@ -3,6 +3,7 @@
 //!
 
 #![no_std]
+#![allow(internal_features)]
 #![feature(slice_internals)]
 
 extern crate core;
