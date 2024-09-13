@@ -55,13 +55,13 @@ $(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR):
 	@[ ! -d $@ ] && mkdir -p $@ || true
 
 $(XWMO_RUSTLIB):
-	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) build $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
+	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) build --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
 
 doc:
-	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) doc $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
+	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) doc --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
 
 rustdoc:
-	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) rustdoc $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
+	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) rustdoc --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
 
 clean:
 	@$(RM) -f $(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
