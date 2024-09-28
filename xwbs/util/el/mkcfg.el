@@ -71,8 +71,8 @@
 (defvar XWOS-opt-wkspc nil "Path of workspace directory")
 (defvar XWOS-cfg "XWOS.cfg" "Name of XWOS.cfg")
 (defvar XWOS-cfg-rs "XWOS.cfg.rs" "Name of XWOS.cfg.rs")
-(logi "script path:%s" elpath)
-(logd "argv:%s" argv)
+(logi "script path: %s" elpath)
+(logd "argv: %s" argv)
 
 (let ()
   (pop argv)  ; Remove the -- separator
@@ -130,15 +130,15 @@
 ;;;;;;;; ;;;;;;;; ;;;;;;;; Get infomation ;;;;;;;; ;;;;;;;; ;;;;;;;;
 ;; Get top directory
 (setq current-path (expand-file-name "."))
-(logi "Current Path:%s" current-path)
+(logi "Current Path: %s" current-path)
 (setq XWOS-srcpath
       (expand-file-name XWOS-opt-srcpath (file-name-as-directory current-path)))
-(logi "XWOS SrcPath:%s" XWOS-srcpath)
+(logi "XWOS SrcPath: %s" XWOS-srcpath)
 (setq XWOS-rel-srcpath (file-relative-name XWOS-srcpath current-path))
-(logi "XWOS Relative SrcPath:%s" XWOS-rel-srcpath)
-(logi "XWOS CfgPath:%s" XWOS-opt-cfgdir)
-(logi "XWOS Workspace:%s" XWOS-opt-wkspc)
-(setq XWOS-forward-srcpath
+(logi "XWOS Relative SrcPath: %s" XWOS-rel-srcpath)
+(logi "XWOS CfgPath: %s" XWOS-opt-cfgdir)
+(logi "XWOS Workspace: %s" XWOS-opt-wkspc)
+(setq XWOS-obj-dir-rel-wkspcobj-dir
       (directory-file-name
        (let (result)
          (dolist (elt (split-string XWOS-rel-srcpath "/") result)
@@ -147,20 +147,20 @@
          (if (null result)
              (setq result "XWOS"))
          result)))
-(logi "XWOS Forward SrcPath:%s" XWOS-forward-srcpath)
+(logi "XWOS ObjPath rel workspace/obj: %s" XWOS-obj-dir-rel-wkspcobj-dir)
 
-(setq XWOS-backward-srcpath
+(setq XWOS-obj-dir-back-wkspcobj-dir
       (directory-file-name
        (let (result)
-         (dolist (elt (split-string XWOS-forward-srcpath "/") result)
+         (dolist (elt (split-string XWOS-obj-dir-rel-wkspcobj-dir "/") result)
            (setq result (concat result "../")))
          (if (null result)
              (setq result ".."))
          result)))
-(logi "XWOS Backward SrcPath:%s" XWOS-backward-srcpath)
+(logi "XWOS ObjPath back to workspace/obj: %s" XWOS-obj-dir-back-wkspcobj-dir)
 
-(logi "XWOS.cfg:%s" XWOS-cfg)
-(logi "XWOS.cfg.rs:%s" XWOS-cfg-rs)
+(logi "XWOS.cfg: %s" XWOS-cfg)
+(logi "XWOS.cfg.rs: %s" XWOS-cfg-rs)
 (setq XWOS-cfg-buffer (find-file-noselect (concat XWOS-opt-wkspc "/" XWOS-cfg)))
 (setq XWOS-cfg-rs-buffer (find-file-noselect (concat XWOS-opt-wkspc "/" XWOS-cfg-rs)))
 (setq XWOS-autogen-header-buffer (find-file-noselect (concat XWOS-opt-cfgdir "/autogen.h")))
@@ -193,31 +193,31 @@
 (set-buffer project-cfg-h-buffer)
 (set-buffer-multibyte nil)
 
-(logi "host:%s" (symbol-name system-type))
+(logi "host: %s" (symbol-name system-type))
 
 (goto-char (point-min))
 (re-search-forward
  "^#define[ \t]+\\(XWCFG_ARCH\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-arch (match-string 2))
-(logi "ARCH:%s" XWOS-cfg-arch)
+(logi "ARCH: %s" XWOS-cfg-arch)
 
 (goto-char (point-min))
 (re-search-forward
  "^#define[ \t]+\\(XWCFG_SUBARCH\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-subarch (match-string 2))
-(logi "Sub-ARCH:%s" XWOS-cfg-subarch)
+(logi "Sub-ARCH: %s" XWOS-cfg-subarch)
 
 (goto-char (point-min))
 (re-search-forward
  "^#define[ \t]+\\(XWCFG_COMPILER\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-compiler (match-string 2))
-(logi "compiler:%s" XWOS-cfg-compiler)
+(logi "compiler: %s" XWOS-cfg-compiler)
 
 (goto-char (point-min))
 (re-search-forward
  "^#define[ \t]+\\(XWCFG_LIBC\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-libc (match-string 2))
-(logi "libc:%s" XWOS-cfg-libc)
+(logi "libc: %s" XWOS-cfg-libc)
 
 (goto-char (point-min))
 (let ((rc))
@@ -225,31 +225,31 @@
   (if (null rc)
     (setq XWOS-cfg-lds "")
     (setq XWOS-cfg-lds (match-string 1))))
-(logi "XWOS-cfg-lds:%s" XWOS-cfg-lds)
+(logi "XWOS-cfg-lds: %s" XWOS-cfg-lds)
 
 (goto-char (point-min))
 (re-search-forward
  "^#define[ \t]+\\(XWCFG_CPU\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-cpu (match-string 2))
-(logi "CPU:%s" XWOS-cfg-cpu)
+(logi "CPU: %s" XWOS-cfg-cpu)
 
 (goto-char (point-min))
 (re-search-forward
  "^#define[ \t]+\\(XWCFG_SOC\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-soc (match-string 2))
-(logi "SOC:%s" XWOS-cfg-soc)
+(logi "SOC: %s" XWOS-cfg-soc)
 
 (goto-char (point-min))
 (re-search-forward
  "^#define[ \t]+\\(XWCFG_BOARD\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-brd (match-string 2))
-(logi "board:%s" XWOS-cfg-brd)
+(logi "board: %s" XWOS-cfg-brd)
 
 (goto-char (point-min))
 (re-search-forward
  "^#define[ \t]+\\(XWCFG_CORE\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-core (match-string 2))
-(logi "core:%s" XWOS-cfg-core)
+(logi "core: %s" XWOS-cfg-core)
 
 (goto-char (point-min))
 (re-search-forward
@@ -258,7 +258,7 @@
       (cond
        ((string= (match-string 2) "1") "y")
        (t "n")))
-(logi "middleware:%s" XWOS-cfg-xwmd)
+(logi "middleware: %s" XWOS-cfg-xwmd)
 
 (goto-char (point-min))
 (re-search-forward
@@ -267,7 +267,7 @@
       (cond
        ((string= (match-string 2) "1") "y")
        (t "n")))
-(logi "external:%s" XWOS-cfg-xwem)
+(logi "external: %s" XWOS-cfg-xwem)
 
 (goto-char (point-min))
 (re-search-forward
@@ -276,7 +276,7 @@
       (cond
        ((string= (match-string 2) "1") "y")
        (t "n")))
-(logi "application:%s" XWOS-cfg-xwam)
+(logi "application: %s" XWOS-cfg-xwam)
 
 (goto-char (point-min))
 (let (rc)
@@ -285,40 +285,42 @@
   (if (null rc)
       (setq XWOS-cfg-oempath "")
       (setq XWOS-cfg-oempath (match-string 1))))
-(logi "XWOS-cfg-oempath:%s" XWOS-cfg-oempath)
+(logi "XWOS-cfg-oempath: %s" XWOS-cfg-oempath)
 
 ;; Get directories Info
 (setq XWOS-xwos-dir (concat "xwos"))
-(logi "XWOS-xwos-dir:%s" XWOS-xwos-dir)
+(logi "XWOS-xwos-dir: %s" XWOS-xwos-dir)
 (setq XWOS-xwcd-dir (concat "xwcd"))
-(logi "XWOS-xwcd-dir:%s" XWOS-xwcd-dir)
+(logi "XWOS-xwcd-dir: %s" XWOS-xwcd-dir)
 (setq XWOS-xwmd-dir (concat "xwmd"))
-(logi "XWOS-xwmd-dir:%s" XWOS-xwmd-dir)
+(logi "XWOS-xwmd-dir: %s" XWOS-xwmd-dir)
 (setq XWOS-xwem-dir (concat "xwem"))
-(logi "XWOS-xwem-dir:%s" XWOS-xwem-dir)
+(logi "XWOS-xwem-dir: %s" XWOS-xwem-dir)
 (setq XWOS-xwam-dir (concat "xwam"))
-(logi "XWOS-xwam-dir:%s" XWOS-xwam-dir)
+(logi "XWOS-xwam-dir: %s" XWOS-xwam-dir)
 (when (string= XWOS-cfg-compiler "clang")
   (setq XWOS-cfg-compiler "llvm"))
 (setq XWOS-arch-dir (concat "xwcd/soc/" XWOS-cfg-arch "/" XWOS-cfg-subarch))
-(logi "XWOS-arch-dir:%s" XWOS-arch-dir)
+(logi "XWOS-arch-dir: %s" XWOS-arch-dir)
 (setq XWOS-cpu-dir (concat XWOS-arch-dir "/" XWOS-cfg-cpu))
-(logi "XWOS-cpu-dir:%s" XWOS-cpu-dir)
+(logi "XWOS-cpu-dir: %s" XWOS-cpu-dir)
 (setq XWOS-soc-dir (concat XWOS-cpu-dir "/" XWOS-cfg-soc))
-(logi "XWOS-soc-dir:%s" XWOS-soc-dir)
+(logi "XWOS-soc-dir: %s" XWOS-soc-dir)
 (setq XWOS-brd-dir (file-relative-name current-path XWOS-srcpath))
-(logi "XWOS-brd-dir:%s" XWOS-brd-dir)
+(logi "XWOS-brd-dir: %s" XWOS-brd-dir)
 (setq XWOS-bm-dir (concat XWOS-brd-dir "/bm"))
-(logi "XWOS-bm-dir:%s" XWOS-bm-dir)
+(logi "XWOS-bm-dir: %s" XWOS-bm-dir)
 (setq XWOS-wkspc-dir
       (if (file-name-absolute-p XWOS-opt-wkspc)
           XWOS-opt-wkspc
           (concat XWOS-brd-dir "/" XWOS-opt-wkspc)))
-(logi "XWOS-wkspc-dir:%s" XWOS-wkspc-dir)
-(setq XWOS-obj-dir (concat XWOS-wkspc-dir "/obj/" XWOS-forward-srcpath))
-(logi "XWOS-obj-dir:%s" XWOS-obj-dir)
-(setq XWOS-oemobj-dir (concat XWOS-wkspc-dir "/obj/oem"))
-(logi "XWOS-oemobj-dir:%s" XWOS-oemobj-dir)
+(logi "XWOS-wkspc-dir: %s" XWOS-wkspc-dir)
+(setq XWOS-wkspcobj-dir (concat XWOS-wkspc-dir "/obj"))
+(logi "XWOS-wkspcobj-dir: %s" XWOS-wkspcobj-dir)
+(setq XWOS-obj-dir (concat XWOS-wkspcobj-dir "/" XWOS-obj-dir-rel-wkspcobj-dir))
+(logi "XWOS-obj-dir: %s" XWOS-obj-dir)
+(setq XWOS-oemobj-dir (concat XWOS-wkspcobj-dir "/oem"))
+(logi "XWOS-oemobj-dir: %s" XWOS-oemobj-dir)
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; generate XWOS.cfg ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (set-buffer XWOS-cfg-buffer)
@@ -341,8 +343,8 @@
 (insert "## ******** ******** ******** ******** directory info ******** ******** ******** ******** ##\n")
 (insert (concat "XWOS_PATH := " XWOS-srcpath "\n"))
 (insert (concat "XWOS_RELPATH := " XWOS-rel-srcpath "\n"))
-(insert (concat "XWOS_FWDPATH := " XWOS-forward-srcpath "\n"))
-(insert (concat "XWOS_BWDPATH := " XWOS-backward-srcpath "\n"))
+(insert (concat "XWOS_OBJ_DIR_REL_WKSPCOBJ_DIR := " XWOS-obj-dir-rel-wkspcobj-dir "\n"))
+(insert (concat "XWOS_OBJ_DIR_BACK_WKSPCOBJ_DIR := " XWOS-obj-dir-back-wkspcobj-dir "\n"))
 (insert (concat "XWOS_OS_DIR := " XWOS-xwos-dir "\n"))
 (insert (concat "XWOS_XWCD_DIR := " XWOS-xwcd-dir "\n"))
 (insert (concat "XWOS_XWMD_DIR := " XWOS-xwmd-dir "\n"))
@@ -355,6 +357,7 @@
 (insert (concat "XWOS_BM_DIR := " XWOS-bm-dir "\n"))
 (insert (concat "XWOS_OEM_DIR := " XWOS-brd-dir "/" XWOS-cfg-oempath "\n"))
 (insert (concat "XWOS_WKSPC_DIR := " XWOS-wkspc-dir "\n"))
+(insert (concat "XWOS_WKSPCOBJ_DIR := " XWOS-wkspcobj-dir "\n"))
 (insert (concat "XWOS_OBJ_DIR := " XWOS-obj-dir "\n"))
 (insert (concat "XWOS_OEMOBJ_DIR := " XWOS-oemobj-dir "\n"))
 (insert "## ******** ******** ******** ******** ARCH ******** ******** ******** ******** ##\n")
@@ -653,8 +656,8 @@
 (insert "## ******** ******** ******** ******** directory info ******** ******** ******** ******** ##\n")
 (insert (concat "export XWOS_PATH=" XWOS-srcpath "\n"))
 (insert (concat "export XWOS_RELPATH=" XWOS-rel-srcpath "\n"))
-(insert (concat "export XWOS_FWDPATH=" XWOS-forward-srcpath "\n"))
-(insert (concat "export XWOS_BWDPATH=" XWOS-backward-srcpath "\n"))
+(insert (concat "export XWOS_OBJ_DIR_REL_WKSPCOBJ_DIR=" XWOS-obj-dir-rel-wkspcobj-dir "\n"))
+(insert (concat "export XWOS_OBJ_DIR_BACK_WKSPCOBJ_DIR=" XWOS-obj-dir-back-wkspcobj-dir "\n"))
 (insert (concat "export XWOS_OS_DIR=" XWOS-xwos-dir "\n"))
 (insert (concat "export XWOS_XWCD_DIR=" XWOS-xwcd-dir "\n"))
 (insert (concat "export XWOS_XWMD_DIR=" XWOS-xwmd-dir "\n"))
@@ -667,6 +670,7 @@
 (insert (concat "export XWOS_BM_DIR=" XWOS-bm-dir "\n"))
 (insert (concat "export XWOS_OEM_DIR=" XWOS-brd-dir "/" XWOS-cfg-oempath "\n"))
 (insert (concat "export XWOS_WKSPC_DIR=" XWOS-wkspc-dir "\n"))
+(insert (concat "export XWOS_WKSPCOBJ_DIR=" XWOS-wkspcobj-dir "\n"))
 (insert (concat "export XWOS_OBJ_DIR=" XWOS-obj-dir "\n"))
 (insert (concat "export XWOS_OEMOBJ_DIR=" XWOS-oemobj-dir "\n"))
 (insert "## ******** ******** ******** ******** includes ******** ******** ******** ******** ##\n")

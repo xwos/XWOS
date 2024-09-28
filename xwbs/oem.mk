@@ -43,13 +43,13 @@ $(OEM):
 	$(MAKE) $(strip -C $(XWOS_PATH) \
                         -f $(subst $(XWOS_OEMOBJ_DIR),$(XWOS_OEM_DIR),$(@D))/xwmo.mk \
                         XWOS_BRD_DIR=$(XWOS_BRD_DIR) \
-                        XWMO_OBJ_DIR=$(XWOS_BWDPATH)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)))
+                        XWMO_OBJ_DIR=$(XWOS_OBJ_DIR_BACK_WKSPCOBJ_DIR)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)))
 
 $(OEM_DSM):
 	$(MAKE) $(strip -C $(XWOS_PATH) \
                         -f $(subst $(XWOS_OEMOBJ_DIR),$(XWOS_OEM_DIR),$(@D))/xwmo.mk \
                         XWOS_BRD_DIR=$(XWOS_BRD_DIR) \
-                        XWMO_OBJ_DIR=$(XWOS_BWDPATH)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)) \
+                        XWMO_OBJ_DIR=$(XWOS_OBJ_DIR_BACK_WKSPCOBJ_DIR)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)) \
                         NODEP=y \
                         dsm)
 
@@ -57,7 +57,7 @@ $(OEM_CLEAN):
 	$(MAKE) $(strip -C $(XWOS_PATH) \
                         -f $(subst $(XWOS_OEMOBJ_DIR),$(XWOS_OEM_DIR),$(@D))/xwmo.mk \
                         XWOS_BRD_DIR=$(XWOS_BRD_DIR) \
-                        XWMO_OBJ_DIR=$(XWOS_BWDPATH)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)) \
+                        XWMO_OBJ_DIR=$(XWOS_OBJ_DIR_BACK_WKSPCOBJ_DIR)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)) \
                         NODEP=y \
                         clean)
 
@@ -65,7 +65,7 @@ $(OEM_DISTCLEAN):
 	$(MAKE) $(strip -C $(XWOS_PATH) \
                         -f $(subst $(XWOS_OEMOBJ_DIR),$(XWOS_OEM_DIR),$(@D))/xwmo.mk \
 		        XWOS_BRD_DIR=$(XWOS_BRD_DIR) \
-                        XWMO_OBJ_DIR=$(XWOS_BWDPATH)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)) \
+                        XWMO_OBJ_DIR=$(XWOS_OBJ_DIR_BACK_WKSPCOBJ_DIR)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)) \
                         NODEP=y \
                         distclean)
 
