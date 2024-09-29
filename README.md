@@ -10,8 +10,6 @@ XWOS的源码遵循 **MISRA-C:2012** 标准，已经在汽车行业有越来越�
 + <http://xwos.tech/>
 + <https://xwos.org/>
 + <http://xwos.org/>
-+ <https://xwos.gitee.io/>
-+ <https://xwos.github.io/>
 
 
 # 开源协议
