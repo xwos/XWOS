@@ -140,6 +140,7 @@ xwer_t xwup_skd_init_lc(void)
         xwup_bh_cb_init(&xwskd->bhcb);
         xwup_skd_init_bhd();
 #endif
+        xwskd->dis_irq_cnt = (xwsq_t)0;
         xwlib_bclst_init_head(&xwskd->thdlist);
         xwskd->thd_num = (xwsz_t)0;
         xwlib_bclst_init_head(&xwskd->thdelist);

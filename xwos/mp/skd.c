@@ -181,6 +181,7 @@ xwer_t xwmp_skd_init_lc(void)
         xwmp_bh_cb_init(&xwskd->bhcb);
         xwmp_skd_init_bhd(xwskd);
 #endif
+        xwskd->dis_irq_cnt = (xwsq_t)0;
         xwmp_splk_init(&xwskd->cxlock);
         xwmp_splk_init(&xwskd->thdlistlock);
         xwlib_bclst_init_head(&xwskd->thdlist);

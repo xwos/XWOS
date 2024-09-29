@@ -164,6 +164,7 @@ struct __xwcc_alignl1cache xwmp_skd {
         struct xwmp_bh_cb bhcb; /**< 中断底半部控制块 */
         struct xwmp_skdobj_stack bh; /**< 中断底半部任务的栈信息 */
 #endif
+        xwsq_t dis_irq_cnt; /**< 关闭中断的计数器 */
         struct xwmp_tt tt; /**< 时间树 */
         struct xwmp_splk cxlock; /**< 上下文切换的锁 */
         struct xwmp_skd_pm pm; /**< 调度器电源管理控制块 */

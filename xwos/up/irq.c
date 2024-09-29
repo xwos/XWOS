@@ -74,13 +74,21 @@ xwer_t xwup_irq_get_id(xwirq_t * irqnbuf)
 __xwup_api
 void xwup_cpuirq_enable_lc(void)
 {
-        xwospl_cpuirq_enable_lc();
+        struct xwup_skd * xwskd = xwup_skd_get_lc();
+        if (xwskd->dis_irq_cnt > (xwsq_t)1) {
+                xwskd->dis_irq_cnt--;
+        } else if ((xwsq_t)1 == xwskd->dis_irq_cnt) {
+                xwskd->dis_irq_cnt--;
+                xwospl_cpuirq_enable_lc();
+        } else {}
 }
 
 __xwup_api
 void xwup_cpuirq_disable_lc(void)
 {
+        struct xwup_skd * xwskd = xwup_skd_get_lc();
         xwospl_cpuirq_disable_lc();
+        xwskd->dis_irq_cnt++;
 }
 
 __xwup_api
