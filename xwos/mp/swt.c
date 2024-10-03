@@ -406,9 +406,7 @@ void xwmp_swt_ttn_callback(struct xwmp_ttn * ttn)
         swt->cb(swt, swt->arg);
         if ((xwsq_t)0 != ((xwsq_t)XWMP_SWT_FLAG_RESTART & swt->flag)) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
-                /* 其他CPU在此时调用 `xwmp_swt_stop()` 会失败，
-                   软件定时器只会减少一次引用计数。
-                   引用计数的值一定小于3，本地CPU可由此获知需要停止重启软件定时器。*/
+                /* 其他CPU在此时调用 `xwmp_swt_stop()` 会导致引用计数的值小于3。*/
                 xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
                 refcnt = xwos_object_get_refcnt(&swt->xwobj);
                 if (refcnt >= (xwsq_t)3) {
