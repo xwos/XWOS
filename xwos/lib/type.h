@@ -336,10 +336,10 @@ typedef __xwcc_atomic xws64_t atomic_xws64_t; /**< 原子的64位有符号整数
 
 
 #if !defined(ARCH_HAVE_XWSZ_T) || defined(__DOXYGEN__)
-typedef unsigned long xwsz_t; /**< 大小值（无符号）*/
+typedef unsigned long xwsz_t; /**< 大小值 (无符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWSZ_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwsz_t atomic_xwsz_t; /**< 大小值（无符号，原子的）*/
+typedef __xwcc_atomic xwsz_t atomic_xwsz_t; /**< 大小值 (无符号，原子的) */
 #endif
 #ifndef BITS_PER_XWSZ_T
 #  define BITS_PER_XWSZ_T       BITS_PER_ULONG
@@ -352,10 +352,10 @@ typedef __xwcc_atomic xwsz_t atomic_xwsz_t; /**< 大小值（无符号，原子�
 #endif
 
 #if !defined(ARCH_HAVE_XWSSZ_T) || defined(__DOXYGEN__)
-typedef signed long xwssz_t; /**< 大小值（有符号）*/
+typedef signed long xwssz_t; /**< 大小值 (有符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWSSZ_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwssz_t atomic_xwssz_t; /**< 大小值（有符号，原子的）*/
+typedef __xwcc_atomic xwssz_t atomic_xwssz_t; /**< 大小值 (有符号，原子的) */
 #endif
 #ifndef BITS_PER_XWSSZ_T
 #  define BITS_PER_XWSSZ_T      BITS_PER_LONG
@@ -375,7 +375,7 @@ typedef __xwcc_atomic xwssz_t atomic_xwssz_t; /**< 大小值（有符号，原�
 typedef unsigned long xwptr_t; /**< 指针数值 */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWPTR_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwptr_t atomic_xwptr_t; /**< 指针数值（原子的）*/
+typedef __xwcc_atomic xwptr_t atomic_xwptr_t; /**< 指针数值 (原子的) */
 #endif
 #ifndef BITS_PER_XWPTR_T
 #  define BITS_PER_XWPTR_T      BITS_PER_ULONG
@@ -392,7 +392,7 @@ typedef __xwcc_atomic xwptr_t atomic_xwptr_t; /**< 指针数值（原子的）*/
 typedef xwptr_t xwstk_t; /**< 栈槽 */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWSTK_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwstk_t atomic_xwstk_t; /**< 栈槽（原子的）*/
+typedef __xwcc_atomic xwstk_t atomic_xwstk_t; /**< 栈槽 (原子的) */
 #endif
 #ifndef BITS_PER_XWSTK_T
 #  define BITS_PER_XWSTK_T      BITS_PER_XWPTR_T
@@ -406,10 +406,10 @@ typedef __xwcc_atomic xwstk_t atomic_xwstk_t; /**< 栈槽（原子的）*/
 
 
 #if !defined(ARCH_HAVE_XWREG_T) || defined(__DOXYGEN__)
-typedef xwptr_t xwreg_t; /**< 寄存器数值（无符号）*/
+typedef xwptr_t xwreg_t; /**< 寄存器数值 (无符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWREG_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwreg_t atomic_xwreg_t; /**< 寄存器数值（无符号，原子的）*/
+typedef __xwcc_atomic xwreg_t atomic_xwreg_t; /**< 寄存器数值 (无符号，原子的) */
 #endif
 #ifndef BITS_PER_XWREG_T
 #  define BITS_PER_XWREG_T      BITS_PER_XWPTR_T
@@ -422,10 +422,10 @@ typedef __xwcc_atomic xwreg_t atomic_xwreg_t; /**< 寄存器数值（无符号�
 #endif
 
 #if !defined(ARCH_HAVE_XWSREG_T) || defined(__DOXYGEN__)
-typedef ptrdiff_t xwsreg_t; /**< 寄存器数值（有符号）*/
+typedef ptrdiff_t xwsreg_t; /**< 寄存器数值 (有符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWSREG_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwsreg_t atomic_xwsreg_t; /**< 寄存器数值（有符号，原子的）*/
+typedef __xwcc_atomic xwsreg_t atomic_xwsreg_t; /**< 寄存器数值 (有符号，原子的) */
 #endif
 #ifndef BITS_PER_XWSREG_T
 #  define BITS_PER_XWSREG_T     BITS_PER_XWREG_T
@@ -442,10 +442,10 @@ typedef __xwcc_atomic xwsreg_t atomic_xwsreg_t; /**< 寄存器数值（有符号
 
 
 #if !defined(ARCH_HAVE_XWSQ_T) || defined(__DOXYGEN__)
-typedef unsigned long xwsq_t; /**< 顺序值（无符号）*/
+typedef unsigned long xwsq_t; /**< 顺序值 (无符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWSQ_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwsq_t atomic_xwsq_t; /**< 顺序值（无符号，原子的）*/
+typedef __xwcc_atomic xwsq_t atomic_xwsq_t; /**< 顺序值 (无符号，原子的) */
 #endif
 #ifndef BITS_PER_XWSQ_T
 #  define BITS_PER_XWSQ_T       BITS_PER_ULONG
@@ -458,10 +458,10 @@ typedef __xwcc_atomic xwsq_t atomic_xwsq_t; /**< 顺序值（无符号，原子�
 #endif
 
 #if !defined(ARCH_HAVE_XWSSQ_T) || defined(__DOXYGEN__)
-typedef signed long xwssq_t; /**< 顺序值（有符号）*/
+typedef signed long xwssq_t; /**< 顺序值 (有符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWSSQ_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwssq_t atomic_xwssq_t; /**< 顺序值（有符号，原子的）*/
+typedef __xwcc_atomic xwssq_t atomic_xwssq_t; /**< 顺序值 (有符号，原子的) */
 #endif
 #ifndef BITS_PER_XWSSQ_T
 #  define BITS_PER_XWSSQ_T      BITS_PER_LONG
@@ -478,10 +478,10 @@ typedef __xwcc_atomic xwssq_t atomic_xwssq_t; /**< 顺序值（有符号，原�
 
 
 #if !defined(ARCH_HAVE_XWID_T) || defined(__DOXYGEN__)
-typedef unsigned long xwid_t; /**< ID（无符号）*/
+typedef unsigned long xwid_t; /**< ID (无符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWID_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwid_t atomic_xwid_t; /**< ID（无符号，原子的）*/
+typedef __xwcc_atomic xwid_t atomic_xwid_t; /**< ID (无符号，原子的) */
 #endif
 #ifndef BITS_PER_XWID_T
 #  define BITS_PER_XWID_T       BITS_PER_ULONG
@@ -494,10 +494,10 @@ typedef __xwcc_atomic xwid_t atomic_xwid_t; /**< ID（无符号，原子的）*/
 #endif
 
 #if !defined(ARCH_HAVE_XWSID_T) || defined(__DOXYGEN__)
-typedef signed long xwsid_t; /**< ID（有符号）*/
+typedef signed long xwsid_t; /**< ID (有符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWSID_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwsid_t atomic_xwsid_t; /**< ID（有符号，原子的）*/
+typedef __xwcc_atomic xwsid_t atomic_xwsid_t; /**< ID (有符号，原子的) */
 #endif
 #ifndef BITS_PER_XWSID_T
 #  define BITS_PER_XWSID_T      BITS_PER_LONG
@@ -514,7 +514,7 @@ typedef __xwcc_atomic xwsid_t atomic_xwsid_t; /**< ID（有符号，原子的）
 
 
 #if !defined(ARCH_HAVE_XWIRQ_T) || defined(__DOXYGEN__)
-typedef signed int xwirq_t; /**< 中断号（有符号）*/
+typedef signed int xwirq_t; /**< 中断号 (有符号) */
 #endif
 #ifndef BITS_PER_XWIRQ_T
 #  define BITS_PER_XWIRQ_T      BITS_PER_INT
@@ -531,10 +531,10 @@ typedef signed int xwirq_t; /**< 中断号（有符号）*/
 
 
 #if !defined(ARCH_HAVE_XWPR_T) || defined(__DOXYGEN__)
-typedef xws32_t xwpr_t; /**< 优先级（有符号）*/
+typedef xws32_t xwpr_t; /**< 优先级 (有符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWPR_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwpr_t atomic_xwpr_t; /**< 优先级（有符号，原子的）*/
+typedef __xwcc_atomic xwpr_t atomic_xwpr_t; /**< 优先级 (有符号，原子的) */
 #endif
 #ifndef BITS_PER_XWPR_T
 #  define BITS_PER_XWPR_T       BITS_PER_XWS32_T
@@ -551,10 +551,10 @@ typedef __xwcc_atomic xwpr_t atomic_xwpr_t; /**< 优先级（有符号，原子�
 
 
 #if !defined(ARCH_HAVE_XWER_T) || defined(__DOXYGEN__)
-typedef signed long xwer_t; /**< 错误码（有符号）*/
+typedef signed long xwer_t; /**< 错误码 (有符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWER_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwer_t atomic_xwer_t; /**< 错误码（有符号，原子的）*/
+typedef __xwcc_atomic xwer_t atomic_xwer_t; /**< 错误码 (有符号，原子的) */
 #endif
 #ifndef BITS_PER_XWER_T
 #  define BITS_PER_XWER_T       BITS_PER_LONG
@@ -571,10 +571,10 @@ typedef __xwcc_atomic xwer_t atomic_xwer_t; /**< 错误码（有符号，原子�
 
 
 #if !defined(ARCH_HAVE_XWBMP_T) || defined(__DOXYGEN__)
-typedef xwu32_t xwbmp_t; /**< 位图（无符号）*/
+typedef xwu32_t xwbmp_t; /**< 位图 (无符号) */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWBMP_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwbmp_t atomic_xwbmp_t; /**< 位图（无符号，原子的）*/
+typedef __xwcc_atomic xwbmp_t atomic_xwbmp_t; /**< 位图 (无符号，原子的) */
 #endif
 #ifndef BITS_PER_XWBMP_T
 #  define BITS_PER_XWBMP_T      BITS_PER_XWU32_T
@@ -591,7 +591,7 @@ typedef __xwcc_atomic xwbmp_t atomic_xwbmp_t; /**< 位图（无符号，原子�
 typedef xwptr_t xwlfq_t; /**< 无锁队列 */
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWLFQ_T) || defined(__DOXYGEN__)
-typedef __xwcc_atomic xwlfq_t atomic_xwlfq_t; /**< 无锁队列（原子的）*/
+typedef __xwcc_atomic xwlfq_t atomic_xwlfq_t; /**< 无锁队列 (原子的) */
 #endif
 #ifndef BITS_PER_XWLFQ_T
 #  define BITS_PER_XWLFQ_T      BITS_PER_XWPTR_T
@@ -703,29 +703,59 @@ union xwos_ulock {
  * @ingroup xwos_lib_type
  * @{
  */
+#if !defined(ARCH_HAVE_XWTK_T) || defined(__DOXYGEN__)
+/**
+ * @brief XWOS系统滴答计数 (无符号)
+ */
+typedef xwu64_t xwtk_t;
+#endif
+#if !defined(ARCH_HAVE_ATOMIC_XWTK_T) || defined(__DOXYGEN__)
+/**
+ * @brief XWOS系统滴答计数 (无符号，原子的)
+ */
+typedef __xwcc_atomic xwtk_t atomic_xwtk_t;
+#endif
+
+#ifndef XWTK_MAX
+/**
+ * @brief `xwtk_t` 的最大值
+ */
+#  define XWTK_MAX      ((xwtk_t)((~(xwu64_t)0)))
+#endif
+#ifndef XWTK_MIN
+/**
+ * @brief `xwtk_t` 的最小值
+ */
+#  define XWTK_MIN      ((xwtk_t)0)
+#endif
+#ifndef BITS_PER_XWTK_T
+#  define BITS_PER_XWTK_T       BITS_PER_XWU64_T
+#endif
+#ifndef XWTK_T_SHIFT
+#  define XWTK_T_SHIFT          XWU64_T_SHIFT
+#endif
+
 #if !defined(ARCH_HAVE_XWTM_T) || defined(__DOXYGEN__)
 /**
- * @brief XWOS系统时间（有符号)
+ * @brief XWOS系统时间 (有符号)
  */
 typedef xws64_t xwtm_t;
 #endif
 #if !defined(ARCH_HAVE_ATOMIC_XWTM_T) || defined(__DOXYGEN__)
 /**
- * @brief XWOS系统时间（有符号，原子的)
+ * @brief XWOS系统时间 (有符号，原子的)
  */
 typedef __xwcc_atomic xwtm_t atomic_xwtm_t;
 #endif
 
 #ifndef XWTM_MAX
 /**
- * @ingroup xwos_lib_type_time
  * @brief `xwtm_t` 的最大值
  */
 #  define XWTM_MAX      ((xwtm_t)((~(xwu64_t)0) >> 1))
 #endif
 #ifndef XWTM_MIN
 /**
- * @ingroup xwos_lib_type_time
  * @brief `xwtm_t` 的最小值
  */
 #  define XWTM_MIN      ((xwtm_t)(-XWTM_MAX - (xwtm_t)1))

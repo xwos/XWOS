@@ -989,7 +989,7 @@ xwer_t xwmp_cond_wait_to(struct xwmp_cond * cond,
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         hwt = &xwskd->tt.hwt;
-        now = xwmp_syshwt_get_timetick(hwt);
+        now = xwmp_syshwt_get_time(hwt);
         if (xwtm_cmp(to, now) < 0) {
                 rc = -ETIMEDOUT;
         } else if (xwtm_cmp(to, now) == 0) {

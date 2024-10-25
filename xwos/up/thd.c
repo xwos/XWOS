@@ -1244,7 +1244,7 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
-        now = xwup_syshwt_get_timetick(hwt);
+        now = xwup_syshwt_get_time(hwt);
         if (xwtm_cmp(to, now) < 0) {
                 rc = -ETIMEDOUT;
                 goto err_timedout;
@@ -1385,12 +1385,12 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
                 XWOS_BUG();
                 rc = -EBUG;
         }
-        *from = xwup_syshwt_get_timetick(hwt);
+        *from = xwup_syshwt_get_time(hwt);
         return rc;
 
 err_intr:
 err_cannot:
-        *from = xwup_syshwt_get_timetick(hwt);
+        *from = xwup_syshwt_get_time(hwt);
         return rc;
 }
 

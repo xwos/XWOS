@@ -19,8 +19,11 @@
 /**
  * @defgroup xwos_time 时间
  * @ingroup xwos
- * XWOS的 **时间** 以 @ref xwtm_t 表示。
- * `xwtm_t` 是一个有符号的64位整数，单位为 **纳秒** 。参考 @ref xwos_lib_type_time
+ * XWOS的 **时间** 以 @ref xwtm_t 表示。系统滴答定时器中断的次数用 @ref xwtk_t 表示。
+ * 参考 @ref xwos_lib_type_time 。
+ *
+ * + `xwtk_t` 是一个无符号的64位整数。
+ * + `xwtm_t` 是一个有符号的64位整数，单位为 **纳秒** 。
  *
  * ## 获取当前的系统时间
  *
@@ -53,7 +56,7 @@
 static __xwos_inline_api
 xwtm_t xwtm_now(void)
 {
-        return xwosdl_skd_get_timetick_lc();
+        return xwosdl_skd_get_time_lc();
 }
 
 /**
@@ -129,9 +132,9 @@ xwtm_t xwtm_fts(xwtm_t dur)
  * `XWOS的系统滴答计数 = 滴答时间定时器中断的次数`
  */
 static __xwos_inline_api
-xwu64_t xwtm_nowtc(void)
+xwtk_t xwtm_nowtc(void)
 {
-        return xwosdl_skd_get_tickcount_lc();
+        return xwosdl_skd_get_tick_lc();
 }
 
 /**

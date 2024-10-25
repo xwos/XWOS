@@ -772,7 +772,7 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();
         hwt = &xwskd->tt.hwt;
-        now = xwup_syshwt_get_timetick(hwt);
+        now = xwup_syshwt_get_time(hwt);
         if (xwtm_cmp(to, now) < 0) {
                 rc = -ETIMEDOUT;
         } else if (xwtm_cmp(to, now) == 0) {

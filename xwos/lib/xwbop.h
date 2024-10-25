@@ -404,6 +404,8 @@ DEFINE_XWBOP(xwbmp_t, 32)
 DEFINE_XWBOP(xwbmp_t, 64)
 #endif
 
+DEFINE_XWBOP(xwtk_t, 64)
+
 /******** ******** 位图操作 ******** ********/
 /**
  * @brief XWOS BOPLIB：声明位图

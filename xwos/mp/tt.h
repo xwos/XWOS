@@ -93,9 +93,9 @@ struct xwmp_skd * xwmp_tt_get_skd(struct xwmp_tt * xwtt);
 xwer_t xwmp_syshwt_init(struct xwmp_syshwt * hwt);
 xwer_t xwmp_syshwt_start(struct xwmp_syshwt * hwt);
 xwer_t xwmp_syshwt_stop(struct xwmp_syshwt * hwt);
-xwtm_t xwmp_syshwt_get_timetick(struct xwmp_syshwt * hwt);
-xwu64_t xwmp_syshwt_get_tickcount(struct xwmp_syshwt * hwt);
+xwtm_t xwmp_syshwt_get_time(struct xwmp_syshwt * hwt);
 xwtm_t xwmp_syshwt_get_timestamp(struct xwmp_syshwt * hwt);
+xwtk_t xwmp_syshwt_get_tick(struct xwmp_syshwt * hwt);
 void xwmp_syshwt_task(struct xwmp_syshwt * hwt);
 struct xwmp_tt * xwmp_syshwt_get_tt(struct xwmp_syshwt * hwt);
 

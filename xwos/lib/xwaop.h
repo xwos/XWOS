@@ -2462,6 +2462,7 @@ DEFINE_XWAOP(xwbmp_t, xwu32_t)
 DEFINE_XWAOP(xwbmp_t, xwu64_t)
 #endif
 
+DEFINE_XWAOP(xwtk_t, xwu64_t)
 DEFINE_XWAOP(xwtm_t, xws64_t)
 
 /**

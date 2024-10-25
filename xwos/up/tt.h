@@ -92,9 +92,9 @@ struct xwup_skd * xwup_tt_get_skd(struct xwup_tt * xwtt);
 xwer_t xwup_syshwt_init(struct xwup_syshwt * hwt);
 xwer_t xwup_syshwt_start(struct xwup_syshwt * hwt);
 xwer_t xwup_syshwt_stop(struct xwup_syshwt * hwt);
-xwtm_t xwup_syshwt_get_timetick(struct xwup_syshwt * hwt);
-xwu64_t xwup_syshwt_get_tickcount(struct xwup_syshwt * hwt);
+xwtm_t xwup_syshwt_get_time(struct xwup_syshwt * hwt);
 xwtm_t xwup_syshwt_get_timestamp(struct xwup_syshwt * hwt);
+xwtk_t xwup_syshwt_get_tick(struct xwup_syshwt * hwt);
 void xwup_syshwt_task(struct xwup_syshwt * hwt);
 struct xwup_tt * xwup_syshwt_get_tt(struct xwup_syshwt * hwt);
 

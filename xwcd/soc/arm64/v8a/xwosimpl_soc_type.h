@@ -174,12 +174,12 @@ typedef xws64_t xwsid_t; /**< ID (有符号) */
 #define XWSID_T_SHIFT           XWS64_T_SHIFT
 
 #define ARCH_HAVE_XWER_T        1
-typedef xws64_t xwer_t; /**< 错误码（有符号）*/
+typedef xws64_t xwer_t; /**< 错误码 (有符号) */
 #define BITS_PER_XWER_T         BITS_PER_XWS64_T
 #define XWER_T_SHIFT            XWS64_T_SHIFT
 
 #define ARCH_HAVE_XWBMP_T       1
-typedef xwu64_t xwbmp_t; /**< 位图（无符号）*/
+typedef xwu64_t xwbmp_t; /**< 位图 (无符号) */
 #define BITS_PER_XWBMP_T        BITS_PER_XWU64_T
 #define XWBMP_T_SHIFT           XWU64_T_SHIFT
 

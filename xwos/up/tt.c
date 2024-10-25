@@ -278,9 +278,9 @@ xwer_t xwup_tt_check_deadline(struct xwup_tt * xwtt)
 
         rc = XWOK;
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-        for (tick = xwup_syshwt_get_timetick(&xwtt->hwt);
+        for (tick = xwup_syshwt_get_time(&xwtt->hwt);
              ((NULL != xwtt->leftmost) && (xwtm_cmp(xwtt->deadline, tick) <= 0));
-             tick = xwup_syshwt_get_timetick(&xwtt->hwt)) {
+             tick = xwup_syshwt_get_time(&xwtt->hwt)) {
                 leftmost = xwtt->leftmost;
                 xwup_tt_rmrbn_locked(xwtt, leftmost);
                 xwlib_bclst_insseg_tail(&xwtt->timeout, &leftmost->rbb);
@@ -379,7 +379,7 @@ xwer_t xwup_syshwt_stop(struct xwup_syshwt * hwt)
  * - 重入性：可重入
  */
 __xwup_code
-xwtm_t xwup_syshwt_get_timetick(struct xwup_syshwt * hwt)
+xwtm_t xwup_syshwt_get_time(struct xwup_syshwt * hwt)
 {
         xwsq_t seq;
         xwtm_t timetick;
@@ -389,21 +389,6 @@ xwtm_t xwup_syshwt_get_timetick(struct xwup_syshwt * hwt)
                 timetick = hwt->timetick;
         } while (xwup_sqlk_rd_retry(&hwt->lock, seq));
         return timetick;
-}
-
-/**
- * @brief 获取系统滴答计数
- * @param[in] hwt: 硬件定时器结构体的指针
- * @return 系统滴答计数
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-__xwup_code
-xwu64_t xwup_syshwt_get_tickcount(struct xwup_syshwt * hwt)
-{
-        return (xwu64_t)xwup_syshwt_get_timetick(hwt) / (xwu64_t)XWOSCFG_SYSHWT_PERIOD;
 }
 
 /**
@@ -429,6 +414,21 @@ xwtm_t xwup_syshwt_get_timestamp(struct xwup_syshwt * hwt)
                 ts = xwtm_add(ts, timeconfetti);
         } while (xwup_sqlk_rd_retry(&hwt->lock, seq));
         return ts;
+}
+
+/**
+ * @brief 获取系统滴答计数
+ * @param[in] hwt: 硬件定时器结构体的指针
+ * @return 系统滴答计数
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwup_code
+xwtk_t xwup_syshwt_get_tick(struct xwup_syshwt * hwt)
+{
+        return (xwtk_t)xwup_syshwt_get_time(hwt) / (xwtk_t)XWOSCFG_SYSHWT_PERIOD;
 }
 
 /**

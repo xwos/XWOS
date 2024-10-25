@@ -898,7 +898,7 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         hwt = &xwskd->tt.hwt;
-        now = xwmp_syshwt_get_timetick(hwt);
+        now = xwmp_syshwt_get_time(hwt);
         if (xwtm_cmp(to, now) < 0) {
                 rc = -ETIMEDOUT;
         } else if (xwtm_cmp(to, now) == 0) {

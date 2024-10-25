@@ -54,21 +54,21 @@ void xwosdl_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
 }
 
 static __xwcc_inline
-xwtm_t xwosdl_skd_get_timetick_lc(void)
+xwtm_t xwosdl_skd_get_time_lc(void)
 {
         struct xwmp_skd * xwskd;
 
         xwskd = xwmp_skd_get_lc();
-        return xwmp_syshwt_get_timetick(&xwskd->tt.hwt);
+        return xwmp_syshwt_get_time(&xwskd->tt.hwt);
 }
 
 static __xwcc_inline
-xwu64_t xwosdl_skd_get_tickcount_lc(void)
+xwtk_t xwosdl_skd_get_tick_lc(void)
 {
         struct xwmp_skd * xwskd;
 
         xwskd = xwmp_skd_get_lc();
-        return xwmp_syshwt_get_tickcount(&xwskd->tt.hwt);
+        return xwmp_syshwt_get_tick(&xwskd->tt.hwt);
 }
 
 static __xwcc_inline
