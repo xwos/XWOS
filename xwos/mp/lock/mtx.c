@@ -749,8 +749,6 @@ xwer_t xwmp_mtx_blkthd_to_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        xwmb_mp_rmb();
-        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
         wkuprs = xwaop_load(xwsq_t, &thd->ttn.wkuprs, xwaop_mo_relaxed);
         if ((xwsq_t)XWMP_WQN_REASON_INTR == reason) {
@@ -895,8 +893,26 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
         xwtm_t now;
         xwer_t rc;
 
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        if (!xwmp_skd_tstth(xwskd)) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
+        if (!xwmp_skd_tstpmpt(xwskd)) {
+                rc = -EDISPMPT;
+                goto err_dispmpt;
+        }
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+        if (!xwmp_skd_tstbh(xwskd)) {
+                rc = -EDISBH;
+                goto err_disbh;
+        }
+#endif
         hwt = &xwskd->tt.hwt;
         now = xwmp_syshwt_get_time(hwt);
         if (xwtm_cmp(to, now) < 0) {
@@ -908,12 +924,6 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
                                 rc = -ETIMEDOUT;
                         }
                 }
-        } else if (!xwmp_skd_tstpmpt(xwskd)) {
-                rc = -ECANNOTPMPT;
-#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        } else if (!xwmp_skd_tstbh(xwskd)) {
-                rc = -ECANNOTBH;
-#endif
         } else {
                 rc = xwmp_mtx_grab(mtx);
                 if (XWOK == rc) {
@@ -924,6 +934,10 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
                         }
                 }
         }
+
+err_disbh:
+err_dispmpt:
+err_disirq:
         return rc;
 }
 
@@ -960,8 +974,6 @@ xwer_t xwmp_mtx_blkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        xwmb_mp_rmb();
-        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
         if ((xwsq_t)XWMP_WQN_REASON_UP == reason) {
                 rc = XWOK;
@@ -1008,18 +1020,26 @@ xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
         struct xwmp_thd * cthd;
         struct xwmp_skd * xwskd;
 
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        if (!xwmp_skd_tstth(xwskd)) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
         if (!xwmp_skd_tstpmpt(xwskd)) {
-                rc = -ECANNOTPMPT;
-                goto err_cannot;
+                rc = -EDISPMPT;
+                goto err_dispmpt;
+        }
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        } else if (!xwmp_skd_tstbh(xwskd)) {
-                rc = -ECANNOTBH;
-                goto err_cannot;
+        if (!xwmp_skd_tstbh(xwskd)) {
+                rc = -EDISBH;
+                goto err_disbh;
+        }
 #endif
-        } else {}
-
         rc = xwmp_mtx_grab(mtx);
         if (rc < 0) {
                 goto err_mtx_grab;
@@ -1033,7 +1053,9 @@ xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
 err_mtx_do_lock_unintr:
         xwmp_mtx_put(mtx); // cppcheck-suppress [misra-c2012-17.7]
 err_mtx_grab:
-err_cannot:
+err_disbh:
+err_dispmpt:
+err_disirq:
         return rc;
 }
 

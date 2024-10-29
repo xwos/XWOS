@@ -51,4 +51,10 @@ void xwospl_cpuirq_save_lc(xwreg_t * cpuirq)
         armv8a_cpuirq_save_lc(cpuirq);
 }
 
+static __xwbsp_inline
+bool xwospl_cpuirq_test_lc(void)
+{
+        return armv8a_cpuirq_test_lc();
+}
+
 #endif /* xwcd/soc/arm64/v8a/a72/bcm2711/xwosimpl_irq.h */

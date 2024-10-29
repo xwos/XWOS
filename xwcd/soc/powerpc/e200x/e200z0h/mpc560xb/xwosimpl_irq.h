@@ -53,4 +53,10 @@ void xwospl_cpuirq_save_lc(xwreg_t * cpuirq)
         arch_cpuirq_save_lc(cpuirq);
 }
 
+static __xwbsp_inline
+bool xwospl_cpuirq_test_lc(void)
+{
+        return arch_cpuirq_test_lc();
+}
+
 #endif /* xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/xwosimpl_irq.h */

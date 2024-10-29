@@ -72,7 +72,7 @@ struct xwup_thd_attr {
  * ```
  */
 struct xwup_thd {
-        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+        struct xwos_object xwobj; /**< C语言面向对象：继承 `struct xwos_object` */
         struct xwup_skdobj_stack stack; /**< 栈 */
         struct xwlib_bclst_node thdnode; /**< 调度器线程链表中的节点 */
 
@@ -84,11 +84,10 @@ struct xwup_thd {
 #endif
 
         /* 就绪态 */
-        struct xwlib_bclst_node rqnode; /**< 就绪队列节点，
-                                             此成员被锁rtrq->lock保护 */
+        struct xwlib_bclst_node rqnode; /**< 就绪队列节点，被锁 `rtrq->lock` 保护 */
 
         /* 睡眠态 */
-        struct xwup_ttn ttn; /**< 时间树节点, 被锁tt->lock保护 */
+        struct xwup_ttn ttn; /**< 时间树节点, 被锁 `tt->lock` 保护 */
 
         /* 等待态 */
         struct xwup_wqn wqn; /**< 等待队列 */

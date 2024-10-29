@@ -23,7 +23,6 @@
 #elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
 #  include <stdlib.h>
 #endif
-#include <xwos/lib/xwaop.h>
 #include <xwos/up/skd.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/swt.h>

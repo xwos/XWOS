@@ -24,14 +24,11 @@
 #endif
 #include <xwosimpl_irq.h>
 
-static __xwbsp_inline
-void xwospl_cpuirq_enable_lc(void);
-static __xwbsp_inline
-void xwospl_cpuirq_disable_lc(void);
-static __xwbsp_inline
-void xwospl_cpuirq_restore_lc(xwreg_t cpuirq);
-static __xwbsp_inline
-void xwospl_cpuirq_save_lc(xwreg_t * cpuirq);
+static __xwbsp_inline void xwospl_cpuirq_enable_lc(void);
+static __xwbsp_inline void xwospl_cpuirq_disable_lc(void);
+static __xwbsp_inline void xwospl_cpuirq_restore_lc(xwreg_t cpuirq);
+static __xwbsp_inline void xwospl_cpuirq_save_lc(xwreg_t * cpuirq);
+static __xwbsp_inline bool xwospl_cpuirq_test_lc(void);
 
 xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf);
 xwer_t xwospl_irq_enable(xwirq_t irqn);

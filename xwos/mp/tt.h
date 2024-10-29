@@ -72,7 +72,7 @@ enum xwmp_ttn_wkup_reasaon_em {
  * @brief 时间树节点
  */
 struct xwmp_ttn {
-        struct xwlib_bclst_node rbb; /**< 此有相同关键字的红黑树节点，
+        struct xwlib_bclst_node rbb; /**< 具有相同关键字的红黑树节点，
                                           组成双循环链表，此为链表节点 */
         struct xwlib_rbtree_node rbn; /**< 红黑树节点 */
         xwtm_t wkup_xwtm; /**< 唤醒时间 */

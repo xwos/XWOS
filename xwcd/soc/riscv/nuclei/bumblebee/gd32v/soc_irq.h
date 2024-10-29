@@ -127,6 +127,7 @@ void soc_cpuirq_enable_lc(void);
 void soc_cpuirq_disable_lc(void);
 void soc_cpuirq_restore_lc(xwreg_t cpuirq);
 void soc_cpuirq_save_lc(xwreg_t * cpuirq);
+bool soc_cpuirq_test_lc(void);
 xwer_t soc_irqc_init(void);
 xwer_t soc_irq_get_id(xwirq_t * irqnbuf);
 xwer_t soc_irq_request(xwirq_t irqn, xwisr_f isrfunc);

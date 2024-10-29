@@ -51,4 +51,10 @@ void xwospl_cpuirq_save_lc(xwreg_t * cpuirq)
         soc_cpuirq_save_lc(cpuirq);
 }
 
+static __xwbsp_inline
+bool xwospl_cpuirq_test_lc(void)
+{
+        return soc_cpuirq_test_lc();
+}
+
 #endif /* xwcd/soc/riscv/nuclei/bumblebee/gd32v/xwosimpl_irq.h */

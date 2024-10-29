@@ -99,6 +99,13 @@ void soc_cpuirq_save_lc(xwreg_t * cpuirq)
 }
 
 __xwbsp_code
+bool soc_cpuirq_test_lc(void)
+{
+        xwreg_t cpuirq = __RV_CSR_READ(CSR_MSTATUS);
+        return !!(cpuirq & MSTATUS_MIE);
+}
+
+__xwbsp_code
 xwer_t soc_irqc_init(void)
 {
         ECLIC_SetMth(0);

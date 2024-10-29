@@ -663,6 +663,24 @@ xwer_t xwup_plsem_wait_to(struct xwup_plsem * sem, xwtm_t to)
         xwtm_t now;
         xwer_t rc;
 
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
+        if (!xwup_skd_tstth_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
+        if (!xwup_skd_tstpmpt_lc()) {
+                rc = -EDISPMPT;
+                goto err_dispmpt;
+        }
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+        if (!xwup_skd_tstbh_lc()) {
+                rc = -EDISBH;
+                goto err_disbh;
+        }
+#endif
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();
         hwt = &xwskd->tt.hwt;
@@ -676,15 +694,13 @@ xwer_t xwup_plsem_wait_to(struct xwup_plsem * sem, xwtm_t to)
                                 rc = -ETIMEDOUT;
                         }
                 }
-        } else if (!xwup_skd_tstpmpt_lc()) {
-                rc = -ECANNOTPMPT;
-#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        } else if (!xwup_skd_tstbh_lc()) {
-                rc = -ECANNOTBH;
-#endif
         } else {
                 rc = xwup_plsem_test(sem, xwskd, cthd, to);
         }
+
+err_disbh:
+err_dispmpt:
+err_disirq:
         return rc;
 }
 
@@ -757,11 +773,15 @@ xwer_t xwup_plsem_wait_unintr(struct xwup_plsem * sem)
         struct xwup_thd * cthd;
         xwer_t rc;
 
-        if (!xwup_skd_tstpmpt_lc()) {
-                rc = -ECANNOTPMPT;
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+        } else if (!xwup_skd_tstth_lc()) {
+                rc = -EDISIRQ;
+        } else if (!xwup_skd_tstpmpt_lc()) {
+                rc = -EDISPMPT;
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwup_skd_tstbh_lc()) {
-                rc = -ECANNOTBH;
+                rc = -EDISBH;
 #endif
         } else {
                 cthd = xwup_skd_get_cthd_lc();

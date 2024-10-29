@@ -577,6 +577,18 @@ void armv8a_cpuirq_save_lc(xwreg_t * cpuirq)
         armv8a_cpuirq_disable_lc();
 }
 
+/**
+ * @brief Test local CPU IRQ flag
+ */
+static __xwbsp_inline
+bool armv8a_cpuirq_test_lc(void)
+{
+        xwreg_t cpuirq;
+
+        armv8a_sysreg_read(&cpuirq, daif);
+        return !(cpuirq & ((xwreg_t)3 << (xwreg_t)6));
+}
+
 /* EL switch */
 void armv8a_switch_el3_to_el2_aarch64(void);
 void armv8a_switch_el2_to_el1_aarch64(void);

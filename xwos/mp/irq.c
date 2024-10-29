@@ -74,21 +74,25 @@ xwer_t xwmp_irq_get_id(xwirq_t * irqnbuf)
 __xwmp_api
 void xwmp_cpuirq_enable_lc(void)
 {
-        struct xwmp_skd * xwskd = xwmp_skd_get_lc();
-        if (xwskd->dis_irq_cnt > (xwsq_t)1) {
-                xwskd->dis_irq_cnt--;
-        } else if ((xwsq_t)1 == xwskd->dis_irq_cnt) {
-                xwskd->dis_irq_cnt--;
-                xwospl_cpuirq_enable_lc();
-        } else {}
+        xwospl_cpuirq_enable_lc();
 }
 
 __xwmp_api
 void xwmp_cpuirq_disable_lc(void)
 {
-        struct xwmp_skd * xwskd = xwmp_skd_get_lc();
         xwospl_cpuirq_disable_lc();
-        xwskd->dis_irq_cnt++;
+}
+
+__xwmp_api
+void xwmp_cpuirq_resume_lc(void)
+{
+        xwmp_skd_enth_lc(); // cppcheck-suppress [misra-c2012-17.7]
+}
+
+__xwmp_api
+void xwmp_cpuirq_suspend_lc(void)
+{
+        xwmp_skd_dsth_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwmp_api
@@ -101,4 +105,10 @@ __xwmp_api
 void xwmp_cpuirq_save_lc(xwreg_t * cpuirq)
 {
         xwospl_cpuirq_save_lc(cpuirq);
+}
+
+__xwmp_api
+bool xwmp_cpuirq_test_lc(void)
+{
+        return xwospl_cpuirq_test_lc();
 }

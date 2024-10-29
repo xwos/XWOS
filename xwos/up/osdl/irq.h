@@ -58,6 +58,18 @@ void xwosdl_cpuirq_disable_lc(void)
 }
 
 static __xwcc_inline
+void xwosdl_cpuirq_resume_lc(void)
+{
+        xwup_cpuirq_resume_lc();
+}
+
+static __xwcc_inline
+void xwosdl_cpuirq_suspend_lc(void)
+{
+        xwup_cpuirq_suspend_lc();
+}
+
+static __xwcc_inline
 void xwosdl_cpuirq_restore_lc(xwreg_t cpuirq)
 {
         xwup_cpuirq_restore_lc(cpuirq);
@@ -67,6 +79,12 @@ static __xwcc_inline
 void xwosdl_cpuirq_save_lc(xwreg_t * cpuirq)
 {
         xwup_cpuirq_save_lc(cpuirq);
+}
+
+static __xwcc_inline
+bool xwosdl_cpuirq_test_lc(void)
+{
+        return xwup_cpuirq_test_lc();
 }
 
 #endif /* xwos/up/osdl/irq.h */

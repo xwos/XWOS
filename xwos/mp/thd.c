@@ -1474,27 +1474,37 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         xwsq_t wkuprs;
         xwreg_t cpuirq;
 
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        if (!xwmp_skd_tstth(xwskd)) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
+        if (!xwmp_skd_tstpmpt(xwskd)) {
+                rc = -EDISPMPT;
+                goto err_dispmpt;
+        }
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+        if (!xwmp_skd_tstbh(xwskd)) {
+                rc = -EDISBH;
+                goto err_disbh;
+        }
+#endif
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
         now = xwmp_syshwt_get_time(hwt);
         if (xwtm_cmp(to, now) < 0) {
                 rc = -ETIMEDOUT;
                 goto err_timedout;
-        } else if (xwtm_cmp(to, now) == 0) {
+        }
+        if (xwtm_cmp(to, now) == 0) {
                 rc = XWOK;
                 goto err_timedout;
-        } else if (!xwmp_skd_tstpmpt(xwskd)) {
-                rc = -ECANNOTPMPT;
-                goto err_cannot;
-#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        } else if (!xwmp_skd_tstbh(xwskd)) {
-                rc = -ECANNOTBH;
-                goto err_cannot;
-#endif
-        } else {}
-
+        }
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
         rc = xwmp_skd_wakelock_lock(xwskd);
@@ -1531,8 +1541,6 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        xwmb_mp_rmb();
-        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         wkuprs = xwaop_load(xwsq_t, &cthd->ttn.wkuprs, xwaop_mo_relaxed);
         if ((xwsq_t)XWMP_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 rc = XWOK;
@@ -1545,8 +1553,10 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         return rc;
 
 err_intr:
-err_cannot:
 err_timedout:
+err_disbh:
+err_dispmpt:
+err_disirq:
         return rc;
 }
 
@@ -1562,22 +1572,29 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwsq_t wkuprs;
         xwer_t rc;
 
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        if (!xwmp_skd_tstth(xwskd)) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
+        if (!xwmp_skd_tstpmpt(xwskd)) {
+                rc = -EDISPMPT;
+                goto err_dispmpt;
+        }
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+        if (!xwmp_skd_tstbh(xwskd)) {
+                rc = -EDISBH;
+                goto err_disbh;
+        }
+#endif
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
         to = xwtm_add_safely(*from, dur);
-
-        if (!xwmp_skd_tstpmpt(xwskd)) {
-                rc = -ECANNOTPMPT;
-                goto err_cannot;
-#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        } else if (!xwmp_skd_tstbh(xwskd)) {
-                rc = -ECANNOTBH;
-                goto err_cannot;
-#endif
-        } else {}
-
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
         rc = xwmp_skd_wakelock_lock(xwskd);
@@ -1614,8 +1631,6 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        xwmb_mp_rmb();
-        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         wkuprs = xwaop_load(xwsq_t, &cthd->ttn.wkuprs, xwaop_mo_relaxed);
         if ((xwsq_t)XWMP_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 rc = XWOK;
@@ -1625,12 +1640,12 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
                 XWOS_BUG();
                 rc = -EBUG;
         }
-        *from = xwmp_syshwt_get_time(hwt);
-        return rc;
 
 err_intr:
         *from = xwmp_syshwt_get_time(hwt);
-err_cannot:
+err_disbh:
+err_dispmpt:
+err_disirq:
         return rc;
 }
 

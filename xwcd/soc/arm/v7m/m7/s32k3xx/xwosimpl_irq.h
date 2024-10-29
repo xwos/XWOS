@@ -51,4 +51,10 @@ void xwospl_cpuirq_save_lc(xwreg_t * cpuirq)
         arch_cpuirq_save_lc(cpuirq);
 }
 
+static __xwbsp_inline
+bool xwospl_cpuirq_test_lc(void)
+{
+        return arch_cpuirq_test_lc();
+}
+
 #endif /* xwcd/soc/arm/v7m/m7/s32k3xx/xwosimpl_irq.h */

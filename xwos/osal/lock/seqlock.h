@@ -37,32 +37,32 @@
  *
  * ## 独占读
  *
- * + 只保护 **线程** 上下文之间的临界区
+ * + 保护 **线程** 上下文之间的独占读临界区
  *   + `xwos_sqlk_rdex_lock()` ：上锁，关闭抢占
  *   + `xwos_sqlk_rdex_trylock()` ：尝试上锁，关闭抢占
  *   + `xwos_sqlk_rdex_unlock()` ：解锁，开启抢占
  *
- * + 保护 **任意** 上下文之间的临界区
+ * + 保护 **任意** 上下文之间的独占读临界区
  *   + `xwos_sqlk_rdex_lock_cpuirq()` ：上锁，关闭抢占、CPU中断
  *   + `xwos_sqlk_rdex_trylock_cpuirq()` ：尝试上锁，关闭抢占、CPU中断
  *   + `xwos_sqlk_rdex_unlock_cpuirq()` ：解锁，开启抢占、CPU中断
  *
- * + **多个** 自旋锁保护 **任意** 上下文之间的 **嵌套** 临界区
+ * + 保护 **任意** 上下文之间的 **嵌套** 独占读临界区
  *   + `xwos_sqlk_rdex_lock_cpuirqsv()` ：上锁，关闭抢占，保存CPU中断标志并关闭
  *   + `xwos_sqlk_rdex_trylock_cpuirqsv()` ：尝试上锁，关闭抢占，保存CPU中断标志并关闭
  *   + `xwos_sqlk_rdex_unlock_cpuirqrs()` ：解锁，开启抢占，恢复CPU中断
  *
- * + 保护 **线程** 和 **指定的外设中断** 上下文之间的临界区
+ * + 保护 **线程** 和 **指定中断** 上下文之间的独占读临界区
  *   + `xwos_sqlk_rdex_lock_irqs()` ：上锁，关闭抢占，关闭部分中断
  *   + `xwos_sqlk_rdex_trylock_irqs()` ：尝试上锁，关闭抢占，关闭部分中断
  *   + `xwos_sqlk_rdex_unlock_irqs()` ：解锁，开启抢占、开启部分中断
  *
- * + **多个** 自旋锁保护 **线程** 和 **指定的外设中断** 上下文之间的 **嵌套** 临界区
+ * + 保护 **线程** 和 **指定中断** 上下文之间的 **嵌套** 独占读临界区
  *   + `xwos_sqlk_rdex_lock_irqssv()` ：上锁，关闭抢占，保存部分中断标志并关闭
  *   + `xwos_sqlk_rdex_trylock_irqssv()` ：尝试上锁，关闭抢占，保存部分中断标志并关闭
  *   + `xwos_sqlk_rdex_unlock_irqsrs()` ：解锁，开启抢占、恢复部分中断
  *
- * + 保护 **线程** 和 **中断底半部** 上下文之间的临界区
+ * + 保护 **线程** 和 **中断底半部** 上下文之间的独占读临界区
  *   + `xwos_sqlk_rdex_lock_bh()` ：上锁，关闭抢占、中断底半部
  *   + `xwos_sqlk_rdex_trylock_bh()` ：尝试上锁，关闭抢占、中断底半部
  *   + `xwos_sqlk_rdex_unlock_bh()` ：解锁，开启抢占、中断底半部
@@ -70,32 +70,32 @@
  *
  * ## 写
  *
- * + 只保护 **线程** 上下文之间的临界区
+ * + 保护 **线程** 上下文之间的读写临界区
  *   + `xwos_sqlk_wr_lock()` ：上锁，关闭抢占
  *   + `xwos_sqlk_wr_trylock()` ：尝试上锁，关闭抢占
  *   + `xwos_sqlk_wr_unlock()` ：解锁，开启抢占
  *
- * + 保护 **任意** 上下文之间的临界区
+ * + 保护 **任意** 上下文之间的读写临界区
  *   + `xwos_sqlk_wr_lock_cpuirq()` ：上锁，关闭抢占、CPU中断
  *   + `xwos_sqlk_wr_trylock_cpuirq()` ：尝试上锁，关闭抢占、CPU中断
  *   + `xwos_sqlk_wr_unlock_cpuirq()` ：解锁，开启抢占、CPU中断
  *
- * + **多个** 自旋锁保护 **任意** 上下文之间的 **嵌套** 临界区
+ * + 保护 **任意** 上下文之间的 **嵌套** 读写临界区
  *   + `xwos_sqlk_wr_lock_cpuirqsv()` ：上锁，关闭抢占，保存CPU中断标志并关闭
  *   + `xwos_sqlk_wr_trylock_cpuirqsv()` ：尝试上锁，关闭抢占，保存CPU中断标志并关闭
  *   + `xwos_sqlk_wr_unlock_cpuirqrs()` ：解锁，开启抢占，恢复CPU中断
  *
- * + 保护 **线程** 和 **指定的外设中断** 上下文之间的临界区
+ * + 保护 **线程** 和 **指定中断** 上下文之间的读写临界区
  *   + `xwos_sqlk_wr_lock_irqs()` ：上锁，关闭抢占，关闭部分中断
  *   + `xwos_sqlk_wr_trylock_irqs()` ：尝试上锁，关闭抢占，关闭部分中断
  *   + `xwos_sqlk_wr_unlock_irqs()` ：解锁，开启抢占、开启部分中断
  *
- * + **多个** 自旋锁保护 **线程** 和 **指定的外设中断** 上下文之间的 **嵌套** 临界区
+ * + 保护 **线程** 和 **指定中断** 上下文之间的 **嵌套** 读写临界区
  *   + `xwos_sqlk_wr_lock_irqssv()` ：上锁，关闭抢占，保存部分中断标志并关闭
  *   + `xwos_sqlk_wr_trylock_irqssv()` ：尝试上锁，关闭抢占，保存部分中断标志并关闭
  *   + `xwos_sqlk_wr_unlock_irqsrs()` ：解锁，开启抢占、恢复部分中断
  *
- * + 保护 **线程** 和 **中断底半部** 上下文之间的临界区
+ * + 保护 **线程** 和 **中断底半部** 上下文之间的读写临界区
  *   + `xwos_sqlk_wr_lock_bh()` ：上锁，关闭抢占、中断底半部
  *   + `xwos_sqlk_wr_trylock_bh()` ：尝试上锁，关闭抢占、中断底半部
  *   + `xwos_sqlk_wr_unlock_bh()` ：解锁，开启抢占、中断底半部

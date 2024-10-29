@@ -23,10 +23,13 @@
  *
  * ## CPU中断开关
  *
- * + `xwos_cpuirq_enable_lc()` ：开启CPU的中断开关
- * + `xwos_cpuirq_disable_lc()` ：关闭CPU的中断开关
- * + `xwos_cpuirq_save_lc()` ：保存当前CPU的中断开关状态后关闭
- * + `xwos_cpuirq_restore_lc()` ：恢复之前保存的CPU的中断开关状态
+ * + `xwos_cpuirq_enable_lc()` ：开启本地CPU的中断开关（不可嵌套使用）
+ * + `xwos_cpuirq_disable_lc()` ：关闭本地CPU的中断开关（不可嵌套使用）
+ * + `xwos_cpuirq_resume_lc()` ：暂停本地CPU的中断（可嵌套使用）
+ * + `xwos_cpuirq_suspend_lc()` ：恢复本地CPU的中断（可嵌套使用）
+ * + `xwos_cpuirq_save_lc()` ：保存本地CPU的中断开关然后关闭（可嵌套使用）
+ * + `xwos_cpuirq_restore_lc()` ：恢复本地CPU的中断开关（可嵌套使用）
+ * + `xwos_cpuirq_test_lc()` ：测试本地CPU的中断开关状态
  *
  *
  * ## 外设中断
@@ -138,7 +141,8 @@ xwer_t xwos_irq_get_id(xwirq_t * irqnbuf)
  * @note
  * + 上下文：任意
  * @details
- * 此函数运行在哪个CPU上，开启的就是哪个CPU的中断。
+ * + 此CAPI只能在 `xwos_cpuirq_disable_lc()` 之后，与之成对使用，不可嵌套。
+ * + 此CAPI运行在哪个CPU上，开启的就是哪个CPU的中断。此CAPI不影响其他CPU的中断开关。
  */
 static __xwos_inline_api
 void xwos_cpuirq_enable_lc(void)
@@ -151,7 +155,8 @@ void xwos_cpuirq_enable_lc(void)
  * @note
  * + 上下文：任意
  * @details
- * 此函数运行在哪个CPU上，关闭的就是哪个CPU的中断。
+ * + 此CAPI只能在 `xwos_cpuirq_enable_lc()` 之前，与之成对使用，不可嵌套。
+ * + 此CAPI运行在哪个CPU上，关闭的就是哪个CPU的中断。此CAPI不影响其他CPU的中断开关。
  */
 static __xwos_inline_api
 void xwos_cpuirq_disable_lc(void)
@@ -161,11 +166,41 @@ void xwos_cpuirq_disable_lc(void)
 
 /**
  * @brief XWOS API：恢复本地CPU的中断
+ * @note
+ * + 上下文：任意
+ * @details
+ * + 此CAPI只能在 `xwos_cpuirq_suspend_lc()` 之后，与之成对使用。
+ * + `xwos_cpuirq_suspend_lc()` 调用了多少次，就要调用有与之对应次数此CAPI。
+ * + 此CAPI运行在哪个CPU上，开启的就是哪个CPU的中断。此CAPI不影响其他CPU的中断开关。
+ */
+static __xwos_inline_api
+void xwos_cpuirq_resume_lc(void)
+{
+        xwosdl_cpuirq_resume_lc();
+}
+
+/**
+ * @brief XWOS API：暂停本地CPU的中断
+ * @note
+ * + 上下文：任意
+ * @details
+ * + 此CAPI只能在 `xwos_cpuirq_resmue_lc()` 之前，与之成对使用。
+ * + 此CAPI可嵌套使用，但需要在之后调用相同次数的 `xwos_cpuirq_resmue_lc()` 。
+ * + 此CAPI运行在哪个CPU上，关闭的就是哪个CPU的中断。此CAPI不影响其他CPU的中断开关。
+ */
+static __xwos_inline_api
+void xwos_cpuirq_suspend_lc(void)
+{
+        xwosdl_cpuirq_suspend_lc();
+}
+
+/**
+ * @brief XWOS API：恢复本地CPU的中断开关
  * @param[in] cpuirq: 本地CPU的中断开关
  * @note
  * + 上下文：任意
  * @details
- * 此函数运行在哪个CPU上，恢复的就是哪个CPU的中断。
+ * + 此CAPI运行在哪个CPU上，恢复的就是哪个CPU的中断开关。
  */
 static __xwos_inline_api
 void xwos_cpuirq_restore_lc(xwreg_t cpuirq)
@@ -174,17 +209,31 @@ void xwos_cpuirq_restore_lc(xwreg_t cpuirq)
 }
 
 /**
- * @brief XWOS API：保存然后关闭本地CPU的中断
+ * @brief XWOS API：保存然后关闭本地CPU的中断开关
  * @param[out] cpuirq: 指向缓冲区的指针，此缓冲区用于返回本地CPU的中断开关
  * @note
  * + 上下文：任意
  * @details
- * 此函数运行在哪个CPU上，保存然后关闭的就是哪个CPU的中断。
+ * + 此CAPI运行在哪个CPU上，保存然后关闭的就是哪个CPU的中断开关。
  */
 static __xwos_inline_api
 void xwos_cpuirq_save_lc(xwreg_t * cpuirq)
 {
         xwosdl_cpuirq_save_lc(cpuirq);
+}
+
+/**
+ * @brief XWOS API：测试本地CPU的中断开关状态
+ * return 本地CPU的中断状态
+ * retval true: 开启中断
+ * retval false: 关闭中断
+ * @note
+ * + 上下文：任意
+ */
+static __xwos_inline_api
+bool xwos_cpuirq_test_lc(void)
+{
+        return xwosdl_cpuirq_test_lc();
 }
 
 /**

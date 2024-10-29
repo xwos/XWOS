@@ -767,6 +767,7 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwsq_t bh;
 #endif
+        xwsq_t th;
         struct xwmp_tt * xwtt;
 
         xwtt = &xwskd->tt;
@@ -817,19 +818,21 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwmp_skd_svbh(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_rsbh(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwospl_cpuirq_enable_lc();
+
+        xwmp_skd_svth(xwskd, &th); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsth(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_wakelock_unlock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_wakelock_lock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsth(xwskd, th); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwmp_skd_rsbh(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
 #endif
         xwmp_skd_rspmpt(xwskd, pmpt); // cppcheck-suppress [misra-c2012-17.7]
 
         /* 判断唤醒原因 */
-        xwmb_mp_rmb();
-        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
         wkuprs = xwaop_load(xwsq_t, &thd->ttn.wkuprs, xwaop_mo_relaxed);
         if ((xwsq_t)XWMP_WQN_REASON_INTR == reason) {
@@ -1019,6 +1022,7 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwsq_t bh;
 #endif
+        xwsq_t th;
         xwer_t rc;
 
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
@@ -1053,8 +1057,10 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwmp_skd_svbh(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_rsbh(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwospl_cpuirq_enable_lc();
+        xwmp_skd_svth(xwskd, &th); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsth(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsth(xwskd, th); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwmp_skd_rsbh(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
@@ -1062,8 +1068,6 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwmp_skd_rspmpt(xwskd, pmpt); // cppcheck-suppress [misra-c2012-17.7]
 
         /* 判断唤醒原因 */
-        xwmb_mp_rmb();
-        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
         if ((xwsq_t)XWMP_WQN_REASON_UP == reason) {
                 if ((xwsq_t)XWOS_LKST_UNLOCKED == *lkst) {

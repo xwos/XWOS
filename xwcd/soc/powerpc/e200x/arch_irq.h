@@ -74,4 +74,18 @@ void arch_cpuirq_restore_lc(xwreg_t cpuirq)
         );
 }
 
+static __xwbsp_inline
+bool arch_cpuirq_test_lc(void)
+{
+        union msr_reg msr;
+
+        __asm__ volatile(
+        "       mfmsr           %[__msr]"
+        : [__msr] "=&r" (msr.w)
+        :
+        : "memory"
+        );
+        return !!(msr.b.ee);
+}
+
 #endif  /* xwcd/soc/powerpc/e200x/arch_irq.h */

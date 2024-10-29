@@ -187,15 +187,12 @@
 #define ENOTBHCTX       803 /**< @brief Not bottom half context */
 #define EISRCTX         804 /**< @brief ISR context */
 #define ENOTISRCTX      805 /**< @brief Not ISR context */
-#define ECANNOTPMPT     806 /**< @brief Cannot preemption */
-#define ECANNOTBH       807 /**< @brief Cannot enter BH */
-
-#define ENILOBJD        880 /**< @brief Nil object descriptor */
-#define EOBJDEAD        884 /**< @brief Object dead */
-#define EOBJACTIVE      885 /**< @brief Object active */
+#define EDISPMPT        806 /**< @brief preemption disabled */
+#define EDISBH          807 /**< @brief bottom half disabled */
+#define EDISIRQ         808 /**< @brief irq disabled */
 
 #define EEXIT           814 /**< @brief Need to exit */
-#define EBUG            860 /**< @brief BUG */
+
 #define ETYPE           830 /**< @brief Type error */
 #define EEMPTY          831 /**< @brief Empty error */
 #define ENEGATIVE       832 /**< @brief Negative state */
@@ -203,6 +200,14 @@
 #define E2SMALL         835 /**< @brief Too small */
 #define EALIGN          836 /**< @brief Not aligned */
 #define EOWNER          837 /**< @brief Owner error */
+#define EMISSINGEND     838 /**< @brief forget closing error */
+
+#define EBUG            860 /**< @brief BUG */
+
+#define ENILOBJD        880 /**< @brief Nil object descriptor */
+#define EOBJDEAD        884 /**< @brief Object dead */
+#define EOBJACTIVE      885 /**< @brief Object active */
+
 
 /**
  * @} xwos_lib_errno

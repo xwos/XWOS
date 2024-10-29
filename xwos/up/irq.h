@@ -25,7 +25,10 @@ xwer_t xwup_irq_restore(xwirq_t irqn, xwreg_t flag);
 xwer_t xwup_irq_get_id(xwirq_t * irqnbuf);
 void xwup_cpuirq_enable_lc(void);
 void xwup_cpuirq_disable_lc(void);
+void xwup_cpuirq_resume_lc(void);
+void xwup_cpuirq_suspend_lc(void);
 void xwup_cpuirq_restore_lc(xwreg_t cpuirq);
 void xwup_cpuirq_save_lc(xwreg_t * cpuirq);
+bool xwup_cpuirq_test_lc(void);
 
 #endif /* xwos/up/irq.h */

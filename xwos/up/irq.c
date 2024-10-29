@@ -74,21 +74,25 @@ xwer_t xwup_irq_get_id(xwirq_t * irqnbuf)
 __xwup_api
 void xwup_cpuirq_enable_lc(void)
 {
-        struct xwup_skd * xwskd = xwup_skd_get_lc();
-        if (xwskd->dis_irq_cnt > (xwsq_t)1) {
-                xwskd->dis_irq_cnt--;
-        } else if ((xwsq_t)1 == xwskd->dis_irq_cnt) {
-                xwskd->dis_irq_cnt--;
-                xwospl_cpuirq_enable_lc();
-        } else {}
+        xwospl_cpuirq_enable_lc();
 }
 
 __xwup_api
 void xwup_cpuirq_disable_lc(void)
 {
-        struct xwup_skd * xwskd = xwup_skd_get_lc();
         xwospl_cpuirq_disable_lc();
-        xwskd->dis_irq_cnt++;
+}
+
+__xwup_api
+void xwup_cpuirq_resume_lc(void)
+{
+        xwup_skd_enth_lc(); // cppcheck-suppress [misra-c2012-17.7]
+}
+
+__xwup_api
+void xwup_cpuirq_suspend_lc(void)
+{
+        xwup_skd_dsth_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwup_api
@@ -101,4 +105,10 @@ __xwup_api
 void xwup_cpuirq_save_lc(xwreg_t * cpuirq)
 {
         xwospl_cpuirq_save_lc(cpuirq);
+}
+
+__xwup_api
+bool xwup_cpuirq_test_lc(void)
+{
+        return xwospl_cpuirq_test_lc();
 }

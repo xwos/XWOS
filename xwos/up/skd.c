@@ -140,7 +140,7 @@ xwer_t xwup_skd_init_lc(void)
         xwup_bh_cb_init(&xwskd->bhcb);
         xwup_skd_init_bhd();
 #endif
-        xwskd->dis_irq_cnt = (xwsq_t)0;
+        xwskd->dis_th_cnt = (xwsq_t)0;
         xwlib_bclst_init_head(&xwskd->thdlist);
         xwskd->thd_num = (xwsz_t)0;
         xwlib_bclst_init_head(&xwskd->thdelist);
@@ -390,6 +390,80 @@ void xwup_skd_init_idled(void)
 #endif
 }
 
+/**
+ * @brief 关闭CPU的中断顶半部
+ * @return XWOS MP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_dsth_lc(void)
+{
+        struct xwup_skd * xwskd = &xwup_skd;
+
+        xwospl_cpuirq_disable_lc();
+        xwskd->dis_th_cnt++;
+        return xwskd;
+}
+
+/**
+ * @brief 开启CPU的中断顶半部
+ * @return XWOS MP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_enth_lc(void)
+{
+        struct xwup_skd * xwskd = &xwup_skd;
+
+        xwskd->dis_th_cnt--;
+        if ((xwsq_t)0 == xwskd->dis_th_cnt) {
+                xwospl_cpuirq_enable_lc();
+        }
+        return xwskd;
+}
+
+/**
+ * @brief 保存调度器的中断顶半部禁止计数器并关闭中断
+ * @param[out] dis_th_cnt: 指向缓冲区的指针，通过此缓冲区返回计数器的值
+ * @return XWOS MP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_svth_lc(xwsq_t * dis_th_cnt)
+{
+        struct xwup_skd * xwskd = &xwup_skd;
+
+        xwospl_cpuirq_disable_lc();
+        *dis_th_cnt = xwskd->dis_th_cnt;
+        xwskd->dis_th_cnt++;
+        return xwskd;
+}
+
+/**
+ * @brief 恢复调度器的中断顶半部禁止计数器
+ * @param[in] dis_th_cnt: 计数器的值
+ * @return XWOS MP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_rsth_lc(xwsq_t dis_th_cnt)
+{
+        struct xwup_skd * xwskd = &xwup_skd;
+
+        xwskd->dis_th_cnt = dis_th_cnt;
+        if ((xwsq_t)0 == dis_th_cnt) {
+                xwospl_cpuirq_enable_lc();
+        }
+        return xwskd;
+}
+
+/**
+ * @brief 测试是否允许进入中断顶半部
+ * @retval true: 允许
+ * @retval false: 禁止
+ */
+__xwup_code
+bool xwup_skd_tstth_lc(void)
+{
+        return ((xwsq_t)0 == xwup_skd.dis_th_cnt);
+}
+
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 /**
  * @brief 中断底半部的主函数
@@ -471,7 +545,7 @@ void xwup_skd_init_bhd(void)
 }
 
 /**
- * @brief XWUP API：禁止本地CPU调度器进入中断底半部
+ * @brief XWUP API：关闭本地CPU调度器的中断底半部
  * @return XWOS UP调度器的指针
  * @note
  * - 同步/异步：同步
@@ -481,10 +555,9 @@ void xwup_skd_init_bhd(void)
 __xwup_api
 struct xwup_skd * xwup_skd_dsbh_lc(void)
 {
-        struct xwup_skd * xwskd;
+        struct xwup_skd * xwskd = &xwup_skd;
         xwreg_t cpuirq;
 
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->dis_bh_cnt++;
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -492,7 +565,7 @@ struct xwup_skd * xwup_skd_dsbh_lc(void)
 }
 
 /**
- * @brief XWUP API：允许本地CPU调度器进入中断底半部
+ * @brief XWUP API：开启本地CPU调度器的中断底半部
  * @return XWOS UP调度器的指针
  * @note
  * - 同步/异步：同步
@@ -502,12 +575,10 @@ struct xwup_skd * xwup_skd_dsbh_lc(void)
 __xwup_api
 struct xwup_skd * xwup_skd_enbh_lc(void)
 {
-        struct xwup_skd * xwskd;
+        struct xwup_skd * xwskd = &xwup_skd;
         xwreg_t cpuirq;
-        bool sched;
+        bool sched = false;
 
-        sched = false;
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->dis_bh_cnt--;
         if ((xwsq_t)0 == xwskd->dis_bh_cnt) {
@@ -527,17 +598,16 @@ struct xwup_skd * xwup_skd_enbh_lc(void)
 }
 
 /**
- * @brief 保存调度器的中断底半部
+ * @brief 保存调度器的中断底半部禁止计数器并关闭中断底半部
  * @param[out] dis_bh_cnt: 指向缓冲区的指针，此缓冲区用于返回禁止中断底半部计数
  * @return XWOS UP调度器的指针
  */
 __xwup_code
 struct xwup_skd * xwup_skd_svbh_lc(xwsq_t * dis_bh_cnt)
 {
-        struct xwup_skd * xwskd;
+        struct xwup_skd * xwskd = &xwup_skd;
         xwreg_t cpuirq;
 
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         *dis_bh_cnt = xwskd->dis_bh_cnt;
         xwskd->dis_bh_cnt++;
@@ -546,19 +616,17 @@ struct xwup_skd * xwup_skd_svbh_lc(xwsq_t * dis_bh_cnt)
 }
 
 /**
- * @brief 恢复调度器的中断底半部
+ * @brief 恢复调度器的中断底半部禁止计数器
  * @param[in] dis_bh_cnt: 禁止中断底半部计数
  * @return XWOS UP调度器的指针
  */
 __xwup_code
 struct xwup_skd * xwup_skd_rsbh_lc(xwsq_t dis_bh_cnt)
 {
-        struct xwup_skd * xwskd;
+        struct xwup_skd * xwskd = &xwup_skd;
         xwreg_t cpuirq;
-        bool sched;
+        bool sched = false;
 
-        sched = false;
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->dis_bh_cnt = dis_bh_cnt;
         if ((xwsq_t)0 == xwskd->dis_bh_cnt) {
@@ -602,11 +670,10 @@ bool xwup_skd_tstbh_lc(void)
 __xwup_code
 xwer_t xwup_skd_req_bh(void)
 {
-        struct xwup_skd * xwskd;
+        struct xwup_skd * xwskd = &xwup_skd;
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->req_bh_cnt++;
         if ((xwsq_t)0 == xwskd->dis_bh_cnt) {
@@ -638,9 +705,7 @@ xwer_t xwup_skd_req_bh(void)
 __xwup_api
 bool xwup_skd_tst_in_bh_lc(void)
 {
-        struct xwup_skd * xwskd;
-
-        xwskd = xwup_skd_get_lc();
+        struct xwup_skd * xwskd = &xwup_skd;
         return (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk);
 }
 #endif
@@ -648,10 +713,9 @@ bool xwup_skd_tst_in_bh_lc(void)
 __xwup_api
 struct xwup_skd * xwup_skd_dspmpt_lc(void)
 {
-        struct xwup_skd * xwskd;
+        struct xwup_skd * xwskd = &xwup_skd;
         xwreg_t cpuirq;
 
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->dis_pmpt_cnt++;
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -661,13 +725,11 @@ struct xwup_skd * xwup_skd_dspmpt_lc(void)
 __xwup_api
 struct xwup_skd * xwup_skd_enpmpt_lc(void)
 {
-        struct xwup_skd * xwskd;
+        struct xwup_skd * xwskd = &xwup_skd;
         struct xwup_thd * t;
-        bool sched;
+        bool sched = false;
         xwreg_t cpuirq;
 
-        sched = false;
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->dis_pmpt_cnt--;
         if ((xwsq_t)0 == xwskd->dis_pmpt_cnt) {
@@ -707,10 +769,9 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
 __xwup_api
 struct xwup_skd * xwup_skd_svpmpt_lc(xwsq_t * dis_pmpt_cnt)
 {
-        struct xwup_skd * xwskd;
+        struct xwup_skd * xwskd = &xwup_skd;
         xwreg_t cpuirq;
 
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         *dis_pmpt_cnt = xwskd->dis_pmpt_cnt;
         xwskd->dis_pmpt_cnt++;
@@ -726,13 +787,11 @@ struct xwup_skd * xwup_skd_svpmpt_lc(xwsq_t * dis_pmpt_cnt)
 __xwup_code
 struct xwup_skd * xwup_skd_rspmpt_lc(xwsq_t dis_pmpt_cnt)
 {
-        struct xwup_skd * xwskd;
+        struct xwup_skd * xwskd = &xwup_skd;
         struct xwup_thd * t;
-        bool sched;
+        bool sched = false;
         xwreg_t cpuirq;
 
-        sched = false;
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->dis_pmpt_cnt = dis_pmpt_cnt;
         if ((xwsq_t)0 == xwskd->dis_pmpt_cnt) {
@@ -772,9 +831,7 @@ struct xwup_skd * xwup_skd_rspmpt_lc(xwsq_t dis_pmpt_cnt)
 __xwup_code
 bool xwup_skd_tstpmpt_lc(void)
 {
-        struct xwup_skd * xwskd;
-
-        xwskd = &xwup_skd;
+        struct xwup_skd * xwskd = &xwup_skd;
         return ((xwsq_t)0 == xwskd->dis_pmpt_cnt);
 }
 

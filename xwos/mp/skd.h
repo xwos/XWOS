@@ -164,7 +164,7 @@ struct __xwcc_alignl1cache xwmp_skd {
         struct xwmp_bh_cb bhcb; /**< 中断底半部控制块 */
         struct xwmp_skdobj_stack bh; /**< 中断底半部任务的栈信息 */
 #endif
-        xwsq_t dis_irq_cnt; /**< 关闭中断的计数器 */
+        atomic_xwsq_t dis_th_cnt; /**< 关闭中断顶半部的计数器 */
         struct xwmp_tt tt; /**< 时间树 */
         struct xwmp_splk cxlock; /**< 上下文切换的锁 */
         struct xwmp_skd_pm pm; /**< 调度器电源管理控制块 */
@@ -195,6 +195,12 @@ bool xwmp_skd_tstbh(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_req_bh(struct xwmp_skd * xwskd);
 bool xwmp_skd_tst_in_bh(struct xwmp_skd * xwskd);
 
+struct xwmp_skd * xwmp_skd_dsth(struct xwmp_skd * xwskd);
+struct xwmp_skd * xwmp_skd_enth(struct xwmp_skd * xwskd);
+struct xwmp_skd * xwmp_skd_svth(struct xwmp_skd * xwskd, xwsq_t * dis_th_cnt);
+struct xwmp_skd * xwmp_skd_rsth(struct xwmp_skd * xwskd, xwsq_t dis_th_cnt);
+bool xwmp_skd_tstth(struct xwmp_skd * xwskd);
+
 void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd);
 void xwmp_skd_chkpmpt_all(void);
 xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd);
@@ -216,12 +222,55 @@ xwer_t xwmp_skd_start_syshwt_lc(void);
 xwer_t xwmp_skd_stop_syshwt_lc(void);
 xwid_t xwmp_skd_get_cpuid_lc(void);
 
-struct xwmp_skd * xwmp_skd_dsbh_lc(void);
-struct xwmp_skd * xwmp_skd_enbh_lc(void);
-bool xwmp_skd_tst_in_bh_lc(void);
+static __xwcc_inline
+struct xwmp_skd * xwmp_skd_dsth_lc(void)
+{
+        struct xwmp_skd * xwskd = xwmp_skd_get_lc();
+        return xwmp_skd_dsth(xwskd);
+}
 
-struct xwmp_skd * xwmp_skd_dspmpt_lc(void);
-struct xwmp_skd * xwmp_skd_enpmpt_lc(void);
+static __xwcc_inline
+struct xwmp_skd * xwmp_skd_enth_lc(void)
+{
+        struct xwmp_skd * xwskd = xwmp_skd_get_lc();
+        return xwmp_skd_enth(xwskd);
+}
+
+static __xwcc_inline
+struct xwmp_skd * xwmp_skd_dsbh_lc(void)
+{
+        struct xwmp_skd * xwskd = xwmp_skd_get_lc();
+        return xwmp_skd_dsbh(xwskd);
+}
+
+static __xwcc_inline
+struct xwmp_skd * xwmp_skd_enbh_lc(void)
+{
+        struct xwmp_skd * xwskd = xwmp_skd_get_lc();
+        return xwmp_skd_enbh(xwskd);
+}
+
+static __xwcc_inline
+bool xwmp_skd_tst_in_bh_lc(void)
+{
+        struct xwmp_skd * xwskd = xwmp_skd_get_lc();
+        return xwmp_skd_tst_in_bh(xwskd);
+}
+
+static __xwcc_inline
+struct xwmp_skd * xwmp_skd_dspmpt_lc(void)
+{
+        struct xwmp_skd * xwskd = xwmp_skd_get_lc();
+        return xwmp_skd_dspmpt(xwskd);
+}
+
+static __xwcc_inline
+struct xwmp_skd * xwmp_skd_enpmpt_lc(void)
+{
+        struct xwmp_skd * xwskd = xwmp_skd_get_lc();
+        return xwmp_skd_enpmpt(xwskd);
+}
+
 xwer_t xwmp_skd_suspend(xwid_t cpuid);
 xwer_t xwmp_skd_resume(xwid_t cpuid);
 xwsq_t xwmp_skd_get_pm_state(struct xwmp_skd * xwskd);

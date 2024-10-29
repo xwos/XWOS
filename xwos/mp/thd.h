@@ -88,10 +88,10 @@ struct xwmp_thd {
         } migration; /**< 迁移状态成员 */
 
         /* 就绪态 */
-        struct xwlib_bclst_node rqnode; /**< 就绪队列节点，此成员被锁rtrq->lock保护 */
+        struct xwlib_bclst_node rqnode; /**< 就绪队列节点，被锁 `rtrq->lock` 保护 */
 
         /* 睡眠态 */
-        struct xwmp_ttn ttn; /**< 继承：时间树节点, 被锁tt->lock保护 */
+        struct xwmp_ttn ttn; /**< 继承：时间树节点, 被锁 `tt->lock` 保护 */
 
         /* 阻塞态 */
         struct xwmp_wqn wqn; /**< 等待队列 */
@@ -110,7 +110,7 @@ struct xwmp_thd {
                 xwpr_t r; /**< 线程的运行态优先级 */
                 xwpr_t rq; /**< 线程的就绪态优先级 */
                 xwpr_t wq; /**< 线程的等待态优先级 */
-        } dprio; /**< 线程的动态优先级，被<em><b>stlock</b></em>保护 */
+        } dprio; /**< 线程的动态优先级，被 `stlock` 保护 */
 
 #if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
         /* 线程私有数据 */

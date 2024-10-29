@@ -74,6 +74,18 @@ void arch_cpuirq_save_lc(xwreg_t * cpuirq)
         armv7m_nvic_disable_interrupts();
 }
 
+/**
+ * @brief Test local CPU IRQ flag
+ */
+static __xwbsp_inline
+bool arch_cpuirq_test_lc(void)
+{
+        xwreg_t cpuirq;
+
+        armv7m_get_primask(&cpuirq);
+        return (0 == cpuirq);
+}
+
 void arch_nvic_init(void);
 xwer_t arch_nvic_irq_get_id(xwirq_t * irqnbuf);
 xwer_t arch_nvic_irq_enable(xwirq_t irqn);

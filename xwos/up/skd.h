@@ -160,7 +160,7 @@ struct xwup_skd {
         struct xwup_bh_cb bhcb; /**< 中断底半部控制块 */
         struct xwup_skdobj_stack bh; /**< 中断底半部任务的栈信息 */
 #endif
-        xwsq_t dis_irq_cnt; /**< 关闭中断的计数器 */
+        xwsq_t dis_th_cnt; /**< 关闭中断顶半部的计数器 */
         struct xwup_tt tt; /**< 时间树 */
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         struct xwup_skd_pm pm; /**< 调度器低功耗控制块 */
@@ -197,6 +197,12 @@ xwer_t xwup_skd_init_lc(void);
 xwer_t xwup_skd_start_lc(void);
 xwer_t xwup_skd_start_syshwt_lc(void);
 xwer_t xwup_skd_stop_syshwt_lc(void);
+
+struct xwup_skd * xwup_skd_dsth_lc(void);
+struct xwup_skd * xwup_skd_enth_lc(void);
+struct xwup_skd * xwup_skd_svth_lc(xwsq_t * dis_bh_cnt);
+struct xwup_skd * xwup_skd_rsth_lc(xwsq_t dis_bh_cnt);
+bool xwup_skd_tstth_lc(void);
 
 struct xwup_skd * xwup_skd_dsbh_lc(void);
 struct xwup_skd * xwup_skd_enbh_lc(void);

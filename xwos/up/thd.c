@@ -13,7 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbop.h>
-#include <xwos/lib/xwaop.h>
 #include <xwos/lib/lfq.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
@@ -455,8 +454,7 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
 
         thd->state = (xwsq_t)XWUP_SKDOBJ_ST_UNKNOWN;
         if (attr->privileged) {
-                xwaop_s1m(xwsq_t, &thd->stack.flag, (xwsq_t)XWUP_SKDOBJ_FLAG_PRIVILEGED,
-                          NULL, NULL);
+                thd->stack.flag |= (xwsq_t)XWUP_SKDOBJ_FLAG_PRIVILEGED;
         }
         if (attr->detached) {
                 thd->state |= (xwsq_t)XWUP_SKDOBJ_ST_DETACHED;
@@ -1240,6 +1238,24 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         xwer_t rc;
         xwreg_t cpuirq;
 
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
+        if (!xwup_skd_tstth_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
+        if (!xwup_skd_tstpmpt_lc()) {
+                rc = -EDISPMPT;
+                goto err_dispmpt;
+        }
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+        if (!xwup_skd_tstbh_lc()) {
+                rc = -EDISBH;
+                goto err_disbh;
+        }
+#endif
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
@@ -1248,19 +1264,11 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         if (xwtm_cmp(to, now) < 0) {
                 rc = -ETIMEDOUT;
                 goto err_timedout;
-        } else if (xwtm_cmp(to, now) == 0) {
+        }
+        if (xwtm_cmp(to, now) == 0) {
                 rc = XWOK;
                 goto err_timedout;
-        } else if (!xwup_skd_tstpmpt_lc()) {
-                rc = -ECANNOTPMPT;
-                goto err_cannot;
-#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        } else if (!xwup_skd_tstbh_lc()) {
-                rc = -ECANNOTBH;
-                goto err_cannot;
-#endif
-        } else {}
-
+        }
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
@@ -1308,8 +1316,10 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         return rc;
 
 err_intr:
-err_cannot:
 err_timedout:
+err_disbh:
+err_dispmpt:
+err_disirq:
         return rc;
 }
 
@@ -1324,22 +1334,29 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwreg_t cpuirq;
         xwer_t rc;
 
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
+        if (!xwup_skd_tstth_lc()) {
+                rc = -EDISIRQ;
+                goto err_disirq;
+        }
+        if (!xwup_skd_tstpmpt_lc()) {
+                rc = -EDISPMPT;
+                goto err_dispmpt;
+        }
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+        if (!xwup_skd_tstbh_lc()) {
+                rc = -EDISBH;
+                goto err_disbh;
+        }
+#endif
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
         to = xwtm_add_safely(*from, dur);
-
-        if (!xwup_skd_tstpmpt_lc()) {
-                rc = -ECANNOTPMPT;
-                goto err_cannot;
-#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        } else if (!xwup_skd_tstbh_lc()) {
-                rc = -ECANNOTBH;
-                goto err_cannot;
-#endif
-        } else {}
-
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
@@ -1385,12 +1402,12 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
                 XWOS_BUG();
                 rc = -EBUG;
         }
-        *from = xwup_syshwt_get_time(hwt);
-        return rc;
 
 err_intr:
-err_cannot:
         *from = xwup_syshwt_get_time(hwt);
+err_disbh:
+err_dispmpt:
+err_disirq:
         return rc;
 }
 
