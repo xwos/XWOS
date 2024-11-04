@@ -44,3 +44,6 @@ ifeq ($(XWCFG_CORE),mp)
 else
   include xwos/up/up.mk
 endif
+
+######## ######## ######## ######## arcos ######## ######## ######## ########
+include xwos/arcos/arcos.mk
