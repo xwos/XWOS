@@ -34,6 +34,7 @@
 #include "board/xwac/fatfs/sdcard.h"
 #include "bm/app/xwssc.h"
 #include "bm/app/thd.h"
+#include "bm/autosarcp/rte/Rte.h"
 
 #define LOGTAG "Main"
 
@@ -62,6 +63,8 @@ xwer_t xwos_main(void)
         if (rc < 0) {
                 goto err_thd_create;
         }
+
+        Rte_Init();
 
         rc = xwos_skd_start_lc();
         if (rc < 0) {
@@ -162,6 +165,8 @@ xwer_t main_task(void * arg)
         if (rc < 0) {
                 goto err_init_devices;
         }
+
+        Rte_Start();
 
         /* Mount sdcard */
         rc = sdcard_fatfs_mount();
