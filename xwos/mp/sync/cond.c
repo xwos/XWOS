@@ -106,33 +106,30 @@ xwer_t xwmp_cond_lock(void * lock, xwsq_t lktype, xwtm_t to, bool unintr,
                       void * lkdata);
 
 static __xwmp_code
-xwer_t xwmp_cond_test(struct xwmp_cond * cond,
-                      struct xwmp_skd * xwskd, struct xwmp_thd * thd,
-                      void * lock, xwsq_t lktype, void * lkdata,
-                      xwtm_t to, xwsq_t * lkst);
+xwer_t xwmp_cond_acquire_or_block_to(struct xwmp_cond * cond,
+                                     struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                                     void * lock, xwsq_t lktype, void * lkdata,
+                                     xwtm_t to, xwsq_t * lkst);
 
 static __xwmp_code
-xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
-                                           struct xwmp_skd * xwskd,
-                                           struct xwmp_thd * thd,
-                                           void * lock, xwsq_t lktype,
-                                           void * lkdata,
-                                           xwtm_t to, xwsq_t * lkst,
-                                           xwreg_t cpuirq);
+xwer_t xwmp_cond_block_to(struct xwmp_cond * cond,
+                          struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                          void * lock, xwsq_t lktype, void * lkdata,
+                          xwtm_t to, xwsq_t * lkst,
+                          xwreg_t cpuirq);
 
 static __xwmp_code
-xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
-                                        struct xwmp_thd * thd,
-                                        void * lock, xwsq_t lktype,
-                                        void * lkdata,
-                                        xwsq_t * lkst,
-                                        xwreg_t cpuirq);
+xwer_t xwmp_cond_block_unintr(struct xwmp_cond * cond,
+                              struct xwmp_thd * thd,
+                              void * lock, xwsq_t lktype, void * lkdata,
+                              xwsq_t * lkst,
+                              xwreg_t cpuirq);
 
 __xwmp_code
-xwer_t xwmp_cond_test_unintr(struct xwmp_cond * cond,
-                             struct xwmp_thd * thd,
-                             void * lock, xwsq_t lktype, void * lkdata,
-                             xwsq_t * lkst);
+xwer_t xwmp_cond_acquire_unintr(struct xwmp_cond * cond,
+                                struct xwmp_thd * thd,
+                                void * lock, xwsq_t lktype, void * lkdata,
+                                xwsq_t * lkst);
 
 #if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
 /**
@@ -751,13 +748,11 @@ xwer_t xwmp_cond_lock(void * lock, xwsq_t lktype, xwtm_t to, bool unintr,
 }
 
 static __xwmp_code
-xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
-                                           struct xwmp_skd * xwskd,
-                                           struct xwmp_thd * thd,
-                                           void * lock, xwsq_t lktype,
-                                           void * lkdata,
-                                           xwtm_t to, xwsq_t * lkst,
-                                           xwreg_t cpuirq)
+xwer_t xwmp_cond_block_to(struct xwmp_cond * cond,
+                          struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                          void * lock, xwsq_t lktype, void * lkdata,
+                          xwtm_t to, xwsq_t * lkst,
+                          xwreg_t cpuirq)
 {
         xwer_t rc;
         xwpr_t dprio;
@@ -803,13 +798,15 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         }
 
         /* 加入时间树 */
-        xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-        xwmp_splk_lock(&thd->stlock);
-        xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWMP_SKDOBJ_ST_SLEEPING);
-        xwmp_splk_unlock(&thd->stlock);
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_thd_tt_add_locked(thd, xwtt, to, cpuirq);
-        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        if (to > 0) {
+                xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwmp_splk_lock(&thd->stlock);
+                xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWMP_SKDOBJ_ST_SLEEPING);
+                xwmp_splk_unlock(&thd->stlock);
+                // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_thd_tt_add_locked(thd, xwtt, to, cpuirq);
+                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        }
 
         /* 调度 */
         xwmp_skd_svpmpt(xwskd, &pmpt); // cppcheck-suppress [misra-c2012-17.7]
@@ -945,10 +942,10 @@ err_intr:
 }
 
 __xwmp_code
-xwer_t xwmp_cond_test(struct xwmp_cond * cond,
-                      struct xwmp_skd * xwskd, struct xwmp_thd * thd,
-                      void * lock, xwsq_t lktype, void * lkdata,
-                      xwtm_t to, xwsq_t * lkst)
+xwer_t xwmp_cond_acquire_or_block_to(struct xwmp_cond * cond,
+                                     struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                                     void * lock, xwsq_t lktype, void * lkdata,
+                                     xwtm_t to, xwsq_t * lkst)
 {
         xwreg_t cpuirq;
         xwer_t rc;
@@ -960,9 +957,8 @@ xwer_t xwmp_cond_test(struct xwmp_cond * cond,
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 rc = -EINTR;
         } else {
-                rc = xwmp_cond_blkthd_to_unlkwq_cpuirqrs(cond, xwskd, thd,
-                                                         lock, lktype, lkdata,
-                                                         to, lkst, cpuirq);
+                rc = xwmp_cond_block_to(cond, xwskd, thd, lock, lktype, lkdata,
+                                        to, lkst, cpuirq);
                 // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_skd_wakelock_unlock(xwskd);
         }
@@ -971,10 +967,20 @@ xwer_t xwmp_cond_test(struct xwmp_cond * cond,
 
 __xwmp_api
 xwer_t xwmp_cond_wait(struct xwmp_cond * cond,
-                      void * lock, xwsq_t lktype,
-                      void * lkdata, xwsq_t * lkst)
+                      void * lock, xwsq_t lktype, void * lkdata, xwsq_t * lkst)
 {
-        return xwmp_cond_wait_to(cond, lock, lktype, lkdata, XWTM_MAX, lkst);
+        struct xwmp_thd * cthd;
+        struct xwmp_skd * xwskd;
+        xwer_t rc;
+
+        *lkst = (xwsq_t)XWOS_LKST_LOCKED;
+        cthd = xwmp_skd_get_cthd_lc();
+        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        rc = xwmp_cond_acquire_or_block_to(cond,
+                                           xwskd, cthd,
+                                           lock, lktype, lkdata,
+                                           0, lkst);
+        return rc;
 }
 
 __xwmp_api
@@ -1002,18 +1008,19 @@ xwer_t xwmp_cond_wait_to(struct xwmp_cond * cond,
                 }
                 rc = -ETIMEDOUT;
         } else {
-                rc = xwmp_cond_test(cond, xwskd, cthd, lock, lktype, lkdata, to, lkst);
+                rc = xwmp_cond_acquire_or_block_to(cond,
+                                                   xwskd, cthd,
+                                                   lock, lktype, lkdata,
+                                                   to, lkst);
         }
         return rc;
 }
 
 static __xwmp_code
-xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
-                                        struct xwmp_thd * thd,
-                                        void * lock, xwsq_t lktype,
-                                        void * lkdata,
-                                        xwsq_t * lkst,
-                                        xwreg_t cpuirq)
+xwer_t xwmp_cond_block_unintr(struct xwmp_cond * cond,
+                              struct xwmp_thd * thd,
+                              void * lock, xwsq_t lktype, void * lkdata,
+                              xwsq_t * lkst, xwreg_t cpuirq)
 {
         struct xwmp_skd * xwskd;
         xwpr_t dprio;
@@ -1085,17 +1092,16 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
 }
 
 __xwmp_code
-xwer_t xwmp_cond_test_unintr(struct xwmp_cond * cond,
-                             struct xwmp_thd * thd,
-                             void * lock, xwsq_t lktype, void * lkdata,
-                             xwsq_t * lkst)
+xwer_t xwmp_cond_acquire_unintr(struct xwmp_cond * cond,
+                                struct xwmp_thd * thd,
+                                void * lock, xwsq_t lktype, void * lkdata,
+                                xwsq_t * lkst)
 {
         xwreg_t cpuirq;
         xwer_t rc;
 
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
-        rc = xwmp_cond_blkthd_unlkwq_cpuirqrs(cond, thd, lock, lktype, lkdata,
-                                              lkst, cpuirq);
+        rc = xwmp_cond_block_unintr(cond, thd, lock, lktype, lkdata, lkst, cpuirq);
         return rc;
 }
 
@@ -1109,6 +1115,6 @@ xwer_t xwmp_cond_wait_unintr(struct xwmp_cond * cond,
 
         *lkst = (xwsq_t)XWOS_LKST_LOCKED;
         cthd = xwmp_skd_get_cthd_lc();
-        rc = xwmp_cond_test_unintr(cond, cthd, lock, lktype, lkdata, lkst);
+        rc = xwmp_cond_acquire_unintr(cond, cthd, lock, lktype, lkdata, lkst);
         return rc;
 }

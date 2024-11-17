@@ -100,33 +100,28 @@ xwer_t xwup_cond_lock(void * lock, xwsq_t lktype, xwtm_t to,
                       bool unintr, void * lkdata);
 
 static __xwup_code
-xwer_t xwup_cond_test(struct xwup_cond * cond,
+xwer_t xwup_cond_acquire_or_block_to(struct xwup_cond * cond,
                       struct xwup_skd * xwskd, struct xwup_thd * thd,
                       void * lock, xwsq_t lktype, void * lkdata,
                       xwtm_t to, xwsq_t * lkst);
 
 static __xwup_code
-xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
-                                           struct xwup_skd * xwskd,
-                                           struct xwup_thd * thd,
-                                           void * lock, xwsq_t lktype,
-                                           void * lkdata,
-                                           xwtm_t to, xwsq_t * lkst,
-                                           xwreg_t cpuirq);
+xwer_t xwup_cond_block_to(struct xwup_cond * cond,
+                          struct xwup_skd * xwskd, struct xwup_thd * thd,
+                          void * lock, xwsq_t lktype, void * lkdata,
+                          xwtm_t to, xwsq_t * lkst, xwreg_t cpuirq);
 
 static __xwup_code
-xwer_t xwup_cond_blkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
-                                        struct xwup_thd * thd,
-                                        void * lock, xwsq_t lktype,
-                                        void * lkdata,
-                                        xwsq_t * lkst,
-                                        xwreg_t cpuirq);
+xwer_t xwup_cond_block_unintr(struct xwup_cond * cond,
+                              struct xwup_thd * thd,
+                              void * lock, xwsq_t lktype, void * lkdata,
+                              xwsq_t * lkst, xwreg_t cpuirq);
 
 static __xwup_code
-xwer_t xwup_cond_test_unintr(struct xwup_cond * cond,
-                             struct xwup_thd * thd,
-                             void * lock, xwsq_t lktype, void * lkdata,
-                             xwsq_t * lkst);
+xwer_t xwup_cond_acquire_unintr(struct xwup_cond * cond,
+                                struct xwup_thd * thd,
+                                void * lock, xwsq_t lktype, void * lkdata,
+                                xwsq_t * lkst);
 
 #if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
 /**
@@ -720,13 +715,10 @@ xwer_t xwup_cond_lock(void * lock, xwsq_t lktype, xwtm_t to, bool unintr,
 }
 
 static __xwup_code
-xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
-                                           struct xwup_skd * xwskd,
-                                           struct xwup_thd * thd,
-                                           void * lock, xwsq_t lktype,
-                                           void * lkdata,
-                                           xwtm_t to, xwsq_t * lkst,
-                                           xwreg_t cpuirq)
+xwer_t xwup_cond_block_to(struct xwup_cond * cond,
+                          struct xwup_skd * xwskd, struct xwup_thd * thd,
+                          void * lock, xwsq_t lktype, void * lkdata,
+                          xwtm_t to, xwsq_t * lkst, xwreg_t cpuirq)
 {
         struct xwup_tt * xwtt;
         xwsq_t pmpt;
@@ -761,11 +753,13 @@ xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
         }
 
         /* 加入时间树 */
-        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
-        xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_SLEEPING);
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwup_thd_tt_add_locked(thd, xwtt, to, cpuirq);
-        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        if (to > 0) {
+                xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_SLEEPING);
+                // cppcheck-suppress [misra-c2012-17.7]
+                xwup_thd_tt_add_locked(thd, xwtt, to, cpuirq);
+                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        }
 
         /* 调度 */
         xwup_skd_svpmpt_lc(&pmpt); // cppcheck-suppress [misra-c2012-17.7]
@@ -880,10 +874,10 @@ err_intr:
 }
 
 static __xwup_code
-xwer_t xwup_cond_test(struct xwup_cond * cond,
-                      struct xwup_skd * xwskd, struct xwup_thd * thd,
-                      void * lock, xwsq_t lktype, void * lkdata,
-                      xwtm_t to, xwsq_t * lkst)
+xwer_t xwup_cond_acquire_or_block_to(struct xwup_cond * cond,
+                                     struct xwup_skd * xwskd, struct xwup_thd * thd,
+                                     void * lock, xwsq_t lktype, void * lkdata,
+                                     xwtm_t to, xwsq_t * lkst)
 {
         xwreg_t cpuirq;
         xwer_t rc;
@@ -897,10 +891,8 @@ xwer_t xwup_cond_test(struct xwup_cond * cond,
                 rc = -EINTR;
         } else {
 #endif
-                rc = xwup_cond_blkthd_to_unlkwq_cpuirqrs(cond, xwskd, thd,
-                                                         lock, lktype, lkdata,
-                                                         to, lkst,
-                                                         cpuirq);
+                rc = xwup_cond_block_to(cond, xwskd, thd, lock, lktype, lkdata,
+                                        to, lkst, cpuirq);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                 xwup_skd_wakelock_unlock(); // cppcheck-suppress [misra-c2012-17.7]
         }
@@ -913,7 +905,17 @@ xwer_t xwup_cond_wait(struct xwup_cond * cond,
                       void * lock, xwsq_t lktype, void * lkdata,
                       xwsq_t * lkst)
 {
-        return xwup_cond_wait_to(cond, lock, lktype, lkdata, XWTM_MAX, lkst);
+        struct xwup_thd * cthd;
+        struct xwup_skd * xwskd;
+        xwer_t rc;
+
+        *lkst = (xwsq_t)XWOS_LKST_LOCKED;
+        cthd = xwup_skd_get_cthd_lc();
+        xwskd = xwup_skd_get_lc();
+        rc = xwup_cond_acquire_or_block_to(cond,
+                                           xwskd, cthd, lock,
+                                           lktype, lkdata, 0, lkst);
+        return rc;
 }
 
 __xwup_api
@@ -941,18 +943,18 @@ xwer_t xwup_cond_wait_to(struct xwup_cond * cond,
                 }
                 rc = -ETIMEDOUT;
         } else {
-                rc = xwup_cond_test(cond, xwskd, cthd, lock, lktype, lkdata, to, lkst);
+                rc = xwup_cond_acquire_or_block_to(cond, xwskd, cthd,
+                                                   lock, lktype, lkdata,
+                                                   to, lkst);
         }
         return rc;
 }
 
 static __xwup_code
-xwer_t xwup_cond_blkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
-                                        struct xwup_thd * thd,
-                                        void * lock, xwsq_t lktype,
-                                        void * lkdata,
-                                        xwsq_t * lkst,
-                                        xwreg_t cpuirq)
+xwer_t xwup_cond_block_unintr(struct xwup_cond * cond,
+                              struct xwup_thd * thd,
+                              void * lock, xwsq_t lktype, void * lkdata,
+                              xwsq_t * lkst, xwreg_t cpuirq)
 {
         xwer_t rc;
         xwsq_t pmpt;
@@ -1009,18 +1011,16 @@ xwer_t xwup_cond_blkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
 }
 
 static __xwup_code
-xwer_t xwup_cond_test_unintr(struct xwup_cond * cond,
-                             struct xwup_thd * thd,
-                             void * lock, xwsq_t lktype, void * lkdata,
-                             xwsq_t * lkst)
+xwer_t xwup_cond_acquire_unintr(struct xwup_cond * cond,
+                                struct xwup_thd * thd,
+                                void * lock, xwsq_t lktype, void * lkdata,
+                                xwsq_t * lkst)
 {
         xwreg_t cpuirq;
         xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        rc = xwup_cond_blkthd_unlkwq_cpuirqrs(cond, thd,
-                                              lock, lktype, lkdata,
-                                              lkst, cpuirq);
+        rc = xwup_cond_block_unintr(cond, thd, lock, lktype, lkdata, lkst, cpuirq);
         return rc;
 }
 
@@ -1034,6 +1034,6 @@ xwer_t xwup_cond_wait_unintr(struct xwup_cond * cond,
 
         *lkst = (xwsq_t)XWOS_LKST_LOCKED;
         cthd = xwup_skd_get_cthd_lc();
-        rc = xwup_cond_test_unintr(cond, cthd, lock, lktype, lkdata, lkst);
+        rc = xwup_cond_acquire_unintr(cond, cthd, lock, lktype, lkdata, lkst);
         return rc;
 }
