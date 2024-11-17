@@ -228,7 +228,7 @@ int xwlua_condsp_wait(lua_State * L)
                         ulualksp.ud = luaL_testudata(L, 2, "xwlua_mtx_sp");
                         if (ulualksp.ud) {
                                 ulock.osal.mtx = ulualksp.mtxsp->mtx;
-                                xwos_mtx_get_lkst(ulualksp.mtxsp->mtx, &lkst);
+                                xwos_mtx_get_status(ulualksp.mtxsp->mtx, &lkst);
                                 if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         lktype = XWOS_LK_NONE;
                                 } else {
@@ -319,7 +319,7 @@ int xwlua_condsp_wait_to(lua_State * L)
                         ulualksp.ud = luaL_testudata(L, 2, "xwlua_mtx_sp");
                         if (ulualksp.ud) {
                                 ulock.osal.mtx = ulualksp.mtxsp->mtx;
-                                xwos_mtx_get_lkst(ulualksp.mtxsp->mtx, &lkst);
+                                xwos_mtx_get_status(ulualksp.mtxsp->mtx, &lkst);
                                 if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         lktype = XWOS_LK_NONE;
                                 } else {
@@ -414,7 +414,7 @@ int xwlua_condsp_wait_unintr(lua_State * L)
                         ulualksp.ud = luaL_testudata(L, 2, "xwlua_mtx_sp");
                         if (ulualksp.ud) {
                                 ulock.osal.mtx = ulualksp.mtxsp->mtx;
-                                xwos_mtx_get_lkst(ulualksp.mtxsp->mtx, &lkst);
+                                xwos_mtx_get_status(ulualksp.mtxsp->mtx, &lkst);
                                 if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         lktype = XWOS_LK_NONE;
                                 } else {

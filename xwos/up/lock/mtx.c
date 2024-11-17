@@ -97,22 +97,20 @@ static __xwup_code
 void xwup_mtx_chprio(struct xwup_mtx * mtx);
 
 static __xwup_code
-xwer_t xwup_mtx_blkthd_to_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
-                                          struct xwup_skd * xwskd,
-                                          struct xwup_thd * thd,
-                                          xwtm_t to,
-                                          xwreg_t cpuirq);
+xwer_t xwup_mtx_block_to(struct xwup_mtx * mtx,
+                         struct xwup_skd * xwskd, struct xwup_thd * thd,
+                         xwtm_t to, xwreg_t cpuirq);
 
 static __xwup_code
-xwer_t xwup_mtx_test(struct xwup_mtx * mtx, struct xwup_thd * thd, xwtm_t to);
+xwer_t xwup_mtx_lock_or_block_to(struct xwup_mtx * mtx, struct xwup_thd * thd,
+                                 xwtm_t to);
 
 static __xwup_code
-xwer_t xwup_mtx_blkthd_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
-                                       struct xwup_thd * thd,
-                                       xwreg_t cpuirq);
+xwer_t xwup_mtx_block_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd,
+                             xwreg_t cpuirq);
 
 static __xwup_code
-xwer_t xwup_mtx_test_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd);
+xwer_t xwup_mtx_lock_or_block_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 
 #if defined(XWOSCFG_LOCK_MTX_MEMPOOL) && (1 == XWOSCFG_LOCK_MTX_MEMPOOL)
 /**
@@ -595,11 +593,9 @@ xwer_t xwup_mtx_lock(struct xwup_mtx * mtx)
 }
 
 static __xwup_code
-xwer_t xwup_mtx_blkthd_to_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
-                                          struct xwup_skd * xwskd,
-                                          struct xwup_thd * thd,
-                                          xwtm_t to,
-                                          xwreg_t cpuirq)
+xwer_t xwup_mtx_block_to(struct xwup_mtx * mtx,
+                         struct xwup_skd * xwskd, struct xwup_thd * thd,
+                         xwtm_t to, xwreg_t cpuirq)
 {
         xwer_t rc;
         struct xwup_tt * xwtt;
@@ -718,7 +714,8 @@ err_intr:
 }
 
 static __xwup_code
-xwer_t xwup_mtx_test(struct xwup_mtx * mtx, struct xwup_thd * thd, xwtm_t to)
+xwer_t xwup_mtx_lock_or_block_to(struct xwup_mtx * mtx, struct xwup_thd * thd,
+                                 xwtm_t to)
 {
         struct xwup_skd * xwskd;
         struct xwup_mtxtree * mt;
@@ -743,8 +740,7 @@ xwer_t xwup_mtx_test(struct xwup_mtx * mtx, struct xwup_thd * thd, xwtm_t to)
                         rc = -EINTR;
                 } else {
 #endif
-                        rc = xwup_mtx_blkthd_to_unlkwq_cpuirqrs(mtx, xwskd, thd,
-                                                                to, cpuirq);
+                        rc = xwup_mtx_block_to(mtx, xwskd, thd, to, cpuirq);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                         // cppcheck-suppress [misra-c2012-17.7]
                         xwup_skd_wakelock_unlock();
@@ -801,7 +797,7 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
                         }
                 }
         } else {
-                rc = xwup_mtx_test(mtx, cthd, to);
+                rc = xwup_mtx_lock_or_block_to(mtx, cthd, to);
         }
 
 err_disbh:
@@ -811,9 +807,8 @@ err_disirq:
 }
 
 static __xwup_code
-xwer_t xwup_mtx_blkthd_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
-                                       struct xwup_thd * thd,
-                                       xwreg_t cpuirq)
+xwer_t xwup_mtx_block_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd,
+                             xwreg_t cpuirq)
 {
         xwer_t rc;
 
@@ -842,7 +837,7 @@ xwer_t xwup_mtx_blkthd_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
 }
 
 static __xwup_code
-xwer_t xwup_mtx_test_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd)
+xwer_t xwup_mtx_lock_or_block_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd)
 {
         struct xwup_mtxtree * mt;
         xwreg_t cpuirq;
@@ -857,7 +852,7 @@ xwer_t xwup_mtx_test_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd)
                 xwospl_cpuirq_restore_lc(cpuirq);
                 xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         } else if (NULL != mtx->ownertree) {
-                rc = xwup_mtx_blkthd_unlkwq_cpuirqrs(mtx, thd, cpuirq);
+                rc = xwup_mtx_block_unintr(mtx, thd, cpuirq);
         } else {
                 xwup_mtxtree_add(mt, mtx);
                 xwup_thd_chprio(thd);
@@ -886,7 +881,7 @@ xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
 #endif
         } else {
                 cthd = xwup_skd_get_cthd_lc();
-                rc = xwup_mtx_test_unintr(mtx, cthd);
+                rc = xwup_mtx_lock_or_block_unintr(mtx, cthd);
         }
         return rc;
 }
@@ -923,16 +918,16 @@ xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
 }
 
 __xwup_api
-xwer_t xwup_mtx_get_lkst(struct xwup_mtx * mtx, xwsq_t * lkst)
+xwer_t xwup_mtx_get_status(struct xwup_mtx * mtx, xwsq_t * status)
 {
         volatile struct xwup_mtxtree * ownertree;
 
         // cppcheck-suppress [misra-c2012-17.7]
         xwmb_read(struct xwup_mtxtree *, ownertree, &mtx->ownertree);
         if (NULL != ownertree) {
-                *lkst = (xwsq_t)XWOS_LKST_LOCKED;
+                *status = (xwsq_t)XWOS_LKST_LOCKED;
         } else {
-                *lkst = (xwsq_t)XWOS_LKST_UNLOCKED;
+                *status = (xwsq_t)XWOS_LKST_UNLOCKED;
         }
         return XWOK;
 }

@@ -71,6 +71,6 @@ xwer_t xwup_mtx_lock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to);
 xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx);
-xwer_t xwup_mtx_get_lkst(struct xwup_mtx * mtx, xwsq_t * lkst);
+xwer_t xwup_mtx_get_status(struct xwup_mtx * mtx, xwsq_t * status);
 
 #endif /* xwos/up/lock/mtx.h */

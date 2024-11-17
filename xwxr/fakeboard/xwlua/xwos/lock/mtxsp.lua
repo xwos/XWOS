@@ -224,9 +224,9 @@ lock = xwos.mtx.new()
 rc = lock:lock()
 if (rc == 0) then
   -- 临界区
-  lkst = lock:get_lkst()
+  lkst = lock:status()
   lock:unlock()
 end
 ]]
-function mtxsp:get_lkst(mtxsp)
+function mtxsp:status(mtxsp)
 end

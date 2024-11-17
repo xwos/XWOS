@@ -134,12 +134,12 @@ xwer_t xwosdl_mtx_trylock(struct xwosdl_mtx * mtx)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_mtx_get_lkst(struct xwosdl_mtx * mtx, xwsq_t * lkst)
+xwer_t xwosdl_mtx_get_status(struct xwosdl_mtx * mtx, xwsq_t * status)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
+        XWOS_VALIDATE((status), "nullptr", -EFAULT);
 
-        return xwup_mtx_get_lkst(mtx, lkst);
+        return xwup_mtx_get_status(mtx, status);
 }
 
 #endif /* xwos/up/osdl/lock/mtx.h */

@@ -101,26 +101,22 @@ static __xwmp_code
 void xwmp_mtx_chprio(struct xwmp_mtx * mtx);
 
 static __xwmp_code
-xwer_t xwmp_mtx_blkthd_to_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
-                                          struct xwmp_skd * xwskd,
-                                          struct xwmp_thd * thd,
-                                          xwtm_t to,
-                                          xwreg_t cpuirq);
+xwer_t xwmp_mtx_block_to(struct xwmp_mtx * mtx,
+                         struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                         xwtm_t to, xwreg_t cpuirq);
 
 static __xwmp_code
-xwer_t xwmp_mtx_test(struct xwmp_mtx * mtx,
-                     struct xwmp_skd * xwskd,
-                     struct xwmp_thd * thd,
-                     xwtm_t to);
+xwer_t xwmp_mtx_lock_or_block_to(struct xwmp_mtx * mtx,
+                                 struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                                 xwtm_t to);
 
 static __xwmp_code
-xwer_t xwmp_mtx_blkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
-                                       struct xwmp_thd * thd,
-                                       xwreg_t cpuirq);
+xwer_t xwmp_mtx_block_unintr(struct xwmp_mtx * mtx, struct xwmp_thd * thd,
+                             xwreg_t cpuirq);
 
 static __xwmp_code
-xwer_t xwmp_mtx_test_unintr(struct xwmp_mtx * mtx,
-                            struct xwmp_thd * thd, struct xwmp_skd * xwskd);
+xwer_t xwmp_mtx_lock_or_block_unintr(struct xwmp_mtx * mtx,
+                                     struct xwmp_skd * xwskd, struct xwmp_thd * thd);
 
 #if defined(XWOSCFG_LOCK_MTX_MEMPOOL) && (1 == XWOSCFG_LOCK_MTX_MEMPOOL)
 /**
@@ -689,11 +685,9 @@ xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx)
 }
 
 static __xwmp_code
-xwer_t xwmp_mtx_blkthd_to_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
-                                          struct xwmp_skd * xwskd,
-                                          struct xwmp_thd * thd,
-                                          xwtm_t to,
-                                          xwreg_t cpuirq)
+xwer_t xwmp_mtx_block_to(struct xwmp_mtx * mtx,
+                         struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                         xwtm_t to, xwreg_t cpuirq)
 {
         xwer_t rc;
         struct xwmp_tt * xwtt;
@@ -844,10 +838,9 @@ err_intr:
 }
 
 static __xwmp_code
-xwer_t xwmp_mtx_test(struct xwmp_mtx * mtx,
-                     struct xwmp_skd * xwskd,
-                     struct xwmp_thd * thd,
-                     xwtm_t to)
+xwer_t xwmp_mtx_lock_or_block_to(struct xwmp_mtx * mtx,
+                                 struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                                 xwtm_t to)
 {
         struct xwmp_mtxtree * mt;
         xwreg_t cpuirq;
@@ -869,8 +862,7 @@ xwer_t xwmp_mtx_test(struct xwmp_mtx * mtx,
                         xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                         rc = -EINTR;
                 } else {
-                        rc = xwmp_mtx_blkthd_to_unlkwq_cpuirqrs(mtx, xwskd, thd,
-                                                                to, cpuirq);
+                        rc = xwmp_mtx_block_to(mtx, xwskd, thd, to, cpuirq);
                         // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_skd_wakelock_unlock(xwskd);
                 }
@@ -927,7 +919,7 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
         } else {
                 rc = xwmp_mtx_grab(mtx);
                 if (XWOK == rc) {
-                        rc = xwmp_mtx_test(mtx, xwskd, cthd, to);
+                        rc = xwmp_mtx_lock_or_block_to(mtx, xwskd, cthd, to);
                         if (rc < 0) {
                                 // cppcheck-suppress [misra-c2012-17.7]
                                 xwmp_mtx_put(mtx);
@@ -942,9 +934,8 @@ err_disirq:
 }
 
 static __xwmp_code
-xwer_t xwmp_mtx_blkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
-                                       struct xwmp_thd * thd,
-                                       xwreg_t cpuirq)
+xwer_t xwmp_mtx_block_unintr(struct xwmp_mtx * mtx, struct xwmp_thd * thd,
+                             xwreg_t cpuirq)
 {
         struct xwmp_skd * xwskd;
         xwsq_t reason;
@@ -986,8 +977,8 @@ xwer_t xwmp_mtx_blkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
 }
 
 static __xwmp_code
-xwer_t xwmp_mtx_test_unintr(struct xwmp_mtx * mtx,
-                            struct xwmp_thd * thd, struct xwmp_skd * xwskd)
+xwer_t xwmp_mtx_lock_or_block_unintr(struct xwmp_mtx * mtx,
+                                     struct xwmp_skd * xwskd, struct xwmp_thd * thd)
 {
         struct xwmp_mtxtree * mt;
         xwreg_t cpuirq;
@@ -1002,7 +993,7 @@ xwer_t xwmp_mtx_test_unintr(struct xwmp_mtx * mtx,
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         } else if (NULL != mtx->ownertree) {
-                rc = xwmp_mtx_blkthd_unlkwq_cpuirqrs(mtx, thd, cpuirq);
+                rc = xwmp_mtx_block_unintr(mtx, thd, cpuirq);
         } else {
                 xwmp_mtxtree_add(mtx, mt);
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
@@ -1044,7 +1035,7 @@ xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
         if (rc < 0) {
                 goto err_mtx_grab;
         }
-        rc = xwmp_mtx_test_unintr(mtx, cthd, xwskd);
+        rc = xwmp_mtx_lock_or_block_unintr(mtx, xwskd, cthd);
         if (rc < 0) {
                 goto err_mtx_do_lock_unintr;
         }
@@ -1098,7 +1089,7 @@ err_mtx_grab:
 }
 
 __xwmp_api
-xwer_t xwmp_mtx_get_lkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
+xwer_t xwmp_mtx_get_status(struct xwmp_mtx * mtx, xwsq_t * status)
 {
         xwer_t rc;
         volatile struct xwmp_mtxtree * ownertree;
@@ -1109,9 +1100,9 @@ xwer_t xwmp_mtx_get_lkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
         }
         xwmb_mp_load_acquire(struct xwmp_mtxtree *, ownertree, &mtx->ownertree);
         if (NULL != ownertree) {
-                *lkst = (xwsq_t)XWOS_LKST_LOCKED;
+                *status = (xwsq_t)XWOS_LKST_LOCKED;
         } else {
-                *lkst = (xwsq_t)XWOS_LKST_UNLOCKED;
+                *status = (xwsq_t)XWOS_LKST_UNLOCKED;
         }
         xwmp_mtx_put(mtx); // cppcheck-suppress [misra-c2012-17.7]
         return XWOK;

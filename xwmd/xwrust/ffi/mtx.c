@@ -81,7 +81,7 @@ xwer_t xwrustffi_mtx_lock_unintr(struct xwos_mtx * mtx)
         return xwos_mtx_lock_unintr(mtx);
 }
 
-xwer_t xwrustffi_mtx_get_lkst(struct xwos_mtx * mtx, xwsq_t * lkst)
+xwer_t xwrustffi_mtx_get_status(struct xwos_mtx * mtx, xwsq_t * lkst)
 {
-        return xwos_mtx_get_lkst(mtx, lkst);
+        return xwos_mtx_get_status(mtx, lkst);
 }

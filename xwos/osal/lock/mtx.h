@@ -51,7 +51,7 @@
  *
  * ## 获取锁状态
  *
- * + `xwos_mtx_get_lkst()` ：获取锁的状态，可在 **任意** 上下文使用
+ * + `xwos_mtx_get_status()` ：获取锁的状态，可在 **任意** 上下文使用
  *
  *
  * ## 互斥锁对象的生命周期管理
@@ -376,7 +376,7 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
 /**
  * @brief XWOS API：获取锁的状态
  * @param[in] mtx: 互斥锁对象的指针
- * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @param[out] status: 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -385,9 +385,9 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwer_t xwos_mtx_get_lkst(struct xwos_mtx * mtx, xwsq_t * lkst)
+xwer_t xwos_mtx_get_status(struct xwos_mtx * mtx, xwsq_t * lkst)
 {
-        return xwosdl_mtx_get_lkst(&mtx->osmtx, lkst);
+        return xwosdl_mtx_get_status(&mtx->osmtx, lkst);
 }
 
 /**

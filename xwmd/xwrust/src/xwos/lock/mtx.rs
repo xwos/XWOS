@@ -221,7 +221,7 @@ extern "C" {
     fn xwrustffi_mtx_trylock(mtx: *mut XwosMtx) -> XwEr;
     fn xwrustffi_mtx_lock_to(mtx: *mut XwosMtx, to: XwTm) -> XwEr;
     fn xwrustffi_mtx_lock_unintr(mtx: *mut XwosMtx) -> XwEr;
-    fn xwrustffi_mtx_get_lkst(mtx: *mut XwosMtx, lkst: *mut XwSq) -> XwEr;
+    fn xwrustffi_mtx_get_status(mtx: *mut XwosMtx, lkst: *mut XwSq) -> XwEr;
 }
 
 /// 互斥锁的错误码
