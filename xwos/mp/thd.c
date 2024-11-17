@@ -588,9 +588,7 @@ void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg)
         xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, (xwsq_t)XWMP_SKDOBJ_ST_STANDBY);
         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-
-        /* Add to ready queue */
-        rc = xwmp_thd_rq_add_tail(thd, thd->sprio);
+        rc = xwmp_thd_rq_add_tail(thd, thd->sprio); /* Add to ready queue */
         XWOS_BUG_ON(rc < 0);
 }
 
@@ -992,13 +990,11 @@ xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
                                         rc = -ESTALE;
                                 } else {
                                         // cppcheck-suppress [misra-c2012-17.7]
-                                        xwmp_rtwq_remove_locked(&mtx->rtwq,
-                                                                &thd->wqn);
+                                        xwmp_rtwq_remove_locked(&mtx->rtwq, &thd->wqn);
                                         xwmp_splk_lock(&thd->stlock);
                                         thd->dprio.wq = dprio;
                                         xwmp_splk_unlock(&thd->stlock);
-                                        xwmp_rtwq_add_locked(&mtx->rtwq,
-                                                             &thd->wqn,
+                                        xwmp_rtwq_add_locked(&mtx->rtwq, &thd->wqn,
                                                              dprio);
                                         xwmp_splk_unlock(&thd->wqn.lock);
                                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
@@ -1030,13 +1026,11 @@ xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
                                         rc = -ESTALE;
                                 } else {
                                         // cppcheck-suppress [misra-c2012-17.7]
-                                        xwmp_rtwq_remove_locked(&sem->wq.rt,
-                                                                &thd->wqn);
+                                        xwmp_rtwq_remove_locked(&sem->wq.rt, &thd->wqn);
                                         xwmp_splk_lock(&thd->stlock);
                                         thd->dprio.wq = dprio;
                                         xwmp_splk_unlock(&thd->stlock);
-                                        xwmp_rtwq_add_locked(&sem->wq.rt,
-                                                             &thd->wqn,
+                                        xwmp_rtwq_add_locked(&sem->wq.rt, &thd->wqn,
                                                              dprio);
                                         xwmp_splk_unlock(&thd->wqn.lock);
                                         xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
@@ -1109,14 +1103,8 @@ xwer_t xwmp_thd_rq_add_head(struct xwmp_thd * thd, xwpr_t prio)
         xwrtrq = &xwskd->rq.rt;
         xwmp_splk_lock_cpuirqsv(&xwrtrq->lock, &cpuirq);
         xwmp_splk_lock(&thd->stlock);
-        if ((((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_BLOCKING & thd->state)) &&
-             ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_SLEEPING & thd->state)))
-            ||
-            ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_FROZEN & thd->state))) {
-                xwmp_splk_unlock(&thd->stlock);
-                rc = -ESTALE;
-        } else if ((xwsq_t)0 != (((xwsq_t)XWMP_SKDOBJ_ST_RUNNING |
-                                  (xwsq_t)XWMP_SKDOBJ_ST_READY) & thd->state)) {
+        if ((xwsq_t)0 != (((xwsq_t)XWMP_SKDOBJ_ST_RUNNING |
+                           (xwsq_t)XWMP_SKDOBJ_ST_READY) & thd->state)) {
                 xwmp_splk_unlock(&thd->stlock);
                 rc = -EEXIST;
         } else {
@@ -1150,14 +1138,8 @@ xwer_t xwmp_thd_rq_add_tail(struct xwmp_thd * thd, xwpr_t prio)
         xwrtrq = &xwskd->rq.rt;
         xwmp_splk_lock_cpuirqsv(&xwrtrq->lock, &cpuirq);
         xwmp_splk_lock(&thd->stlock);
-        if ((((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_BLOCKING & thd->state)) &&
-             ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_SLEEPING & thd->state)))
-            ||
-            ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_FROZEN & thd->state))) {
-                xwmp_splk_unlock(&thd->stlock);
-                rc = -ESTALE;
-        } else if ((xwsq_t)0 != (((xwsq_t)XWMP_SKDOBJ_ST_RUNNING |
-                                  (xwsq_t)XWMP_SKDOBJ_ST_READY) & thd->state)) {
+        if ((xwsq_t)0 != (((xwsq_t)XWMP_SKDOBJ_ST_RUNNING |
+                           (xwsq_t)XWMP_SKDOBJ_ST_READY) & thd->state)) {
                 xwmp_splk_unlock(&thd->stlock);
                 rc = -EEXIST;
         } else {
@@ -1476,22 +1458,22 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
 
         if (!xwospl_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         if (!xwmp_skd_tstth(xwskd)) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -EDISPMPT;
-                goto err_dispmpt;
+                goto err_dis;
         }
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -EDISBH;
-                goto err_disbh;
+                goto err_dis;
         }
 #endif
         xwtt = &xwskd->tt;
@@ -1554,9 +1536,7 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
 
 err_intr:
 err_timedout:
-err_disbh:
-err_dispmpt:
-err_disirq:
+err_dis:
         return rc;
 }
 
@@ -1574,22 +1554,22 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
 
         if (!xwospl_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         if (!xwmp_skd_tstth(xwskd)) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -EDISPMPT;
-                goto err_dispmpt;
+                goto err_dis;
         }
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -EDISBH;
-                goto err_disbh;
+                goto err_dis;
         }
 #endif
         xwtt = &xwskd->tt;
@@ -1643,9 +1623,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
 
 err_intr:
         *from = xwmp_syshwt_get_time(hwt);
-err_disbh:
-err_dispmpt:
-err_disirq:
+err_dis:
         return rc;
 }
 

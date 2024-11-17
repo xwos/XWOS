@@ -1240,20 +1240,20 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
 
         if (!xwospl_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwup_skd_tstth_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwup_skd_tstpmpt_lc()) {
                 rc = -EDISPMPT;
-                goto err_dispmpt;
+                goto err_dis;
         }
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         if (!xwup_skd_tstbh_lc()) {
                 rc = -EDISBH;
-                goto err_disbh;
+                goto err_dis;
         }
 #endif
         cthd = xwup_skd_get_cthd_lc();
@@ -1317,9 +1317,7 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
 
 err_intr:
 err_timedout:
-err_disbh:
-err_dispmpt:
-err_disirq:
+err_dis:
         return rc;
 }
 
@@ -1336,20 +1334,20 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
 
         if (!xwospl_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwup_skd_tstth_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwup_skd_tstpmpt_lc()) {
                 rc = -EDISPMPT;
-                goto err_dispmpt;
+                goto err_dis;
         }
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         if (!xwup_skd_tstbh_lc()) {
                 rc = -EDISBH;
-                goto err_disbh;
+                goto err_dis;
         }
 #endif
         cthd = xwup_skd_get_cthd_lc();
@@ -1405,9 +1403,7 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
 
 err_intr:
         *from = xwup_syshwt_get_time(hwt);
-err_disbh:
-err_dispmpt:
-err_disirq:
+err_dis:
         return rc;
 }
 
@@ -1432,7 +1428,7 @@ xwer_t xwup_cthd_freeze(void)
  * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在中断上下文中调用并且这个中断只能由@ref xwup_cthd_freeze()触发。
+ * - 此函数只能在中断上下文中调用并且这个中断只能由 @ref xwup_cthd_freeze() 触发。
  */
 __xwup_code
 xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
