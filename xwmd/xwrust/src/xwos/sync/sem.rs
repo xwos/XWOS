@@ -179,9 +179,11 @@ pub enum SemError {
     /// 不在线程上下文内
     NotThreadContext(XwEr),
     /// 抢占被关闭
-    CannotPmpt(XwEr),
+    DisPmpt(XwEr),
     /// 中断底半部被关闭
-    CannotBh(XwEr),
+    DisBh(XwEr),
+    /// 中断被关闭
+    DisIrq(XwEr),
     /// 信号量不可用
     NoData(XwEr),
     /// 信号选择器的位置超出范围
@@ -205,8 +207,9 @@ impl SemError {
             Self::Interrupt(rc) => rc,
             Self::Timedout(rc) => rc,
             Self::NotThreadContext(rc) => rc,
-            Self::CannotPmpt(rc) => rc,
-            Self::CannotBh(rc) => rc,
+            Self::DisPmpt(rc) => rc,
+            Self::DisBh(rc) => rc,
+            Self::DisIrq(rc) => rc,
             Self::NoData(rc) => rc,
             Self::OutOfSelPos(rc) => rc,
             Self::AlreadyBound(rc) => rc,
@@ -593,8 +596,9 @@ impl Sem {
     /// + [`SemError::NotInit`] 信号量没有初始化
     /// + [`SemError::Interrupt`] 等待被中断
     /// + [`SemError::NotThreadContext`] 不在线程上下文内
-    /// + [`SemError::CannotPmpt`] 抢占被关闭
-    /// + [`SemError::CannotBh`] 中断底半部被关闭
+    /// + [`SemError::DisPmpt`] 抢占被关闭
+    /// + [`SemError::DisBh`] 中断底半部被关闭
+    /// + [`SemError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -630,10 +634,12 @@ impl Sem {
                     SemError::Interrupt(rc)
                 } else if -ENOTTHDCTX == rc {
                     SemError::NotThreadContext(rc)
-                } else if -ECANNOTPMPT == rc {
-                    SemError::CannotPmpt(rc)
-                } else if -ECANNOTBH == rc {
-                    SemError::CannotBh(rc)
+                } else if -EDISPMPT == rc {
+                    SemError::DisPmpt(rc)
+                } else if -EDISBH == rc {
+                    SemError::DisBh(rc)
+                } else if -EDISIRQ == rc {
+                    SemError::DisIrq(rc)
                 } else {
                     SemError::Unknown(rc)
                 }
@@ -666,8 +672,9 @@ impl Sem {
     /// + [`SemError::Interrupt`] 等待被中断
     /// + [`SemError::Timedout`] 等待超时
     /// + [`SemError::NotThreadContext`] 不在线程上下文内
-    /// + [`SemError::CannotPmpt`] 抢占被关闭
-    /// + [`SemError::CannotBh`] 中断底半部被关闭
+    /// + [`SemError::DisPmpt`] 抢占被关闭
+    /// + [`SemError::DisBh`] 中断底半部被关闭
+    /// + [`SemError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -706,10 +713,12 @@ impl Sem {
                     SemError::Timedout(rc)
                 } else if -ENOTTHDCTX == rc {
                     SemError::NotThreadContext(rc)
-                } else if -ECANNOTPMPT == rc {
-                    SemError::CannotPmpt(rc)
-                } else if -ECANNOTBH == rc {
-                    SemError::CannotBh(rc)
+                } else if -EDISPMPT == rc {
+                    SemError::DisPmpt(rc)
+                } else if -EDISBH == rc {
+                    SemError::DisBh(rc)
+                } else if -EDISIRQ == rc {
+                    SemError::DisIrq(rc)
                 } else {
                     SemError::Unknown(rc)
                 }
@@ -733,8 +742,9 @@ impl Sem {
     /// + [`SemError::Ok`] 没有错误
     /// + [`SemError::NotInit`] 信号量没有初始化
     /// + [`SemError::NotThreadContext`] 不在线程上下文内
-    /// + [`SemError::CannotPmpt`] 抢占被关闭
-    /// + [`SemError::CannotBh`] 中断底半部被关闭
+    /// + [`SemError::DisPmpt`] 抢占被关闭
+    /// + [`SemError::DisBh`] 中断底半部被关闭
+    /// + [`SemError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -769,10 +779,12 @@ impl Sem {
                     SemError::Ok(rc)
                 } else if -ENOTTHDCTX == rc {
                     SemError::NotThreadContext(rc)
-                } else if -ECANNOTPMPT == rc {
-                    SemError::CannotPmpt(rc)
-                } else if -ECANNOTBH == rc {
-                    SemError::CannotBh(rc)
+                } else if -EDISPMPT == rc {
+                    SemError::DisPmpt(rc)
+                } else if -EDISBH == rc {
+                    SemError::DisBh(rc)
+                } else if -EDISIRQ == rc {
+                    SemError::DisIrq(rc)
                 } else {
                     SemError::Unknown(rc)
                 }

@@ -306,8 +306,9 @@ xwer_t xwcq_jq(struct xwcq * cq, const xwu8_t * data, xwsz_t * size);
  * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -331,8 +332,9 @@ xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -358,8 +360,9 @@ xwer_t xwcq_dq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -399,8 +402,9 @@ xwer_t xwcq_trydq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -425,8 +429,9 @@ xwer_t xwcq_rq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -452,8 +457,9 @@ xwer_t xwcq_rq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -493,8 +499,9 @@ xwer_t xwcq_tryrq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -521,8 +528,9 @@ xwer_t xwcq_pfq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -549,8 +557,9 @@ xwer_t xwcq_pfq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -594,8 +603,9 @@ xwer_t xwcq_trypfq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -621,8 +631,9 @@ xwer_t xwcq_prq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
@@ -649,8 +660,9 @@ xwer_t xwcq_prq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOTTHDCTX: 不在线程上下文中
- * @retval -EDSPMPT: 抢占被关闭
- * @retval -EDSBH: 中断底半部被关闭
+ * @retval -EDISIRQ: 中断被关闭
+ * @retval -EDISPMPT: 抢占被关闭
+ * @retval -EDISBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details

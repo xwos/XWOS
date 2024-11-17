@@ -238,9 +238,11 @@ pub enum MutexError {
     /// 不在线程上下文内
     NotThreadContext(XwEr),
     /// 抢占被关闭
-    CannotPmpt(XwEr),
+    DisPmpt(XwEr),
     /// 中断底半部被关闭
-    CannotBh(XwEr),
+    DisBh(XwEr),
+    /// 中断被关闭
+    DisIrq(XwEr),
     /// 未知错误
     Unknown(XwEr),
 }
@@ -253,8 +255,9 @@ impl MutexError {
             Self::Interrupt(rc) => rc,
             Self::Timedout(rc) => rc,
             Self::NotThreadContext(rc) => rc,
-            Self::CannotPmpt(rc) => rc,
-            Self::CannotBh(rc) => rc,
+            Self::DisPmpt(rc) => rc,
+            Self::DisBh(rc) => rc,
+            Self::DisIrq(rc) => rc,
             Self::WouldBlock(rc) => rc,
             Self::Unknown(rc) => rc,
         }
@@ -366,8 +369,9 @@ impl<T: ?Sized> Mutex<T> {
     /// + [`MutexError::NotInit`] 互斥锁未被初始化
     /// + [`MutexError::Interrupt`] 等待被中断
     /// + [`MutexError::NotThreadContext`] 不在线程上下文中
-    /// + [`MutexError::CannotPmpt`] 抢占被关闭
-    /// + [`MutexError::CannotBh`] 中断底半部被关闭
+    /// + [`MutexError::DisPmpt`] 抢占被关闭
+    /// + [`MutexError::DisBh`] 中断底半部被关闭
+    /// + [`MutexError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -402,10 +406,12 @@ impl<T: ?Sized> Mutex<T> {
                     Err(MutexError::Interrupt(rc))
                 } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext(rc))
-                } else if -ECANNOTPMPT == rc {
-                    Err(MutexError::CannotPmpt(rc))
-                } else if -ECANNOTBH == rc {
-                    Err(MutexError::CannotBh(rc))
+                } else if -EDISPMPT == rc {
+                    Err(MutexError::DisPmpt(rc))
+                } else if -EDISBH == rc {
+                    Err(MutexError::DisBh(rc))
+                } else if -EDISIRQ == rc {
+                    Err(MutexError::DisIrq(rc))
                 } else {
                     Err(MutexError::Unknown(rc))
                 }
@@ -492,8 +498,9 @@ impl<T: ?Sized> Mutex<T> {
     /// + [`MutexError::Interrupt`] 等待被中断
     /// + [`MutexError::Timedout`] 等待超时
     /// + [`MutexError::NotThreadContext`] 不在线程上下文中
-    /// + [`MutexError::CannotPmpt`] 抢占被关闭
-    /// + [`MutexError::CannotBh`] 中断底半部被关闭
+    /// + [`MutexError::DisPmpt`] 抢占被关闭
+    /// + [`MutexError::DisBh`] 中断底半部被关闭
+    /// + [`MutexError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -531,10 +538,12 @@ impl<T: ?Sized> Mutex<T> {
                     Err(MutexError::Timedout(rc))
                 } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext(rc))
-                } else if -ECANNOTPMPT == rc {
-                    Err(MutexError::CannotPmpt(rc))
-                } else if -ECANNOTBH == rc {
-                    Err(MutexError::CannotBh(rc))
+                } else if -EDISPMPT == rc {
+                    Err(MutexError::DisPmpt(rc))
+                } else if -EDISBH == rc {
+                    Err(MutexError::DisBh(rc))
+                } else if -EDISIRQ == rc {
+                    Err(MutexError::DisIrq(rc))
                 } else {
                     Err(MutexError::Unknown(rc))
                 }
@@ -558,8 +567,9 @@ impl<T: ?Sized> Mutex<T> {
     ///
     /// + [`MutexError::NotInit`] 互斥锁未被初始化
     /// + [`MutexError::NotThreadContext`] 不在线程上下文中
-    /// + [`MutexError::CannotPmpt`] 抢占被关闭
-    /// + [`MutexError::CannotBh`] 中断底半部被关闭
+    /// + [`MutexError::DisPmpt`] 抢占被关闭
+    /// + [`MutexError::DisBh`] 中断底半部被关闭
+    /// + [`MutexError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -594,10 +604,12 @@ impl<T: ?Sized> Mutex<T> {
                     Err(MutexError::WouldBlock(rc))
                 } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext(rc))
-                } else if -ECANNOTPMPT == rc {
-                    Err(MutexError::CannotPmpt(rc))
-                } else if -ECANNOTBH == rc {
-                    Err(MutexError::CannotBh(rc))
+                } else if -EDISPMPT == rc {
+                    Err(MutexError::DisPmpt(rc))
+                } else if -EDISBH == rc {
+                    Err(MutexError::DisBh(rc))
+                } else if -EDISIRQ == rc {
+                    Err(MutexError::DisIrq(rc))
                 } else {
                     Err(MutexError::Unknown(rc))
                 }

@@ -319,21 +319,15 @@ pub const EISRCTX: XwEr = 804;
 /// Not ISR context
 pub const ENOTISRCTX: XwEr = 805;
 /// Cannot preemption
-pub const ECANNOTPMPT: XwEr = 806;
+pub const EDISPMPT: XwEr = 806;
 /// Cannot enter BH
-pub const ECANNOTBH: XwEr = 807;
-
-/// Nil object descriptor
-pub const ENILOBJD: XwEr = 880;
-/// Object dead
-pub const EOBJDEAD: XwEr = 884;
-/// Object active
-pub const EOBJACTIVE: XwEr = 885;
+pub const EDISBH: XwEr = 807;
+/// Cannot enter BH
+pub const EDISIRQ: XwEr = 808;
 
 /// Need to exit
 pub const EEXIT: XwEr = 814;
-/// BUG
-pub const EBUG: XwEr = 860;
+
 /// Type error
 pub const ETYPE: XwEr = 830;
 /// Empty error
@@ -348,3 +342,13 @@ pub const E2SMALL: XwEr = 835;
 pub const EALIGN: XwEr = 836;
 /// Owner error
 pub const EOWNER: XwEr = 837;
+
+/// BUG
+pub const EBUG: XwEr = 860;
+
+/// Nil object descriptor
+pub const ENILOBJD: XwEr = 880;
+/// Object dead
+pub const EOBJDEAD: XwEr = 884;
+/// Object active
+pub const EOBJACTIVE: XwEr = 885;

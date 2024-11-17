@@ -352,9 +352,11 @@ pub enum XwmqError {
     /// 不在线程上下文内
     NotThreadContext(XwEr),
     /// 抢占被关闭
-    CannotPmpt(XwEr),
+    DisPmpt(XwEr),
     /// 中断底半部被关闭
-    CannotBh(XwEr),
+    DisBh(XwEr),
+    /// 中断被关闭
+    DisIrq(XwEr),
     /// 消息队列中没有可用的消息槽
     NoSlot(XwEr),
     /// 消息队列中没有消息
@@ -372,8 +374,9 @@ impl XwmqError {
             Self::Interrupt(rc) => rc,
             Self::Timedout(rc) => rc,
             Self::NotThreadContext(rc) => rc,
-            Self::CannotPmpt(rc) => rc,
-            Self::CannotBh(rc) => rc,
+            Self::DisPmpt(rc) => rc,
+            Self::DisBh(rc) => rc,
+            Self::DisIrq(rc) => rc,
             Self::NoSlot(rc) => rc,
             Self::NoMsg(rc) => rc,
             Self::Unknown(rc) => rc,
@@ -583,8 +586,9 @@ where
     /// + [`XwmqError::NotInit`] 消息队列没有初始化
     /// + [`XwmqError::Interrupt`] 等待被中断
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -620,10 +624,12 @@ where
                     XwmqError::Interrupt(rc)
                 } else if -ENOTTHDCTX == rc {
                     XwmqError::NotThreadContext(rc)
-                } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt(rc)
-                } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh(rc)
+                } else if -EDISPMPT == rc {
+                    XwmqError::DisPmpt(rc)
+                } else if -EDISBH == rc {
+                    XwmqError::DisBh(rc)
+                } else if -EDISIRQ == rc {
+                    XwmqError::DisIrq(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
@@ -657,8 +663,9 @@ where
     /// + [`XwmqError::Interrupt`] 等待被中断
     /// + [`XwmqError::Timedout`] 等待超时
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -697,10 +704,12 @@ where
                     XwmqError::Timedout(rc)
                 } else if -ENOTTHDCTX == rc {
                     XwmqError::NotThreadContext(rc)
-                } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt(rc)
-                } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh(rc)
+                } else if -EDISPMPT == rc {
+                    XwmqError::DisPmpt(rc)
+                } else if -EDISBH == rc {
+                    XwmqError::DisBh(rc)
+                } else if -EDISIRQ == rc {
+                    XwmqError::DisIrq(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
@@ -730,8 +739,9 @@ where
     /// + [`XwmqError::Ok`] 没有错误
     /// + [`XwmqError::NotInit`] 消息队列没有初始化
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -765,10 +775,12 @@ where
                     XwmqError::Ok(rc)
                 } else if -ENOTTHDCTX == rc {
                     XwmqError::NotThreadContext(rc)
-                } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt(rc)
-                } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh(rc)
+                } else if -EDISPMPT == rc {
+                    XwmqError::DisPmpt(rc)
+                } else if -EDISBH == rc {
+                    XwmqError::DisBh(rc)
+                } else if -EDISIRQ == rc {
+                    XwmqError::DisIrq(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
@@ -860,8 +872,9 @@ where
     /// + [`XwmqError::NotInit`] 消息队列没有初始化
     /// + [`XwmqError::Interrupt`] 等待被中断
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -897,10 +910,12 @@ where
                     XwmqError::Interrupt(rc)
                 } else if -ENOTTHDCTX == rc {
                     XwmqError::NotThreadContext(rc)
-                } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt(rc)
-                } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh(rc)
+                } else if -EDISPMPT == rc {
+                    XwmqError::DisPmpt(rc)
+                } else if -EDISBH == rc {
+                    XwmqError::DisBh(rc)
+                } else if -EDISIRQ == rc {
+                    XwmqError::DisIrq(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
@@ -934,8 +949,9 @@ where
     /// + [`XwmqError::Interrupt`] 等待被中断
     /// + [`XwmqError::Timedout`] 等待超时
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -974,10 +990,12 @@ where
                     XwmqError::Timedout(rc)
                 } else if -ENOTTHDCTX == rc {
                     XwmqError::NotThreadContext(rc)
-                } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt(rc)
-                } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh(rc)
+                } else if -EDISPMPT == rc {
+                    XwmqError::DisPmpt(rc)
+                } else if -EDISBH == rc {
+                    XwmqError::DisBh(rc)
+                } else if -EDISIRQ == rc {
+                    XwmqError::DisIrq(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
@@ -1007,8 +1025,9 @@ where
     /// + [`XwmqError::Ok`] 没有错误
     /// + [`XwmqError::NotInit`] 消息队列没有初始化
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -1042,10 +1061,12 @@ where
                     XwmqError::Ok(rc)
                 } else if -ENOTTHDCTX == rc {
                     XwmqError::NotThreadContext(rc)
-                } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt(rc)
-                } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh(rc)
+                } else if -EDISPMPT == rc {
+                    XwmqError::DisPmpt(rc)
+                } else if -EDISBH == rc {
+                    XwmqError::DisBh(rc)
+                } else if -EDISIRQ == rc {
+                    XwmqError::DisIrq(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
@@ -1139,8 +1160,9 @@ where
     /// + [`XwmqError::NotInit`] 消息队列没有初始化
     /// + [`XwmqError::Interrupt`] 等待被中断
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -1186,10 +1208,12 @@ where
                     Err(XwmqError::Interrupt(rc))
                 } else if -ENOTTHDCTX == rc {
                     Err(XwmqError::NotThreadContext(rc))
-                } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt(rc))
-                } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh(rc))
+                } else if -EDISPMPT == rc {
+                    Err(XwmqError::DisPmpt(rc))
+                } else if -EDISBH == rc {
+                    Err(XwmqError::DisBh(rc))
+                } else if -EDISIRQ == rc {
+                    Err(XwmqError::DisIrq(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
@@ -1223,8 +1247,9 @@ where
     /// + [`XwmqError::Interrupt`] 等待被中断
     /// + [`XwmqError::Timedout`] 等待超时
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -1273,10 +1298,12 @@ where
                     Err(XwmqError::Timedout(rc))
                 } else if -ENOTTHDCTX == rc {
                     Err(XwmqError::NotThreadContext(rc))
-                } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt(rc))
-                } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh(rc))
+                } else if -EDISPMPT == rc {
+                    Err(XwmqError::DisPmpt(rc))
+                } else if -EDISBH == rc {
+                    Err(XwmqError::DisBh(rc))
+                } else if -EDISIRQ == rc {
+                    Err(XwmqError::DisIrq(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
@@ -1303,8 +1330,9 @@ where
     ///
     /// + [`XwmqError::NotInit`] 消息队列没有初始化
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -1348,10 +1376,12 @@ where
                     Ok(boxdata)
                 } else if -ENOTTHDCTX == rc {
                     Err(XwmqError::NotThreadContext(rc))
-                } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt(rc))
-                } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh(rc))
+                } else if -EDISPMPT == rc {
+                    Err(XwmqError::DisPmpt(rc))
+                } else if -EDISBH == rc {
+                    Err(XwmqError::DisBh(rc))
+                } else if -EDISIRQ == rc {
+                    Err(XwmqError::DisIrq(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
@@ -1447,8 +1477,9 @@ where
     /// + [`XwmqError::NotInit`] 消息队列没有初始化
     /// + [`XwmqError::Interrupt`] 等待被中断
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -1494,10 +1525,12 @@ where
                     Err(XwmqError::Interrupt(rc))
                 } else if -ENOTTHDCTX == rc {
                     Err(XwmqError::NotThreadContext(rc))
-                } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt(rc))
-                } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh(rc))
+                } else if -EDISPMPT == rc {
+                    Err(XwmqError::DisPmpt(rc))
+                } else if -EDISBH == rc {
+                    Err(XwmqError::DisBh(rc))
+                } else if -EDISIRQ == rc {
+                    Err(XwmqError::DisIrq(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
@@ -1531,8 +1564,9 @@ where
     /// + [`XwmqError::Interrupt`] 等待被中断
     /// + [`XwmqError::Timedout`] 等待超时
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -1581,10 +1615,12 @@ where
                     Err(XwmqError::Timedout(rc))
                 } else if -ENOTTHDCTX == rc {
                     Err(XwmqError::NotThreadContext(rc))
-                } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt(rc))
-                } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh(rc))
+                } else if -EDISPMPT == rc {
+                    Err(XwmqError::DisPmpt(rc))
+                } else if -EDISBH == rc {
+                    Err(XwmqError::DisBh(rc))
+                } else if -EDISIRQ == rc {
+                    Err(XwmqError::DisIrq(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
@@ -1611,8 +1647,9 @@ where
     ///
     /// + [`XwmqError::NotInit`] 消息队列没有初始化
     /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
-    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
-    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisPmpt`] 抢占被关闭
+    /// + [`XwmqError::DisBh`] 中断底半部被关闭
+    /// + [`XwmqError::DisIrq`] 中断被关闭
     ///
     /// # 示例
     ///
@@ -1656,10 +1693,12 @@ where
                     Ok(boxdata)
                 } else if -ENOTTHDCTX == rc {
                     Err(XwmqError::NotThreadContext(rc))
-                } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt(rc))
-                } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh(rc))
+                } else if -EDISPMPT == rc {
+                    Err(XwmqError::DisPmpt(rc))
+                } else if -EDISBH == rc {
+                    Err(XwmqError::DisBh(rc))
+                } else if -EDISIRQ == rc {
+                    Err(XwmqError::DisIrq(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
