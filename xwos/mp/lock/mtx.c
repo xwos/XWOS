@@ -639,8 +639,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         rc = xwmp_thd_wakeup(t);
                         if (rc < 0) {
-                                /* 如果 `t` 已经在其他CPU开始运行，
-                                   它的动态优先级需要被修改。*/
+                                /* 如果 `t` 运行在其他CPU上，可能进入当前case。*/
                                 seq = xwmp_sqlk_rd_begin(&mt->lock);
                                 dprio = (t->sprio > mt->maxprio) ?
                                         t->sprio : mt->maxprio;
@@ -676,12 +675,6 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                 }
         }
         return rc;
-}
-
-__xwmp_api
-xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx)
-{
-        return xwmp_mtx_lock_to(mtx, XWTM_MAX);
 }
 
 static __xwmp_code
@@ -726,13 +719,15 @@ xwer_t xwmp_mtx_block_to(struct xwmp_mtx * mtx,
         xwmp_mtx_chprio(mtx);
 
         /* 加入时间树 */
-        xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-        xwmp_splk_lock(&thd->stlock);
-        xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_SLEEPING);
-        xwmp_splk_unlock(&thd->stlock);
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_thd_tt_add_locked(thd, xwtt, to, cpuirq);
-        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        if (to > 0) {
+                xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwmp_splk_lock(&thd->stlock);
+                xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_SLEEPING);
+                xwmp_splk_unlock(&thd->stlock);
+                // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_thd_tt_add_locked(thd, xwtt, to, cpuirq);
+                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        }
 
         /* 调度 */
         xwospl_cpuirq_enable_lc();
@@ -877,6 +872,47 @@ xwer_t xwmp_mtx_lock_or_block_to(struct xwmp_mtx * mtx,
 }
 
 __xwmp_api
+xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx)
+{
+        struct xwmp_thd * cthd;
+        struct xwmp_skd * xwskd;
+        xwer_t rc;
+
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+                goto err_dis;
+        }
+        cthd = xwmp_skd_get_cthd_lc();
+        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        if (!xwmp_skd_tstth(xwskd)) {
+                rc = -EDISIRQ;
+                goto err_dis;
+        }
+        if (!xwmp_skd_tstpmpt(xwskd)) {
+                rc = -EDISPMPT;
+                goto err_dis;
+        }
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+        if (!xwmp_skd_tstbh(xwskd)) {
+                rc = -EDISBH;
+                goto err_dis;
+        }
+#endif
+        rc = xwmp_mtx_grab(mtx);
+        if (rc < 0) {
+                goto err_grab;
+        }
+        rc = xwmp_mtx_lock_or_block_to(mtx, xwskd, cthd, 0);
+        if (rc < 0) {
+                xwmp_mtx_put(mtx); // cppcheck-suppress [misra-c2012-17.7]
+        }
+
+err_grab:
+err_dis:
+        return rc;
+}
+
+__xwmp_api
 xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
 {
         struct xwmp_thd * cthd;
@@ -887,22 +923,22 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
 
         if (!xwospl_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         if (!xwmp_skd_tstth(xwskd)) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -EDISPMPT;
-                goto err_dispmpt;
+                goto err_dis;
         }
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -EDISBH;
-                goto err_disbh;
+                goto err_dis;
         }
 #endif
         hwt = &xwskd->tt.hwt;
@@ -918,18 +954,17 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
                 }
         } else {
                 rc = xwmp_mtx_grab(mtx);
-                if (XWOK == rc) {
-                        rc = xwmp_mtx_lock_or_block_to(mtx, xwskd, cthd, to);
-                        if (rc < 0) {
-                                // cppcheck-suppress [misra-c2012-17.7]
-                                xwmp_mtx_put(mtx);
-                        }
+                if (rc < 0) {
+                        goto err_grab;
+                }
+                rc = xwmp_mtx_lock_or_block_to(mtx, xwskd, cthd, to);
+                if (rc < 0) {
+                        xwmp_mtx_put(mtx); // cppcheck-suppress [misra-c2012-17.7]
                 }
         }
 
-err_disbh:
-err_dispmpt:
-err_disirq:
+err_grab:
+err_dis:
         return rc;
 }
 
@@ -1013,22 +1048,22 @@ xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
 
         if (!xwospl_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         if (!xwmp_skd_tstth(xwskd)) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -EDISPMPT;
-                goto err_dispmpt;
+                goto err_dis;
         }
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -EDISBH;
-                goto err_disbh;
+                goto err_dis;
         }
 #endif
         rc = xwmp_mtx_grab(mtx);
@@ -1044,9 +1079,7 @@ xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
 err_mtx_do_lock_unintr:
         xwmp_mtx_put(mtx); // cppcheck-suppress [misra-c2012-17.7]
 err_mtx_grab:
-err_disbh:
-err_dispmpt:
-err_disirq:
+err_dis:
         return rc;
 }
 

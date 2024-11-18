@@ -586,12 +586,6 @@ xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx)
         return rc;
 }
 
-__xwup_api
-xwer_t xwup_mtx_lock(struct xwup_mtx * mtx)
-{
-        return xwup_mtx_lock_to(mtx, XWTM_MAX);
-}
-
 static __xwup_code
 xwer_t xwup_mtx_block_to(struct xwup_mtx * mtx,
                          struct xwup_skd * xwskd, struct xwup_thd * thd,
@@ -623,11 +617,13 @@ xwer_t xwup_mtx_block_to(struct xwup_mtx * mtx,
         xwup_mtx_chprio(mtx);
 
         /* 加入到时间树 */
-        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
-        xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_SLEEPING);
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwup_thd_tt_add_locked(thd, xwtt, to, cpuirq);
-        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        if (to > 0) {
+                xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_SLEEPING);
+                // cppcheck-suppress [misra-c2012-17.7]
+                xwup_thd_tt_add_locked(thd, xwtt, to, cpuirq);
+                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        }
 
         /* 调度 */
         xwospl_cpuirq_enable_lc();
@@ -757,6 +753,37 @@ xwer_t xwup_mtx_lock_or_block_to(struct xwup_mtx * mtx, struct xwup_thd * thd,
 }
 
 __xwup_api
+xwer_t xwup_mtx_lock(struct xwup_mtx * mtx)
+{
+        struct xwup_thd * cthd;
+        xwer_t rc;
+
+        if (!xwospl_cpuirq_test_lc()) {
+                rc = -EDISIRQ;
+                goto err_dis;
+        }
+        if (!xwup_skd_tstth_lc()) {
+                rc = -EDISIRQ;
+                goto err_dis;
+        }
+        if (!xwup_skd_tstpmpt_lc()) {
+                rc = -EDISPMPT;
+                goto err_dis;
+        }
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
+        if (!xwup_skd_tstbh_lc()) {
+                rc = -EDISBH;
+                goto err_dis;
+        }
+#endif
+        cthd = xwup_skd_get_cthd_lc();
+        rc = xwup_mtx_lock_or_block_to(mtx, cthd, 0);
+
+err_dis:
+        return rc;
+}
+
+__xwup_api
 xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
 {
         struct xwup_thd * cthd;
@@ -767,20 +794,20 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
 
         if (!xwospl_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwup_skd_tstth_lc()) {
                 rc = -EDISIRQ;
-                goto err_disirq;
+                goto err_dis;
         }
         if (!xwup_skd_tstpmpt_lc()) {
                 rc = -EDISPMPT;
-                goto err_dispmpt;
+                goto err_dis;
         }
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         if (!xwup_skd_tstbh_lc()) {
                 rc = -EDISBH;
-                goto err_disbh;
+                goto err_dis;
         }
 #endif
         cthd = xwup_skd_get_cthd_lc();
@@ -800,9 +827,7 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
                 rc = xwup_mtx_lock_or_block_to(mtx, cthd, to);
         }
 
-err_disbh:
-err_dispmpt:
-err_disirq:
+err_dis:
         return rc;
 }
 
