@@ -68,11 +68,7 @@
 #define XWCDCFG_ds_CAN_CONTROLLER_ROCBT                         0
 #define XWCDCFG_ds_CAN_CONTROLLER_SDU_MAXSIZE                   8U
 #define XWCDCFG_ds_CAN_CONTROLLER_RXQNUM                        8U
-#define XWCDCFG_ds_CAN_CONTROLLER_I2CP                          0
-#define XWCDCFG_ds_CAN_CONTROLLER_SPIP                          0
 #define XWCDCFG_ds_CAN_TRANSCEIVER                              1
-#define XWCDCFG_ds_CAN_TRANSCEIVER_I2CP                         0
-#define XWCDCFG_ds_CAN_TRANSCEIVER_SPIP                         0
 
 /******** ******** misc device ******** ********/
 #define XWCDCFG_ds_MISC                                         0
@@ -92,6 +88,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  CAN transceiver  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWCDCFG_peripheral_can_transceiver_tja1042              0
+#define XWCDCFG_peripheral_can_transceiver_xxx10xx              0
 
 #endif /* cfg/xwcd.h */

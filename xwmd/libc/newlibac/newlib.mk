@@ -27,6 +27,9 @@ endif
 ifeq ($(XWMDCFG_libc_newlibac_FOPS),y)
   XWMO_CSRCS += fops.c
 endif
+ifeq ($(XWMDCFG_libc_newlibac_FATFS),y)
+  XWMO_CSRCS += fatfs.c
+endif
 XWMO_CSRCS += isatty.c
 XWMO_CSRCS += getpid.c
 XWMO_CSRCS += kill.c

@@ -55,6 +55,9 @@
 #define XWCDCFG_ds_SPI_MASTER                                   1
 #define XWCDCFG_ds_SPI_PERIPHERAL                               1
 
+/******** ******** IO Chip ******** ********/
+#define XWCDCFG_ds_IOCHIP                                       1
+
 /******** ******** LIN Bus ******** ********/
 #define XWCDCFG_ds_LIN                                          0
 #define XWCDCFG_ds_LINID                                        0
@@ -65,11 +68,7 @@
 #define XWCDCFG_ds_CAN_CONTROLLER_ROCBT                         0
 #define XWCDCFG_ds_CAN_CONTROLLER_SDU_MAXSIZE                   8U
 #define XWCDCFG_ds_CAN_CONTROLLER_RXQNUM                        8U
-#define XWCDCFG_ds_CAN_CONTROLLER_I2CP                          0
-#define XWCDCFG_ds_CAN_CONTROLLER_SPIP                          0
 #define XWCDCFG_ds_CAN_TRANSCEIVER                              0
-#define XWCDCFG_ds_CAN_TRANSCEIVER_I2CP                         0
-#define XWCDCFG_ds_CAN_TRANSCEIVER_SPIP                         0
 
 /******** ******** misc device ******** ********/
 #define XWCDCFG_ds_MISC                                         0
@@ -78,6 +77,7 @@
  ******** ******** ********   I2C peripheral  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWCDCFG_peripheral_i2c_eeprom                           0
+#define XWCDCFG_peripheral_i2c_iochip_tca9539                   0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   SPI peripheral  ******** ******** ********
