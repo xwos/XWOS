@@ -22,7 +22,7 @@
 #include <xwos/lib/errno.h>
 #include "board/xwac/xwds/device.h"
 
-xwssz_t newlibac_fops_read_stdin(int fd, void * buf, size_t cnt)
+xwssz_t newlibac_fops_read_stdin(int fd, void * buf, xwsz_t cnt)
 {
         xwssz_t rdsz;
         xwsz_t bufsz = cnt;
@@ -47,7 +47,7 @@ xwssz_t newlibac_fops_read_stdin(int fd, void * buf, size_t cnt)
         return rdsz;
 }
 
-xwssz_t newlibac_fops_write_stdout(int fd, const void * data, size_t cnt)
+xwssz_t newlibac_fops_write_stdout(int fd, const void * data, xwsz_t cnt)
 {
         xwssz_t wrsz;
         xwer_t rc;
@@ -64,7 +64,7 @@ xwssz_t newlibac_fops_write_stdout(int fd, const void * data, size_t cnt)
         return wrsz;
 }
 
-xwssz_t newlibac_fops_write_stderr(int fd, const void * data, size_t cnt)
+xwssz_t newlibac_fops_write_stderr(int fd, const void * data, xwsz_t cnt)
 {
         xwssz_t wrsz;
         xwer_t rc;

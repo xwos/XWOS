@@ -24,7 +24,7 @@
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_console.h>
 #include "board/xwac/xwds/device.h"
 
-xwssz_t picolibcac_fops_read_stdin(int fd, void * buf, size_t cnt)
+xwssz_t picolibcac_fops_read_stdin(int fd, void * buf, xwsz_t cnt)
 {
         XWOS_UNUSED(fd);
 
@@ -33,20 +33,7 @@ xwssz_t picolibcac_fops_read_stdin(int fd, void * buf, size_t cnt)
         return cnt;
 }
 
-ssize_t read(int fd, void * buf, size_t cnt)
-{
-        int ret;
-
-        if (0 == fd) {
-                ret = (int)picolibcac_fops_read_stdin(fd, buf, cnt);
-        } else {
-                errno = EPERM;
-                ret = -1;
-        }
-        return ret;
-}
-
-xwssz_t picolibcac_fops_write_stdout(int fd, const void * data, size_t cnt)
+xwssz_t picolibcac_fops_write_stdout(int fd, const void * data, xwsz_t cnt)
 {
         XWOS_UNUSED(fd);
 
@@ -55,66 +42,11 @@ xwssz_t picolibcac_fops_write_stdout(int fd, const void * data, size_t cnt)
         return cnt;
 }
 
-xwssz_t picolibcac_fops_write_stderr(int fd, const void * data, size_t cnt)
+xwssz_t picolibcac_fops_write_stderr(int fd, const void * data, xwsz_t cnt)
 {
         XWOS_UNUSED(fd);
 
         soc_console_tx((const xwu8_t *)data, cnt);
         errno = 0;
         return cnt;
-}
-
-ssize_t write(int fd, const void * data, size_t cnt)
-{
-        int ret;
-
-        if (1 == fd) {
-                ret = (int)picolibcac_fops_write_stdout(fd, data, cnt);
-        } else if (2 == fd) {
-                ret = (int)picolibcac_fops_write_stderr(fd, data, cnt);
-        } else {
-                errno = EPERM;
-                ret = -1;
-        }
-        return ret;
-}
-
-int open(const char * path, int flag, ...)
-{
-
-        XWOS_UNUSED(path);
-        XWOS_UNUSED(flag);
-
-        errno = ENOSYS;
-        return -1;
-}
-
-int close(int fd)
-{
-        XWOS_UNUSED(fd);
-
-        errno = ENOSYS;
-        return -1;
-}
-
-
-_off_t lseek(int fd, _off_t pos, int whence)
-{
-        XWOS_UNUSED(fd);
-        XWOS_UNUSED(pos);
-        XWOS_UNUSED(whence);
-
-        errno = ENOSYS;
-        return -1;
-}
-
-struct stat;
-
-int fstat(int fd, struct stat * sbuf)
-{
-        XWOS_UNUSED(fd);
-        XWOS_UNUSED(sbuf);
-
-        errno = ENOSYS;
-        return -1;
 }

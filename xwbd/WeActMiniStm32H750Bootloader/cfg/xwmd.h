@@ -50,6 +50,13 @@
 #define XWMDCFG_isc_xwcq                                        0
 
 /******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      AUTOSAR classical Platform     ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+/******** ******** OS ******** ********/
+#define XWMDCFG_autosarcp_os                                    0
+#define XWMDCFG_autosarcp_os_USING_STDTYPES_H                   0
+
+/******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            C/C++ Runtime            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_libc                                            0
@@ -57,12 +64,14 @@
 #define XWMDCFG_libc_newlibac_MEM                               1
 #define XWMDCFG_libc_newlibac_SPRINTF                           1
 #define XWMDCFG_libc_newlibac_FOPS                              1
+#define XWMDCFG_libc_newlibac_FATFS                             1
 #define XWMDCFG_libc_newlibac_TIME                              0
 #define XWMDCFG_libc_picolibcac_SETJMP                          1
 #define XWMDCFG_libc_picolibcac_MEM                             1
 #define XWMDCFG_libc_picolibcac_SPRINTF                         1
 #define XWMDCFG_libc_picolibcac_FOPS                            1
-#define XWMDCFG_libc_picolibcac_TIME                            0
+#define XWMDCFG_libc_picolibcac_FATFS                           1
+#define XWMDCFG_libc_picolibcac_TIME                            1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            XWRust Runtime            ******** ********
