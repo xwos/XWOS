@@ -570,7 +570,7 @@ void xwos_cthd_get_attr(struct xwos_thd_attr * attr)
 }
 
 /**
- * @brief XWOS API：通知调度器重新调度线程
+ * @brief XWOS API：当前线程通知调度器重新调度
  * @note
  * + 上下文：线程
  */

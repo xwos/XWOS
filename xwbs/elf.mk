@@ -66,9 +66,11 @@ BRD_LIB := $(XWOS_OBJ_DIR)/$(XWOS_BRD_DIR)/brd.a
 
 XWOS_CSRCS := $(addprefix $(XWOS_OS_DIR)/,$(XWOS_CSRCS))
 XWOS_ASRCS := $(addprefix $(XWOS_OS_DIR)/,$(XWOS_ASRCS))
+XWOS_CXXSRCS := $(addprefix $(XWOS_OS_DIR)/,$(XWOS_CXXSRCS))
 XWOS_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWOS_CSRCS))))
 XWOS_AOBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWOS_ASRCS))))
-XWOS_OBJS := $(XWOS_COBJS) $(XWOS_AOBJS)
+XWOS_CXXOBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWOS_CXXSRCS))))
+XWOS_OBJS := $(XWOS_COBJS) $(XWOS_AOBJS) $(XWOS_CXXOBJS)
 XWOS_OBJS_LST := $(XWOS_OBJ_DIR)/$(XWOS_OS_DIR)/xwos-objs.txt
 XWOS_LIB := $(XWOS_OBJ_DIR)/$(XWOS_OS_DIR)/xwos.a
 

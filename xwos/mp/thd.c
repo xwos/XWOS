@@ -334,7 +334,7 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
         xwstk_t * stkbase;
 
         stkbase = malloc(stack_size);
-        if (NULL == thd) {
+        if (NULL == stkbase) {
                 stkbase = err_ptr(-ENOMEM);
         }
         return stkbase;
@@ -359,7 +359,8 @@ xwer_t xwmp_thd_stack_free(xwstk_t * stk)
 #  elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
         return xwmm_sma_free(xwmp_thd_cache, stk);
 #  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
-        return free(stk);
+        free(stk);
+        return XWOK;
 #  else
         XWOS_UNUSED(stk);
         return -ENOSYS;

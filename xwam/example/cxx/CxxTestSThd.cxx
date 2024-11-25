@@ -18,15 +18,41 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_example_cxx_task_hxx__
-#define __xwam_example_cxx_task_hxx__
+#include "xwam/example/cxx/CxxTestSThd.hxx"
+#include <vector>
+#include "test/vector.hxx"
+#if !defined(__clang__)
+#  include "test/literal.hxx"
+#  include "test/exception.hxx"
+#endif
 
-extern "C" {
-#include <xwos/standard.h>
+__xwcc_alignl1cache xwstk_t CxxTestSThd::sStack[1024];
+
+CxxTestSThd::CxxTestSThd()
+    : SThd("cxx.thd", sStack, sizeof(sStack))
+{
 }
 
-extern "C" {
-xwer_t cxx_thd_main(void * arg);
+CxxTestSThd::~CxxTestSThd()
+{
 }
 
-#endif /* xwam/example/cxx/task.hxx */
+xwer_t CxxTestSThd::thdMainFunction()
+{
+#if !defined(__clang__)
+    testLiteralOperator();
+#endif
+    testStdVector();
+#if !defined(__clang__)
+    testStdExcept(1);
+#endif
+
+    while (!shouldStop()) {
+        if (shouldFreeze()) {
+            freeze();
+        }
+        sleep(xwtm_ms(2000));
+    }
+    detach();
+    return XWOK;
+}

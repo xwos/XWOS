@@ -45,5 +45,8 @@ else
   include xwos/up/up.mk
 endif
 
+######## ######## ######## ######## C++ ######## ######## ######## ########
+include xwos/cxx/cxx.mk
+
 ######## ######## ######## ######## arcos ######## ######## ######## ########
 include xwos/arcos/arcos.mk

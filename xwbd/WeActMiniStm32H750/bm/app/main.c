@@ -29,7 +29,6 @@
 #  include <xwmd/libc/picolibcac/mif.h>
 #endif
 #include <xwem/vm/lua/mif.h>
-#include <xwam/example/cxx/mif.h>
 #include "board/xwac/xwds/device.h"
 #include "board/xwac/fatfs/sdcard.h"
 #include "bm/app/xwssc.h"
@@ -192,11 +191,6 @@ xwer_t main_task(void * arg)
                 goto err_picolibcac_init;
         }
 #endif
-
-        rc = xwos_example_cxx();
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Start C++ example ... <rc:%d>", rc);
-        }
 
         rc = child_thd_start();
         if (rc < 0) {
