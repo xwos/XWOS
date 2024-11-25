@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：C++测试线程
+ * @brief 板级描述层：用户程序：C++应用程序入口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,34 +18,6 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.hxx>
-#include <xwos/osal/thd.hxx>
-#include <vector>
-#include "test/vector.hxx"
-#if !defined(__clang__)
-#  include "test/literal.hxx"
-#  include "test/exception.hxx"
-#endif
-#include "task.hxx"
+#include "xwam/example/cxx/CxxTestSThd.hxx"
 
-xwer_t cxx_thd_main(void * arg)
-{
-  xwer_t rc;
-
-  XWOS_UNUSED(arg);
-
-#if !defined(__clang__)
-  testLiteralOperator();
-#endif
-  testStdVector();
-#if !defined(__clang__)
-  testStdExcept(1);
-#endif
-
-  rc = XWOK;
-  while (!xwos_cthd_frz_shld_stop(NULL)) {
-    xwos_cthd_sleep(XWTM_MS(2000));
-  }
-  xwos_thd_detach(xwos_cthd_self());
-  return rc;
-}
+CxxTestSThd gCxxTestSThd;

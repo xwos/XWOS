@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：C++
+ * @brief 示例：C++测试线程
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,23 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_example_cxx_mif_h__
-#define __xwam_example_cxx_mif_h__
+#ifndef __xwam_example_cxx_CxxTestSThd_hxx__
+#define __xwam_example_cxx_CxxTestSThd_hxx__
 
-#include <xwos/standard.h>
+#include <xwos/standard.hxx>
+#include <xwos/cxx/SThd.hxx>
 
-xwer_t xwos_example_cxx(void);
+class CxxTestSThd : public xwos::SThd
+{
+  public:
+    CxxTestSThd();
+    ~CxxTestSThd();
 
-#endif /* xwam/example/cxx/mif.h */
+  private:
+    virtual xwer_t thdMainFunction() override;
+
+  private:
+    static xwstk_t sStack[1024];
+};
+
+#endif /* xwam/example/cxx/CxxTestSThd.hxx */

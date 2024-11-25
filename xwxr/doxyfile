@@ -948,6 +948,7 @@ INPUT                  = xwxr/index.md \
                          xwos/standard.hxx \
                          xwos/version.h \
                          xwos/osal \
+                         xwos/cxx \
                          xwos/mm \
                          xwos/lib \
                          xwmd/group.dox \

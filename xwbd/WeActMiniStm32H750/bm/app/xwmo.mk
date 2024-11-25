@@ -26,6 +26,9 @@ include xwbs/functions.mk
 XWMO_CSRCS :=
 XWMO_CSRCS += main.c thd.c xwssc.c bootlogo.c
 
+XWMO_CXXSRCS :=
+XWMO_CXXSRCS += cxxapp.cxx
+
 # 定义编译选项
 XWMO_CFLAGS :=
 XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter -Wno-sign-conversion

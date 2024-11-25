@@ -21,10 +21,10 @@
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include xwbs/functions.mk
 
-XWMO_CSRCS := mif.c
+XWMO_CSRCS :=
 XWMO_CFLAGS :=
 
-XWMO_CXXSRCS := task.cxx
+XWMO_CXXSRCS := CxxTestSThd.cxx
 XWMO_CXXSRCS += test/vector.cxx
 XWMO_CXXSRCS_gcc += test/literal.cxx test/exception.cxx
 
