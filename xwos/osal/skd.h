@@ -47,8 +47,8 @@
  *
  * ## 抢占
  *
- * + `xwos_skd_dspmpt_lc()` ：关闭抢占
- * + `xwos_skd_enpmpt_lc()` ：打开抢占
+ * + `xwos_skd_dspmpt_lc()` ：关闭本地CPU调度器的抢占
+ * + `xwos_skd_enpmpt_lc()` ：开启本地CPU调度器的抢占
  *
  * 需要注意，关闭多少次抢占，就要打开相同次数的抢占。
  *
@@ -57,8 +57,8 @@
  * 当配置 `XWOSCFG_SKD_BH` 为 **1** ，XWOS的某些系统函数运行在中断底半部。
  * 例如定时器任务。
  *
- * + `xwos_skd_dsbh_lc()` ：关闭中断底半部
- * + `xwos_skd_enbh_lc()` ：打开中断底半部
+ * + `xwos_skd_dsbh_lc()` ：关闭本地CPU的中断底半部
+ * + `xwos_skd_enbh_lc()` ：开启本地CPU的中断底半部
  *
  * 需要注意，关闭多少次中断底半部，就要打开相同次数的中断底半部。
  *
