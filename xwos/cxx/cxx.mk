@@ -10,4 +10,4 @@
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
 XWOS_CXXSRCS += cxx/SThd.cxx cxx/DThd.cxx
-XWOS_CXXSRCS += cxx/SSwt.cxx
+XWOS_CXXSRCS += cxx/SSwt.cxx cxx/DSwt.cxx
