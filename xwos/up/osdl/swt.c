@@ -20,7 +20,10 @@ xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag)
         xwer_t rc;
         struct xwup_swt * swt;
 
-        XWOS_VALIDATE((swtd), "nullptr", -EFAULT);
+        XWOS_VALIDATE((NULL != swtd), "nullptr", -EFAULT);
+        XWOS_VALIDATE(((XWOSDL_SWT_FLAG_NULL == flag) ||
+                       (XWOSDL_SWT_FLAG_RESTART == flag)),
+                      "invalid-value", -EINVAL);
 
         rc = xwup_swt_create(&swt, flag);
         if (XWOK == rc) {
