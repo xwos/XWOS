@@ -15,8 +15,10 @@
 
 #include <xwos/osal/swt.hxx>
 
+namespace xwos {
+
 /**
- * @defgroup xwos_SSwt 静态软件定时器
+ * @defgroup xwos_cxx_SSwt 静态软件定时器
  * @ingroup xwos_cxx
  *
  * 静态软件定时器是指软件定时器所需要的内存在编译期由编译器分配。
@@ -28,8 +30,6 @@
  *
  * @{
  */
-
-namespace xwos {
 
 /**
  * @brief 静态软件定时器
@@ -72,10 +72,10 @@ class SSwt
     void operator delete(void * obj) = delete;
 };
 
-} // namespace xwos
-
 /**
- * @} xwos_SSwt
+ * @} xwos_cxx_SSwt
  */
+
+} // namespace xwos
 
 #endif /* xwos/cxx/SSwt.hxx */

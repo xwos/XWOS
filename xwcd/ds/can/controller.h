@@ -30,7 +30,7 @@
 #include <xwcd/ds/spi/peripheral.h>
 
 /**
- * @defgroup xwcd_ds_spi CAN
+ * @defgroup xwcd_ds_can CAN
  * @ingroup xwcd_ds
  */
 

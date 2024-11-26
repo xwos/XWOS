@@ -36,7 +36,13 @@
     + @subpage xwos_lib_xwobj
     + @subpage xwos_lib_longjmp
     + @subpage xwos_lib_xwsc
-+  @subpage xwmd
++ @subpage xwos_cxx
+  + @subpage xwos_cxx_Cpu
+  + @subpage xwos_cxx_SThd
+  + @subpage xwos_cxx_DThd
+  + @subpage xwos_cxx_SSwt
+  + @subpage xwos_cxx_DThd
++ @subpage xwmd
   + @subpage xwmd_isc
     + @subpage xwmd_isc_xwcq
     + @subpage xwmd_isc_xwmq

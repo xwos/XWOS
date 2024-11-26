@@ -15,8 +15,10 @@
 
 #include <xwos/osal/thd.hxx>
 
+namespace xwos {
+
 /**
- * @defgroup xwos_DThd 静态线程
+ * @defgroup xwos_cxx_DThd 动态线程
  * @ingroup xwos_cxx
  *
  * 动态线程是指线程所需要的内存空间是在运行时动态申请的。
@@ -28,8 +30,6 @@
  *
  * @{
  */
-
-namespace xwos {
 
 /**
  * @brief 动态线程
@@ -82,10 +82,10 @@ class DThd
     static xwer_t sThdMainFunction(DThd * thd);
 };
 
-} // namespace xwos
-
 /**
- * @} xwos_DThd
+ * @} xwos_cxx_DThd
  */
+
+} // namespace xwos
 
 #endif /* xwos/cxx/DThd.hxx */
