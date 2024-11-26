@@ -16,9 +16,13 @@
 #include <xwos/osal/skd.hxx>
 #include <xwos/osal/irq.hxx>
 
+namespace xwos {
+
 /**
- * @defgroup xwos_Cpu CPU库
+ * @defgroup xwos_cxx_Cpu CPU库
  * @ingroup xwos_cxx
+ *
+ * CPU、调度器、中断、上下文相关的库。
  *
  * ## C++ API
  *
@@ -26,8 +30,6 @@
  *
  * @{
  */
-
-namespace xwos {
 
 class Cpu
 {
@@ -61,10 +63,10 @@ class Cpu
     static void restoreIrq(xwirq_t irqn, xwreg_t flag) { xwos_irq_restore(irqn, flag); } /**< 恢复某个外设中断的开关 */
 };
 
-} // namespace xwos
-
 /**
- * @} xwos_Cpu
+ * @} xwos_cxx_Cpu
  */
+
+} // namespace xwos
 
 #endif /* xwos/cxx/Cpu.hxx */

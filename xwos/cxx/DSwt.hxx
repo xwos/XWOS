@@ -15,8 +15,10 @@
 
 #include <xwos/osal/swt.hxx>
 
+namespace xwos {
+
 /**
- * @defgroup xwos_DSwt 动态软件定时器
+ * @defgroup xwos_cxx_DSwt 动态软件定时器
  * @ingroup xwos_cxx
  *
  * 动态软件定时器是指软件定时器所需要的内存空间是在运行时动态申请的。
@@ -28,8 +30,6 @@
  *
  * @{
  */
-
-namespace xwos {
 
 /**
  * @brief 动态软件定时器
@@ -70,10 +70,10 @@ class DSwt
     static void sSwtAlarmFunction(struct xwos_swt * swt, DSwt * obj);
 };
 
-} // namespace xwos
-
 /**
- * @} xwos_DSwt
+ * @} xwos_cxx_DSwt
  */
+
+} // namespace xwos
 
 #endif /* xwos/cxx/DSwt.hxx */

@@ -15,8 +15,10 @@
 
 #include <xwos/osal/thd.hxx>
 
+namespace xwos {
+
 /**
- * @defgroup xwos_SThd 静态线程
+ * @defgroup xwos_cxx_SThd 静态线程
  * @ingroup xwos_cxx
  *
  * 静态线程是指线程所需要的内存在编译期由编译器分配。
@@ -28,8 +30,6 @@
  *
  * @{
  */
-
-namespace xwos {
 
 /**
  * @brief 静态线程
@@ -87,10 +87,10 @@ class SThd
     void operator delete(void * obj) = delete;
 };
 
-} // namespace xwos
-
 /**
- * @} xwos_SThd
+ * @} xwos_cxx_SThd
  */
+
+} // namespace xwos
 
 #endif /* xwos/cxx/SThd.hxx */
