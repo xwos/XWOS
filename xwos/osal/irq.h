@@ -25,8 +25,8 @@
  *
  * + `xwos_cpuirq_enable_lc()` ：开启本地CPU的中断开关（不可嵌套使用）
  * + `xwos_cpuirq_disable_lc()` ：关闭本地CPU的中断开关（不可嵌套使用）
- * + `xwos_cpuirq_resume_lc()` ：暂停本地CPU的中断（可嵌套使用）
- * + `xwos_cpuirq_suspend_lc()` ：恢复本地CPU的中断（可嵌套使用）
+ * + `xwos_cpuirq_resume_lc()` ：恢复本地CPU的中断（可嵌套使用）
+ * + `xwos_cpuirq_suspend_lc()` ：暂停本地CPU的中断（可嵌套使用）
  * + `xwos_cpuirq_save_lc()` ：保存本地CPU的中断开关然后关闭（可嵌套使用）
  * + `xwos_cpuirq_restore_lc()` ：恢复本地CPU的中断开关（可嵌套使用）
  * + `xwos_cpuirq_test_lc()` ：测试本地CPU的中断开关状态
