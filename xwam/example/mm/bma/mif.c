@@ -35,7 +35,7 @@ xwu8_t __xwcc_alignl1cache xwmmdemo_bma_mempool[XWMMDEMO_BMA_MEMSIZE];
 /**
  * @brief 伙伴算法内存块分配器
  */
-XWMM_BMA_DEF(xwmmdemo_bma_raw, XWMMDEMO_BMA_BLKODR);
+XWMM_BMA_RAWOBJ_DEF(xwmmdemo_bma_raw, XWMMDEMO_BMA_BLKODR);
 struct xwmm_bma * xwmmdemo_bma = (struct xwmm_bma *)xwmmdemo_bma_raw;
 
 /**

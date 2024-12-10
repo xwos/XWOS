@@ -166,7 +166,7 @@ struct xwssc {
         void * hwifcb; /**< 接口硬件 */
 
         /* 内存池 */
-        XWMM_BMA_DEF(mempool_bma_raw, XWSSC_MEMBLK_ODR); /**< 内存池分配器的原始内存 */
+        XWMM_BMA_RAWOBJ_DEF(mempool_bma_raw, XWSSC_MEMBLK_ODR); /**< 内存池分配器的原始内存 */
         struct xwmm_bma * mempool; /**< 内存池分配器 */
 
         /* 发送状态机 */

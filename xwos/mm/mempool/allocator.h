@@ -70,26 +70,15 @@
 #endif
 
 /**
- * @brief 定义内存池结构体类型
- * @param[in] name: 结构体名
- * @param[in] pgodr: 页的数量，以2的pgodr次方形式表示
- */
-// cppcheck-suppress [misra-c2012-20.7]
-#define XWMM_MEMPOOL_TYPEDEF(name, pgodr) \
-        struct name { \
-                struct xwmm_mempool mempool[1U]; \
-                struct xwmm_mempool_page_odrbtree odrbtrees[(pgodr) + 1U]; \
-                struct xwmm_mempool_page pages[1U << (pgodr)]; \
-        }
-
-/**
  * @brief 定义内存池结构体的RAW内存空间，用于初始化内存池结构体
  * @param[in] name: 内存数组名
  * @param[in] pgodr: 页的数量，以2的pgodr次方形式表示
  */
 // cppcheck-suppress [misra-c2012-20.7]
-#define XWMM_MEMPOOL_DEF(name, pgodr) \
-        xwu8_t name[sizeof(XWMM_MEMPOOL_TYPEDEF(name, pgodr))]
+#define XWMM_MEMPOOL_RAWOBJ_DEF(name, pgodr) \
+        xwu8_t name[sizeof(struct xwmm_mempool) + \
+                    sizeof(struct xwmm_mempool_page_odrbtree[(pgodr) + 1U]) + \
+                    sizeof(struct xwmm_mempool_page[1U << (pgodr)])]
 
 /**
  * @brief 内存池
