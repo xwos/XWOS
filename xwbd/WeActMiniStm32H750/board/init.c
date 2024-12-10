@@ -51,7 +51,7 @@ extern xwsz_t dtcm_mr_pos[];
 /**
  * @brief DTCM内存池
  */
-__xwbsp_data XWMM_MEMPOOL_DEF(dtcm_mempool, DTCM_PAGE_ORDER);
+__xwbsp_data XWMM_MEMPOOL_RAWOBJ_DEF(dtcm_mempool, DTCM_PAGE_ORDER);
 
 
 /**

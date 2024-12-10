@@ -47,26 +47,15 @@
 #define XWMM_BMA_INUSED                 ((xwu8_t)0x80) /**< 块正在被使用 */
 
 /**
- * @brief 定义伙伴算法内存块分配器结构体类型
- * @param[in] name: 结构体名
- * @param[in] blkodr: 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
- */
-// cppcheck-suppress [misra-c2012-20.7]
-#define XWMM_BMA_TYPEDEF(name, blkodr) \
-        struct name { \
-                struct xwmm_bma bma[1U]; \
-                struct xwmm_bma_orderlist orderlists[(blkodr) + 1U]; \
-                struct xwmm_bma_bcb bcbs[1U << (blkodr)]; \
-        }
-
-/**
  * @brief 定义伙伴算法内存块分配器结构体的RAW内存空间，
  *        用于初始化伙伴算法内存块分配器结构体
  * @param[in] name: 内存数组名
  * @param[in] blkodr: 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
  */
-#define XWMM_BMA_DEF(name, blkodr) \
-        xwu8_t name[sizeof(XWMM_BMA_TYPEDEF(name, blkodr))]
+#define XWMM_BMA_RAWOBJ_DEF(name, blkodr) \
+        xwu8_t name[sizeof(struct xwmm_bma) + \
+                    sizeof(struct xwmm_bma_orderlist[(blkodr) + 1U]) + \
+                    sizeof(struct xwmm_bma_bcb[1U << (blkodr)])]
 
 /**
  * @brief 阶链表

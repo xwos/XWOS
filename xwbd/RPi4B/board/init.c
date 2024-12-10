@@ -30,7 +30,7 @@ extern void * mempool_mr_origin[];
 #define BOARD_MEMPOOL_MR_ORDER (11U)
 
 __xwbsp_data
-XWMM_MEMPOOL_DEF(board_mempool, BOARD_MEMPOOL_MR_ORDER);
+XWMM_MEMPOOL_RAWOBJ_DEF(board_mempool, BOARD_MEMPOOL_MR_ORDER);
 
 /**
  * @brief 初始化内存管理
