@@ -53,6 +53,9 @@ struct soc_splk {
         } v;
 } __xwcc_aligned(4);
 
+
+#define SOC_SPLK_INITIALIZER { .v.q.n = 0, .v.q.c = 0, }
+
 static __xwbsp_inline
 void soc_splk_init(struct soc_splk * splk)
 {

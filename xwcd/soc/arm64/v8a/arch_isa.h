@@ -34,7 +34,7 @@
 static inline
 xwu8_t armv8a_load_acquire_8b(atomic_xwu8_t * addr)
 {
-        register xwu32_t tmp;
+        xwu32_t tmp;
 
         __asm__ volatile(
         "       ldarb   %w[__tmp], [%[__addr]]\n"
@@ -60,7 +60,7 @@ void armv8a_store_release_8b(atomic_xwu8_t * addr, xwu8_t value)
 static inline
 xwu16_t armv8a_load_acquire_16b(atomic_xwu16_t * addr)
 {
-        register xwu32_t tmp;
+        xwu32_t tmp;
 
         __asm__ volatile(
         "       ldarh   %w[__tmp], [%[__addr]]\n"
@@ -86,7 +86,7 @@ void armv8a_store_release_16b(atomic_xwu16_t * addr, xwu16_t value)
 static inline
 xwu32_t armv8a_load_acquire_32b(atomic_xwu32_t * addr)
 {
-        register xwu32_t tmp;
+        xwu32_t tmp;
 
         __asm__ volatile(
         "       ldar    %w[__tmp], [%[__addr]]\n"
@@ -112,7 +112,7 @@ void armv8a_store_release_32b(atomic_xwu32_t * addr, xwu32_t value)
 static inline
 xwu64_t armv8a_load_acquire_64b(atomic_xwu64_t * addr)
 {
-        register xwu64_t tmp;
+        xwu64_t tmp;
 
         __asm__ volatile(
         "       ldar    %[__tmp], [%[__addr]]\n"
@@ -149,7 +149,7 @@ void armv8a_clear_exclusive(void)
 static inline
 xwu8_t armv8a_load_exclusively_8b(atomic_xwu8_t * addr)
 {
-        register xwu32_t tmp;
+        xwu32_t tmp;
 
         __asm__ volatile(
         "       ldxrb   %w[__tmp], [%[__addr]]\n"
@@ -163,7 +163,7 @@ xwu8_t armv8a_load_exclusively_8b(atomic_xwu8_t * addr)
 static inline
 xwer_t armv8a_store_exclusively_8b(atomic_xwu8_t * addr, xwu8_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stxrb   %w[__rc], %w[__value], [%[__addr]]\n"
@@ -178,7 +178,7 @@ xwer_t armv8a_store_exclusively_8b(atomic_xwu8_t * addr, xwu8_t value)
 static inline
 xwu8_t armv8a_load_acquire_exclusively_8b(atomic_xwu8_t * addr)
 {
-        register xwu32_t tmp;
+        xwu32_t tmp;
 
         __asm__ volatile(
         "       ldaxrb  %w[__tmp], [%[__addr]]\n"
@@ -192,7 +192,7 @@ xwu8_t armv8a_load_acquire_exclusively_8b(atomic_xwu8_t * addr)
 static inline
 xwer_t armv8a_store_release_exclusively_8b(atomic_xwu8_t * addr, xwu8_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stlxrb  %w[__rc], %w[__value], [%[__addr]]\n"
@@ -207,7 +207,7 @@ xwer_t armv8a_store_release_exclusively_8b(atomic_xwu8_t * addr, xwu8_t value)
 static inline
 xwu16_t armv8a_load_exclusively_16b(atomic_xwu16_t * addr)
 {
-        register xwu32_t tmp;
+        xwu32_t tmp;
 
         __asm__ volatile(
         "       ldxrh   %w[__tmp], [%[__addr]]\n"
@@ -221,7 +221,7 @@ xwu16_t armv8a_load_exclusively_16b(atomic_xwu16_t * addr)
 static inline
 xwer_t armv8a_store_exclusively_16b(atomic_xwu16_t * addr, xwu16_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stxrh   %w[__rc], %w[__value], [%[__addr]]\n"
@@ -236,7 +236,7 @@ xwer_t armv8a_store_exclusively_16b(atomic_xwu16_t * addr, xwu16_t value)
 static inline
 xwu16_t armv8a_load_acquire_exclusively_16b(atomic_xwu16_t * addr)
 {
-        register xwu32_t tmp;
+        xwu32_t tmp;
 
         __asm__ volatile(
         "       ldaxrh  %w[__tmp], [%[__addr]]\n"
@@ -250,7 +250,7 @@ xwu16_t armv8a_load_acquire_exclusively_16b(atomic_xwu16_t * addr)
 static inline
 xwer_t armv8a_store_release_exclusively_16b(atomic_xwu16_t * addr, xwu16_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stlxrh  %w[__rc], %w[__value], [%[__addr]]\n"
@@ -265,7 +265,7 @@ xwer_t armv8a_store_release_exclusively_16b(atomic_xwu16_t * addr, xwu16_t value
 static inline
 xwu32_t armv8a_load_exclusively_32b(atomic_xwu32_t * addr)
 {
-        register xwu32_t tmp;
+        xwu32_t tmp;
 
         __asm__ volatile(
         "       ldxr    %w[__tmp], [%[__addr]]\n"
@@ -279,7 +279,7 @@ xwu32_t armv8a_load_exclusively_32b(atomic_xwu32_t * addr)
 static inline
 xwer_t armv8a_store_exclusively_32b(atomic_xwu32_t * addr, xwu32_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stxr    %w[__rc], %w[__value], [%[__addr]]\n"
@@ -294,7 +294,7 @@ xwer_t armv8a_store_exclusively_32b(atomic_xwu32_t * addr, xwu32_t value)
 static inline
 xwu32_t armv8a_load_acquire_exclusively_32b(atomic_xwu32_t * addr)
 {
-        register xwu32_t tmp;
+        xwu32_t tmp;
 
         __asm__ volatile(
         "       ldaxr   %w[__tmp], [%[__addr]]\n"
@@ -308,7 +308,7 @@ xwu32_t armv8a_load_acquire_exclusively_32b(atomic_xwu32_t * addr)
 static inline
 xwer_t armv8a_store_release_exclusively_32b(atomic_xwu32_t * addr, xwu32_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stlxr   %w[__rc], %w[__value], [%[__addr]]\n"
@@ -323,7 +323,7 @@ xwer_t armv8a_store_release_exclusively_32b(atomic_xwu32_t * addr, xwu32_t value
 static inline
 xwu64_t armv8a_load_exclusively_64b(atomic_xwu64_t * addr)
 {
-        register xwu64_t tmp;
+        xwu64_t tmp;
 
         __asm__ volatile(
         "       ldxr    %[__tmp], [%[__addr]]\n"
@@ -337,7 +337,7 @@ xwu64_t armv8a_load_exclusively_64b(atomic_xwu64_t * addr)
 static inline
 xwer_t armv8a_store_exclusively_64b(atomic_xwu64_t * addr, xwu64_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stxr    %w[__rc], %[__value], [%[__addr]]\n"
@@ -352,7 +352,7 @@ xwer_t armv8a_store_exclusively_64b(atomic_xwu64_t * addr, xwu64_t value)
 static inline
 xwu64_t armv8a_load_acquire_exclusively_64b(atomic_xwu64_t * addr)
 {
-        register xwu64_t tmp;
+        xwu64_t tmp;
 
         __asm__ volatile(
         "       ldaxr   %[__tmp], [%[__addr]]\n"
@@ -366,7 +366,7 @@ xwu64_t armv8a_load_acquire_exclusively_64b(atomic_xwu64_t * addr)
 static inline
 xwer_t armv8a_store_release_exclusively_64b(atomic_xwu64_t * addr, xwu64_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stlxr   %w[__rc], %[__value], [%[__addr]]\n"
@@ -402,7 +402,7 @@ xwu128_t armv8a_load_exclusively_128b(atomic_xwu128_t * addr)
 static inline
 xwer_t armv8a_store_exclusively_128b(atomic_xwu128_t * addr, xwu128_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stxp    %w[__rc], %[__vl], %[__vh], [%[__addr]]\n"
@@ -439,7 +439,7 @@ xwu128_t armv8a_load_acquire_exclusively_128b(atomic_xwu128_t * addr)
 static inline
 xwer_t armv8a_store_release_exclusively_128b(atomic_xwu128_t * addr, xwu128_t value)
 {
-        register int32_t rc;
+        int32_t rc;
 
         __asm__ volatile(
         "       stlxp   %w[__rc], %[__vl], %[__vh], [%[__addr]]\n"
