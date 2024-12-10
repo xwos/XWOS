@@ -151,7 +151,7 @@ xwer_t xwssc_stop(struct xwssc * xwssc);
 bool xwssc_tst_connected(struct xwssc * xwssc);
 
 /**
- * @brief XWSSC API: 在限定的时间内，将用户数据加入到XWSSC的发送队列中，并等待发送结果
+ * @brief XWSSC API: 将用户数据加入到XWSSC的发送队列中，并在限定的时间内等待发送结果
  * @param[in] xwssc: XWSSC对象的指针
  * @param[in] data: 数据缓冲区的指针
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -284,7 +284,7 @@ xwer_t xwssc_rx(struct xwssc * xwssc, xwu8_t port,
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示接收缓冲区的大小
  * + (O) 作为输出时，返回实际接收的消息大小
- * @param[out] qos: 指向缓冲区的指针，此缓冲区用于返回消息的QoS，可为NULL表示不关心QoS
+ * @param[out] qos: 返回消息的QoS的缓冲区，可为 `NULL` 表示不关心QoS
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
