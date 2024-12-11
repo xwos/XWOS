@@ -29,250 +29,519 @@ namespace xwisc {
 /**
  * @brief XWCQ C++ 对象
  */
+template<xwsz_t TSlotNum, typename T>
 class Xwcq
 {
   private:
-    struct xwcq * mProxy;
-    xwu8_t mPort; /**< 端口 */
-    xwu8_t mDefaultPriority; /**< 默认发送优先级 */
-    xwu8_t mDefaultQos; /**< 默认Qos */
+    struct xwcq mCq;
+    __xwcc_alignl1cache xwu8_t mPool[sizeof(T) * TSlotNum];
 
   public:
-    Xwcq(struct xwcq * xwcq, xwu8_t port,
-                   xwu8_t default_priority, xwu8_t default_qos);
-    Xwcq() = delete;
+    Xwcq() { xwcq_init(&mCq, sizeof(T), TSlotNum, mPool); }
     ~Xwcq() {}
 
     /**
-     * @brief 发送数据，并同步等待发送结果
-     * @param[in] data: 数据缓冲区的指针
-     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
-     * + (I) 作为输入时，表示数据长度
-     * + (O) 作为输出时，返回实际发送的数据长度
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 空指针
-     * @retval -E2BIG: 数据太长
-     * @retval -ENODEV: 端口号超出范围
-     * @retval -EINVAL: qos错误
-     * @retval -ENOBUFS: 帧槽被使用完
-     * @retval -EPERM: XWCQ未启动
+     * @brief 获取循环队列内部对象指针
+     */
+    struct xwcq * get() { return &mCq; }
+
+    /******** 查询 ********/
+    /**
+     * @brief XWCQ API: 获取循环队列的容量 `TSlotNum`
+     * @return 容量
      * @note
-     * + 上下文：线程
+     * + 上下文：任意
      */
-    xwer_t write(const xwu8_t data[], xwsz_t * size);
-
-    /**
-     * @brief 发送数据，并同步等待发送结果
-     * @param[in] data: 数据缓冲区的指针
-     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
-     * + (I) 作为输入时，表示数据长度
-     * + (O) 作为输出时，返回实际发送的数据长度
-     * @param[in] pri: 用户数据的优先级
-     * @param[in] qos: 服务质量，取值范围： @ref xwcq_msg_qos_em
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 空指针
-     * @retval -E2BIG: 数据太长
-     * @retval -ENODEV: 端口号超出范围
-     * @retval -EINVAL: qos错误
-     * @retval -ENOBUFS: 帧槽被使用完
-     * @retval -EPERM: XWCQ未启动
-     * @note
-     * + 上下文：线程
-     */
-    xwer_t write(const xwu8_t data[], xwsz_t * size, xwu8_t pri, xwu8_t qos);
-
-    /**
-     * @brief 发送数据，并等待发送结果
-     * @param[in] data: 数据缓冲区的指针
-     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
-     * + (I) 作为输入时，表示数据长度
-     * + (O) 作为输出时，返回实际发送的数据长度
-     * @param[in] to: 期望唤醒的时间点
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 空指针
-     * @retval -E2BIG: 数据太长
-     * @retval -ENODEV: 端口号超出范围
-     * @retval -EINVAL: qos错误
-     * @retval -ENOBUFS: 帧槽被使用完
-     * @retval -EPERM: XWCQ未启动
-     * @note
-     * + 上下文：线程
-     * @details
-     * `to` 表示等待超时的时间点：
-     * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
-     *   可以使用 `xwtm_ft(delta)` 表示；
-     * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
-     */
-    xwer_t write(const xwu8_t data[], xwsz_t * size, xwtm_t to);
-
-    /**
-     * @brief 发送数据，并在限定的时间内等待发送结果
-     * @param[in] data: 数据缓冲区的指针
-     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
-     * + (I) 作为输入时，表示数据长度
-     * + (O) 作为输出时，返回实际发送的数据长度
-     * @param[in] pri: 用户数据的优先级
-     * @param[in] qos: 服务质量，取值范围： @ref xwcq_msg_qos_em
-     * @param[in] to: 期望唤醒的时间点
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 空指针
-     * @retval -E2BIG: 数据太长
-     * @retval -ENODEV: 端口号超出范围
-     * @retval -EINVAL: qos错误
-     * @retval -ENOBUFS: 帧槽被使用完
-     * @retval -EPERM: XWCQ未启动
-     * @note
-     * + 上下文：线程
-     * @details
-     * `to` 表示等待超时的时间点：
-     * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
-     *   可以使用 `xwtm_ft(delta)` 表示；
-     * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
-     */
-    xwer_t write(const xwu8_t data[], xwsz_t * size, xwu8_t pri, xwu8_t qos, xwtm_t to);
-
-    /**
-     * @brief 异步发送数据
-     * @param[in] data: 数据缓冲区的指针
-     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
-     * + (I) 作为输入时，表示数据长度
-     * + (O) 作为输出时，返回实际缓存的数据长度
-     * @param[out] txhbuf: 指向缓冲区的指针，通过此缓冲区返回发送句柄
-     * @details
-     * 发送结果通过虚函数 `onAsyncWrited()` 进行通知。用户需要继承本类，
-     * 重新定义此虚函数来获取发送结果。
-     */
-    xwer_t asyncWrite(const xwu8_t data[], xwsz_t * size, xwcq_txh_t * txhbuf);
-
-    /**
-     * @brief 异步发送数据
-     * @param[in] data: 数据缓冲区的指针
-     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
-     * + (I) 作为输入时，表示数据长度
-     * + (O) 作为输出时，返回实际缓存的数据长度
-     * @param[in] pri: 用户数据的优先级
-     * @param[in] qos: 服务质量，取值范围： @ref xwcq_msg_qos_em
-     * @param[out] txhbuf: 指向缓冲区的指针，通过此缓冲区返回发送句柄
-     * @details
-     * 发送结果通过虚函数 `onAsyncWrited()` 进行通知。用户需要继承本类，
-     * 重新定义此虚函数来获取发送结果。
-     */
-    xwer_t asyncWrite(const xwu8_t data[], xwsz_t * size,
-                      xwu8_t pri, xwu8_t qos, xwcq_txh_t * txhbuf);
-
-    /**
-     * @brief 中断异步发送
-     * @param[in] txh: 发送句柄
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 空指针
-     * @retval -EACCES: 消息帧已经正在发送
-     * @note
-     * + 上下文：中断、中断底半部、线程
-     * + 异步函数
-     * @details
-     * 如果消息已经被 XWCQ TX 线程选中，发送不可被中断；
-     * 仅当消息还在就绪队列中，未被选中发送时才可中断。
-     */
-    xwer_t abortAsyncWrite(xwcq_txh_t txh);
-
-    /**
-     * @brief 获取异步发送状态
-     * @param[in] txh: 发送句柄
-     * @return 发送状态，取值： @ref xwcq_carrier_state_em
-     * @note
-     * + 上下文：中断、中断底半部、线程
-     */
-    enum xwcq_carrier_state_em getAsyncWriteState(xwcq_txh_t txh) {
-        return (enum xwcq_carrier_state_em)xwcq_get_txstate(txh);
+    xwsz_t capacity() {
+        xwsz_t cap;
+        xwcq_get_capacity(&mCq, &cap);
+        return cap;
     }
 
     /**
-     * @brief 接收数据，若数据为空，就无限等待
-     * @param[out] rxbuf: 指向缓冲区的指针，此缓冲区用于接收消息
-     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
-     * + (I) 作为输入时，表示接收缓冲区的大小
-     * + (O) 作为输出时，返回实际接收的消息大小
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 空指针
-     * @retval -ENODEV: 端口号超出范围
-     * @retval -EPERM: XWCQ未启动
-     * @retval -ETIMEDOUT: 超时
+     * @brief XWCQ API: 获取循环队列的单个数据槽的大小 `sizeof(T)`
+     * @return 单个数据槽的大小
      * @note
-     * + 上下文：线程
+     * + 上下文：任意
      */
-    xwer_t read(xwu8_t rxbuf[], xwsz_t * size);
+    xwsz_t size() {
+        xwsz_t size;
+        xwcq_get_size(&mCq, &size);
+        return size;
+    }
 
     /**
-     * @brief 接收数据，若数据为空，就限时等待
-     * @param[out] rxbuf: 指向缓冲区的指针，此缓冲区用于接收消息
+     * @brief XWCQ API: 获取循环队列中有效数据槽的数量
+     * @return 有效数据槽的数量
+     * @note
+     * + 上下文：任意
+     */
+    xwsz_t availability() {
+        xwsz_t availability;
+        xwcq_get_availability(&mCq, &availability);
+        return availability;
+    }
+
+    /******** 维护 ********/
+    /**
+     * @brief 清空循环队列
+     * @note
+     * + 上下文：任意
+     */
+    void flush() { xwcq_flush(&mCq); }
+
+    /******** 发送 ********/
+    /**
+     * @brief 将数据发送到循环队列的 **尾端**  (入队，EnQueue)
+     * @param[in] data: 数据
      * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
-     * + (I) 作为输入时，表示接收缓冲区的大小
-     * + (O) 作为输出时，返回实际接收的消息大小
-     * @param[out] qos: 返回消息的QoS的缓冲区，可为 `nullptr` 表示不关心QoS
+     * + (I) 作为输入时，表示待入队的数据大小
+     * + (O) 作为输出时，返回实际入队的数据大小
      * @return 错误码
      * @retval XWOK: 没有错误
      * @retval -EFAULT: 空指针
-     * @retval -ENODEV: 端口号超出范围
-     * @retval -EPERM: XWCQ未启动
-     * @retval -ETIMEDOUT: 超时
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 如果传入的数据大小 `*size` 超过初始化循环队列时指定的 `sizeof(T)` ，
+     *   数据将被截断。
+     * + 如果循环队列数据已被填满，循环队列会循环回队列 **首端** 的位置，
+     *   覆盖掉原数据。
+     * + 此C++API不会阻塞调用者，因此可以在中断中使用。
+     */
+    xwer_t eq(T * data, xwsz_t * size) {
+        return xwcq_eq(&mCq, (const xwu8_t *)data, size);
+    }
+
+    /**
+     * @brief 将数据发送循环队列的 **首端**  (插队，Jump the Queue)
+     * @param[in] data: 数据
+     * @param[in] size: 数据的大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 如果传入的数据大小 `*size` 超过初始化循环队列时指定的 `sizeof(T)` ，
+     *   数据将被截断。
+     * + 如果循环队列数据已被填满，循环队列会循环回队列 **尾端** 的位置，
+     *   覆盖掉原数据。
+     * + 此C++API不会阻塞调用者，因此可以在中断中使用。
+     */
+    xwer_t jq(T * data, xwsz_t * size) {
+        return xwcq_jq(&mCq, (const xwu8_t *)data, size);
+    }
+
+    /******** 接收 ********/
+
+    /**
+     * @brief 等待从循环队列的 **首端** 接收数据 (离队，DeQueue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -EINTR: 等待被中断
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
      * @note
      * + 上下文：线程
      * @details
-     * `to` 表示等待超时的时间点：
-     * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
-     *   可以使用 `xwtm_ft(delta)` 表示；
-     * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出，或等待被中断。
+     * + 如果等待被中断，此C++API将返回 `-EINTR` 。
      */
-    xwer_t read(xwu8_t rxbuf[], xwsz_t * size, xwu8_t * qos, xwtm_t to);
+    xwer_t dq(T * data, xwsz_t * size) {
+        return xwcq_dq(&mCq, (xwu8_t *)data, size);
+    }
 
     /**
-     * @brief 尝试接收消息，若接收队列为空，立即返回错误码
-     * @param[out] rxbuf: 指向缓冲区的指针，此缓冲区用于接收消息
+     * @brief 限时等待从循环队列的 **首端** 接收数据 (离队，DeQueue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
      * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
      * + (I) 作为输入时，表示接收缓冲区的大小
-     * + (O) 作为输出时，返回实际接收的消息大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @param[in] to: 期望唤醒的时间点
      * @return 错误码
      * @retval XWOK: 没有错误
      * @retval -EFAULT: 空指针
-     * @retval -ENODEV: 端口号超出范围
-     * @retval -ENODATA: 接收队列为空
-     * @retval -EPERM: XWCQ未启动
+     * @retval -EINTR: 等待被中断
+     * @retval -ETIMEDOUT: 超时
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
      * @note
-     * + 上下文：中断、中断底半部、线程
+     * + 上下文：线程
+     * @details
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出，或等待被中断，或等待超时。
+     * + 如果等待被中断，此C++API将返回 `-EINTR` 。
+     * + `to` 表示等待超时的时间点：
+     *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+     *     可以使用 `xwtm_ft(delta)` 表示；
+     *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
      */
-    xwer_t tryRead(xwu8_t rxbuf[], xwsz_t * size);
+    xwer_t dq(T * data, xwsz_t * size, xwtm_t to) {
+        return xwcq_dq_to(&mCq, (xwu8_t *)data, size, to);
+    }
 
     /**
-     * @brief 尝试接收消息，若接收队列为空，立即返回错误码
-     * @param[out] rxbuf: 指向缓冲区的指针，此缓冲区用于接收消息
+     * @brief 等待从循环队列的 **首端** 接收数据 (离队，DeQueue)，
+     *        并且等待不可被中断
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
      * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
      * + (I) 作为输入时，表示接收缓冲区的大小
-     * + (O) 作为输出时，返回实际接收的消息大小
-     * @param[out] qos: 返回消息的QoS的缓冲区，可为 `nullptr` 表示不关心QoS
+     * + (O) 作为输出时，返回实际接收的数据大小
      * @return 错误码
      * @retval XWOK: 没有错误
      * @retval -EFAULT: 空指针
-     * @retval -ENODEV: 端口号超出范围
-     * @retval -ENODATA: 接收队列为空
-     * @retval -EPERM: XWCQ未启动
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
      * @note
-     * + 上下文：中断、中断底半部、线程
+     * + 上下文：线程
+     * @details
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，直到循环队列中有消息可取出。
+     * + 调用此C++API的线程的阻塞等待不可被中断。
      */
-    xwer_t tryRead(xwu8_t rxbuf[], xwsz_t * size, xwu8_t * qos);
+    xwer_t dqUnintr(T * data, xwsz_t * size) {
+        return xwcq_dq_unintr(&mCq, (xwu8_t *)data, size);
+    }
 
-  protected:
-    virtual void onAsyncWrited(xwcq_txh_t txh, xwer_t rc);
+    /**
+     * @brief 尝试从循环队列的 **首端** 接收数据 (离队，DeQueue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENODATA: 循环队列为空
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 若循环队列中为空，就立即返回 `-ENODATA` 。
+     * + 此C++API可在中断中使用。
+     */
+    xwer_t tryDq(T * data, xwsz_t * size) {
+        return xwcq_trydq(&mCq, (xwu8_t *)data, size);
+    }
 
+    /**
+     * @brief 等待从循环队列的 **尾端** 接收数据 (反向离队，Reversely deQueue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -EINTR: 等待被中断
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
+     * @note
+     * + 上下文：线程
+     * @details
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出，或等待被中断。
+     * + 如果等待被中断，此C++API将返回 `-EINTR` 。
+     */
+    xwer_t rq(T * data, xwsz_t * size) {
+        return xwcq_rq(&mCq, (xwu8_t *)data, size);
+    }
 
-  private:
-    static void sOnAsyncWrited(struct xwcq * xwcq, xwcq_txh_t txh,
-                               xwer_t rc, void * arg);
+    /**
+     * @brief 限时等待从循环队列的 **尾端** 接收数据  (反向离队，Reversely deQueue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @param[in] to: 期望唤醒的时间点
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -EINTR: 等待被中断
+     * @retval -ETIMEDOUT: 超时
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
+     * @note
+     * + 上下文：线程
+     * @details
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出，或等待被中断，或等待超时。
+     * + 如果等待被中断，此C++API将返回 `-EINTR` 。
+     * + `to` 表示等待超时的时间点：
+     *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+     *     可以使用 `xwtm_ft(delta)` 表示；
+     *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+     */
+    xwer_t rq(T * data, xwsz_t * size, xwtm_t to) {
+        return xwcq_rq_to(&mCq, (xwu8_t *)data, size, to);
+    }
+
+    /**
+     * @brief 等待从循环队列的 **尾端** 接收数据 (反向离队，Reversely deQueue)，
+     *        并且等待不可被中断
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
+     * @note
+     * + 上下文：线程
+     * @details
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出。
+     * + 调用此C++API的线程的阻塞等待不可被中断。
+     */
+    xwer_t rqUnintr(T * data, xwsz_t * size) {
+        return xwcq_rq_unintr(&mCq, (xwu8_t *)data, size);
+    }
+
+    /**
+     * @brief 尝试从循环队列的 **尾端** 接收数据 (反向离队，Reversely deQueue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENODATA: 循环队列为空
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 若循环队列中为空，就立即返回 `-ENODATA` ，此C++API可在中断中使用。
+     */
+    xwer_t tryRq(T * data, xwsz_t * size) {
+        return xwcq_tryrq(&mCq, (xwu8_t *)data, size);
+    }
+
+    /**
+     * @brief 等待从循环队列 **头端** 拷贝数据 (Peek at the Front of Queue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -EINTR: 等待被中断
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
+     * @note
+     * + 上下文：线程
+     * @details
+     * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出，或等待被中断。
+     * + 如果等待被中断，此C++API将返回 `-EINTR` 。
+     */
+    xwer_t pfq(T * data, xwsz_t * size) {
+        return xwcq_pfq(&mCq, (xwu8_t *)data, size);
+    }
+
+    /**
+     * @brief 限时等待从循环队列 **头端** 拷贝数据 (Peek at the Front of Queue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @param[in] to: 期望唤醒的时间点
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -EINTR: 等待被中断
+     * @retval -ETIMEDOUT: 超时
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
+     * @note
+     * + 上下文：线程
+     * @details
+     * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出，或等待被中断，或等待超时。
+     * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
+     * + `to` 表示等待超时的时间点：
+     *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+     *     可以使用 `xwtm_ft(delta)` 表示；
+     *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+     */
+    xwer_t pfq(T * data, xwsz_t * size, xwtm_t to) {
+        return xwcq_pfq_to(&mCq, (xwu8_t *)data, size, to);
+    }
+
+    /**
+     * @brief 等待从循环队列 **头端** 拷贝数据 (Peek at the Front of Queue)，
+     *        并且等待不可被中断
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
+     * @note
+     * + 上下文：线程
+     * @details
+     * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出。
+     * + 调用此C++API的线程的阻塞等待不可被中断。
+     */
+    xwer_t pfqUnintr(T * data, xwsz_t * size) {
+        return xwcq_pfq_unintr(&mCq, (xwu8_t *)data, size);
+    }
+
+    /**
+     * @brief 尝试从循环队列 **头端** 拷贝数据 (Peek at the Front of Queue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENODATA: 循环队列为空
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+     * + 若循环队列中为空，就立即返回 `-ENODATA` ，此CAPI可在中断中使用。
+     */
+    xwer_t tryPfq(T * data, xwsz_t * size) {
+        return xwcq_trypfq(&mCq, (xwu8_t *)data, size);
+    }
+
+    /**
+     * @brief 等待从循环队列 **尾端** 拷贝数据 (Peek at the Rear of Queue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -EINTR: 等待被中断
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
+     * @note
+     * + 上下文：线程
+     * @details
+     * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出，或等待被中断。
+     * + 如果等待被中断，此C++API将返回 `-EINTR` 。
+     */
+    xwer_t prq(T * data, xwsz_t * size) {
+        return xwcq_prq(&mCq, (xwu8_t *)data, size);
+    }
+
+    /**
+     * @brief 限时等待从循环队列 **尾端** 拷贝数据 (Peek at the Rear of Queue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @param[in] to: 期望唤醒的时间点
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -EINTR: 等待被中断
+     * @retval -ETIMEDOUT: 超时
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
+     * @note
+     * + 上下文：线程
+     * @details
+     * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出，或等待被中断，或等待超时。
+     * + 如果等待被中断，此C++API将返回 `-EINTR` 。
+     * + `to` 表示等待超时的时间点：
+     *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
+     *     可以使用 `xwtm_ft(delta)` 表示；
+     *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+     */
+    xwer_t prq(T * data, xwsz_t * size, xwtm_t to) {
+        return xwcq_prq_to(&mCq, (xwu8_t *)data, size, to);
+    }
+
+    /**
+     * @brief 等待从循环队列 **尾端** 拷贝数据 (Peek at the Rear of Queue)，
+     *        并且等待不可被中断
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTTHDCTX: 不在线程上下文中
+     * @retval -EDISIRQ: 中断被关闭
+     * @retval -EDISPMPT: 抢占被关闭
+     * @retval -EDISBH: 中断底半部被关闭
+     * @note
+     * + 上下文：线程
+     * @details
+     * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+     * + 若循环队列中数据为空，调用此C++API的线程会阻塞等待，
+     *   直到循环队列中有消息可取出。
+     * + 调用此C++API的线程的阻塞等待不可被中断。
+     */
+    xwer_t prqUnintr(T * data, xwsz_t * size) {
+        return xwcq_prq_unintr(&mCq, (xwu8_t *)data, size);
+    }
+
+    /**
+     * @brief 尝试从循环队列 **尾端** 拷贝数据 (Peek at the Rear of Queue)
+     * @param[out] data: 指向缓冲区的指针，此缓冲区用于接收数据
+     * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+     * + (I) 作为输入时，表示接收缓冲区的大小
+     * + (O) 作为输出时，返回实际接收的数据大小
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENODATA: 循环队列为空
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+     * + 若循环队列中为空，就立即返回 `-ENODATA` ，此CAPI可在中断中使用。
+     */
+    xwer_t tryPrq(T * data, xwsz_t * size) {
+        return xwcq_tryprq(&mCq, (xwu8_t *)data, size);
+    }
 };
 
 /**
