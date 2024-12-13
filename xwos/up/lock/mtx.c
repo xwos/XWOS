@@ -819,7 +819,7 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
         } else if (xwtm_cmp(to, now) == 0) {
                 rc = xwup_mtx_trylock(mtx);
                 if (rc < 0) {
-                        if (-ENODATA == rc) {
+                        if (-EWOULDBLOCK == rc) {
                                 rc = -ETIMEDOUT;
                         }
                 }

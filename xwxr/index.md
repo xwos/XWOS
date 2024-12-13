@@ -42,6 +42,9 @@
   + @subpage xwos_cxx_DThd
   + @subpage xwos_cxx_SSwt
   + @subpage xwos_cxx_DThd
+  + @subpage xwos_cxx_lock
+    + @subpage xwos_cxx_lock_SMtx
+    + @subpage xwos_cxx_lock_DMtx
 + @subpage xwmd
   + @subpage xwmd_isc
     + @subpage xwmd_isc_xwcq

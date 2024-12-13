@@ -11,3 +11,4 @@
 
 XWOS_CXXSRCS += cxx/SThd.cxx cxx/DThd.cxx
 XWOS_CXXSRCS += cxx/SSwt.cxx cxx/DSwt.cxx
+XWOS_CXXSRCS += cxx/lock/SMtx.cxx cxx/lock/DMtx.cxx
