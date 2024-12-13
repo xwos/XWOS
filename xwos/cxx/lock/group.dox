@@ -1,0 +1,4 @@
+/**
+ * @defgroup xwos_cxx_lock XWOS锁机制
+ * @ingroup xwos_cxx
+ */

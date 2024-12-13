@@ -269,7 +269,7 @@ xwos_mtx_d xwos_mtx_get_d(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
- + @retval -EOBJDEAD 互斥锁对象无效
+ * @retval -EOBJDEAD: 互斥锁对象无效
  * @retval -EOWNER: 线程并没有锁定此互斥锁
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
@@ -287,7 +287,7 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
- + @retval -EOBJDEAD 互斥锁对象无效
+ * @retval -EOBJDEAD: 互斥锁对象无效
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @retval -EDSPMPT: 抢占被关闭
@@ -295,9 +295,8 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
  * @note
  * + 上下文：线程
  * @details
- * 若线程无法上锁互斥锁，就阻塞等待，直到能获得锁为之。
- *
- * 线程的阻塞等待可能被中断，此时，API返回 `-EINTR` 。
+ * + 如果无法上锁，调用此CAPI的线程会阻塞等待，直到互斥锁可被上锁，或等待被中断。
+ * + 线程的阻塞等待可能被中断，此时，API返回 `-EINTR` 。
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
@@ -312,7 +311,7 @@ xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
- + @retval -EOBJDEAD 互斥锁对象无效
+ * @retval -EOBJDEAD: 互斥锁对象无效
  * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
  * @retval -ENOTTHDCTX: 不在线程上下文中
@@ -338,7 +337,7 @@ xwer_t xwos_mtx_lock_to(struct xwos_mtx * mtx, xwtm_t to)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
- + @retval -EOBJDEAD 互斥锁对象无效
+ * @retval -EOBJDEAD: 互斥锁对象无效
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
@@ -357,7 +356,7 @@ xwer_t xwos_mtx_lock_unintr(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
- + @retval -EOBJDEAD 互斥锁对象无效
+ * @retval -EOBJDEAD: 互斥锁对象无效
  * @retval -EWOULDBLOCK: 尝试获取锁失败
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
@@ -380,7 +379,7 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- + @retval -EOBJDEAD 互斥锁对象无效
+ * @retval -EOBJDEAD: 互斥锁对象无效
  * @note
  * + 上下文：任意
  */
