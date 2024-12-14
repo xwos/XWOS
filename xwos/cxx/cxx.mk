@@ -61,7 +61,7 @@ ifeq ($(XWOSCFG_SKD_SWT_CXX), y)
   endif
 endif
 
-######## ######## ######## ######## Mutex ######## ######## ######## ########
+######## ######## ######## ######## Lock ######## ######## ######## ########
 ifeq ($(XWOSCFG_LOCK_MTX_CXX), y)
   XWOS_CXXSRCS += cxx/lock/SMtx.cxx
   ifeq ($(XWOSCXXRULE_DMTX),y)
@@ -71,4 +71,8 @@ endif
 
 ifeq ($(XWOSCFG_LOCK_SPLK_CXX), y)
   XWOS_CXXSRCS += cxx/lock/Spinlock.cxx
+endif
+
+ifeq ($(XWOSCFG_LOCK_SQLK_CXX), y)
+  XWOS_CXXSRCS += cxx/lock/Seqlock.cxx
 endif

@@ -142,7 +142,7 @@ void xwos_sqlk_init(struct xwos_sqlk * sql)
  * @note
  * + 上下文：任意
  * @details
- * + 若顺序锁已处于写临界区，就自旋等待。
+ * + 若顺序锁已处于写临界区，调用的线程会自旋等待。
  */
 static __xwos_inline_api
 xwsq_t xwos_sqlk_rd_begin(struct xwos_sqlk * sql)
