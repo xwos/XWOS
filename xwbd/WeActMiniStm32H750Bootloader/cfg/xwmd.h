@@ -42,12 +42,14 @@
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 #define XWMDCFG_isc_xwssc_TXTHD_PRIORITY                        \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define XWMDCFG_isc_xwssc_CXX                                   0
 
 /******** ******** Message Queue ******** ********/
 #define XWMDCFG_isc_xwmq                                        0
 
 /******** ******** Circular Queue ******** ********/
 #define XWMDCFG_isc_xwcq                                        0
+#define XWMDCFG_isc_xwcq_CXX                                    0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      AUTOSAR classical Platform     ******** ********
