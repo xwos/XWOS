@@ -12,32 +12,26 @@
 ######## ######## ######## ######## rule ######## ######## ######## ########
 ifeq ($(XWOSCFG_SYNC_PLSEM),y)
   XWOSRULE_SKD_WQ_PL := y
+else ifeq ($(XWOSCFG_SYNC_COND),y)
+  XWOSRULE_SKD_WQ_PL := y
 else
-  ifeq ($(XWOSCFG_SYNC_COND),y)
-    XWOSRULE_SKD_WQ_PL := y
-  else
-    XWOSRULE_SKD_WQ_PL := n
-  endif
+  XWOSRULE_SKD_WQ_PL := n
 endif
 
 ifeq ($(XWOSCFG_LOCK_MTX),y)
   XWOSRULE_SKD_WQ_RT := y
+else ifeq ($(XWOSCFG_SYNC_RTSEM),y)
+  XWOSRULE_SKD_WQ_RT := y
 else
-  ifeq ($(XWOSCFG_SYNC_RTSEM),y)
-    XWOSRULE_SKD_WQ_RT := y
-  else
-    XWOSRULE_SKD_WQ_RT := n
-  endif
+  XWOSRULE_SKD_WQ_RT := n
 endif
 
 ifeq ($(XWOSCFG_SYNC_PLSEM),y)
   XWOSRULE_SYNC_SEM := y
+else ifeq ($(XWOSCFG_SYNC_RTSEM),y)
+  XWOSRULE_SYNC_SEM := y
 else
-  ifeq ($(XWOSCFG_SYNC_RTSEM),y)
-    XWOSRULE_SYNC_SEM := y
-  else
-    XWOSRULE_SYNC_SEM := n
-  endif
+  XWOSRULE_SYNC_SEM := n
 endif
 
 ######## ######## ######## ######## init ######## ######## ######## ########

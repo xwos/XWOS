@@ -18,7 +18,9 @@ XWMO_CSRCS := protocol.c hwifal.c hwif/uart.c mif.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
 
-XWMO_CXXSRCS := cxx/XwsscPortProxy.cxx
-XWMO_CXXFLAGS :=
+ifeq ($(XWMDCFG_isc_xwssc_CXX),y)
+  XWMO_CXXSRCS := cxx/XwsscPortProxy.cxx
+  XWMO_CXXFLAGS :=
+endif
 
 include xwbs/xwmo.mk

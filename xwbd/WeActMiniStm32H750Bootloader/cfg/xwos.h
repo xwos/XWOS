@@ -99,11 +99,13 @@
 #define XWOSCFG_SKD_THD_STDC_MM                         0
 #define XWOSCFG_SKD_THD_LOCAL_DATA_NUM                  (2U)
 #define XWOSCFG_SKD_THD_EXIT                            1
+#define XWOSCFG_SKD_THD_CXX                             0
 #define XWOSCFG_SKD_SWT                                 1
 #define XWOSCFG_SKD_SWT_MEMPOOL                         0
 #define XWOSCFG_SKD_SWT_MEMSLICE                        0
 #define XWOSCFG_SKD_SWT_SMA                             0
 #define XWOSCFG_SKD_SWT_STDC_MM                         0
+#define XWOSCFG_SKD_SWT_CXX                             0
 
 /******** ******** ******** sync ******** ******** ********/
 #define XWOSCFG_SYNC_PLSEM                              1
@@ -112,18 +114,21 @@
 #define XWOSCFG_SYNC_SEM_MEMSLICE                       0
 #define XWOSCFG_SYNC_SEM_SMA                            0
 #define XWOSCFG_SYNC_SEM_STDC_MM                        0
+#define XWOSCFG_SYNC_SEM_CXX                            0
 
 #define XWOSCFG_SYNC_COND                               1
 #define XWOSCFG_SYNC_COND_MEMPOOL                       0
 #define XWOSCFG_SYNC_COND_MEMSLICE                      0
 #define XWOSCFG_SYNC_COND_SMA                           0
 #define XWOSCFG_SYNC_COND_STDC_MM                       0
+#define XWOSCFG_SYNC_COND_CXX                           0
 
 #define XWOSCFG_SYNC_EVT                                1
 #define XWOSCFG_SYNC_EVT_MEMPOOL                        0
 #define XWOSCFG_SYNC_EVT_MEMSLICE                       0
 #define XWOSCFG_SYNC_EVT_SMA                            0
 #define XWOSCFG_SYNC_EVT_STDC_MM                        0
+#define XWOSCFG_SYNC_EVT_CXX                            0
 
 /******** ******** ******** lock ******** ******** ********/
 #define XWOSCFG_LOCK_MTX                                1
@@ -132,5 +137,9 @@
 #define XWOSCFG_LOCK_MTX_SMA                            0
 #define XWOSCFG_LOCK_MTX_STDC_MM                        0
 #define XWOSCFG_LOCK_FAKEMTX                            0
+#define XWOSCFG_LOCK_MTX_CXX                            0
+
+#define XWOSCFG_LOCK_SPLK_CXX                           0
+#define XWOSCFG_LOCK_SQLK_CXX                           0
 
 #endif /* cfg/xwos.h */

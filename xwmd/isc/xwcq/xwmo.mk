@@ -15,4 +15,10 @@ include xwbs/functions.mk
 XWMO_CSRCS := xwcq.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
+
+ifeq ($(XWMDCFG_isc_xwcq_CXX),y)
+  XWMO_CXXSRCS :=
+  XWMO_CXXFLAGS :=
+endif
+
 include xwbs/xwmo.mk
