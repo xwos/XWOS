@@ -68,3 +68,7 @@ ifeq ($(XWOSCFG_LOCK_MTX_CXX), y)
     XWOS_CXXSRCS += cxx/lock/DMtx.cxx
   endif
 endif
+
+ifeq ($(XWOSCFG_LOCK_SPLK_CXX), y)
+  XWOS_CXXSRCS += cxx/lock/Spinlock.cxx
+endif
