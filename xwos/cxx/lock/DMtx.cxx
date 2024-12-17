@@ -42,6 +42,9 @@ DMtx::Grd::Grd(DMtx * mtx, enum LockMode mode, xwtm_t to)
                 mRc = XWOK;
                 break;
         }
+        if (mRc < 0) {
+            mLockMode = DMtx::LockMode::DMtxUnlock;
+        }
     }
 }
 
@@ -49,6 +52,17 @@ DMtx::Grd::~Grd()
 {
     if (nullptr != mMtx) {
         if (DMtx::LockMode::DMtxUnlock != mLockMode) {
+            mLockMode = DMtx::LockMode::DMtxUnlock;
+            xwos_mtx_unlock(mMtx->mMtxDesc.mtx);
+        }
+    }
+}
+
+void DMtx::Grd::unlock()
+{
+    if (nullptr != mMtx) {
+        if (DMtx::LockMode::DMtxUnlock != mLockMode) {
+            mLockMode = DMtx::LockMode::DMtxUnlock;
             xwos_mtx_unlock(mMtx->mMtxDesc.mtx);
         }
     }
@@ -58,19 +72,22 @@ xwer_t DMtx::Grd::wait(sync::Cond * cond)
 {
     xwer_t rc;
     if (nullptr != mMtx) {
-        union xwos_ulock lock;
-        xwsq_t lkst;
-
-        lock.osal.mtx = mMtx->mMtxDesc.mtx;
-        if (DMtx::LockMode::DMtxLockUninterruptable == mLockMode) {
-            rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
-        } else {
-            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
-        }
-        if (rc < 0) {
-            if (XWOS_LKST_UNLOCKED == lkst) {
-                mLockMode = DMtx::LockMode::DMtxUnlock;
+        if (DMtx::LockMode::DMtxUnlock != mLockMode) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.mtx = mMtx->mMtxDesc.mtx;
+            if (DMtx::LockMode::DMtxLockUninterruptable == mLockMode) {
+                rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
+            } else {
+                rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
             }
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    mLockMode = DMtx::LockMode::DMtxUnlock;
+                }
+            }
+        } else {
+            rc = -ENOLCK;
         }
     } else {
         rc = -EFAULT;
@@ -82,18 +99,22 @@ xwer_t DMtx::Grd::wait(sync::Cond * cond, xwtm_t to)
 {
     xwer_t rc;
     if (nullptr != mMtx) {
-        union xwos_ulock lock;
-        xwsq_t lkst;
-        lock.osal.mtx = mMtx->mMtxDesc.mtx;
-        if (DMtx::LockMode::DMtxLockUninterruptable == mLockMode) {
-            rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
-        } else {
-            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, to, &lkst);
-        }
-        if (rc < 0) {
-            if (XWOS_LKST_UNLOCKED == lkst) {
-                mLockMode = DMtx::LockMode::DMtxUnlock;
+        if (DMtx::LockMode::DMtxUnlock != mLockMode) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.mtx = mMtx->mMtxDesc.mtx;
+            if (DMtx::LockMode::DMtxLockUninterruptable == mLockMode) {
+                rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
+            } else {
+                rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, to, &lkst);
             }
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    mLockMode = DMtx::LockMode::DMtxUnlock;
+                }
+            }
+        } else {
+            rc = -ENOLCK;
         }
     } else {
         rc = -EFAULT;

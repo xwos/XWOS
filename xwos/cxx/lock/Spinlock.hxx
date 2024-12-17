@@ -286,6 +286,13 @@ class Spinlock
         ~LkGrd();
 
         /**
+         * @brief 解锁自旋锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -445,6 +452,13 @@ class Spinlock
         ~LkThGrd();
 
         /**
+         * @brief 解锁自旋锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -601,6 +615,13 @@ class Spinlock
          * @brief 析构自旋锁的RAII机制守卫
          */
         ~LkBhGrd();
+
+        /**
+         * @brief 解锁自旋锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
 
         /**
          * @brief 获取锁状态
@@ -764,6 +785,13 @@ class Spinlock
          * @brief 析构自旋锁的RAII机制守卫
          */
         ~LkIrqsGrd();
+
+        /**
+         * @brief 解锁自旋锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
 
         /**
          * @brief 获取锁状态

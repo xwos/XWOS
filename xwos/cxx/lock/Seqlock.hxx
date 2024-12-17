@@ -506,6 +506,13 @@ class Seqlock
         ~RdexLkGrd();
 
         /**
+         * @brief 解锁顺序锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -516,8 +523,9 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
          * @note
          * + 上下文：线程
          * @details
@@ -551,9 +559,10 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -ETIMEDOUT: 超时
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
+         * @retval -ETIMEDOUT: 超时
          * @note
          * + 上下文：线程
          * @details
@@ -664,6 +673,13 @@ class Seqlock
         ~RdexLkThGrd();
 
         /**
+         * @brief 解锁顺序锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -675,8 +691,9 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
          * @note
          * + 上下文：线程
          * @details
@@ -710,9 +727,10 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -ETIMEDOUT: 超时
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
+         * @retval -ETIMEDOUT: 超时
          * @note
          * + 上下文：线程
          * @details
@@ -822,6 +840,13 @@ class Seqlock
         ~RdexLkBhGrd();
 
         /**
+         * @brief 解锁顺序锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -833,8 +858,9 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
          * @note
          * + 上下文：线程
          * @details
@@ -868,9 +894,10 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -ETIMEDOUT: 超时
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
+         * @retval -ETIMEDOUT: 超时
          * @note
          * + 上下文：线程
          * @details
@@ -984,6 +1011,13 @@ class Seqlock
         ~RdexLkIrqsGrd();
 
         /**
+         * @brief 解锁顺序锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -995,8 +1029,9 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
          * @note
          * + 上下文：线程
          * @details
@@ -1030,9 +1065,10 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -ETIMEDOUT: 超时
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
+         * @retval -ETIMEDOUT: 超时
          * @note
          * + 上下文：线程
          * @details
@@ -1144,6 +1180,13 @@ class Seqlock
         ~WrLkGrd();
 
         /**
+         * @brief 解锁顺序锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -1155,8 +1198,9 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
          * @note
          * + 上下文：线程
          * @details
@@ -1190,9 +1234,10 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -ETIMEDOUT: 超时
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
+         * @retval -ETIMEDOUT: 超时
          * @note
          * + 上下文：线程
          * @details
@@ -1303,6 +1348,13 @@ class Seqlock
         ~WrLkThGrd();
 
         /**
+         * @brief 解锁顺序锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -1314,8 +1366,9 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
          * @note
          * + 上下文：线程
          * @details
@@ -1349,9 +1402,10 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -ETIMEDOUT: 超时
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
+         * @retval -ETIMEDOUT: 超时
          * @note
          * + 上下文：线程
          * @details
@@ -1461,6 +1515,13 @@ class Seqlock
         ~WrLkBhGrd();
 
         /**
+         * @brief 解锁顺序锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -1472,8 +1533,9 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
          * @note
          * + 上下文：线程
          * @details
@@ -1507,9 +1569,10 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -ETIMEDOUT: 超时
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
+         * @retval -ETIMEDOUT: 超时
          * @note
          * + 上下文：线程
          * @details
@@ -1623,6 +1686,13 @@ class Seqlock
         ~WrLkIrqsGrd();
 
         /**
+         * @brief 解锁顺序锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取锁状态
          */
         enum LockStatus getStatus() { return mStatus; }
@@ -1634,8 +1704,9 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
          * @note
          * + 上下文：线程
          * @details
@@ -1669,9 +1740,10 @@ class Seqlock
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -ETIMEDOUT: 超时
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
+         * @retval -ETIMEDOUT: 超时
          * @note
          * + 上下文：线程
          * @details

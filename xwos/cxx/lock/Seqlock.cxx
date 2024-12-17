@@ -46,6 +46,16 @@ Seqlock::RdexLkGrd::~RdexLkGrd()
     }
 }
 
+void Seqlock::RdexLkGrd::unlock()
+{
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_rdex_unlock(&mSeqlock->mLock);
+        }
+    }
+}
+
 xwer_t Seqlock::RdexLkGrd::wait(sync::Cond * cond)
 {
     xwer_t rc;
@@ -141,6 +151,16 @@ Seqlock::RdexLkThGrd::RdexLkThGrd(Seqlock & seqlock)
 }
 
 Seqlock::RdexLkThGrd::~RdexLkThGrd()
+{
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_rdex_unlock_cpuirqrs(&mSeqlock->mLock, mCpuirq);
+        }
+    }
+}
+
+void Seqlock::RdexLkThGrd::unlock()
 {
     if (nullptr != mSeqlock) {
         if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
@@ -254,6 +274,16 @@ Seqlock::RdexLkBhGrd::~RdexLkBhGrd()
     }
 }
 
+void Seqlock::RdexLkBhGrd::unlock()
+{
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_rdex_unlock_bh(&mSeqlock->mLock);
+        }
+    }
+}
+
 xwer_t Seqlock::RdexLkBhGrd::wait(sync::Cond * cond)
 {
     xwer_t rc;
@@ -356,6 +386,18 @@ Seqlock::RdexLkIrqsGrd<TIrqList ...>::RdexLkIrqsGrd(Seqlock & seqlock)
 
 template<xwirq_t ... TIrqList>
 Seqlock::RdexLkIrqsGrd<TIrqList ...>::~RdexLkIrqsGrd()
+{
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_rdex_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                         sizeof...(TIrqList));
+        }
+    }
+}
+
+template<xwirq_t ... TIrqList>
+void Seqlock::RdexLkIrqsGrd<TIrqList ...>::unlock()
 {
     if (nullptr != mSeqlock) {
         if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
@@ -480,6 +522,16 @@ Seqlock::WrLkGrd::~WrLkGrd()
     }
 }
 
+void Seqlock::WrLkGrd::unlock()
+{
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_wr_unlock(&mSeqlock->mLock);
+        }
+    }
+}
+
 xwer_t Seqlock::WrLkGrd::wait(sync::Cond * cond)
 {
     xwer_t rc;
@@ -575,6 +627,16 @@ Seqlock::WrLkThGrd::WrLkThGrd(Seqlock & seqlock)
 }
 
 Seqlock::WrLkThGrd::~WrLkThGrd()
+{
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_wr_unlock_cpuirqrs(&mSeqlock->mLock, mCpuirq);
+        }
+    }
+}
+
+void Seqlock::WrLkThGrd::unlock()
 {
     if (nullptr != mSeqlock) {
         if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
@@ -688,6 +750,16 @@ Seqlock::WrLkBhGrd::~WrLkBhGrd()
     }
 }
 
+void Seqlock::WrLkBhGrd::unlock()
+{
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_wr_unlock_bh(&mSeqlock->mLock);
+        }
+    }
+}
+
 xwer_t Seqlock::WrLkBhGrd::wait(sync::Cond * cond)
 {
     xwer_t rc;
@@ -790,6 +862,18 @@ Seqlock::WrLkIrqsGrd<TIrqList ...>::WrLkIrqsGrd(Seqlock & seqlock)
 
 template<xwirq_t ... TIrqList>
 Seqlock::WrLkIrqsGrd<TIrqList ...>::~WrLkIrqsGrd()
+{
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_wr_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                       sizeof...(TIrqList));
+        }
+    }
+}
+
+template<xwirq_t ... TIrqList>
+void Seqlock::WrLkIrqsGrd<TIrqList ...>::unlock()
 {
     if (nullptr != mSeqlock) {
         if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
