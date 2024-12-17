@@ -1,0 +1,4 @@
+/**
+ * @defgroup xwos_cxx_sync XWOS的同步机制
+ * @ingroup xwos_cxx
+ */
