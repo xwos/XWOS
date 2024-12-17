@@ -64,6 +64,7 @@ class SThd
     xwer_t join(xwer_t * trc) { return xwos_thd_join(mThdDesc, trc); } /**< 等待线程结束并获取它的返回值 */
     xwer_t stop(xwer_t * trc) { return xwos_thd_stop(mThdDesc, trc); } /**< 通知线程退出，等待线程结束并获取它的返回值 */
     xwer_t detach() { return xwos_thd_detach(mThdDesc); } /**< 终止线程并等待它退出 */
+    struct xwos_thd * getXwosObj() { return mThdDesc.thd; } /**< 获取XWOS对象指针 */
 
     /* 生命周期管理 */
     xwer_t grab() { return xwos_thd_grab(mThdDesc); } /**< 增加引用计数 */

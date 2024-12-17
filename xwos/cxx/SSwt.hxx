@@ -58,6 +58,7 @@ class SSwt
                               (xwos_swt_f)sSwtAlarmFunction, this);
     }
     xwer_t stop() { return xwos_swt_stop(&mSwt); } /**< 停止软件定时器 */
+    struct xwos_swt * getXwosObj() { return &mSwt; } /**< 获取XWOS对象指针 */
 
     /* 生命周期管理 */
     xwer_t grab() { return xwos_swt_grab(&mSwt); } /**< 增加引用计数 */
