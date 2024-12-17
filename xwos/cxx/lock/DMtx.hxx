@@ -14,6 +14,7 @@
 #define __xwos_cxx_lock_DMtx_hxx__
 
 #include <xwos/osal/lock/mtx.hxx>
+#include <xwos/cxx/sync/Cond.hxx>
 
 namespace xwos {
 namespace lock {
@@ -29,8 +30,8 @@ namespace lock {
  *
  * `DMtx::Grd` 构造时会上锁互斥锁，析构时会自动解锁互斥锁。
  * `DMtx::Grd` 上锁模式分为：
- * + `DMtx::LockMode::DMtxLock` 默认等待模式，如果无法上锁，
- *   调用线程会阻塞等待上锁。
+ * + `DMtx::LockMode::DMtxUnlock` 未上锁。
+ * + `DMtx::LockMode::DMtxLock` 如果无法上锁，调用线程会阻塞等待上锁。
  * + `DMtx::LockMode::DMtxLockTimed` 定时等待模式，如果无法上锁，
  *   调用线程会定时阻塞等待上锁。
  * + `DMtx::LockMode::DMtxLockUninterruptable` 不可中断等待模式，
@@ -75,8 +76,8 @@ class DMtx
      * @brief 动态互斥锁的锁模式
      */
     enum LockMode : xwu32_t {
-        DMtxLock = 0, /**< 默认等待模式，如果无法上锁，
-                           调用线程会阻塞等待上锁。*/
+        DMtxUnlock = 0, /**< 未上锁 */
+        DMtxLock, /**< 如果无法上锁，调用线程会阻塞等待上锁。*/
         DMtxLockTimed, /**< 定时等待模式，如果无法上锁，
                             调用线程会定时阻塞等待上锁。*/
         DMtxLockUninterruptable, /**< 不可中断等待模式，如果无法上锁，
@@ -93,6 +94,7 @@ class DMtx
       private:
         DMtx * mMtx;
         xwer_t mRc; /**< 内部上锁CAPI的返回值 */
+        enum LockMode mLockMode;
 
       public:
         Grd() = delete;
@@ -111,8 +113,8 @@ class DMtx
          * + 上下文：线程
          * @details
          * + 上锁分为下列几种模式：
-         *   + `DMtx::LockMode::DMtxLock` 默认等待模式，如果无法上锁，
-         *     调用线程会阻塞等待上锁。
+         *   + `DMtx::LockMode::DMtxunLock` 未上锁。
+         *   + `DMtx::LockMode::DMtxLock` 如果无法上锁，调用线程会阻塞等待上锁。
          *   + `DMtx::LockMode::DMtxLockTimed` 定时等待模式，如果无法上锁，
          *     调用线程会定时阻塞等待上锁。
          *   + `DMtx::LockMode::DMtxLockUninterruptable` 不可中断等待模式，
@@ -166,9 +168,92 @@ class DMtx
          * @retval -EDSBH: 中断底半部被关闭
          */
         xwer_t getRc() { return mRc; }
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁互斥锁。
+         * + 如果构造 `DMtx::Grd` 时使用的模式是
+         *   `DMtx::LockMode::DMtxLockUninterruptable` ，那么等待模式也是不可中断的。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新上锁互斥锁，如果构造 `DMtx::Grd` 时使用的模式是
+         *   `DMtx::LockMode::DMtxLockUninterruptable` ，那么重新上锁的模式
+         *   也是 `DMtx::LockMode::DMtxLockUninterruptable` 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `DMtx::Grd::getLockMode()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁互斥锁。
+         * + 如果构造 `DMtx::Grd` 时使用的模式是
+         *   `DMtx::LockMode::DMtxLockUninterruptable` ，那么等待模式也是不可中断的，
+         *   此时参数 `to` 无效，等待将不会超时。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新上锁互斥锁，如果构造 `DMtx::Grd` 时使用的模式是
+         *   `DMtx::LockMode::DMtxLockUninterruptable` ，那么重新上锁的模式
+         *   也是 `DMtx::LockMode::DMtxLockUninterruptable` 。
+         * + 如果构造 `DMtx::Grd` 时使用的模式 **不是**
+         *   `DMtx::LockMode::DMtxLockUninterruptable` ，线程被唤醒时，若互斥锁被
+         *   其他线程占用，线程也最多等待互斥锁到时间点 `to` 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `DMtx::Grd::getLockMode()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
     };
 
-    friend Grd;
   private:
     xwos_mtx_d mMtxDesc; /**< 互斥锁对象描述符 */
     xwer_t mCtorRc; /**< 互斥锁构造的结果 */
@@ -181,6 +266,7 @@ class DMtx
     explicit DMtx(xwpr_t pr = XWOS_SKD_PRIORITY_RT_MAX);
     ~DMtx(); /**< 析构函数 */
     xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态互斥锁构造的结果 */
+    struct xwos_mtx * getXwosObj() { return mMtxDesc.mtx; } /**< 获取XWOS对象指针 */
 
     /* 生命周期管理 */
     xwer_t acquire() { return xwos_mtx_acquire(mMtxDesc); } /**< 增加引用计数 */

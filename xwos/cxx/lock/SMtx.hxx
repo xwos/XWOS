@@ -14,6 +14,7 @@
 #define __xwos_cxx_lock_SMtx_hxx__
 
 #include <xwos/osal/lock/mtx.hxx>
+#include <xwos/cxx/sync/Cond.hxx>
 
 namespace xwos {
 namespace lock {
@@ -29,8 +30,8 @@ namespace lock {
  *
  * `SMtx::Grd` 构造时会上锁互斥锁，析构时会自动解锁互斥锁。
  * `SMtx::Grd` 上锁模式分为：
- * + `SMtx::LockMode::SMtxLock` 默认等待模式，如果无法上锁，
- *   调用线程会阻塞等待上锁。
+ * + `SMtx::LockMode::SMtxUnlock` 未上锁。
+ * + `SMtx::LockMode::SMtxLock` 如果无法上锁，调用线程会阻塞等待上锁。
  * + `SMtx::LockMode::SMtxLockTimed` 定时等待模式，如果无法上锁，
  *   调用线程会定时阻塞等待上锁。
  * + `SMtx::LockMode::SMtxLockUninterruptable` 不可中断等待模式，
@@ -76,8 +77,8 @@ class SMtx
      * @brief 静态互斥锁的锁模式
      */
     enum LockMode : xwu32_t {
-        SMtxLock = 0, /**< 默认等待模式，如果无法上锁，
-                           调用线程会阻塞等待上锁。*/
+        SMtxUnlock = 0, /**< 未上锁 */
+        SMtxLock, /**< 如果无法上锁，调用线程会阻塞等待上锁。*/
         SMtxLockTimed, /**< 定时等待模式，如果无法上锁，
                             调用线程会定时阻塞等待上锁。*/
         SMtxLockUninterruptable, /**< 不可中断等待模式，如果无法上锁，
@@ -94,6 +95,7 @@ class SMtx
       private:
         SMtx * mMtx;
         xwer_t mRc; /**< 内部上锁CAPI的返回值 */
+        enum LockMode mLockMode;
 
       public:
         Grd() = delete;
@@ -112,8 +114,8 @@ class SMtx
          * + 上下文：线程
          * @details
          * + 上锁分为下列几种模式：
-         *   + `SMtx::LockMode::SMtxLock` 默认等待模式，如果无法上锁，
-         *     调用线程会阻塞等待上锁。
+         *   + `SMtx::LockMode::SMtxunLock` 未上锁。
+         *   + `SMtx::LockMode::SMtxLock` 如果无法上锁，调用线程会阻塞等待上锁。
          *   + `SMtx::LockMode::SMtxLockTimed` 定时等待模式，如果无法上锁，
          *     调用线程会定时阻塞等待上锁。
          *   + `SMtx::LockMode::SMtxLockUninterruptable` 不可中断等待模式，
@@ -166,9 +168,97 @@ class SMtx
          * @retval -EDSBH: 中断底半部被关闭
          */
         xwer_t getRc() { return mRc; }
+
+        /**
+         * @brief 获取上锁模式
+         */
+        enum LockMode getLockMode() { return mLockMode; }
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁互斥锁。
+         * + 如果构造 `SMtx::Grd` 时使用的模式是
+         *   `SMtx::LockMode::SMtxLockUninterruptable` ，那么等待模式也是不可中断的。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新上锁互斥锁，如果构造 `SMtx::Grd` 时使用的模式是
+         *   `SMtx::LockMode::SMtxLockUninterruptable` ，那么重新上锁的模式
+         *   也是 `SMtx::LockMode::SMtxLockUninterruptable` 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `SMtx::Grd::getLockMode()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁互斥锁。
+         * + 如果构造 `SMtx::Grd` 时使用的模式是
+         *   `SMtx::LockMode::SMtxLockUninterruptable` ，那么等待模式也是不可中断的，
+         *   此时参数 `to` 无效，等待将不会超时。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新上锁互斥锁，如果构造 `SMtx::Grd` 时使用的模式是
+         *   `SMtx::LockMode::SMtxLockUninterruptable` ，那么重新上锁的模式
+         *   也是 `SMtx::LockMode::SMtxLockUninterruptable` 。
+         * + 如果构造 `SMtx::Grd` 时使用的模式 **不是**
+         *   `SMtx::LockMode::SMtxLockUninterruptable` ，线程被唤醒时，若互斥锁被
+         *   其他线程占用，线程也最多等待互斥锁到时间点 `to` 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `SMtx::Grd::getLockMode()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
     };
 
-    friend Grd;
   private:
     struct xwos_mtx mLock; /**< 互斥锁结构体 */
     xwer_t mCtorRc; /**< 互斥锁构造的结果 */
@@ -181,6 +271,7 @@ class SMtx
     explicit SMtx(xwpr_t pr = XWOS_SKD_PRIORITY_RT_MAX);
     ~SMtx(); /**< 析构函数 */
     xwer_t getCtorRc() { return mCtorRc; } /**< 获取静态互斥锁构造的结果 */
+    struct xwos_mtx * getXwosObj() { return &mLock; } /**< 获取XWOS对象指针 */
 
     /* 生命周期管理 */
     xwer_t grab() { return xwos_mtx_grab(&mLock); } /**< 增加引用计数 */

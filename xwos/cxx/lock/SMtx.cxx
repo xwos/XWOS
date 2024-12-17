@@ -18,6 +18,7 @@ namespace lock {
 /* SMtx::Grd Non-static Member */
 SMtx::Grd::Grd(SMtx * mtx, enum LockMode mode, xwtm_t to)
     : mMtx(mtx)
+    , mLockMode(mode)
 {
     if (nullptr != mMtx) {
         switch (mode) {
@@ -33,6 +34,13 @@ SMtx::Grd::Grd(SMtx * mtx, enum LockMode mode, xwtm_t to)
             case SMtx::LockMode::SMtxLockTry:
                 mRc = xwos_mtx_trylock(&mMtx->mLock);
                 break;
+            case SMtx::LockMode::SMtxUnlock:
+                mRc = XWOK;
+                break;
+            default:
+                mLockMode = SMtx::LockMode::SMtxUnlock;
+                mRc = XWOK;
+                break;
         }
     }
 }
@@ -40,10 +48,57 @@ SMtx::Grd::Grd(SMtx * mtx, enum LockMode mode, xwtm_t to)
 SMtx::Grd::~Grd()
 {
     if (nullptr != mMtx) {
-        if (XWOK == mRc) {
+        if (SMtx::LockMode::SMtxUnlock != mLockMode) {
             xwos_mtx_unlock(&mMtx->mLock);
         }
     }
+}
+
+xwer_t SMtx::Grd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mMtx) {
+        union xwos_ulock lock;
+        xwsq_t lkst;
+        lock.osal.mtx = &mMtx->mLock;
+        if (SMtx::LockMode::SMtxLockUninterruptable == mLockMode) {
+            rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
+        } else {
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
+        }
+        if (rc < 0) {
+            if (XWOS_LKST_UNLOCKED == lkst) {
+                mLockMode = SMtx::LockMode::SMtxUnlock;
+            }
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t SMtx::Grd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mMtx) {
+        union xwos_ulock lock;
+        xwsq_t lkst;
+
+        lock.osal.mtx = &mMtx->mLock;
+        if (SMtx::LockMode::SMtxLockUninterruptable == mLockMode) {
+            rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
+        } else {
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, to, &lkst);
+        }
+        if (rc < 0) {
+            if (XWOS_LKST_UNLOCKED == lkst) {
+                mLockMode = SMtx::LockMode::SMtxUnlock;
+            }
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* SMtx Non-static Member */
