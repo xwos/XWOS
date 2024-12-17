@@ -14,6 +14,7 @@
 #define __xwos_cxx_lock_Seqlock_hxx__
 
 #include <xwos/osal/lock/seqlock.hxx>
+#include <xwos/cxx/sync/Cond.hxx>
 
 namespace xwos {
 namespace lock {
@@ -463,6 +464,15 @@ class Seqlock
 {
   public:
     /**
+     * @brief 锁状态
+     */
+    enum LockStatus : xwu32_t {
+        SeqlockUnlocked = 0,
+        SeqlockRdexLocked,
+        SeqlockWrLocked,
+    };
+
+    /**
      * @brief 独占读普通上锁模式下的顺序锁RAII机制守卫
      * @details
      * + 构造函数关闭当前CPU调度器的抢占，然后上锁顺序锁。
@@ -475,6 +485,7 @@ class Seqlock
     {
       protected:
         Seqlock * mSeqlock;
+        enum LockStatus mStatus;
 
       public:
         /**
@@ -494,8 +505,84 @@ class Seqlock
          */
         ~RdexLkGrd();
 
+        /**
+         * @brief 获取锁状态
+         */
+        enum LockStatus getStatus() { return mStatus; }
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
+
       protected:
-        RdexLkGrd(): mSeqlock(nullptr) {}
+        RdexLkGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
     };
 
     /**
@@ -555,6 +642,7 @@ class Seqlock
     {
       protected:
         Seqlock * mSeqlock;
+        enum LockStatus mStatus;
         xwreg_t mCpuirq; /**< 保存当前CPU的中断标志 */
 
       public:
@@ -575,8 +663,85 @@ class Seqlock
          */
         ~RdexLkThGrd();
 
+        /**
+         * @brief 获取锁状态
+         */
+        enum LockStatus getStatus() { return mStatus; }
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
+
       protected:
-        RdexLkThGrd(): mSeqlock(nullptr) {}
+        RdexLkThGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
     };
 
     /**
@@ -636,6 +801,7 @@ class Seqlock
     {
       protected:
         Seqlock * mSeqlock;
+        enum LockStatus mStatus;
 
       public:
         /**
@@ -655,8 +821,85 @@ class Seqlock
          */
         ~RdexLkBhGrd();
 
+        /**
+         * @brief 获取锁状态
+         */
+        enum LockStatus getStatus() { return mStatus; }
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
+
       protected:
-        RdexLkBhGrd(): mSeqlock(nullptr) {}
+        RdexLkBhGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
     };
 
     /**
@@ -718,6 +961,7 @@ class Seqlock
     {
       protected:
         Seqlock * mSeqlock;
+        enum LockStatus mStatus;
         xwirq_t mIrqs[sizeof...(TIrqList)];
         xwreg_t mIrqFlags[sizeof...(TIrqList)];
 
@@ -739,8 +983,85 @@ class Seqlock
          */
         ~RdexLkIrqsGrd();
 
+        /**
+         * @brief 获取锁状态
+         */
+        enum LockStatus getStatus() { return mStatus; }
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
+
       protected:
-        RdexLkIrqsGrd(): mSeqlock(nullptr) {}
+        RdexLkIrqsGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
     };
 
     /**
@@ -802,6 +1123,7 @@ class Seqlock
     {
       protected:
         Seqlock * mSeqlock;
+        enum LockStatus mStatus;
 
       public:
         /**
@@ -821,8 +1143,85 @@ class Seqlock
          */
         ~WrLkGrd();
 
+        /**
+         * @brief 获取锁状态
+         */
+        enum LockStatus getStatus() { return mStatus; }
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
+
       protected:
-        WrLkGrd(): mSeqlock(nullptr) {}
+        WrLkGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
     };
 
     /**
@@ -882,6 +1281,7 @@ class Seqlock
     {
       protected:
         Seqlock * mSeqlock;
+        enum LockStatus mStatus;
         xwreg_t mCpuirq; /**< 保存当前CPU的中断标志 */
 
       public:
@@ -902,8 +1302,85 @@ class Seqlock
          */
         ~WrLkThGrd();
 
+        /**
+         * @brief 获取锁状态
+         */
+        enum LockStatus getStatus() { return mStatus; }
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
+
       protected:
-        WrLkThGrd(): mSeqlock(nullptr) {}
+        WrLkThGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
     };
 
     /**
@@ -963,6 +1440,7 @@ class Seqlock
     {
       protected:
         Seqlock * mSeqlock;
+        enum LockStatus mStatus;
 
       public:
         /**
@@ -982,8 +1460,85 @@ class Seqlock
          */
         ~WrLkBhGrd();
 
+        /**
+         * @brief 获取锁状态
+         */
+        enum LockStatus getStatus() { return mStatus; }
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
+
       protected:
-        WrLkBhGrd(): mSeqlock(nullptr) {}
+        WrLkBhGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
     };
 
     /**
@@ -1045,6 +1600,7 @@ class Seqlock
     {
       protected:
         Seqlock * mSeqlock;
+        enum LockStatus mStatus;
         xwirq_t mIrqs[sizeof...(TIrqList)];
         xwreg_t mIrqFlags[sizeof...(TIrqList)];
 
@@ -1066,8 +1622,85 @@ class Seqlock
          */
         ~WrLkIrqsGrd();
 
+        /**
+         * @brief 获取锁状态
+         */
+        enum LockStatus getStatus() { return mStatus; }
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond);
+
+        /**
+         * @brief 等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond)` 。
+         */
+        xwer_t wait(sync::Cond & cond) { return wait(&cond); }
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的指针
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @retval XWOK: 没有错误
+         * @retval -EFAULT: 无效的指针或空指针
+         * @retval -EINVAL: 参数无效
+         * @retval -ETIMEDOUT: 超时
+         * @retval -EINTR: 等待被中断
+         * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 调用此C++API的线程会限时阻塞等待条件量，等待的同时会解锁顺序锁。
+         * + 条件量被单播 `sync::Cond::unicast()` 或广播 `sync::Cond::broadcast()`
+         *   时，会唤醒正在等待的线程。
+         * + 线程被唤醒后，会重新用之前的上锁方式上锁顺序锁 。
+         * + 重新上锁成功后将返回 `XWOK` 。
+         * + 线程的等待被中断后，此C++API返回 `-EINTR` 。
+         * + 线程的等待超时后，此C++API返回 `-ETIMEDOUT` 。
+         * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
+         *   使用 `getStatus()` 确认是否上锁成功。
+         */
+        xwer_t wait(sync::Cond * cond, xwtm_t to);
+
+        /**
+         * @brief 限时等待条件量
+         * @param[in] cond: 条件量对象的引用
+         * @param[in] to: 期望唤醒的时间点
+         * @return 错误码
+         * @note
+         * + 上下文：线程
+         * @details
+         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         */
+        xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
+
       protected:
-        WrLkIrqsGrd(): mSeqlock(nullptr) {}
+        WrLkIrqsGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
     };
 
     /**
@@ -1122,6 +1755,7 @@ class Seqlock
   public:
     Seqlock(); /**< 构造函数 */
     ~Seqlock(); /**< 析构函数 */
+    struct xwos_sqlk * getXwosObj() { return &mLock; } /**< 获取XWOS对象指针 */
 
     /**
      * @brief 开启共享读临界区
