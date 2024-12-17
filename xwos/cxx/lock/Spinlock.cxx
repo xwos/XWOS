@@ -18,25 +18,79 @@ namespace lock {
 /* Spinlock::LkGrd Non-static Member */
 Spinlock::LkGrd::LkGrd(Spinlock * spinlock)
     : mSpinlock(spinlock)
+    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
 {
     if (nullptr != mSpinlock) {
         xwos_splk_lock(&mSpinlock->mLock);
+        mStatus = Spinlock::LockStatus::SpinlockLocked;
     }
 }
 
 Spinlock::LkGrd::LkGrd(Spinlock & spinlock)
     : mSpinlock(&spinlock)
+    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
 {
     if (nullptr != mSpinlock) {
         xwos_splk_lock(&mSpinlock->mLock);
+        mStatus = Spinlock::LockStatus::SpinlockLocked;
     }
 }
 
 Spinlock::LkGrd::~LkGrd()
 {
     if (nullptr != mSpinlock) {
-        xwos_splk_unlock(&mSpinlock->mLock);
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+            xwos_splk_unlock(&mSpinlock->mLock);
+        }
     }
+}
+
+xwer_t Spinlock::LkGrd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.splk = &mSpinlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_splk_lock(&mSpinlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t Spinlock::LkGrd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.splk = &mSpinlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_splk_lock(&mSpinlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Spinlock::TryLkGrd Non-static Member */
@@ -48,6 +102,8 @@ Spinlock::TryLkGrd::TryLkGrd(Spinlock * spinlock)
         mRc = xwos_splk_trylock(&mSpinlock->mLock);
         if (XWOK != mRc) {
             mSpinlock = nullptr;
+        } else {
+            mStatus = Spinlock::LockStatus::SpinlockLocked;
         }
     }
 }
@@ -60,6 +116,8 @@ Spinlock::TryLkGrd::TryLkGrd(Spinlock & spinlock)
         mRc = xwos_splk_trylock(&mSpinlock->mLock);
         if (XWOK != mRc) {
             mSpinlock = nullptr;
+        } else {
+            mStatus = Spinlock::LockStatus::SpinlockLocked;
         }
     }
 }
@@ -67,25 +125,79 @@ Spinlock::TryLkGrd::TryLkGrd(Spinlock & spinlock)
 /* Spinlock::LkThGrd Non-static Member */
 Spinlock::LkThGrd::LkThGrd(Spinlock * spinlock)
     : mSpinlock(spinlock)
+    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
 {
     if (nullptr != mSpinlock) {
         xwos_splk_lock_cpuirqsv(&mSpinlock->mLock, &mCpuirq);
+        mStatus = Spinlock::LockStatus::SpinlockLocked;
     }
 }
 
 Spinlock::LkThGrd::LkThGrd(Spinlock & spinlock)
     : mSpinlock(&spinlock)
+    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
 {
     if (nullptr != mSpinlock) {
         xwos_splk_lock_cpuirqsv(&mSpinlock->mLock, &mCpuirq);
+        mStatus = Spinlock::LockStatus::SpinlockLocked;
     }
 }
 
 Spinlock::LkThGrd::~LkThGrd()
 {
     if (nullptr != mSpinlock) {
-        xwos_splk_unlock_cpuirqrs(&mSpinlock->mLock, mCpuirq);
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+            xwos_splk_unlock_cpuirqrs(&mSpinlock->mLock, mCpuirq);
+        }
     }
+}
+
+xwer_t Spinlock::LkThGrd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.splk = &mSpinlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_splk_lock(&mSpinlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t Spinlock::LkThGrd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.splk = &mSpinlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_splk_lock(&mSpinlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Spinlock::TryLkThGrd Non-static Member */
@@ -97,6 +209,8 @@ Spinlock::TryLkThGrd::TryLkThGrd(Spinlock * spinlock)
         mRc = xwos_splk_trylock_cpuirqsv(&mSpinlock->mLock, &mCpuirq);
         if (XWOK != mRc) {
             mSpinlock = nullptr;
+        } else {
+            mStatus = Spinlock::LockStatus::SpinlockLocked;
         }
     }
 }
@@ -109,6 +223,8 @@ Spinlock::TryLkThGrd::TryLkThGrd(Spinlock & spinlock)
         mRc = xwos_splk_trylock_cpuirqsv(&mSpinlock->mLock, &mCpuirq);
         if (XWOK != mRc) {
             mSpinlock = nullptr;
+        } else {
+            mStatus = Spinlock::LockStatus::SpinlockLocked;
         }
     }
 }
@@ -116,25 +232,79 @@ Spinlock::TryLkThGrd::TryLkThGrd(Spinlock & spinlock)
 /* Spinlock::LkBhGrd Non-static Member */
 Spinlock::LkBhGrd::LkBhGrd(Spinlock * spinlock)
     : mSpinlock(spinlock)
+    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
 {
     if (nullptr != mSpinlock) {
         xwos_splk_lock_bh(&mSpinlock->mLock);
+        mStatus = Spinlock::LockStatus::SpinlockLocked;
     }
 }
 
 Spinlock::LkBhGrd::LkBhGrd(Spinlock & spinlock)
     : mSpinlock(&spinlock)
+    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
 {
     if (nullptr != mSpinlock) {
         xwos_splk_lock_bh(&mSpinlock->mLock);
+        mStatus = Spinlock::LockStatus::SpinlockLocked;
     }
 }
 
 Spinlock::LkBhGrd::~LkBhGrd()
 {
     if (nullptr != mSpinlock) {
-        xwos_splk_unlock_bh(&mSpinlock->mLock);
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+            xwos_splk_unlock_bh(&mSpinlock->mLock);
+        }
     }
+}
+
+xwer_t Spinlock::LkBhGrd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.splk = &mSpinlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_splk_lock(&mSpinlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t Spinlock::LkBhGrd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.splk = &mSpinlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_splk_lock(&mSpinlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Spinlock::TryLkBhGrd Non-static Member */
@@ -146,6 +316,8 @@ Spinlock::TryLkBhGrd::TryLkBhGrd(Spinlock * spinlock)
         mRc = xwos_splk_trylock_bh(&mSpinlock->mLock);
         if (XWOK != mRc) {
             mSpinlock = nullptr;
+        } else {
+            mStatus = Spinlock::LockStatus::SpinlockLocked;
         }
     }
 }
@@ -158,6 +330,8 @@ Spinlock::TryLkBhGrd::TryLkBhGrd(Spinlock & spinlock)
         mRc = xwos_splk_trylock_bh(&mSpinlock->mLock);
         if (XWOK != mRc) {
             mSpinlock = nullptr;
+        } else {
+            mStatus = Spinlock::LockStatus::SpinlockLocked;
         }
     }
 }
@@ -166,21 +340,24 @@ Spinlock::TryLkBhGrd::TryLkBhGrd(Spinlock & spinlock)
 template<xwirq_t ... TIrqList>
 Spinlock::LkIrqsGrd<TIrqList ...>::LkIrqsGrd(Spinlock * spinlock)
     : mSpinlock(spinlock)
+    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
     , mIrqs{TIrqList ...}
 {
     if (nullptr != mSpinlock) {
         xwos_splk_lock_irqssv(&mSpinlock->mLock, mIrqs, mIrqFlags, sizeof...(TIrqList));
+        mStatus = Spinlock::LockStatus::SpinlockLocked;
     }
 }
 
 template<xwirq_t ... TIrqList>
 Spinlock::LkIrqsGrd<TIrqList ...>::LkIrqsGrd(Spinlock & spinlock)
     : mSpinlock(&spinlock)
+    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
     , mIrqs{TIrqList ...}
 {
     if (nullptr != mSpinlock) {
-        xwos_splk_lock_irqssv(&mSpinlock->mLock, mIrqs, mIrqFlags,
-                              sizeof...(TIrqList));
+        xwos_splk_lock_irqssv(&mSpinlock->mLock, mIrqs, mIrqFlags, sizeof...(TIrqList));
+        mStatus = Spinlock::LockStatus::SpinlockLocked;
     }
 }
 
@@ -188,9 +365,61 @@ template<xwirq_t ... TIrqList>
 Spinlock::LkIrqsGrd<TIrqList ...>::~LkIrqsGrd()
 {
     if (nullptr != mSpinlock) {
-        xwos_splk_unlock_irqsrs(&mSpinlock->mLock, mIrqs, mIrqFlags,
-                                sizeof...(TIrqList));
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+            xwos_splk_unlock_irqsrs(&mSpinlock->mLock, mIrqs, mIrqFlags,
+                                    sizeof...(TIrqList));
+        }
     }
+}
+
+template <xwirq_t ... TIrqList>
+xwer_t Spinlock::LkIrqsGrd<TIrqList ...>::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.splk = &mSpinlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_splk_lock(&mSpinlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+template <xwirq_t ... TIrqList>
+xwer_t Spinlock::LkIrqsGrd<TIrqList ...>::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.splk = &mSpinlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_splk_lock(&mSpinlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Spinlock::LkIrqsGrd Non-static Member */
@@ -206,6 +435,8 @@ Spinlock::TryLkIrqsGrd<TIrqList ...>::TryLkIrqsGrd(Spinlock * spinlock)
                                        sizeof...(TIrqList));
         if (XWOK != mRc) {
             LkIrqsGrd<TIrqList ...>::mSpinlock = nullptr;
+        } else {
+            LkIrqsGrd<TIrqList ...>::mStatus = Spinlock::LockStatus::SpinlockLocked;
         }
     }
 }
@@ -222,6 +453,8 @@ Spinlock::TryLkIrqsGrd<TIrqList ...>::TryLkIrqsGrd(Spinlock & spinlock)
                                        sizeof...(TIrqList));
         if (XWOK != mRc) {
             LkIrqsGrd<TIrqList ...>::mSpinlock = nullptr;
+        } else {
+            LkIrqsGrd<TIrqList ...>::mStatus = Spinlock::LockStatus::SpinlockLocked;
         }
     }
 }
