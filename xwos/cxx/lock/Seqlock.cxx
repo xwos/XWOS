@@ -18,25 +18,80 @@ namespace lock {
 /* Seqlock::RdexLkGrd Non-static Member */
 Seqlock::RdexLkGrd::RdexLkGrd(Seqlock * seqlock)
     : mSeqlock(seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+        mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
     }
 }
 
 Seqlock::RdexLkGrd::RdexLkGrd(Seqlock & seqlock)
     : mSeqlock(&seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+        mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
     }
 }
 
 Seqlock::RdexLkGrd::~RdexLkGrd()
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_rdex_unlock(&mSeqlock->mLock);
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_rdex_unlock(&mSeqlock->mLock);
+        }
     }
+}
+
+xwer_t Seqlock::RdexLkGrd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX, nullptr,
+                                &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t Seqlock::RdexLkGrd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Seqlock::TryRdexLkGrd Non-static Member */
@@ -67,25 +122,80 @@ Seqlock::TryRdexLkGrd::TryRdexLkGrd(Seqlock & seqlock)
 /* Seqlock::RdexLkThGrd Non-static Member */
 Seqlock::RdexLkThGrd::RdexLkThGrd(Seqlock * seqlock)
     : mSeqlock(seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_rdex_lock_cpuirqsv(&mSeqlock->mLock, &mCpuirq);
+        mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
     }
 }
 
 Seqlock::RdexLkThGrd::RdexLkThGrd(Seqlock & seqlock)
     : mSeqlock(&seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_rdex_lock_cpuirqsv(&mSeqlock->mLock, &mCpuirq);
+        mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
     }
 }
 
 Seqlock::RdexLkThGrd::~RdexLkThGrd()
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_rdex_unlock_cpuirqrs(&mSeqlock->mLock, mCpuirq);
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_rdex_unlock_cpuirqrs(&mSeqlock->mLock, mCpuirq);
+        }
     }
+}
+
+xwer_t Seqlock::RdexLkThGrd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX, nullptr,
+                                &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t Seqlock::RdexLkThGrd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Seqlock::TryRdexLkThGrd Non-static Member */
@@ -116,25 +226,80 @@ Seqlock::TryRdexLkThGrd::TryRdexLkThGrd(Seqlock & seqlock)
 /* Seqlock::RdexLkBhGrd Non-static Member */
 Seqlock::RdexLkBhGrd::RdexLkBhGrd(Seqlock * seqlock)
     : mSeqlock(seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_rdex_lock_bh(&mSeqlock->mLock);
+        mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
     }
 }
 
 Seqlock::RdexLkBhGrd::RdexLkBhGrd(Seqlock & seqlock)
     : mSeqlock(&seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_rdex_lock_bh(&mSeqlock->mLock);
+        mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
     }
 }
 
 Seqlock::RdexLkBhGrd::~RdexLkBhGrd()
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_rdex_unlock_bh(&mSeqlock->mLock);
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_rdex_unlock_bh(&mSeqlock->mLock);
+        }
     }
+}
+
+xwer_t Seqlock::RdexLkBhGrd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX, nullptr,
+                                &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t Seqlock::RdexLkBhGrd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Seqlock::TryRdexLkBhGrd Non-static Member */
@@ -166,21 +331,26 @@ Seqlock::TryRdexLkBhGrd::TryRdexLkBhGrd(Seqlock & seqlock)
 template<xwirq_t ... TIrqList>
 Seqlock::RdexLkIrqsGrd<TIrqList ...>::RdexLkIrqsGrd(Seqlock * seqlock)
     : mSeqlock(seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
     , mIrqs{TIrqList ...}
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_rdex_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags, sizeof...(TIrqList));
+        xwos_sqlk_rdex_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                   sizeof...(TIrqList));
+        mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
     }
 }
 
 template<xwirq_t ... TIrqList>
 Seqlock::RdexLkIrqsGrd<TIrqList ...>::RdexLkIrqsGrd(Seqlock & seqlock)
     : mSeqlock(&seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
     , mIrqs{TIrqList ...}
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_rdex_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags,
                                    sizeof...(TIrqList));
+        mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
     }
 }
 
@@ -188,12 +358,65 @@ template<xwirq_t ... TIrqList>
 Seqlock::RdexLkIrqsGrd<TIrqList ...>::~RdexLkIrqsGrd()
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_rdex_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
-                                     sizeof...(TIrqList));
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_rdex_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                         sizeof...(TIrqList));
+        }
     }
 }
 
-/* Seqlock::RdexLkIrqsGrd Non-static Member */
+template<xwirq_t ... TIrqList>
+xwer_t Seqlock::RdexLkIrqsGrd<TIrqList ...>::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX, nullptr,
+                                &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+template<xwirq_t ... TIrqList>
+xwer_t Seqlock::RdexLkIrqsGrd<TIrqList ...>::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+/* Seqlock::TryRdexLkIrqsGrd Non-static Member */
 template<xwirq_t ... TIrqList>
 Seqlock::TryRdexLkIrqsGrd<TIrqList ...>::TryRdexLkIrqsGrd(Seqlock * seqlock)
     : RdexLkIrqsGrd<TIrqList ...>()
@@ -229,25 +452,80 @@ Seqlock::TryRdexLkIrqsGrd<TIrqList ...>::TryRdexLkIrqsGrd(Seqlock & seqlock)
 /* Seqlock::WrLkGrd Non-static Member */
 Seqlock::WrLkGrd::WrLkGrd(Seqlock * seqlock)
     : mSeqlock(seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_wr_lock(&mSeqlock->mLock);
+        mStatus = Seqlock::LockStatus::SeqlockWrLocked;
     }
 }
 
 Seqlock::WrLkGrd::WrLkGrd(Seqlock & seqlock)
     : mSeqlock(&seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_wr_lock(&mSeqlock->mLock);
+        mStatus = Seqlock::LockStatus::SeqlockWrLocked;
     }
 }
 
 Seqlock::WrLkGrd::~WrLkGrd()
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_wr_unlock(&mSeqlock->mLock);
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_wr_unlock(&mSeqlock->mLock);
+        }
     }
+}
+
+xwer_t Seqlock::WrLkGrd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR, nullptr,
+                                &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t Seqlock::WrLkGrd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Seqlock::TryWrLkGrd Non-static Member */
@@ -278,25 +556,80 @@ Seqlock::TryWrLkGrd::TryWrLkGrd(Seqlock & seqlock)
 /* Seqlock::WrLkThGrd Non-static Member */
 Seqlock::WrLkThGrd::WrLkThGrd(Seqlock * seqlock)
     : mSeqlock(seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_wr_lock_cpuirqsv(&mSeqlock->mLock, &mCpuirq);
+        mStatus = Seqlock::LockStatus::SeqlockWrLocked;
     }
 }
 
 Seqlock::WrLkThGrd::WrLkThGrd(Seqlock & seqlock)
     : mSeqlock(&seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_wr_lock_cpuirqsv(&mSeqlock->mLock, &mCpuirq);
+        mStatus = Seqlock::LockStatus::SeqlockWrLocked;
     }
 }
 
 Seqlock::WrLkThGrd::~WrLkThGrd()
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_wr_unlock_cpuirqrs(&mSeqlock->mLock, mCpuirq);
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_wr_unlock_cpuirqrs(&mSeqlock->mLock, mCpuirq);
+        }
     }
+}
+
+xwer_t Seqlock::WrLkThGrd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR, nullptr,
+                                &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t Seqlock::WrLkThGrd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Seqlock::TryWrLkThGrd Non-static Member */
@@ -327,25 +660,80 @@ Seqlock::TryWrLkThGrd::TryWrLkThGrd(Seqlock & seqlock)
 /* Seqlock::WrLkBhGrd Non-static Member */
 Seqlock::WrLkBhGrd::WrLkBhGrd(Seqlock * seqlock)
     : mSeqlock(seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_wr_lock_bh(&mSeqlock->mLock);
+        mStatus = Seqlock::LockStatus::SeqlockWrLocked;
     }
 }
 
 Seqlock::WrLkBhGrd::WrLkBhGrd(Seqlock & seqlock)
     : mSeqlock(&seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_wr_lock_bh(&mSeqlock->mLock);
+        mStatus = Seqlock::LockStatus::SeqlockWrLocked;
     }
 }
 
 Seqlock::WrLkBhGrd::~WrLkBhGrd()
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_wr_unlock_bh(&mSeqlock->mLock);
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_wr_unlock_bh(&mSeqlock->mLock);
+        }
     }
+}
+
+xwer_t Seqlock::WrLkBhGrd::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR, nullptr,
+                                &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+xwer_t Seqlock::WrLkBhGrd::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
 }
 
 /* Seqlock::TryWrLkBhGrd Non-static Member */
@@ -377,21 +765,26 @@ Seqlock::TryWrLkBhGrd::TryWrLkBhGrd(Seqlock & seqlock)
 template<xwirq_t ... TIrqList>
 Seqlock::WrLkIrqsGrd<TIrqList ...>::WrLkIrqsGrd(Seqlock * seqlock)
     : mSeqlock(seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
     , mIrqs{TIrqList ...}
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_wr_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags, sizeof...(TIrqList));
+        xwos_sqlk_wr_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                 sizeof...(TIrqList));
+        mStatus = Seqlock::LockStatus::SeqlockWrLocked;
     }
 }
 
 template<xwirq_t ... TIrqList>
 Seqlock::WrLkIrqsGrd<TIrqList ...>::WrLkIrqsGrd(Seqlock & seqlock)
     : mSeqlock(&seqlock)
+    , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
     , mIrqs{TIrqList ...}
 {
     if (nullptr != mSeqlock) {
         xwos_sqlk_wr_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags,
                                  sizeof...(TIrqList));
+        mStatus = Seqlock::LockStatus::SeqlockWrLocked;
     }
 }
 
@@ -399,12 +792,65 @@ template<xwirq_t ... TIrqList>
 Seqlock::WrLkIrqsGrd<TIrqList ...>::~WrLkIrqsGrd()
 {
     if (nullptr != mSeqlock) {
-        xwos_sqlk_wr_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
-                                   sizeof...(TIrqList));
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+            xwos_sqlk_wr_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                       sizeof...(TIrqList));
+        }
     }
 }
 
-/* Seqlock::WrLkIrqsGrd Non-static Member */
+template<xwirq_t ... TIrqList>
+xwer_t Seqlock::WrLkIrqsGrd<TIrqList ...>::wait(sync::Cond * cond)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR, nullptr,
+                                &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+template<xwirq_t ... TIrqList>
+xwer_t Seqlock::WrLkIrqsGrd<TIrqList ...>::wait(sync::Cond * cond, xwtm_t to)
+{
+    xwer_t rc;
+    if (nullptr != mSeqlock) {
+        if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+            union xwos_ulock lock;
+            xwsq_t lkst;
+            lock.osal.sqlk = &mSeqlock->mLock;
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR, nullptr,
+                                   to, &lkst);
+            if (rc < 0) {
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                    xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                }
+            }
+        } else {
+            rc = -ENOLCK;
+        }
+    } else {
+        rc = -EFAULT;
+    }
+    return rc;
+}
+
+/* Seqlock::TryWrLkIrqsGrd Non-static Member */
 template<xwirq_t ... TIrqList>
 Seqlock::TryWrLkIrqsGrd<TIrqList ...>::TryWrLkIrqsGrd(Seqlock * seqlock)
     : WrLkIrqsGrd<TIrqList ...>()
