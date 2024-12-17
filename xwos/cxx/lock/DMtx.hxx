@@ -156,6 +156,13 @@ class DMtx
         ~Grd();
 
         /**
+         * @brief 解锁互斥锁
+         * @details
+         * + 主动解锁后，析构函数将不再解锁。
+         */
+        void unlock();
+
+        /**
          * @brief 获取上锁结果错误码
          * @return 错误码
          * @retval XWOK: 没有错误
@@ -176,8 +183,9 @@ class DMtx
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
          * @note
          * + 上下文：线程
          * @details
@@ -215,9 +223,10 @@ class DMtx
          * @retval XWOK: 没有错误
          * @retval -EFAULT: 无效的指针或空指针
          * @retval -EINVAL: 参数无效
-         * @retval -ETIMEDOUT: 超时
-         * @retval -EINTR: 等待被中断
          * @retval -ENOTTHDCTX: 不在线程上下文中
+         * @retval -ENOLCK: 未上锁
+         * @retval -EINTR: 等待被中断
+         * @retval -ETIMEDOUT: 超时
          * @note
          * + 上下文：线程
          * @details

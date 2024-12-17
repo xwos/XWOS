@@ -46,6 +46,16 @@ Spinlock::LkGrd::~LkGrd()
     }
 }
 
+void Spinlock::LkGrd::unlock()
+{
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+            xwos_splk_unlock(&mSpinlock->mLock);
+        }
+    }
+}
+
 xwer_t Spinlock::LkGrd::wait(sync::Cond * cond)
 {
     xwer_t rc;
@@ -144,6 +154,16 @@ Spinlock::LkThGrd::LkThGrd(Spinlock & spinlock)
 }
 
 Spinlock::LkThGrd::~LkThGrd()
+{
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+            xwos_splk_unlock_cpuirqrs(&mSpinlock->mLock, mCpuirq);
+        }
+    }
+}
+
+void Spinlock::LkThGrd::unlock()
 {
     if (nullptr != mSpinlock) {
         if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
@@ -260,6 +280,16 @@ Spinlock::LkBhGrd::~LkBhGrd()
     }
 }
 
+void Spinlock::LkBhGrd::unlock()
+{
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+            xwos_splk_unlock_bh(&mSpinlock->mLock);
+        }
+    }
+}
+
 xwer_t Spinlock::LkBhGrd::wait(sync::Cond * cond)
 {
     xwer_t rc;
@@ -363,6 +393,18 @@ Spinlock::LkIrqsGrd<TIrqList ...>::LkIrqsGrd(Spinlock & spinlock)
 
 template<xwirq_t ... TIrqList>
 Spinlock::LkIrqsGrd<TIrqList ...>::~LkIrqsGrd()
+{
+    if (nullptr != mSpinlock) {
+        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+            xwos_splk_unlock_irqsrs(&mSpinlock->mLock, mIrqs, mIrqFlags,
+                                    sizeof...(TIrqList));
+        }
+    }
+}
+
+template<xwirq_t ... TIrqList>
+void Spinlock::LkIrqsGrd<TIrqList ...>::unlock()
 {
     if (nullptr != mSpinlock) {
         if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
