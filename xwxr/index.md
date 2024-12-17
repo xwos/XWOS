@@ -47,6 +47,9 @@
     + @subpage xwos_cxx_lock_DMtx
     + @subpage xwos_cxx_lock_Spinlock
     + @subpage xwos_cxx_lock_Seqlock
+  + @subpage xwos_cxx_sync
+    + @subpage xwos_cxx_sync_SCond
+    + @subpage xwos_cxx_sync_DCond
 + @subpage xwmd
   + @subpage xwmd_isc
     + @subpage xwmd_isc_xwcq

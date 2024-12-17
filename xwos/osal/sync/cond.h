@@ -58,8 +58,9 @@
  *
  * ## 使用信号选择器选择条件量
  *
- * + `xwos_cond_bind()` ：将条件量绑定到 [信号选择器](../Docs/TechRefManual/Sync/Sel) 上
+ * + `xwos_cond_bind()` ：绑定条件量到 [信号选择器](../Docs/TechRefManual/Sync/Sel)
  * + `xwos_cond_unbind()` ：从 [信号选择器](../Docs/TechRefManual/Sync/Sel) 上解绑
+ *   条件量
  *
  *
  * ## 条件量对象的生命周期管理
@@ -74,7 +75,7 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知条件量对象的指针的情况下，可以通过 `xwos_cond_get_d()` 获取 @ref xwos_cond_d ，
+ * 已知条件量对象指针的情况下，可以通过 `xwos_cond_get_d()` 获取 @ref xwos_cond_d ，
  * 或可以通过 `xwos_cond_get_tik()` 获取对象标签。
  *
  *
@@ -315,10 +316,8 @@ xwer_t xwos_cond_unbind(struct xwos_cond * cond, struct xwos_sel * sel)
  * @note
  * + 上下文：任意
  * @details
- * 已冻结的条件量对象不允许单播或广播，但可以被等待，
- * 测试条件量对象的线程会加入到条件量对象的等待队列中阻塞等待。
- *
- * 对已经冻结的条件量再次冻结，将返回 `-EALREADY` 。
+ * + 已冻结的条件量不允许单播或广播，但可以被线程等待。
+ * + 对已经冻结的条件量再次冻结，将返回 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_freeze(struct xwos_cond * cond)
@@ -336,8 +335,8 @@ xwer_t xwos_cond_freeze(struct xwos_cond * cond)
  * @note
  * + 上下文：任意
  * @details
- * 此函数只对已冻结的条件量对象起作用，
- * 对未冻结的条件量对象调用此函数将返回错误码 `-EALREADY` 。
+ * + 此函数只对已冻结的条件量对象起作用，
+ *   对未冻结的条件量对象调用此函数将返回错误码 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_thaw(struct xwos_cond * cond)
@@ -346,7 +345,7 @@ xwer_t xwos_cond_thaw(struct xwos_cond * cond)
 }
 
 /**
- * @brief XWOS API：广播条件量对象，等待队列中的所有线程都会被唤醒
+ * @brief XWOS API：广播条件量对象
  * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -355,7 +354,9 @@ xwer_t xwos_cond_thaw(struct xwos_cond * cond)
  * @note
  * + 上下文：任意
  * @details
- * 此函数只对未冻结的条件量对象起作用，已冻结的条件量对象将得到错误码 `-ENEGATIVE` 。
+ * + 广播条件量会唤醒所有等待的线程。
+ * + 此CAPI只对未冻结的条件量对象起作用，已冻结的条件量对象将返回
+ *   错误码 `-ENEGATIVE` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_broadcast(struct xwos_cond * cond)
@@ -364,7 +365,7 @@ xwer_t xwos_cond_broadcast(struct xwos_cond * cond)
 }
 
 /**
- * @brief XWOS API：单播条件量对象，只会唤醒第一个线程
+ * @brief XWOS API：单播条件量对象
  * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -373,7 +374,9 @@ xwer_t xwos_cond_broadcast(struct xwos_cond * cond)
  * @note
  * + 上下文：任意
  * @details
- * 此函数只对未冻结的条件量对象起作用，已冻结的条件量对象将得到错误码 `-ENEGATIVE` 。
+ * + 单播条件量会唤醒第一个等待的线程。
+ * + 此CAPI只对未冻结的条件量对象起作用，已冻结的条件量对象将返回
+ *   错误码 `-ENEGATIVE` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_unicast(struct xwos_cond * cond)
@@ -382,7 +385,7 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
 }
 
 /**
- * @brief XWOS API：阻塞当前线程，直到被条件量唤醒
+ * @brief XWOS API：等待条件量
  * @param[in] cond: 条件量对象的指针
  * @param[in] lock: 锁
  * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
@@ -399,8 +402,12 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
  * @note
  * + 上下文：线程
  * @details
- * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
- *   实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
+ * + 调用此CAPI的线程会阻塞等待条件量，等待的同时会解锁一个锁。
+ * + 条件量被单播 `xwos_cond_unicast()` 或广播 `xwos_cond_broadcast()` 时，
+ *   会唤醒正在等待的线程，线程会重新对锁进行上锁，上锁成功此CAPI返回 `XWOK` 。
+ * + 重新上锁时，当锁类型是互斥锁时，若互斥锁被其他线程占用，将继续阻塞等待互斥锁。
+ * + 所有类型的锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
+ *   实际是一个指针，有些锁还需要伴生数据 `lkdata` ：
  *   + `XWOS_LK_MTX` ：互斥锁
  *     + `lock` ：代表互斥锁（访问方式： `lock.osal.mtx` ）；
  *     + `lockdata` ：无作用，设置为 `NULL` 即可；
@@ -416,8 +423,10 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
  *   + `XWOS_LK_CALLBACK` ：自定义的加锁与解锁函数
  *     + `lock` ：代表指向 `struct xwlk_cblk` 的指针（访问方式： `lock.cb` ）；
  *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
- * + `lkst` 用于返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
- *   但若返回错误码时，锁的状态不确定。
+ * + `lkst` 用于返回锁的状态。
+ *   + 此CAPI返回 `XWOK` 时，锁状态一定是 **已上锁( `XWOS_LKST_LOCKED` )** 。
+ *   + 此CAPI返回其他错误码时，锁的状态不确定，需要通过返回值 `lkst` 查询。
+ * + 线程的等待被中断后，此CAPI返回 `-EINTR` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_wait(struct xwos_cond * cond,
@@ -428,7 +437,7 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
 }
 
 /**
- * @brief XWOS API：限时阻塞当前线程，直到被条件量唤醒
+ * @brief XWOS API：限时等待条件量
  * @param[in] cond: 条件量对象的指针
  * @param[in] lock: 锁
  * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
@@ -447,8 +456,13 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * @note
  * + 上下文：线程
  * @details
- * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
- *   实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
+ * + 调用此CAPI的线程会阻塞等待条件量，等待的同时会解锁一个锁。
+ * + 条件量被单播 `xwos_cond_unicast()` 或广播 `xwos_cond_broadcast()` 时，
+ *   会唤醒正在等待的线程，线程会重新对锁进行上锁，上锁成功此CAPI返回 `XWOK` 。
+ * + 重新上锁时，当锁类型是互斥锁时，若互斥锁被其他线程占用，将继续阻塞等待互斥锁，
+ *   直到超时的时间点 `to` 。
+ * + 所有类型的锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
+ *   实际是一个指针，有些锁还需要伴生数据 `lkdata` ：
  *   + `XWOS_LK_MTX` ：互斥锁
  *     + `lock` ：代表互斥锁（访问方式： `lock.osal.mtx` ）；
  *     + `lockdata` ：无作用，设置为 `NULL` 即可；
@@ -464,12 +478,15 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  *   + `XWOS_LK_CALLBACK` ：自定义的加锁与解锁函数
  *     + `lock` ：代表指向 `struct xwlk_cblk` 的指针（访问方式： `lock.cb` ）；
  *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
- * + `lkst` 用于返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
- *   但若返回错误码时，锁的状态不确定。
  * + `to` 表示等待超时的时间点：
  *   + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
  *     可以使用 `xwtm_ft(delta)` 表示；
- *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ *   + 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ * + `lkst` 用于返回锁的状态。
+ *   + 此CAPI返回 `XWOK` 时，锁状态一定是 **已上锁( `XWOS_LKST_LOCKED` )** 。
+ *   + 此CAPI返回其他错误码时，锁的状态不确定，需要通过返回值 `lkst` 查询。
+ * + 线程的等待被中断后，此CAPI返回 `-EINTR` 。
+ * + 线程的等待超时后，此CAPI返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
@@ -480,7 +497,7 @@ xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
 }
 
 /**
- * @brief XWOS API：阻塞当前线程，直到被条件量唤醒，且阻塞不可被中断
+ * @brief XWOS API：不可中断地等待条件量
  * @param[in] cond: 条件量对象的指针
  * @param[in] lock: 锁
  * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
@@ -496,8 +513,13 @@ xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
  * @note
  * + 上下文：线程
  * @details
- * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
- *   实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
+ * + 调用此CAPI的线程会阻塞等待条件量，且等待不可被中断，等待的同时会解锁一个锁。
+ * + 条件量被单播 `xwos_cond_unicast()` 或广播 `xwos_cond_broadcast()` 时，
+ *   会唤醒正在等待的线程，线程会重新对锁进行上锁，上锁成功此CAPI返回 `XWOK` 。
+ * + 重新上锁时，当锁类型是互斥锁时，若互斥锁被其他线程占用，将继续阻塞等待互斥锁，
+ *   且使用CAPI `xwos_mtx_lock_unitr()` 进行等待。
+ * + 所有类型的锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
+ *   实际是一个指针，有些锁还需要伴生数据 `lkdata` ：
  *   + `XWOS_LK_MTX` ：互斥锁
  *     + `lock` ：代表互斥锁（访问方式： `lock.osal.mtx` ）；
  *     + `lockdata` ：无作用，设置为 `NULL` 即可；
@@ -513,8 +535,9 @@ xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
  *   + `XWOS_LK_CALLBACK` ：自定义的加锁与解锁函数
  *     + `lock` ：代表指向 `struct xwlk_cblk` 的指针（访问方式： `lock.cb` ）；
  *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
- * + `lkst` 用于返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
- *   但若返回错误码时，锁的状态不确定。
+ * + `lkst` 用于返回锁的状态。
+ *   + 此CAPI返回 `XWOK` 时，锁状态一定是 **已上锁( `XWOS_LKST_LOCKED` )** 。
+ *   + 此CAPI返回其他错误码时，锁的状态不确定，需要通过返回值 `lkst` 查询。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_wait_unintr(struct xwos_cond * cond,
