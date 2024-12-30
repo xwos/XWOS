@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：系统硬件定时器
+ * @brief SOC描述层：初始化
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_syshwt_h__
-#define __xwosimpl_syshwt_h__
+#ifndef __xwcd_soc_arm_v7m_m4_fc4150_soc_init_h__
+#define __xwcd_soc_arm_v7m_m4_fc4150_soc_init_h__
 
-#ifndef __xwos_ospl_syshwt_h__
-#  error "This file should be included from <xwos/ospl/syshwt.h>."
-#endif
+#include <xwos/standard.h>
 
-#endif /* xwcd/soc/arm/v7m/m7/fc7300/xwosimpl_syshwt.h */
+void soc_isr_reset(void);
+void soc_relocate_ivt(void);
+void soc_relocate_data(void);
+void soc_disable_wdg(void);
+
+#endif /* xwcd/soc/arm/v7m/m4/fc4150/soc_init.h */

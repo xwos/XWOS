@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：系统硬件定时器
+ * @brief XWOS移植实现层：中断
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,35 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_syshwt_h__
-#define __xwosimpl_syshwt_h__
+#include <xwos/standard.h>
+#include <xwcd/soc/arm/v7m/arch_irq.h>
 
-#ifndef __xwos_ospl_syshwt_h__
-#  error "This file should be included from <xwos/ospl/syshwt.h>."
-#endif
+__xwbsp_code
+xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf)
+{
+        return arch_nvic_irq_get_id(irqnbuf);
+}
 
-#endif /* xwcd/soc/arm/v7m/m7/fc7300/xwosimpl_syshwt.h */
+__xwbsp_code
+xwer_t xwospl_irq_enable(xwirq_t irqn)
+{
+        return arch_nvic_irq_enable(irqn);
+}
+
+__xwbsp_code
+xwer_t xwospl_irq_disable(xwirq_t irqn)
+{
+        return arch_nvic_irq_disable(irqn);
+}
+
+__xwbsp_code
+xwer_t xwospl_irq_save(xwirq_t irqn, xwreg_t * flag)
+{
+        return arch_nvic_irq_save(irqn, flag);
+}
+
+__xwbsp_code
+xwer_t xwospl_irq_restore(xwirq_t irqn, xwreg_t flag)
+{
+        return arch_nvic_irq_restore(irqn, flag);
+}
