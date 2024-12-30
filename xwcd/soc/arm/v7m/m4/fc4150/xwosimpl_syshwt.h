@@ -25,4 +25,4 @@
 #  error "This file should be included from <xwos/ospl/syshwt.h>."
 #endif
 
-#endif /* xwcd/soc/arm/v7m/m7/fc7300/xwosimpl_syshwt.h */
+#endif /* xwcd/soc/arm/v7m/m4/fc4150/xwosimpl_syshwt.h */

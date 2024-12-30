@@ -36,4 +36,4 @@ void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
         armv7m_isb();
 }
 
-#endif /* xwcd/soc/arm/v7m/m7/flagchip/xwosimpl_skd.h */
+#endif /* xwcd/soc/arm/v7m/m7/fc7300/xwosimpl_skd.h */

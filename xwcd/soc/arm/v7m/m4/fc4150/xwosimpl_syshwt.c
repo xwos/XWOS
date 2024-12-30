@@ -18,11 +18,31 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_syshwt_h__
-#define __xwosimpl_syshwt_h__
+#include <xwos/standard.h>
+#include <xwos/ospl/syshwt.h>
+#include <xwcd/soc/arm/v7m/arch_systick.h>
 
-#ifndef __xwos_ospl_syshwt_h__
-#  error "This file should be included from <xwos/ospl/syshwt.h>."
-#endif
+__xwbsp_code
+xwer_t xwospl_syshwt_init(struct xwospl_syshwt * hwt)
+{
+        arch_systick_init(hwt);
+        return XWOK;
+}
 
-#endif /* xwcd/soc/arm/v7m/m7/fc7300/xwosimpl_syshwt.h */
+__xwbsp_code
+xwer_t xwospl_syshwt_start(struct xwospl_syshwt * hwt)
+{
+        return arch_systick_start(hwt);
+}
+
+__xwbsp_code
+xwer_t xwospl_syshwt_stop(struct xwospl_syshwt * hwt)
+{
+        return arch_systick_stop(hwt);
+}
+
+__xwbsp_code
+xwtm_t xwospl_syshwt_get_timeconfetti(struct xwospl_syshwt * hwt)
+{
+        return arch_systick_get_timeconfetti(hwt);
+}

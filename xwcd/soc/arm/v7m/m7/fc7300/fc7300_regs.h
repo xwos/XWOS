@@ -29,4 +29,4 @@
 
 #define SOC_CPM_LOCK (*((__xw_io xwreg_t *)0xE0080020UL))
 
-#endif /* xwcd/soc/arm/v7m/m7/flagchip/fc7300_regs.h */
+#endif /* xwcd/soc/arm/v7m/m7/fc7300/fc7300_regs.h */

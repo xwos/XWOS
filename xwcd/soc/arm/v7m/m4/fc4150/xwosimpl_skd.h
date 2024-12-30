@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：系统硬件定时器
+ * @brief XWOS移植实现层：调度
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,22 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_syshwt_h__
-#define __xwosimpl_syshwt_h__
+#ifndef __xwosimpl_skd_h__
+#define __xwosimpl_skd_h__
 
-#ifndef __xwos_ospl_syshwt_h__
-#  error "This file should be included from <xwos/ospl/syshwt.h>."
+#ifndef __xwos_ospl_skd_h__
+#  error "This file should be included from <xwos/ospl/skd.h>."
 #endif
 
-#endif /* xwcd/soc/arm/v7m/m7/fc7300/xwosimpl_syshwt.h */
+#include <xwcd/soc/arm/v7m/armv7m_nvic.h>
+
+static __xwbsp_inline
+void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
+{
+        XWOS_UNUSED(xwskd);
+        armv7m_nvic_pend_pendsv();
+        armv7m_dsb();
+        armv7m_isb();
+}
+
+#endif /* xwcd/soc/arm/v7m/m4/fc4150/xwosimpl_skd.h */

@@ -57,4 +57,4 @@ bool xwospl_cpuirq_test_lc(void)
         return arch_cpuirq_test_lc();
 }
 
-#endif /* xwcd/soc/arm/v7m/m7/fc7300/xwosimpl_irq.h */
+#endif /* xwcd/soc/arm/v7m/m4/fc4150/xwosimpl_irq.h */
