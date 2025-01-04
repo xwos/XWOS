@@ -326,10 +326,9 @@ xwer_t xwos_sem_unbind(struct xwos_sem * sem, struct xwos_sel * sel)
  * @note
  * + 上下文：任意
  * @details
- * 被冻结的信号量对象不允许增加(V操作)，但可以被测试(P操作)。
- * 测试信号量对象的线程会被加入到信号量对象的等待队列。
- *
- * 对已经冻结的信号量再次冻结，将返回 `-EALREADY` 。
+ * + 被冻结的信号量对象不允许增加(V操作)，但可以被测试(P操作)。
+ *   测试信号量对象的线程会被加入到信号量对象的等待队列。
+ * + 对已经冻结的信号量再次冻结，将返回 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_freeze(struct xwos_sem * sem)
@@ -347,8 +346,8 @@ xwer_t xwos_sem_freeze(struct xwos_sem * sem)
  * @note
  * + 上下文：任意
  * @details
- * 此函数只对已冻结的信号量对象起作用，
- * 对未冻结的信号量对象调用此函数将返回错误码 `-EALREADY` 。
+ * + 此CAPI只对已冻结的信号量对象起作用，
+ *   对未冻结的信号量对象调用此函数将返回错误码 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_thaw(struct xwos_sem * sem)
@@ -367,7 +366,7 @@ xwer_t xwos_sem_thaw(struct xwos_sem * sem)
  * @note
  * + 上下文：任意
  * @details
- * 此函数只对未冻结的信号量对象起作用，已冻结的信号量对象将得到错误码 `-ENEGATIVE` 。
+ * 此CAPI只对未冻结的信号量对象起作用，已冻结的信号量对象将得到错误码 `-ENEGATIVE` 。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_post(struct xwos_sem * sem)
