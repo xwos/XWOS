@@ -35,7 +35,6 @@ class Cond
     explicit Cond(xwos_cond * cond) : mCondPtr(cond) {}
     ~Cond() { mCondPtr = nullptr; }
 
-    /* XWOS CAPI 能处理 `nullptr` 的情况。 */
     xwer_t unicast() { return xwos_cond_unicast(mCondPtr); }
     xwer_t broadcast() { return xwos_cond_broadcast(mCondPtr); }
     xwer_t freeze() { return xwos_cond_freeze(mCondPtr); }
