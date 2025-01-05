@@ -77,7 +77,7 @@ class DThd
     xwer_t sleep(xwtm_t dur) { return xwos_cthd_sleep(dur); } /**< 当前线程睡眠一段时间 */
     xwer_t sleepTo(xwtm_t to) { return xwos_cthd_sleep_to(to); } /**< 当前线程睡眠到一个时间点 */
     xwer_t sleepFrom(xwtm_t * from, xwtm_t dur) { return xwos_cthd_sleep_from(from, dur); } /**< 当前线程从一个时间起点睡眠到另一个时间点 */
-    xwer_t freeze(void) { return xwos_cthd_shld_stop(); } /**< 冻结当前线程 */
+    xwer_t freeze(void) { return xwos_cthd_freeze(); } /**< 冻结当前线程 */
 
   private:
     static xwer_t sThdMainFunction(DThd * thd);
