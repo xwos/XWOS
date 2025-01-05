@@ -45,6 +45,8 @@
  *
  * + `xwos_br_wait()` ：等待所有线程到达栅栏，只能在 **线程** 上下文使用
  * + `xwos_br_wait_to()` ：限时等待所有线程到达栅栏，只能在 **线程** 上下文使用
+ * + `xwos_br_wait_unintr()` ：等待所有线程到达栅栏，且等待不可被中断，
+ *   只能在 **线程** 上下文使用
  *
  *
  * ## 使用信号选择器选择线程栅栏
@@ -360,6 +362,24 @@ static __xwos_inline_api
 xwer_t xwos_br_wait_to(struct xwos_br * br, xwtm_t to)
 {
         return xwosdl_br_wait_to(&br->osbr, to);
+}
+
+/**
+ * @brief XWOS API：等待所有线程到达栅栏，且等待不可被中断
+ * @param[in] br: 线程栅栏对象的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的指针或空指针
+ * @retval -ECHRNG: 线程数量超出范围
+ * @retval -EINTR: 等待被中断
+ * @retval -ENOTTHDCTX：不在线程上下文中
+ * @note
+ * + 上下文：线程
+ */
+static __xwos_inline_api
+xwer_t xwos_br_wait_unintr(struct xwos_br * br)
+{
+        return xwosdl_br_wait_unintr(&br->osbr);
 }
 
 /**

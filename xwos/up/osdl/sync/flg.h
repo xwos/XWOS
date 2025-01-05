@@ -240,4 +240,20 @@ xwer_t xwosdl_flg_trywait(struct xwosdl_flg * flg,
         return xwup_flg_trywait(flg, trigger, action, origin, msk);
 }
 
+static __xwcc_inline
+xwer_t xwosdl_flg_wait_unintr(struct xwosdl_flg * flg,
+                              xwsq_t trigger, xwsq_t action,
+                              xwbmp_t origin[], xwbmp_t msk[])
+{
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+        XWOS_VALIDATE((origin), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
+        XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+
+        return xwup_flg_wait_unintr(flg, trigger, action, origin, msk);
+}
+
 #endif /* xwos/up/osdl/sync/flg.h */

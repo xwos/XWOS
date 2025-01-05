@@ -57,6 +57,7 @@
  * + `xwos_flg_wait()` ：等待事件，只能在 **线程** 上下文使用
  * + `xwos_flg_wait_to()` ：限时等待事件，只能在 **线程** 上下文使用
  * + `xwos_flg_trywait()` ：仅测试事件，可在 **任意** 上下文使用
+ * + `xwos_flg_wait_unintr()` ：等待事件，且等待不可被中断，只能在 **线程** 上下文使用
  *
  *
  * ## 使用信号选择器选择事件标志
@@ -674,6 +675,50 @@ xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
                         xwbmp_t origin[], xwbmp_t msk[])
 {
         return xwosdl_flg_trywait(&flg->osflg, trigger, action, origin, msk);
+}
+
+/**
+ * @brief XWOS API：等待事件，且等待不可被中断
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] trigger: 事件触发条件，取值：
+ * + 电平触发
+ *   @arg @ref XWOS_FLG_TRIGGER_SET_ALL : 掩码中的所有位同时为1
+ *   @arg @ref XWOS_FLG_TRIGGER_SET_ANY : 掩码中的任意位为1
+ *   @arg @ref XWOS_FLG_TRIGGER_CLR_ALL : 掩码中的所有位同时为0
+ *   @arg @ref XWOS_FLG_TRIGGER_CLR_ANY : 掩码中的任意位为0
+ * + 边沿触发
+ *   @arg @ref XWOS_FLG_TRIGGER_TGL_ALL : 掩码中的所有位同时发生翻转
+ *   @arg @ref XWOS_FLG_TRIGGER_TGL_ANY : 掩码中的任意位发生翻转
+ * @param[in] action: 事件触发后的动作，
+ * + 当trigger为 **电平触发** 时，取值：
+ *   @arg @ref XWOS_FLG_ACTION_CONSUMPTION : 消费事件
+ *   @arg @ref XWOS_FLG_ACTION_NONE : 无操作
+ * + 当trigger为 **边沿触发** 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
+ * @param[in,out] origin: 指向缓冲区的指针：
+ * + 当 `trigger` 为 **电平触发** 时
+ *   + (O) 返回事件发生时的位图的状态
+ * + 当trigger为 **边沿触发** 时
+ *   + (I) 作为输入时，作为比较的初始状态
+ *   + (O) 作为输出时，返回触发后的事件位图状态（常作为下一次调用的初始值）
+ * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的指针或空指针
+ * @retval -EINVAL: 参数无效
+ * @retval -EINTR: 等待被中断
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @note
+ * + 上下文：线程
+ * @details
+ * + 当没有检测到事件时，线程会阻塞等待。
+ * + 当检测到事件时，线程被唤醒，然后返回 `XWOK` 。
+ * + 当线程阻塞等待被中断时，返回 `-EINTR` 。
+ */
+static __xwos_inline_api
+xwer_t xwos_flg_wait_unintr(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
+                            xwbmp_t origin[], xwbmp_t msk[])
+{
+        return xwosdl_flg_wait_unintr(&flg->osflg, trigger, action, origin, msk);
 }
 
 /**

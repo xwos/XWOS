@@ -107,13 +107,16 @@ xwer_t xwup_flg_read(struct xwup_evt * evt, xwbmp_t out[]);
 xwer_t xwup_flg_wait(struct xwup_evt * evt,
                      xwsq_t trigger, xwsq_t action,
                      xwbmp_t origin[], xwbmp_t msk[]);
-xwer_t xwup_flg_trywait(struct xwup_evt * evt,
-                        xwsq_t trigger, xwsq_t action,
-                        xwbmp_t origin[], xwbmp_t msk[]);
 xwer_t xwup_flg_wait_to(struct xwup_evt * evt,
                         xwsq_t trigger, xwsq_t action,
                         xwbmp_t origin[], xwbmp_t msk[],
                         xwtm_t to);
+xwer_t xwup_flg_trywait(struct xwup_evt * evt,
+                        xwsq_t trigger, xwsq_t action,
+                        xwbmp_t origin[], xwbmp_t msk[]);
+xwer_t xwup_flg_wait_unintr(struct xwup_evt * evt,
+                            xwsq_t trigger, xwsq_t action,
+                            xwbmp_t origin[], xwbmp_t msk[]);
 
 /******** type:XWUP_EVT_TYPE_SEL ********/
 /* public(xwup) */
@@ -129,13 +132,15 @@ xwer_t xwup_sel_obj_c0i(struct xwup_evt * evt, struct xwup_synobj * synobj);
 
 /* public */
 xwer_t xwup_sel_select(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
-xwer_t xwup_sel_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 xwer_t xwup_sel_select_to(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                           xwtm_t to);
+xwer_t xwup_sel_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
+xwer_t xwup_sel_select_unintr(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 
 /******** type:XWUP_EVT_TYPE_BR ********/
 /* public */
 xwer_t xwup_br_wait(struct xwup_evt * evt);
 xwer_t xwup_br_wait_to(struct xwup_evt * evt, xwtm_t to);
+xwer_t xwup_br_wait_unintr(struct xwup_evt * evt);
 
 #endif /* xwos/up/sync/evt.h */
