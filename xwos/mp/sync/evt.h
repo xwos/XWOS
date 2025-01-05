@@ -107,13 +107,16 @@ xwer_t xwmp_flg_read(struct xwmp_evt * evt, xwbmp_t out[]);
 xwer_t xwmp_flg_wait(struct xwmp_evt * evt,
                      xwsq_t trigger, xwsq_t action,
                      xwbmp_t origin[], xwbmp_t msk[]);
-xwer_t xwmp_flg_trywait(struct xwmp_evt * evt,
-                        xwsq_t trigger, xwsq_t action,
-                        xwbmp_t origin[], xwbmp_t msk[]);
 xwer_t xwmp_flg_wait_to(struct xwmp_evt * evt,
                         xwsq_t trigger, xwsq_t action,
                         xwbmp_t origin[], xwbmp_t msk[],
                         xwtm_t to);
+xwer_t xwmp_flg_trywait(struct xwmp_evt * evt,
+                        xwsq_t trigger, xwsq_t action,
+                        xwbmp_t origin[], xwbmp_t msk[]);
+xwer_t xwmp_flg_wait_unintr(struct xwmp_evt * evt,
+                            xwsq_t trigger, xwsq_t action,
+                            xwbmp_t origin[], xwbmp_t msk[]);
 
 
 /******** type:XWMP_EVT_TYPE_SEL ********/
@@ -128,13 +131,15 @@ xwer_t xwmp_sel_obj_s1i(struct xwmp_evt * evt, struct xwmp_synobj * synobj);
 xwer_t xwmp_sel_obj_c0i(struct xwmp_evt * evt, struct xwmp_synobj * synobj);
 
 xwer_t xwmp_sel_select(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
-xwer_t xwmp_sel_tryselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 xwer_t xwmp_sel_select_to(struct xwmp_evt * evt,
                           xwbmp_t msk[], xwbmp_t trg[],
                           xwtm_t to);
+xwer_t xwmp_sel_tryselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
+xwer_t xwmp_sel_select_unintr(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 
 /******** type:XWMP_EVT_TYPE_BR ********/
 xwer_t xwmp_br_wait(struct xwmp_evt * evt);
 xwer_t xwmp_br_wait_to(struct xwmp_evt * evt, xwtm_t to);
+xwer_t xwmp_br_wait_unintr(struct xwmp_evt * evt);
 
 #endif /* xwos/mp/sync/evt.h */

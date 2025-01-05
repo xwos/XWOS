@@ -136,4 +136,14 @@ xwer_t xwosdl_br_wait_to(struct xwosdl_br * br, xwtm_t to)
         return xwmp_br_wait_to(br, to);
 }
 
+static __xwcc_inline
+xwer_t xwosdl_br_wait_unintr(struct xwosdl_br * br)
+{
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+        XWOS_VALIDATE((br->type == XWMP_EVT_TYPE_BR), "type-error", -ETYPE);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+
+        return xwmp_br_wait_unintr(br);
+}
+
 #endif /* xwos/mp/osdl/sync/br.h */

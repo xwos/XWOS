@@ -97,13 +97,13 @@ static __xwmp_code
 xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc);
 
 static __xwmp_code
-xwer_t xwmp_flg_trywait_level(struct xwmp_evt * evt,
-                              xwsq_t trigger, xwsq_t action,
-                              xwbmp_t origin[], xwbmp_t msk[]);
+xwer_t xwmp_flg_wait_level(struct xwmp_evt * evt,
+                           xwsq_t trigger, xwsq_t action,
+                           xwbmp_t origin[], xwbmp_t msk[]);
 
 static __xwmp_code
-xwer_t xwmp_flg_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
-                             xwbmp_t origin[], xwbmp_t msk[]);
+xwer_t xwmp_flg_wait_edge(struct xwmp_evt * evt, xwsq_t trigger,
+                          xwbmp_t origin[], xwbmp_t msk[]);
 
 static __xwmp_code
 xwer_t xwmp_flg_wait_to_level(struct xwmp_evt * evt,
@@ -115,6 +115,24 @@ static __xwmp_code
 xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
                              xwbmp_t origin[], xwbmp_t msk[],
                              xwtm_t to);
+
+static __xwmp_code
+xwer_t xwmp_flg_trywait_level(struct xwmp_evt * evt,
+                              xwsq_t trigger, xwsq_t action,
+                              xwbmp_t origin[], xwbmp_t msk[]);
+
+static __xwmp_code
+xwer_t xwmp_flg_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
+                             xwbmp_t origin[], xwbmp_t msk[]);
+
+static __xwmp_code
+xwer_t xwmp_flg_wait_unintr_level(struct xwmp_evt * evt,
+                                  xwsq_t trigger, xwsq_t action,
+                                  xwbmp_t origin[], xwbmp_t msk[]);
+
+static __xwmp_code
+xwer_t xwmp_flg_wait_unintr_edge(struct xwmp_evt * evt, xwsq_t trigger,
+                                 xwbmp_t origin[], xwbmp_t msk[]);
 
 #if defined(XWOSCFG_SYNC_EVT_MEMPOOL) && (1 == XWOSCFG_SYNC_EVT_MEMPOOL)
 /**
@@ -625,12 +643,164 @@ xwer_t xwmp_flg_read(struct xwmp_evt * evt, xwbmp_t out[])
         return XWOK;
 }
 
+static __xwmp_code
+xwer_t xwmp_flg_wait_level(struct xwmp_evt * evt,
+                           xwsq_t trigger, xwsq_t action,
+                           xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        bool triggered;
+        xwsq_t lkst;
+        xwer_t rc;
+
+        rc = XWOK;
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
+                if (NULL != origin) {
+                        xwbmpop_assign(origin, evt->bmp, evt->num);
+                }
+                if ((xwsq_t)XWMP_FLG_ACTION_CONSUMPTION == action) {
+                        switch (trigger) {
+                        case XWMP_FLG_TRIGGER_SET_ALL:
+                                triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk,
+                                                                  evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_SET_ANY:
+                                triggered = xwbmpop_t1mo_then_c0m(evt->bmp, msk,
+                                                                  evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_CLR_ALL:
+                                triggered = xwbmpop_t0ma_then_s1m(evt->bmp, msk,
+                                                                  evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_CLR_ANY:
+                                triggered = xwbmpop_t0mo_then_s1m(evt->bmp, msk,
+                                                                  evt->num);
+                                break;
+                        default:
+                                triggered = true;
+                                rc = -EINVAL;
+                                break;
+                        }
+                } else {
+                        switch (trigger) {
+                        case XWMP_FLG_TRIGGER_SET_ALL:
+                                triggered = xwbmpop_t1ma(evt->bmp, msk, evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_SET_ANY:
+                                triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_CLR_ALL:
+                                triggered = xwbmpop_t0ma(evt->bmp, msk, evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_CLR_ANY:
+                                triggered = xwbmpop_t0mo(evt->bmp, msk, evt->num);
+                                break;
+                        default:
+                                triggered = true;
+                                rc = -EINVAL;
+                                break;
+                        }
+                }
+                if (triggered) {
+                        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                        break;
+                } else {
+                        rc = xwmp_cond_wait(&evt->cond,
+                                            &evt->lock, XWOS_LK_SPLK, NULL,
+                                            &lkst);
+                        if (XWOK == rc) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
+                                        xwmp_splk_lock(&evt->lock);
+                                }
+                        } else {
+                                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
+                                        xwmp_splk_unlock(&evt->lock);
+                                }
+                                xwmp_cpuirq_restore_lc(cpuirq);
+                                break;
+                        }
+                }
+        }
+        return rc;
+}
+
+static __xwmp_code
+xwer_t xwmp_flg_wait_edge(struct xwmp_evt * evt, xwsq_t trigger,
+                          xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        xwsq_t lkst;
+        xwssq_t cmprc;
+        bool triggered;
+        xwer_t rc = XWOK;
+        xwbmpop_define(cur, evt->num);
+        xwbmpop_define(tmp, evt->num);
+
+        xwbmpop_and(origin, msk, evt->num);
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
+                xwbmpop_assign(cur, evt->bmp, evt->num);
+                xwbmpop_and(cur, msk, evt->num);
+                if ((xwsq_t)XWMP_FLG_TRIGGER_TGL_ALL == trigger) {
+                        xwbmpop_assign(tmp, cur, evt->num);
+                        xwbmpop_xor(tmp, origin, evt->num);
+                        cmprc = xwbmpop_cmp(tmp, msk, evt->num);
+                        if (0 == cmprc) {
+                                triggered = true;
+                                rc = XWOK;
+                        } else {
+                                triggered = false;
+                        }
+                } else if ((xwsq_t)XWMP_FLG_TRIGGER_TGL_ANY == trigger) {
+                        cmprc = xwbmpop_cmp(origin, cur, evt->num);
+                        if (0 == cmprc) {
+                                triggered = false;
+                        } else {
+                                triggered = true;
+                                rc = XWOK;
+                        }
+                } else {
+                        triggered = true;
+                        rc = -EINVAL;
+                }
+                if (triggered) {
+                        xwbmpop_assign(origin, cur, evt->num);
+                        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                        break;
+                } else {
+                        rc = xwmp_cond_wait(&evt->cond,
+                                            &evt->lock, XWOS_LK_SPLK, NULL,
+                                            &lkst);
+                        if (XWOK == rc) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
+                                        xwmp_splk_lock(&evt->lock);
+                                }
+                        } else {
+                                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
+                                        xwmp_splk_unlock(&evt->lock);
+                                }
+                                xwmp_cpuirq_restore_lc(cpuirq);
+                                break;
+                        }
+                }
+        }
+        return rc;
+}
+
 __xwmp_api
 xwer_t xwmp_flg_wait(struct xwmp_evt * evt,
                      xwsq_t trigger, xwsq_t action,
                      xwbmp_t origin[], xwbmp_t msk[])
 {
-        return xwmp_flg_wait_to(evt, trigger, action, origin, msk, XWTM_MAX);
+        xwer_t rc;
+
+        if (trigger <= (xwsq_t)XWMP_FLG_TRIGGER_CLR_ANY) {
+                rc = xwmp_flg_wait_level(evt, trigger, action, origin, msk);
+        } else {
+                rc = xwmp_flg_wait_edge(evt, trigger, origin, msk);
+        }
+        return rc;
 }
 
 static __xwmp_code
@@ -919,6 +1089,166 @@ xwer_t xwmp_flg_trywait(struct xwmp_evt * evt,
         return rc;
 }
 
+static __xwmp_code
+xwer_t xwmp_flg_wait_unintr_level(struct xwmp_evt * evt,
+                                  xwsq_t trigger, xwsq_t action,
+                                  xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        bool triggered;
+        xwsq_t lkst;
+        xwer_t rc;
+
+        rc = XWOK;
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
+                if (NULL != origin) {
+                        xwbmpop_assign(origin, evt->bmp, evt->num);
+                }
+                if ((xwsq_t)XWMP_FLG_ACTION_CONSUMPTION == action) {
+                        switch (trigger) {
+                        case XWMP_FLG_TRIGGER_SET_ALL:
+                                triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk,
+                                                                  evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_SET_ANY:
+                                triggered = xwbmpop_t1mo_then_c0m(evt->bmp, msk,
+                                                                  evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_CLR_ALL:
+                                triggered = xwbmpop_t0ma_then_s1m(evt->bmp, msk,
+                                                                  evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_CLR_ANY:
+                                triggered = xwbmpop_t0mo_then_s1m(evt->bmp, msk,
+                                                                  evt->num);
+                                break;
+                        default:
+                                triggered = true;
+                                rc = -EINVAL;
+                                break;
+                        }
+                } else {
+                        switch (trigger) {
+                        case XWMP_FLG_TRIGGER_SET_ALL:
+                                triggered = xwbmpop_t1ma(evt->bmp, msk, evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_SET_ANY:
+                                triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_CLR_ALL:
+                                triggered = xwbmpop_t0ma(evt->bmp, msk, evt->num);
+                                break;
+                        case XWMP_FLG_TRIGGER_CLR_ANY:
+                                triggered = xwbmpop_t0mo(evt->bmp, msk, evt->num);
+                                break;
+                        default:
+                                triggered = true;
+                                rc = -EINVAL;
+                                break;
+                        }
+                }
+                if (triggered) {
+                        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                        break;
+                } else {
+                        rc = xwmp_cond_wait_unintr(&evt->cond,
+                                                   &evt->lock, XWOS_LK_SPLK, NULL,
+                                                   &lkst);
+                        if (XWOK == rc) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
+                                        xwmp_splk_lock(&evt->lock);
+                                }
+                        } else {
+                                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
+                                        xwmp_splk_unlock(&evt->lock);
+                                }
+                                xwmp_cpuirq_restore_lc(cpuirq);
+                                break;
+                        }
+                }
+        }
+        return rc;
+}
+
+static __xwmp_code
+xwer_t xwmp_flg_wait_unintr_edge(struct xwmp_evt * evt, xwsq_t trigger,
+                                 xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        xwsq_t lkst;
+        xwssq_t cmprc;
+        bool triggered;
+        xwer_t rc = XWOK;
+        xwbmpop_define(cur, evt->num);
+        xwbmpop_define(tmp, evt->num);
+
+        xwbmpop_and(origin, msk, evt->num);
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
+                xwbmpop_assign(cur, evt->bmp, evt->num);
+                xwbmpop_and(cur, msk, evt->num);
+                if ((xwsq_t)XWMP_FLG_TRIGGER_TGL_ALL == trigger) {
+                        xwbmpop_assign(tmp, cur, evt->num);
+                        xwbmpop_xor(tmp, origin, evt->num);
+                        cmprc = xwbmpop_cmp(tmp, msk, evt->num);
+                        if (0 == cmprc) {
+                                triggered = true;
+                                rc = XWOK;
+                        } else {
+                                triggered = false;
+                        }
+                } else if ((xwsq_t)XWMP_FLG_TRIGGER_TGL_ANY == trigger) {
+                        cmprc = xwbmpop_cmp(origin, cur, evt->num);
+                        if (0 == cmprc) {
+                                triggered = false;
+                        } else {
+                                triggered = true;
+                                rc = XWOK;
+                        }
+                } else {
+                        triggered = true;
+                        rc = -EINVAL;
+                }
+                if (triggered) {
+                        xwbmpop_assign(origin, cur, evt->num);
+                        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                        break;
+                } else {
+                        rc = xwmp_cond_wait_unintr(&evt->cond,
+                                                   &evt->lock, XWOS_LK_SPLK, NULL,
+                                                   &lkst);
+                        if (XWOK == rc) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
+                                        xwmp_splk_lock(&evt->lock);
+                                }
+                        } else {
+                                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
+                                        xwmp_splk_unlock(&evt->lock);
+                                }
+                                xwmp_cpuirq_restore_lc(cpuirq);
+                                break;
+                        }
+                }
+        }
+        return rc;
+}
+
+__xwmp_api
+xwer_t xwmp_flg_wait_unintr(struct xwmp_evt * evt,
+                            xwsq_t trigger, xwsq_t action,
+                            xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwer_t rc;
+
+        if (trigger <= (xwsq_t)XWMP_FLG_TRIGGER_CLR_ANY) {
+                rc = xwmp_flg_wait_unintr_level(evt, trigger, action, origin, msk);
+        } else {
+                rc = xwmp_flg_wait_unintr_edge(evt, trigger, origin, msk);
+        }
+        return rc;
+}
+
 /******** type:XWMP_EVT_TYPE_SEL ********/
 /**
  * @brief 绑定同步对象到事件对象，事件对象类型为 `XWMP_EVT_TYPE_SEL`
@@ -1083,7 +1413,51 @@ err_notconn:
 __xwmp_api
 xwer_t xwmp_sel_select(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 {
-        return xwmp_sel_select_to(evt, msk, trg, XWTM_MAX);
+        xwer_t rc;
+        xwreg_t cpuirq;
+        bool triggered;
+        xwsq_t lkst;
+
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
+                triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
+                if (triggered) {
+                        if (NULL != trg) {
+                                xwbmpop_assign(trg, evt->bmp, evt->num);
+                                /* Clear non-exclusive bits */
+                                xwbmpop_and(evt->bmp, evt->msk, evt->num);
+                                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                                xwbmpop_and(trg, msk, evt->num);
+                        } else {
+                                /* Clear non-exclusive bits */
+                                xwbmpop_and(evt->bmp, evt->msk, evt->num);
+                                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                        }
+                        rc = XWOK;
+                        break;
+                } else {
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, evt->num);
+                        rc = xwmp_cond_wait(&evt->cond,
+                                            &evt->lock, XWOS_LK_SPLK, NULL,
+                                            &lkst);
+                        if (XWOK == rc) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
+                                        xwmp_splk_lock(&evt->lock);
+                                }
+                        } else {
+                                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
+                                        xwmp_splk_unlock(&evt->lock);
+                                }
+                                xwmp_cpuirq_restore_lc(cpuirq);
+                                if (NULL != trg) {
+                                        xwbmpop_c0all(trg, evt->num);
+                                }
+                                break;
+                        }
+                }
+        }
+        return rc;
 }
 
 __xwmp_api
@@ -1166,11 +1540,95 @@ xwer_t xwmp_sel_tryselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
         return rc;
 }
 
+__xwmp_api
+xwer_t xwmp_sel_select_unintr(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
+{
+        xwer_t rc;
+        xwreg_t cpuirq;
+        bool triggered;
+        xwsq_t lkst;
+
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
+                triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
+                if (triggered) {
+                        if (NULL != trg) {
+                                xwbmpop_assign(trg, evt->bmp, evt->num);
+                                /* Clear non-exclusive bits */
+                                xwbmpop_and(evt->bmp, evt->msk, evt->num);
+                                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                                xwbmpop_and(trg, msk, evt->num);
+                        } else {
+                                /* Clear non-exclusive bits */
+                                xwbmpop_and(evt->bmp, evt->msk, evt->num);
+                                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                        }
+                        rc = XWOK;
+                        break;
+                } else {
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, evt->num);
+                        rc = xwmp_cond_wait_unintr(&evt->cond,
+                                                   &evt->lock, XWOS_LK_SPLK, NULL,
+                                                   &lkst);
+                        if (XWOK == rc) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
+                                        xwmp_splk_lock(&evt->lock);
+                                }
+                        } else {
+                                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
+                                        xwmp_splk_unlock(&evt->lock);
+                                }
+                                xwmp_cpuirq_restore_lc(cpuirq);
+                                if (NULL != trg) {
+                                        xwbmpop_c0all(trg, evt->num);
+                                }
+                                break;
+                        }
+                }
+        }
+        return rc;
+}
+
 /******** type:XWMP_EVT_TYPE_BR ********/
 __xwmp_api
 xwer_t xwmp_br_wait(struct xwmp_evt * evt)
 {
-        return xwmp_br_wait_to(evt, XWTM_MAX);
+        xwreg_t cpuirq;
+        xwssq_t pos;
+        bool triggered;
+        xwsq_t lkst;
+        xwer_t rc;
+
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        pos = xwbmpop_ffz(evt->bmp, evt->num);
+        if ((pos < 0) || (pos >= (xwssq_t)evt->num)) {
+                rc = -ECHRNG;
+                goto err_pos_range;
+        }
+        xwbmpop_s1i(evt->bmp, (xwsq_t)pos);
+        triggered = xwbmpop_t1ma(evt->bmp, evt->msk, evt->num);
+        if (triggered) {
+                xwbmpop_c0i(evt->bmp, (xwsq_t)pos);
+                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                xwmp_cond_broadcast(&evt->cond); // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_cthd_yield();
+                rc = XWOK;
+        } else {
+                rc = xwmp_cond_wait(&evt->cond,
+                                    &evt->lock, XWOS_LK_SPLK, NULL,
+                                    &lkst);
+                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
+                        xwmp_splk_lock(&evt->lock);
+                }
+                xwbmpop_c0i(evt->bmp, (xwsq_t)pos);
+                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        }
+        return rc;
+
+err_pos_range:
+        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        return rc;
 }
 
 __xwmp_api
@@ -1200,6 +1658,46 @@ xwer_t xwmp_br_wait_to(struct xwmp_evt * evt, xwtm_t to)
                 rc = xwmp_cond_wait_to(&evt->cond,
                                        &evt->lock, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
+                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
+                        xwmp_splk_lock(&evt->lock);
+                }
+                xwbmpop_c0i(evt->bmp, (xwsq_t)pos);
+                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        }
+        return rc;
+
+err_pos_range:
+        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        return rc;
+}
+
+__xwmp_api
+xwer_t xwmp_br_wait_unintr(struct xwmp_evt * evt)
+{
+        xwreg_t cpuirq;
+        xwssq_t pos;
+        bool triggered;
+        xwsq_t lkst;
+        xwer_t rc;
+
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        pos = xwbmpop_ffz(evt->bmp, evt->num);
+        if ((pos < 0) || (pos >= (xwssq_t)evt->num)) {
+                rc = -ECHRNG;
+                goto err_pos_range;
+        }
+        xwbmpop_s1i(evt->bmp, (xwsq_t)pos);
+        triggered = xwbmpop_t1ma(evt->bmp, evt->msk, evt->num);
+        if (triggered) {
+                xwbmpop_c0i(evt->bmp, (xwsq_t)pos);
+                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                xwmp_cond_broadcast(&evt->cond); // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_cthd_yield();
+                rc = XWOK;
+        } else {
+                rc = xwmp_cond_wait_unintr(&evt->cond,
+                                           &evt->lock, XWOS_LK_SPLK, NULL,
+                                           &lkst);
                 if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                         xwmp_splk_lock(&evt->lock);
                 }

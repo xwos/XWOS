@@ -45,6 +45,7 @@
  * + `xwos_sel_select()` ：等待 **选择信号** ，只能在 **线程** 上下文使用
  * + `xwos_sel_select_to()` ：限时等待 **选择信号** ，只能在 **线程** 上下文使用
  * + `xwos_sel_tryselect()` ：仅测试是否有 **选择信号** ，可在 **任意** 上下文使用
+ * + `xwos_sel_select_unintr()` ：等待 **选择信号** ，且等待不可被中断，只能在 **线程** 上下文使用
  *
  *
  * ## 使用信号选择器选择信号选择器
@@ -384,6 +385,25 @@ static __xwos_inline_api
 xwer_t xwos_sel_tryselect(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 {
         return xwosdl_sel_select(&sel->ossel, msk, trg);
+}
+
+/**
+ * @brief XWOS API：等待信号选择器中的 **选择信号** ，且等待不可被中断
+ * @param[in] sel: 信号选择器对象的指针
+ * @param[in] msk: 同步对象位图掩码，表示只关注掩码内的同步对象
+ * @param[out] trg: 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @note
+ * + 上下文：线程
+ */
+static __xwos_inline_api
+xwer_t xwos_sel_select_unintr(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
+{
+        return xwosdl_sel_select_unintr(&sel->ossel, msk, trg);
 }
 
 /**
