@@ -142,4 +142,6 @@
 #define XWOSCFG_LOCK_SPLK_CXX                           0
 #define XWOSCFG_LOCK_SQLK_CXX                           0
 
+/******** ******** ******** power management ******** ******** ********/
+#define XWOSCFG_PM_CXX                                  0
 #endif /* cfg/xwos.h */
