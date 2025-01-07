@@ -215,16 +215,13 @@ class Flg
      *   @arg Flg::WaitMode::FlgWaitTimed
      *   @arg Flg::WaitMode::FlgWaitUninterruptable
      *   @arg Flg::WaitMode::FlgTryWait
-     * @param[in] to: 期望唤醒的时间点，
-     *                仅当 `mode == Flg::WaitMode::FlgWaitTimed` 时有效。
+     * @param[in] to: 期望唤醒的时间点，仅当 `mode == Flg::WaitMode::FlgWaitTimed` 时有效。
      * @return 错误码
      * @retval XWOK: 没有错误
      * @retval -EFAULT: 空指针
      * @retval -ETIMEDOUT: 超时
      * @retval -EINTR: 等待被中断
      * @retval -ENOTTHDCTX: 不在线程上下文中
-     * @retval -EDSPMPT: 抢占被关闭
-     * @retval -EDSBH: 中断底半部被关闭
      * @note
      * + 上下文：
      *   + `mode == Flg::WaitMode::FlgTryWait` : 任意
@@ -248,7 +245,7 @@ class Flg
                 rc = xwos_flg_wait(mFlgPtr, trigger, consumption, origin, msk);
                 break;
             case WaitMode::FlgWaitTimed:
-                rc = xwos_flag_wait_to(mFlgPtr, trigger, consumption, origin, msk, to);
+                rc = xwos_flg_wait_to(mFlgPtr, trigger, consumption, origin, msk, to);
                 break;
             case WaitMode::FlgWaitUninterruptable:
                 rc = xwos_flg_wait_unintr(mFlgPtr, trigger, consumption, origin, msk);
