@@ -14,6 +14,7 @@
 #define __xwos_cxx_sync_Br_hxx__
 
 #include <xwos/osal/sync/br.hxx>
+#include <xwos/cxx/sync/Sel.hxx>
 
 extern "C" {
 #include <xwos/lib/xwbop.h>
@@ -109,6 +110,78 @@ class Br
                 break;
         }
         return rc;
+    }
+
+    /**
+     * @brief 绑定线程栅栏对象到信号选择器
+     * @param[in] sel: 信号选择器的指针
+     * @param[in] pos: 线程栅栏对象映射到信号选择器位图中的位置
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -ECHRNG: 位置超出范围
+     * @retval -EALREADY: 同步对象已经绑定到事件对象
+     * @retval -EBUSY: 通道已经被其他同步对象独占
+     * @note
+     * + 上下文：任意
+     * + 绑定方式：非独占绑定
+     * @details
+     * + 当所有线程到达线程栅栏时，线程栅栏将向信号选择器发送信号。
+     */
+    template<xwsz_t TSelNum>
+    xwer_t bind(Sel<TSelNum> * sel, xwsq_t pos) {
+        return xwos_br_bind(mBrPtr, sel->getXwosObj(), pos);
+    }
+
+    /**
+     * @brief 绑定线程栅栏对象到信号选择器
+     * @param[in] sel: 信号选择器的引用
+     * @param[in] pos: 线程栅栏对象映射到信号选择器位图中的位置
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -ECHRNG: 位置超出范围
+     * @retval -EALREADY: 同步对象已经绑定到事件对象
+     * @retval -EBUSY: 通道已经被其他同步对象独占
+     * @note
+     * + 上下文：任意
+     * + 绑定方式：非独占绑定
+     * @details
+     * + 当所有线程到达线程栅栏时，线程栅栏将向信号选择器发送信号。
+     */
+    template<xwsz_t TSelNum>
+    xwer_t bind(Sel<TSelNum> & sel, xwsq_t pos) {
+        return xwos_br_bind(mBrPtr, sel.getXwosObj(), pos);
+    }
+
+    /**
+     * @brief 从信号选择器上解绑线程栅栏对象
+     * @param[in] sel: 信号选择器的引用
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
+     * @note
+     * + 上下文：任意
+     */
+    template<xwsz_t TSelNum>
+    xwer_t unbind(Sel<TSelNum> * sel) {
+        return xwos_br_unbind(mBrPtr, sel->getXwosObj());
+    }
+
+    /**
+     * @brief 从信号选择器上解绑线程栅栏对象
+     * @param[in] sel: 信号选择器的引用
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
+     * @note
+     * + 上下文：任意
+     */
+    template<xwsz_t TSelNum>
+    xwer_t unbind(Sel<TSelNum> & sel) {
+        return xwos_br_unbind(mBrPtr, sel.getXwosObj());
     }
 
     /**

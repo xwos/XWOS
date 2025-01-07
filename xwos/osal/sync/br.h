@@ -278,9 +278,9 @@ xwos_br_d xwos_br_get_d(struct xwos_br * br)
  * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * + 上下文：任意
- * - 绑定方式：非独占绑定
+ * + 绑定方式：非独占绑定
  * @details
- * 当所有线程到达线程栅栏时，绑定了信号选择器的线程栅栏将向信号选择器发送信号。
+ * + 当所有线程到达线程栅栏时，绑定了信号选择器的线程栅栏将向信号选择器发送信号。
  */
 static __xwos_inline_api
 xwer_t xwos_br_bind(struct xwos_br * br, struct xwos_sel * sel, xwsq_t pos)

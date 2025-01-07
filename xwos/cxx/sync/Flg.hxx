@@ -14,6 +14,7 @@
 #define __xwos_cxx_sync_Flg_hxx__
 
 #include <xwos/osal/sync/flg.hxx>
+#include <xwos/cxx/sync/Sel.hxx>
 
 extern "C" {
 #include <xwos/lib/xwbop.h>
@@ -258,6 +259,74 @@ class Flg
                 break;
         }
         return rc;
+    }
+
+    /**
+     * @brief 绑定事件标志对象到信号选择器
+     * @param[in] sel: 信号选择器的指针
+     * @param[in] pos: 事件标志对象映射到信号选择器位图中的位置
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -ECHRNG: 位置超出范围
+     * @retval -EALREADY: 同步对象已经绑定到事件对象
+     * @retval -EBUSY: 通道已经被其他同步对象独占
+     * @note
+     * + 上下文：任意
+     * + 绑定方式：非独占绑定
+     */
+    template<xwsz_t TSelNum>
+    xwer_t bind(Sel<TSelNum> * sel, xwsq_t pos) {
+        return xwos_flg_bind(mFlgPtr, sel->getXwosObj(), pos);
+    }
+
+    /**
+     * @brief 绑定事件标志对象到信号选择器
+     * @param[in] sel: 信号选择器的引用
+     * @param[in] pos: 事件标志对象映射到信号选择器位图中的位置
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -ECHRNG: 位置超出范围
+     * @retval -EALREADY: 同步对象已经绑定到事件对象
+     * @retval -EBUSY: 通道已经被其他同步对象独占
+     * @note
+     * + 上下文：任意
+     * + 绑定方式：非独占绑定
+     */
+    template<xwsz_t TSelNum>
+    xwer_t bind(Sel<TSelNum> & sel, xwsq_t pos) {
+        return xwos_flg_bind(mFlgPtr, sel.getXwosObj(), pos);
+    }
+
+    /**
+     * @brief 从信号选择器上解绑事件标志对象
+     * @param[in] sel: 信号选择器的引用
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
+     * @note
+     * + 上下文：任意
+     */
+    template<xwsz_t TSelNum>
+    xwer_t unbind(Sel<TSelNum> * sel) {
+        return xwos_flg_unbind(mFlgPtr, sel->getXwosObj());
+    }
+
+    /**
+     * @brief 从信号选择器上解绑事件标志对象
+     * @param[in] sel: 信号选择器的引用
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
+     * @note
+     * + 上下文：任意
+     */
+    template<xwsz_t TSelNum>
+    xwer_t unbind(Sel<TSelNum> & sel) {
+        return xwos_flg_unbind(mFlgPtr, sel.getXwosObj());
     }
 
     /**
