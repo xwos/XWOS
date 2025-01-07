@@ -22,6 +22,11 @@ namespace sync {
  * @defgroup xwos_cxx_sync_Cond 条件量基类
  * @ingroup xwos_cxx_sync
  *
+ * ## C++ API
+ *
+ * 头文件： @ref xwos/cxx/sync/Flg.hxx
+ *
+ * @{
  */
 
 /**
