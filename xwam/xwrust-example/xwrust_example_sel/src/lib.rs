@@ -145,14 +145,15 @@ pub fn xwrust_example_sel() {
                                 let mut tg = Bmp::<8>::new();
                                 let msk = Bmp::<8>::new();
                                 msk.s1all();
-                                let _ = flg4.trywait(Trigger::SetAny,
-                                                     Action::Consumption,
+                                let _ = flg4.trywait(Trigger::SetAny, true,
                                                      &mut tg, &msk);
-                                println!("[主线程]<{} ms> 事件 {:?}", xwtm::nowtc(), tg);
+                                println!("[主线程]<{} ms> 事件 {:?}",
+                                         xwtm::nowtc(), tg);
                             }
                         },
                         Err(e) => {
-                            println!("[主线程]<{} ms> 测试sel0失败 ... {:?}", xwtm::nowtc(), e);
+                            println!("[主线程]<{} ms> 测试sel0失败 ... {:?}",
+                                     xwtm::nowtc(), e);
                         },
                     }
                 }

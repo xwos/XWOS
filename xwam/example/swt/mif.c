@@ -154,7 +154,7 @@ xwer_t swtdemo_thd_func(void * arg)
                 /* 等待事件 */
                 rc = xwos_flg_wait(&swtflg,
                                    XWOS_FLG_TRIGGER_SET_ANY,
-                                   XWOS_FLG_ACTION_CONSUMPTION,
+                                   true,
                                    trg, msk);
                 if (XWOK == rc) {
                         /* 测试第0位是否被置1 */

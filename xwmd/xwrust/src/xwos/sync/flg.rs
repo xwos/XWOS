@@ -101,11 +101,11 @@
 //! ## 清除事件
 //!
 //! + 当采用 **电平触发** 时，需要在读取事件位图后 **清除** 事件标志位，否则事件会一直处于触发状态。
-//!   可以在调用等待事件的方法时，指定参数 `action` 为 [`Action::Consumption`] 。
+//!   可以在调用等待事件的方法时，指定参数 `consumption` 为 `true` 。
 //!   **清除** 的含义是：
 //!   + 当线程等待的是位图中的事件位被置 **1** ， **清除** 是指将这些位清 **0** ；
 //!   + 当线程等待的是位图中的事件位被清 **0** ， **清除** 是指将这些位置 **1** ；
-//! + 当采用 **边沿触发** 时，不需要 **清除** 事件的触发条件。
+//! + 当采用 **边沿触发** 时，不需要 **清除** 事件标志位。
 //!
 //!
 //! # 读取事件
@@ -160,12 +160,14 @@ extern "C" {
     pub(crate) fn xwrustffi_flg_c0i(flg: *mut c_void, pos: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_flg_x1m(flg: *mut c_void, msk: *mut XwBmp) -> XwEr;
     pub(crate) fn xwrustffi_flg_x1i(flg: *mut c_void, pos: XwSq) -> XwEr;
-    pub(crate) fn xwrustffi_flg_wait(flg: *mut c_void, tg: XwSq, act: XwSq,
+    pub(crate) fn xwrustffi_flg_wait(flg: *mut c_void, tg: XwSq, consumption: bool,
                                      origin: *mut XwBmp, msk: *mut XwBmp) -> XwEr;
-    pub(crate) fn xwrustffi_flg_wait_to(flg: *mut c_void, tg: XwSq, act: XwSq,
+    pub(crate) fn xwrustffi_flg_wait_to(flg: *mut c_void, tg: XwSq, consumption: bool,
                                         origin: *mut XwBmp, msk: *mut XwBmp, to: XwTm) -> XwEr;
-    pub(crate) fn xwrustffi_flg_trywait(flg: *mut c_void, tg: XwSq, act: XwSq,
+    pub(crate) fn xwrustffi_flg_trywait(flg: *mut c_void, tg: XwSq, consumption: bool,
                                         origin: *mut XwBmp, msk: *mut XwBmp) -> XwEr;
+    pub(crate) fn xwrustffi_flg_wait_unintr(flg: *mut c_void, tg: XwSq, consumption: bool,
+                                            origin: *mut XwBmp, msk: *mut XwBmp) -> XwEr;
 }
 
 /// 事件标志的错误码
@@ -238,14 +240,6 @@ pub enum Trigger {
     ToggleAll = 4,
     /// 任意事件位发生翻转触发
     ToggleAny = 5,
-}
-
-/// 触发后的动作
-pub enum Action {
-    /// 事件触发后不做任何操作
-    None = 0,
-    /// 事件触发后清除触发条件
-    Consumption = 1,
 }
 
 /// XWOS事件标志对象占用的内存大小
@@ -406,11 +400,10 @@ where
 
     /// 同时设置多个事件标志位
     ///
-    /// 此方法会将事件标志位图中，被掩码 `msk` 覆盖的位全部设置为 **1** 。
-    ///
-    /// 此方法除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
-    /// 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
-    /// 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
+    /// + 此RustAPI会将事件标志位图中，被掩码 `msk` 覆盖的位全部设置为 **1** ，
+    ///   然后 **广播** 所有正在等待的线程。
+    /// + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
+    ///   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
     ///
     /// # 参数说明
     ///
@@ -434,11 +427,10 @@ where
 
     /// 设置单个事件标志位
     ///
-    /// 此方法会将事件标志位图中，序号为 `pos` 的单个位设置为 **1** 。
-    ///
-    /// 此函数除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
-    /// 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
-    /// 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
+    /// + 此CAPI会将事件标志位图中，序号为 `pos` 的单个位设置为 **1** ，
+    ///   然后 **广播** 所有正在等待的线程。
+    /// + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
+    ///   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
     ///
     /// # 参数说明
     ///
@@ -462,11 +454,10 @@ where
 
     /// 同时清除多个事件标志位
     ///
-    /// 此方法会将事件标志位图中，被掩码 `msk` 覆盖的位全部清 **0** 。
-    ///
-    /// 此方法除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
-    /// 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
-    /// 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
+    /// + 此CAPI会将事件标志位图中，被掩码 `msk` 覆盖的位全部清 **0** ，
+    ///   然后 **广播** 所有正在等待的线程。
+    /// + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
+    ///   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
     ///
     /// # 参数说明
     ///
@@ -490,11 +481,10 @@ where
 
     /// 清除单个事件标志位
     ///
-    /// 此方法会将事件标志位图中，序号为 `pos` 的单个位清 **0** 。
-    ///
-    /// 此函数除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
-    /// 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
-    /// 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
+    /// + 此CAPI会将事件标志位图中，序号为 `pos` 的单个位清 **0** ，
+    ///   然后 **广播** 所有正在等待的线程。
+    /// + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
+    ///   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
     ///
     /// # 参数说明
     ///
@@ -518,11 +508,10 @@ where
 
     /// 同时翻转多个事件标志位
     ///
-    /// 此方法会将事件标志位图中，被掩码 `msk` 覆盖的位全部翻转。
-    ///
-    /// 此方法除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
-    /// 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
-    /// 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
+    /// + 此CAPI会将事件标志位图中，被掩码 `msk` 覆盖的位全部翻转，
+    ///   然后 **广播** 所有正在等待的线程。
+    /// + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
+    ///   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
     ///
     /// # 参数说明
     ///
@@ -546,11 +535,10 @@ where
 
     /// 翻转单个事件标志位
     ///
-    /// 此方法会将事件标志位图中，序号为 `pos` 的单个位翻转。
-    ///
-    /// 此函数除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
-    /// 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
-    /// 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
+    /// + 此CAPI会将事件标志位图中，序号为 `pos` 的单个位翻转，
+    ///   然后 **广播** 所有正在等待的线程。
+    /// + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
+    ///   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
     ///
     /// # 参数说明
     ///
@@ -591,8 +579,8 @@ where
     /// + [`Trigger::ClearAll`] 所有事件位被清 **0** 触发
     /// + [`Trigger::ClearAny`] 任意事件位被清 **0** 触发
     ///
-    /// **电平触发** 时，若参数 `action` 取值 [`Action::Consumption`] ，表示线程在读取事件位图后，会 **清除** 事件位图。
-    /// **电平触发** 时，参数 `origin` 用于返回事件发生时的位图状态。
+    /// **电平触发** 时，若参数 `consumption` 取值 `true` ，表示线程在读取事件位图后，会 **清除** 事件位图。
+    /// **电平触发** 时，参数 `origin` 返回事件触发 **之前** 的位图状态。
     ///
     /// ## 边沿触发
     ///
@@ -601,7 +589,7 @@ where
     /// + [`Trigger::SetAll`] 所有事件位发生翻转触发
     /// + [`Trigger::SetAny`] 任意事件位发生翻转触发
     ///
-    /// **边沿触发** 时，参数 `action` 没有作用，取值 [`Action::None`] 即可。
+    /// **边沿触发** 时，参数 `consumption` 没有意义。
     /// **边沿触发** 时，必须要有一个初始状态，就像数字电路一样：
     ///
     /// + 当位的初始值为 **0** (低电平)，然后跳变到 **1** (高电平)的瞬间被称为上升沿。此时触发的事件被称为上升沿触发。
@@ -612,11 +600,21 @@ where
     /// # 参数说明
     ///
     /// + tg: 事件触发条件
-    /// + act: 事件触发后的动作
+    ///   + **电平触发**
+    ///     + [`Trigger::SetAll`] 所有事件位被置 **1** 触发
+    ///     + [`Trigger::SetAny`] 任意事件位被置 **1** 触发
+    ///     + [`Trigger::ClearAll`] 所有事件位被清 **0** 触发
+    ///     + [`Trigger::ClearAny`] 任意事件位被清 **0** 触发
+    ///   + **边沿触发**
+    ///     + [`Trigger::SetAll`] 所有事件位发生翻转触发
+    ///     + [`Trigger::SetAny`] 任意事件位发生翻转触发
+    /// + consumption: 事件触发后是否清除事件
     /// + origin: 事件位图
-    ///   + **电平触发** 时，参数 `origin` 用于返回事件发生时的位图状态。
-    ///   + 初始值就由参数 `origin` 指明，触发后，事件位发生跳变，跳变后的结果还是由参数 `origin` 返回。
-    /// + msk: 事件的位图掩码
+    ///   + **电平触发** 时，参数 `origin` 用于返回事件触发 **之前** 的位图状态。
+    ///   + **边沿触发** 时
+    ///     + 输入时 `origin` 指明事件标志位图的初始值，用于评估事件位图是否发生变化。
+    ///     + 输出时 `origin` 返回触发后的事件标志位图状态（可作为下一次调用的初始值）。
+    /// + msk: 事件的位图掩码，表示只关注掩码部分的事件
     ///
     /// # 上下文
     ///
@@ -640,12 +638,12 @@ where
     /// pub fn xwrust_example_flg() {
     /// }
     /// ```
-    pub fn wait(&self, tg: Trigger, act: Action,
+    pub fn wait(&self, tg: Trigger, consumption: bool,
                 origin: &mut Bmp<N>, msk: &Bmp<N>) -> FlgError {
         unsafe {
             let mut rc = xwrustffi_flg_acquire(self.flg.get() as _, *self.tik.get());
             if rc == 0 {
-                rc = xwrustffi_flg_wait(self.flg.get() as _, tg as XwSq, act as XwSq,
+                rc = xwrustffi_flg_wait(self.flg.get() as _, tg as XwSq, consumption,
                                         origin.bmp.get() as _, msk.bmp.get() as _);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
@@ -683,8 +681,8 @@ where
     /// + [`Trigger::ClearAll`] 所有事件位被清 **0** 触发
     /// + [`Trigger::ClearAny`] 任意事件位被清 **0** 触发
     ///
-    /// **电平触发** 时，若参数 `action` 取值 [`Action::Consumption`] ，表示线程在读取事件位图后，会 **清除** 事件位图。
-    /// **电平触发** 时，参数 `origin` 用于返回事件发生时的位图状态。
+    /// **电平触发** 时，若参数 `consumption` 取值 `true` ，表示线程在读取事件位图后，会 **清除** 事件位图。
+    /// **电平触发** 时，参数 `origin` 返回事件触发 **之前** 的位图状态。
     ///
     /// ## 边沿触发
     ///
@@ -693,7 +691,7 @@ where
     /// + [`Trigger::SetAll`] 所有事件位发生翻转触发
     /// + [`Trigger::SetAny`] 任意事件位发生翻转触发
     ///
-    /// **边沿触发** 时，参数 `action` 没有作用，取值 [`Action::None`] 即可。
+    /// **边沿触发** 时，参数 `consumption` 没有意义。
     /// **边沿触发** 时，必须要有一个初始状态，就像数字电路一样：
     ///
     /// + 当位的初始值为 **0** (低电平)，然后跳变到 **1** (高电平)的瞬间被称为上升沿。此时触发的事件被称为上升沿触发。
@@ -704,12 +702,21 @@ where
     /// # 参数说明
     ///
     /// + tg: 事件触发条件
-    /// + act: 事件触发后的动作
+    ///   + **电平触发**
+    ///     + [`Trigger::SetAll`] 所有事件位被置 **1** 触发
+    ///     + [`Trigger::SetAny`] 任意事件位被置 **1** 触发
+    ///     + [`Trigger::ClearAll`] 所有事件位被清 **0** 触发
+    ///     + [`Trigger::ClearAny`] 任意事件位被清 **0** 触发
+    ///   + **边沿触发**
+    ///     + [`Trigger::SetAll`] 所有事件位发生翻转触发
+    ///     + [`Trigger::SetAny`] 任意事件位发生翻转触发
+    /// + consumption: 事件触发后是否清除事件
     /// + origin: 事件位图
-    ///   + **电平触发** 时，参数 `origin` 用于返回事件发生时的位图状态。
-    ///   + 初始值就由参数 `origin` 指明，触发后，事件位发生跳变，跳变后的结果还是由参数 `origin` 返回。
-    /// + msk: 事件的位图掩码
-    /// + to: 期望唤醒的时间点
+    ///   + **电平触发** 时，参数 `origin` 用于返回事件触发 **之前** 的位图状态。
+    ///   + **边沿触发** 时
+    ///     + 输入时 `origin` 指明事件标志位图的初始值，用于评估事件位图是否发生变化。
+    ///     + 输出时 `origin` 返回触发后的事件标志位图状态（可作为下一次调用的初始值）。
+    /// + msk: 事件的位图掩码，表示只关注掩码部分的事件
     ///
     /// # 上下文
     ///
@@ -734,12 +741,12 @@ where
     /// pub fn xwrust_example_flg() {
     /// }
     /// ```
-    pub fn wait_to(&self, tg: Trigger, act: Action,
+    pub fn wait_to(&self, tg: Trigger, consumption: bool,
                    origin: &mut Bmp<N>, msk: &Bmp<N>, to: XwTm) -> FlgError {
         unsafe {
             let mut rc = xwrustffi_flg_acquire(self.flg.get() as _, *self.tik.get());
             if rc == 0 {
-                rc = xwrustffi_flg_wait_to(self.flg.get() as _, tg as XwSq, act as XwSq,
+                rc = xwrustffi_flg_wait_to(self.flg.get() as _, tg as XwSq, consumption,
                                            origin.bmp.get() as _, msk.bmp.get() as _, to);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
@@ -777,8 +784,8 @@ where
     /// + [`Trigger::ClearAll`] 所有事件位被清 **0** 触发
     /// + [`Trigger::ClearAny`] 任意事件位被清 **0** 触发
     ///
-    /// **电平触发** 时，若参数 `action` 取值 [`Action::Consumption`] ，表示线程在读取事件位图后，会 **清除** 事件位图。
-    /// **电平触发** 时，参数 `origin` 用于返回事件发生时的位图状态。
+    /// **电平触发** 时，若参数 `consumption` 取值 `true` ，表示线程在读取事件位图后，会 **清除** 事件位图。
+    /// **电平触发** 时，参数 `origin` 返回事件触发 **之前** 的位图状态。
     ///
     /// ## 边沿触发
     ///
@@ -787,7 +794,7 @@ where
     /// + [`Trigger::SetAll`] 所有事件位发生翻转触发
     /// + [`Trigger::SetAny`] 任意事件位发生翻转触发
     ///
-    /// **边沿触发** 时，参数 `action` 没有作用，取值 [`Action::None`] 即可。
+    /// **边沿触发** 时，参数 `consumption` 没有意义。
     /// **边沿触发** 时，必须要有一个初始状态，就像数字电路一样：
     ///
     /// + 当位的初始值为 **0** (低电平)，然后跳变到 **1** (高电平)的瞬间被称为上升沿。此时触发的事件被称为上升沿触发。
@@ -798,11 +805,21 @@ where
     /// # 参数说明
     ///
     /// + tg: 事件触发条件
-    /// + act: 事件触发后的动作
+    ///   + **电平触发**
+    ///     + [`Trigger::SetAll`] 所有事件位被置 **1** 触发
+    ///     + [`Trigger::SetAny`] 任意事件位被置 **1** 触发
+    ///     + [`Trigger::ClearAll`] 所有事件位被清 **0** 触发
+    ///     + [`Trigger::ClearAny`] 任意事件位被清 **0** 触发
+    ///   + **边沿触发**
+    ///     + [`Trigger::SetAll`] 所有事件位发生翻转触发
+    ///     + [`Trigger::SetAny`] 任意事件位发生翻转触发
+    /// + consumption: 事件触发后是否清除事件
     /// + origin: 事件位图
-    ///   + **电平触发** 时，参数 `origin` 用于返回事件发生时的位图状态。
-    ///   + 初始值就由参数 `origin` 指明，触发后，事件位发生跳变，跳变后的结果还是由参数 `origin` 返回。
-    /// + msk: 事件的位图掩码
+    ///   + **电平触发** 时，参数 `origin` 用于返回事件触发 **之前** 的位图状态。
+    ///   + **边沿触发** 时
+    ///     + 输入时 `origin` 指明事件标志位图的初始值，用于评估事件位图是否发生变化。
+    ///     + 输出时 `origin` 返回触发后的事件标志位图状态（可作为下一次调用的初始值）。
+    /// + msk: 事件的位图掩码，表示只关注掩码部分的事件
     ///
     /// # 上下文
     ///
@@ -825,18 +842,119 @@ where
     /// pub fn xwrust_example_flg() {
     /// }
     /// ```
-    pub fn trywait(&self, tg: Trigger, act: Action,
+    pub fn trywait(&self, tg: Trigger, consumption: bool,
                    origin: &mut Bmp<N>, msk: &Bmp<N>) -> FlgError {
         unsafe {
             let mut rc = xwrustffi_flg_acquire(self.flg.get() as _, *self.tik.get());
             if rc == 0 {
-                rc = xwrustffi_flg_trywait(self.flg.get() as _, tg as XwSq, act as XwSq,
+                rc = xwrustffi_flg_trywait(self.flg.get() as _, tg as XwSq, consumption,
                                            origin.bmp.get() as _, msk.bmp.get() as _);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
                     FlgError::Ok(rc)
                 } else if -ENODATA == rc {
                     FlgError::NoEvent(rc)
+                } else {
+                    FlgError::Unknown(rc)
+                }
+            } else {
+                FlgError::NotInit(rc)
+            }
+        }
+    }
+
+    /// 等待事件，且等待不可被中断
+    ///
+    /// + 当没有检测到事件时，线程会阻塞等待。
+    /// + 当检测到事件时，线程被唤醒，然后返回 [`FlgError::Ok`] 。
+    /// + 当线程阻塞等待被中断时，返回 [`FlgError::Interrupt`] 。
+    ///
+    /// # 事件的触发条件
+    ///
+    /// 事件的触发条件可通过参数 `tg` 设置。事件的触发条件分为两类。
+    ///
+    /// ## 电平触发
+    ///
+    /// **电平触发** 源于数字电路，是一种类比概念，是指事件位图的特定状态（ **1** 或 **0** ）所产生的触发事件，包括：
+    ///
+    /// + [`Trigger::SetAll`] 所有事件位被置 **1** 触发
+    /// + [`Trigger::SetAny`] 任意事件位被置 **1** 触发
+    /// + [`Trigger::ClearAll`] 所有事件位被清 **0** 触发
+    /// + [`Trigger::ClearAny`] 任意事件位被清 **0** 触发
+    ///
+    /// **电平触发** 时，若参数 `consumption` 取值 `true` ，表示线程在读取事件位图后，会 **清除** 事件位图。
+    /// **电平触发** 时，参数 `origin` 返回事件触发 **之前** 的位图状态。
+    ///
+    /// ## 边沿触发
+    ///
+    /// **边沿触发** 源于数字电路，是一种类比概念，是指事件状态发生改变（ **1** 变 **0** 或 **0** 变 **1** ）时产生的唤醒信号，包括：
+    ///
+    /// + [`Trigger::SetAll`] 所有事件位发生翻转触发
+    /// + [`Trigger::SetAny`] 任意事件位发生翻转触发
+    ///
+    /// **边沿触发** 时，参数 `consumption` 没有意义。
+    /// **边沿触发** 时，必须要有一个初始状态，就像数字电路一样：
+    ///
+    /// + 当位的初始值为 **0** (低电平)，然后跳变到 **1** (高电平)的瞬间被称为上升沿。此时触发的事件被称为上升沿触发。
+    /// + 当位的初始值为 **1** (高电平)，然后跳变到 **0** (低电平)的瞬间被称为下降沿。此时触发的事件被称为下降沿触发。
+    ///
+    /// 初始值就由参数 `origin` 指明，触发后，事件位发生跳变，跳变后的结果还是由参数 `origin` 返回。
+    ///
+    /// # 参数说明
+    ///
+    /// + tg: 事件触发条件
+    ///   + **电平触发**
+    ///     + [`Trigger::SetAll`] 所有事件位被置 **1** 触发
+    ///     + [`Trigger::SetAny`] 任意事件位被置 **1** 触发
+    ///     + [`Trigger::ClearAll`] 所有事件位被清 **0** 触发
+    ///     + [`Trigger::ClearAny`] 任意事件位被清 **0** 触发
+    ///   + **边沿触发**
+    ///     + [`Trigger::SetAll`] 所有事件位发生翻转触发
+    ///     + [`Trigger::SetAny`] 任意事件位发生翻转触发
+    /// + consumption: 事件触发后是否清除事件
+    /// + origin: 事件位图
+    ///   + **电平触发** 时，参数 `origin` 用于返回事件触发 **之前** 的位图状态。
+    ///   + **边沿触发** 时
+    ///     + 输入时 `origin` 指明事件标志位图的初始值，用于评估事件位图是否发生变化。
+    ///     + 输出时 `origin` 返回触发后的事件标志位图状态（可作为下一次调用的初始值）。
+    /// + msk: 事件的位图掩码，表示只关注掩码部分的事件
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`FlgError::Ok`] 没有错误
+    /// + [`FlgError::NotInit`] 事件标志没有初始化
+    /// + [`FlgError::Interrupt`] 等待被中断
+    /// + [`FlgError::NotThreadContext`] 不在线程上下文内
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// extern crate alloc;
+    /// use alloc::sync::Arc;
+    ///
+    /// use xwrust::xwos::sync::flg::*;
+    ///
+    /// pub fn xwrust_example_flg() {
+    /// }
+    /// ```
+    pub fn wait_unintr(&self, tg: Trigger, consumption: bool,
+                       origin: &mut Bmp<N>, msk: &Bmp<N>) -> FlgError {
+        unsafe {
+            let mut rc = xwrustffi_flg_acquire(self.flg.get() as _, *self.tik.get());
+            if rc == 0 {
+                rc = xwrustffi_flg_wait_unintr(self.flg.get() as _, tg as XwSq, consumption,
+                                               origin.bmp.get() as _, msk.bmp.get() as _);
+                xwrustffi_flg_put(self.flg.get() as _);
+                if XWOK == rc {
+                    FlgError::Ok(rc)
+                } else if -EINTR == rc {
+                    FlgError::Interrupt(rc)
+                } else if -ENOTTHDCTX == rc {
+                    FlgError::NotThreadContext(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }

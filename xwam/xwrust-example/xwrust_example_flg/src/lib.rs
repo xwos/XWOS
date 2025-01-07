@@ -33,7 +33,7 @@ pub fn xwrust_example_flg() {
     let mut tg = Bmp::<8>::new();
     let msk = Bmp::<8>::new();
     msk.s1all();
-    let res = flg.wait(Trigger::SetAny, Action::Consumption, &mut tg, &msk);
+    let res = flg.wait(Trigger::SetAny, true, &mut tg, &msk);
     match res {
         FlgError::Ok(_) => {
             println!("[主线程]<{} ms> 事件发生 {:?}", xwtm::nowtc(), tg);

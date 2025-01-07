@@ -141,7 +141,7 @@ xwer_t flgdemo_consumer_func(void * arg)
                         msk[0]);
                 rc = xwos_flg_wait(&flgdemo_flg,
                                    XWOS_FLG_TRIGGER_SET_ALL,
-                                   XWOS_FLG_ACTION_CONSUMPTION,
+                                   true,
                                    tgevt, msk);
                 if (XWOK == rc) {
                         now = xwtm_nowts();
@@ -164,7 +164,7 @@ xwer_t flgdemo_consumer_func(void * arg)
                         msk[0]);
                 rc = xwos_flg_wait(&flgdemo_flg,
                                    XWOS_FLG_TRIGGER_SET_ANY,
-                                   XWOS_FLG_ACTION_NONE,
+                                   false,
                                    tgevt, msk);
                 if (XWOK == rc) {
                         now = xwtm_nowts();
@@ -187,7 +187,7 @@ xwer_t flgdemo_consumer_func(void * arg)
                         msk[0]);
                 rc = xwos_flg_wait(&flgdemo_flg,
                                    XWOS_FLG_TRIGGER_CLR_ALL,
-                                   XWOS_FLG_ACTION_CONSUMPTION,
+                                   true,
                                    tgevt, msk);
                 if (XWOK == rc) {
                         now = xwtm_nowts();
@@ -210,7 +210,7 @@ xwer_t flgdemo_consumer_func(void * arg)
                         msk[0]);
                 rc = xwos_flg_wait(&flgdemo_flg,
                                    XWOS_FLG_TRIGGER_CLR_ANY,
-                                   XWOS_FLG_ACTION_NONE,
+                                   false,
                                    tgevt, msk);
                 if (XWOK == rc) {
                         now = xwtm_nowts();
@@ -234,7 +234,7 @@ xwer_t flgdemo_consumer_func(void * arg)
                         msk[0], org[0]);
                 rc = xwos_flg_wait(&flgdemo_flg,
                                    XWOS_FLG_TRIGGER_TGL_ALL,
-                                   XWOS_UNUSED_ARGUMENT,
+                                   false,
                                    org, msk);
                 if (XWOK == rc) {
                         now = xwtm_nowts();
@@ -255,7 +255,7 @@ xwer_t flgdemo_consumer_func(void * arg)
                         msk[0], org[0]);
                 rc = xwos_flg_wait(&flgdemo_flg,
                                    XWOS_FLG_TRIGGER_TGL_ANY,
-                                   XWOS_UNUSED_ARGUMENT,
+                                   false,
                                    org, msk);
                 if (XWOK == rc) {
                         now = xwtm_nowts();

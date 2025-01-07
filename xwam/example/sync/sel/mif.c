@@ -376,7 +376,7 @@ xwer_t seldemo_consumer_func(void * arg)
                                 flgmsk[0] = XWBOP_BIT(0) | XWBOP_BIT(1);
                                 rc = xwos_flg_trywait(&seldemo_flg3,
                                                       XWOS_FLG_TRIGGER_SET_ANY,
-                                                      XWOS_FLG_ACTION_CONSUMPTION,
+                                                      true,
                                                       flgtrg, flgmsk);
                                 if (XWOK == rc) {
                                         now = xwtm_nowts();

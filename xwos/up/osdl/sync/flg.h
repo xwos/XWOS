@@ -33,9 +33,6 @@ typedef struct {
 #define XWOSDL_FLG_TRIGGER_TGL_ALL      XWUP_FLG_TRIGGER_TGL_ALL
 #define XWOSDL_FLG_TRIGGER_TGL_ANY      XWUP_FLG_TRIGGER_TGL_ANY
 
-#define XWOSDL_FLG_ACTION_NONE          XWUP_FLG_ACTION_NONE
-#define XWOSDL_FLG_ACTION_CONSUMPTION   XWUP_FLG_ACTION_CONSUMPTION
-
 static __xwcc_inline
 xwer_t xwosdl_flg_init(struct xwosdl_flg * flg, xwsz_t num,
                        xwbmp_t * bmp, xwbmp_t * msk)
@@ -194,7 +191,7 @@ xwer_t xwosdl_flg_read(struct xwosdl_flg * flg, xwbmp_t out[])
 
 static __xwcc_inline
 xwer_t xwosdl_flg_wait(struct xwosdl_flg * flg,
-                       xwsq_t trigger, xwsq_t action,
+                       xwsq_t trigger, bool consumption,
                        xwbmp_t origin[], xwbmp_t msk[])
 {
         XWOS_VALIDATE((flg), "nullptr", -EFAULT);
@@ -202,15 +199,14 @@ xwer_t xwosdl_flg_wait(struct xwosdl_flg * flg,
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
-        XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
         XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
-        return xwup_flg_wait(flg, trigger, action, origin, msk);
+        return xwup_flg_wait(flg, trigger, consumption, origin, msk);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_wait_to(struct xwosdl_flg * flg,
-                          xwsq_t trigger, xwsq_t action,
+                          xwsq_t trigger, bool consumption,
                           xwbmp_t origin[], xwbmp_t msk[],
                           xwtm_t to)
 {
@@ -219,15 +215,14 @@ xwer_t xwosdl_flg_wait_to(struct xwosdl_flg * flg,
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
-        XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
         XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
-        return xwup_flg_wait_to(flg, trigger, action, origin, msk, to);
+        return xwup_flg_wait_to(flg, trigger, consumption, origin, msk, to);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_trywait(struct xwosdl_flg * flg,
-                          xwsq_t trigger, xwsq_t action,
+                          xwsq_t trigger, bool consumption,
                           xwbmp_t origin[], xwbmp_t msk[])
 {
         XWOS_VALIDATE((flg), "nullptr", -EFAULT);
@@ -235,14 +230,13 @@ xwer_t xwosdl_flg_trywait(struct xwosdl_flg * flg,
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
-        XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
 
-        return xwup_flg_trywait(flg, trigger, action, origin, msk);
+        return xwup_flg_trywait(flg, trigger, consumption, origin, msk);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_wait_unintr(struct xwosdl_flg * flg,
-                              xwsq_t trigger, xwsq_t action,
+                              xwsq_t trigger, bool consumption,
                               xwbmp_t origin[], xwbmp_t msk[])
 {
         XWOS_VALIDATE((flg), "nullptr", -EFAULT);
@@ -250,10 +244,9 @@ xwer_t xwosdl_flg_wait_unintr(struct xwosdl_flg * flg,
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
-        XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
         XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
 
-        return xwup_flg_wait_unintr(flg, trigger, action, origin, msk);
+        return xwup_flg_wait_unintr(flg, trigger, consumption, origin, msk);
 }
 
 #endif /* xwos/up/osdl/sync/flg.h */

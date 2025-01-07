@@ -102,21 +102,27 @@ xwer_t xwrustffi_flg_read(struct xwos_flg * flg, xwbmp_t out[])
         return xwos_flg_read(flg, out);
 }
 
-xwer_t xwrustffi_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
+xwer_t xwrustffi_flg_wait(struct xwos_flg * flg, xwsq_t trigger, bool consumption,
                           xwbmp_t origin[], xwbmp_t msk[])
 {
-        return xwos_flg_wait(flg, trigger, action, origin, msk);
+        return xwos_flg_wait(flg, trigger, consumption, origin, msk);
 }
 
-xwer_t xwrustffi_flg_wait_to(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
+xwer_t xwrustffi_flg_wait_to(struct xwos_flg * flg, xwsq_t trigger, bool consumption,
                              xwbmp_t origin[], xwbmp_t msk[],
                              xwtm_t to)
 {
-        return xwos_flg_wait_to(flg, trigger, action, origin, msk, to);
+        return xwos_flg_wait_to(flg, trigger, consumption, origin, msk, to);
 }
 
-xwer_t xwrustffi_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
+xwer_t xwrustffi_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, bool consumption,
                              xwbmp_t origin[], xwbmp_t msk[])
 {
-        return xwos_flg_trywait(flg, trigger, action, origin, msk);
+        return xwos_flg_trywait(flg, trigger, consumption, origin, msk);
+}
+
+xwer_t xwrustffi_flg_wait_unintr(struct xwos_flg * flg, xwsq_t trigger, bool consumption,
+                                 xwbmp_t origin[], xwbmp_t msk[])
+{
+        return xwos_flg_wait(flg, trigger, consumption, origin, msk);
 }

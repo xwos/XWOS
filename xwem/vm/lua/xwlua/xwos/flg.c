@@ -301,7 +301,6 @@ int xwlua_flgsp_wait(lua_State * L)
         xwsq_t tgidx;
         xwsq_t trigger;
         bool consumption;
-        xwsq_t action;
         xwlua_bmp_t * origin;
         xwlua_bmp_t * msk;
         xwer_t rc;
@@ -310,14 +309,10 @@ int xwlua_flgsp_wait(lua_State * L)
         tgidx = luaL_checkoption(L, 2, NULL, xwlua_flg_trigger_opt);
         trigger = xwlua_flg_trigger[tgidx];
         consumption = lua_toboolean(L, 3);
-        if (consumption) {
-                action = XWOS_FLG_ACTION_CONSUMPTION;
-        } else {
-                action = XWOS_FLG_ACTION_NONE;
-        }
         origin = (xwlua_bmp_t *)luaL_checkudata(L, 4, "xwlua_bmp_t");
         msk = (xwlua_bmp_t *)luaL_checkudata(L, 5, "xwlua_bmp_t");
-        rc = xwos_flg_wait(flgsp->flg, trigger, action, origin->bmp, msk->bmp);
+        rc = xwos_flg_wait(flgsp->flg, trigger, consumption,
+                           origin->bmp, msk->bmp);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -328,7 +323,6 @@ int xwlua_flgsp_trywait(lua_State * L)
         xwsq_t tgidx;
         xwsq_t trigger;
         bool consumption;
-        xwsq_t action;
         xwlua_bmp_t * origin;
         xwlua_bmp_t * msk;
         xwer_t rc;
@@ -337,14 +331,10 @@ int xwlua_flgsp_trywait(lua_State * L)
         tgidx = luaL_checkoption(L, 2, NULL, xwlua_flg_trigger_opt);
         trigger = xwlua_flg_trigger[tgidx];
         consumption = lua_toboolean(L, 3);
-        if (consumption) {
-                action = XWOS_FLG_ACTION_CONSUMPTION;
-        } else {
-                action = XWOS_FLG_ACTION_NONE;
-        }
         origin = (xwlua_bmp_t *)luaL_checkudata(L, 4, "xwlua_bmp_t");
         msk = (xwlua_bmp_t *)luaL_checkudata(L, 5, "xwlua_bmp_t");
-        rc = xwos_flg_trywait(flgsp->flg, trigger, action, origin->bmp, msk->bmp);
+        rc = xwos_flg_trywait(flgsp->flg, trigger, consumption,
+                              origin->bmp, msk->bmp);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -355,7 +345,6 @@ int xwlua_flgsp_wait_to(lua_State * L)
         xwsq_t tgidx;
         xwsq_t trigger;
         bool consumption;
-        xwsq_t action;
         xwlua_bmp_t * origin;
         xwlua_bmp_t * msk;
         xwtm_t to;
@@ -365,15 +354,33 @@ int xwlua_flgsp_wait_to(lua_State * L)
         tgidx = luaL_checkoption(L, 2, NULL, xwlua_flg_trigger_opt);
         trigger = xwlua_flg_trigger[tgidx];
         consumption = lua_toboolean(L, 3);
-        if (consumption) {
-                action = XWOS_FLG_ACTION_CONSUMPTION;
-        } else {
-                action = XWOS_FLG_ACTION_NONE;
-        }
         origin = (xwlua_bmp_t *)luaL_checkudata(L, 4, "xwlua_bmp_t");
         msk = (xwlua_bmp_t *)luaL_checkudata(L, 5, "xwlua_bmp_t");
         to = (xwtm_t)luaL_checknumber(L, 6);
-        rc = xwos_flg_wait_to(flgsp->flg, trigger, action, origin->bmp, msk->bmp, to);
+        rc = xwos_flg_wait_to(flgsp->flg, trigger, consumption,
+                              origin->bmp, msk->bmp, to);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_flgsp_wait_unintr(lua_State * L)
+{
+        xwlua_flg_sp * flgsp;
+        xwsq_t tgidx;
+        xwsq_t trigger;
+        bool consumption;
+        xwlua_bmp_t * origin;
+        xwlua_bmp_t * msk;
+        xwer_t rc;
+
+        flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
+        tgidx = luaL_checkoption(L, 2, NULL, xwlua_flg_trigger_opt);
+        trigger = xwlua_flg_trigger[tgidx];
+        consumption = lua_toboolean(L, 3);
+        origin = (xwlua_bmp_t *)luaL_checkudata(L, 4, "xwlua_bmp_t");
+        msk = (xwlua_bmp_t *)luaL_checkudata(L, 5, "xwlua_bmp_t");
+        rc = xwos_flg_wait_unintr(flgsp->flg, trigger, consumption,
+                                  origin->bmp, msk->bmp);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -388,11 +395,12 @@ const luaL_Reg xwlua_flgsp_indexmethod[] = {
         {"s1m", xwlua_flgsp_s1m},
         {"c0i", xwlua_flgsp_c0i},
         {"c0m", xwlua_flgsp_c0m},
-        {"x1i", xwlua_flgsp_x1i},
         {"x1m", xwlua_flgsp_x1m},
+        {"x1i", xwlua_flgsp_x1i},
         {"wait", xwlua_flgsp_wait},
-        {"trywait", xwlua_flgsp_trywait},
         {"wait_to", xwlua_flgsp_wait_to},
+        {"trywait", xwlua_flgsp_trywait},
+        {"wait_unintr", xwlua_flgsp_wait_to},
         {NULL, NULL},
 };
 

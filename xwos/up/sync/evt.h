@@ -87,15 +87,6 @@ enum xwup_flg_trigger_em {
         XWUP_FLG_TRIGGER_NUM,
 };
 
-/**
- * @brief 事件触发后的动作枚举
- */
-enum xwup_flg_action_em {
-        XWUP_FLG_ACTION_NONE = 0U, /**< 无动作 */
-        XWUP_FLG_ACTION_CONSUMPTION = 1U, /**< 消费事件 */
-        XWUP_FLG_ACTION_NUM,
-};
-
 /* public */
 xwer_t xwup_flg_s1m(struct xwup_evt * evt, xwbmp_t msk[]);
 xwer_t xwup_flg_s1i(struct xwup_evt * evt, xwsq_t pos);
@@ -105,17 +96,17 @@ xwer_t xwup_flg_x1m(struct xwup_evt * evt, xwbmp_t msk[]);
 xwer_t xwup_flg_x1i(struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_flg_read(struct xwup_evt * evt, xwbmp_t out[]);
 xwer_t xwup_flg_wait(struct xwup_evt * evt,
-                     xwsq_t trigger, xwsq_t action,
+                     xwsq_t trigger, bool consumption,
                      xwbmp_t origin[], xwbmp_t msk[]);
 xwer_t xwup_flg_wait_to(struct xwup_evt * evt,
-                        xwsq_t trigger, xwsq_t action,
+                        xwsq_t trigger, bool consumption,
                         xwbmp_t origin[], xwbmp_t msk[],
                         xwtm_t to);
 xwer_t xwup_flg_trywait(struct xwup_evt * evt,
-                        xwsq_t trigger, xwsq_t action,
+                        xwsq_t trigger, bool consumption,
                         xwbmp_t origin[], xwbmp_t msk[]);
 xwer_t xwup_flg_wait_unintr(struct xwup_evt * evt,
-                            xwsq_t trigger, xwsq_t action,
+                            xwsq_t trigger, bool consumption,
                             xwbmp_t origin[], xwbmp_t msk[]);
 
 /******** type:XWUP_EVT_TYPE_SEL ********/
