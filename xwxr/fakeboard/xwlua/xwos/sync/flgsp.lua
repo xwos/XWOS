@@ -319,10 +319,11 @@ end
 　● 此参数对 **trigger** 取值 **"ta"** ， **"to"** ，无意义。
 
 @tparam userdata origin (**in,out**) 事件的状态位图<br>
-　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：(**out**) 返回触发时的事件状态位图<br>
+　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：<br>
+　　○ (**out**) 返回事件触发 **之前** 的位图状态<br>
 　● 当参数 **trigger** 取值 **"ta"** ， **"to"** 时：<br>
-　　○ (**in**) 用于比较的初始值<br>
-　　○ (**out**) 返回触发时的事件状态位图
+　　○ (**in**) 输入时，作为评估事件位图是否发生变化的初始状态<br>
+　　○ (**out**) 输出时，返回触发后的事件标志位图状态（可作为下一次调用的初始值）
 
 @tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件
 
@@ -427,6 +428,67 @@ end
 
 
 --[[--------
+限时等待事件标志对象的触发事件
+
+
+
+@tparam userdata flgsp (**in**) 事件标志对象强指针
+
+@tparam string trigger (**in**) 事件触发条件<br>
+　● **"sa"** 所有事件位被置 **1** 触发<br>
+　● **"so"** 任意事件位被置 **1** 触发<br>
+　● **"ca"** 所有事件位被清 **0** 触发<br>
+　● **"co"** 任意事件位被清 **0** 触发<br>
+　● **"ta"** 所有事件位发生翻转触发<br>
+　● **"to"** 任意事件位发生翻转触发
+
+@tparam boolean consumption (**in**) 是否消费事件<br>
+　● **消费** 事件是指，当线程等到事件被唤醒，可以选择是否 **清除** 事件标志。<br>
+　● **清除** 的含义是：<br>
+　　○ 当线程等待的是位图中的事件位被置 **1** ， **清除** 是指将这些位清 **0** ；<br>
+　　○ 当线程等待的是位图中的事件位被清 **0** ， **清除** 是指将这些位置 **1** ；<br>
+　● 此参数对 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 有效；<br>
+　● 此参数对 **trigger** 取值 **"ta"** ， **"to"** ，无意义。
+
+@tparam userdata origin (**in,out**) 事件的状态位图<br>
+　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：<br>
+　　○ (**out**) 返回事件触发 **之前** 的位图状态<br>
+　● 当参数 **trigger** 取值 **"ta"** ， **"to"** 时：<br>
+　　○ (**in**) 输入时，作为评估事件位图是否发生变化的初始状态<br>
+　　○ (**out**) 输出时，返回触发后的事件标志位图状态（可作为下一次调用的初始值）
+
+@tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件
+
+@tparam number to (**in**) 期望的阻塞等待时间
+
+@treturn number 返回值<br>
+　● **0** 没有错误<br>
+　● **-EINVAL** 参数错误<br>
+　● **-EINTR** 等待被中断<br>
+　● **-ENOTTHDCTX** 不在线程上下文中<br>
+　● **-ETIMEDOUT** 超时
+
+@usage
+flg = xwos.flg.new(32)
+origin = flg:bmp();
+msk = flg:bmp();
+msk:zero();
+msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 事件掩码：0xFF
+rc = flg:wait_to("ca", true, origin, msk, xwtm.ft(xwtm.s(1)))
+if (rc == 0) then
+  -- 事件1,2,3,4,5,6,7,8全部被清除
+  -- 消费事件，事件1,2,3,4,5,6,7,8全被设置
+else if (rc == -116)
+  -- 超时
+else
+  -- 错误发生
+end
+]]
+function flgsp:wait_to(flgsp, trigger, consumption, origin, msk, to)
+end
+
+
+--[[--------
 检查事件标志
 
 
@@ -452,10 +514,11 @@ end
 　● 此参数对 **trigger** 取值 **"ta"** ， **"to"** ，无意义。
 
 @tparam userdata origin (**in,out**) 事件的状态位图<br>
-　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：(**out**) 返回触发时的事件状态位图<br>
+　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：<br>
+　　○ (**out**) 返回事件触发 **之前** 的位图状态<br>
 　● 当参数 **trigger** 取值 **"ta"** ， **"to"** 时：<br>
-　　○ (**in**) 用于比较的初始值<br>
-　　○ (**out**) 返回触发时的事件状态位图
+　　○ (**in**) 输入时，作为评估事件位图是否发生变化的初始状态<br>
+　　○ (**out**) 输出时，返回触发后的事件标志位图状态（可作为下一次调用的初始值）
 
 @tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件
 
@@ -487,7 +550,7 @@ end
 
 
 --[[--------
-限时等待事件标志对象的触发事件
+等待触发事件，且等待不可被中断
 
 
 
@@ -504,27 +567,25 @@ end
 @tparam boolean consumption (**in**) 是否消费事件<br>
 　● **消费** 事件是指，当线程等到事件被唤醒，可以选择是否 **清除** 事件标志。<br>
 　● **清除** 的含义是：<br>
-　　○ 当线程等待的是位图中的事件位被置 **1** ， **清除** 是指将这些位清 **0** ；<br>
-　　○ 当线程等待的是位图中的事件位被清 **0** ， **清除** 是指将这些位置 **1** ；<br>
+　　○ 当线程等待的是位图中的事件位被置 **1** ，**清除** 是指将这些位清 **0** ；<br>
+　　○ 当线程等待的是位图中的事件位被清 **0** ，**清除** 是指将这些位置 **1** ；<br>
 　● 此参数对 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 有效；<br>
 　● 此参数对 **trigger** 取值 **"ta"** ， **"to"** ，无意义。
 
 @tparam userdata origin (**in,out**) 事件的状态位图<br>
-　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：(**out**) 返回触发时的事件状态位图<br>
+　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：<br>
+　　○ (**out**) 返回事件触发 **之前** 的位图状态<br>
 　● 当参数 **trigger** 取值 **"ta"** ， **"to"** 时：<br>
-　　○ (**in**) 用于比较的初始值<br>
-　　○ (**out**) 返回触发时的事件状态位图
+　　○ (**in**) 输入时，作为评估事件位图是否发生变化的初始状态<br>
+　　○ (**out**) 输出时，返回触发后的事件标志位图状态（可作为下一次调用的初始值）
 
 @tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件
 
-@tparam number to (**in**) 期望的阻塞等待时间
-
-@treturn number 返回值<br>
+@treturn[1] number 返回值<br>
 　● **0** 没有错误<br>
 　● **-EINVAL** 参数错误<br>
 　● **-EINTR** 等待被中断<br>
-　● **-ENOTTHDCTX** 不在线程上下文中<br>
-　● **-ETIMEDOUT** 超时
+　● **-ENOTTHDCTX** 不在线程上下文中
 
 @usage
 flg = xwos.flg.new(32)
@@ -532,15 +593,89 @@ origin = flg:bmp();
 msk = flg:bmp();
 msk:zero();
 msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 事件掩码：0xFF
-rc = flg:wait_to("ca", true, origin, msk, xwtm.ft(xwtm.s(1)))
+rc = flg:wait_unintr("sa", true, origin, msk)
+if (rc == 0) then
+  -- 获取所有的事件1,2,3,4,5,6,7,8
+  -- 消费事件，事件1,2,3,4,5,6,7,8会被清除
+else
+  -- 错误发生
+end
+
+@usage
+flg = xwos.flg.new(32)
+origin = flg:bmp();
+msk = flg:bmp();
+msk:zero();
+msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 事件掩码：0xFF
+rc = flg:wait_unintr("so", true, origin, msk)
+if (rc == 0) then
+  -- 获取事件1,2,3,4,5,6,7,8中的一个或多个
+  -- 消费事件，事件1,2,3,4,5,6,7,8会被清除
+else
+  -- 错误发生
+end
+
+@usage
+flg = xwos.flg.new(32)
+origin = flg:bmp();
+msk = flg:bmp();
+msk:zero();
+msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 事件掩码：0xFF
+rc = flg:wait_unintr("ca", true, origin, msk)
 if (rc == 0) then
   -- 事件1,2,3,4,5,6,7,8全部被清除
   -- 消费事件，事件1,2,3,4,5,6,7,8全被设置
-else if (rc == -116)
-  -- 超时
+else
+  -- 错误发生
+end
+
+@usage
+flg = xwos.flg.new(32)
+origin = flg:bmp();
+msk = flg:bmp();
+msk:zero();
+msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 事件掩码：0xFF
+rc = flg:wait_unintr("co", true, origin, msk)
+if (rc == 0) then
+  -- 事件1,2,3,4,5,6,7,8中的一个或多个被清除
+  -- 消费事件，事件1,2,3,4,5,6,7,8全被设置
+else
+  -- 错误发生
+end
+
+@usage
+flg = xwos.flg.new(32)
+origin = flg:bmp();
+origin:zero();
+origin:s1i(2, 4, 6, 8); -- 事件初始值：0xAA
+msk = flg:bmp();
+msk:zero();
+msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 事件掩码：0xFF
+rc = flg:wait_unintr("ta", true, origin, msk)
+if (rc == 0) then
+  -- 事件1,2,3,4,5,6,7,8全部发生了翻转
+  -- consumption对此种类型的等待不起作用
+  -- origin为翻转后的事件状态（0x55）
+else
+  -- 错误发生
+end
+
+@usage
+flg = xwos.flg.new(32)
+origin = flg:bmp();
+origin:zero();
+origin:s1i(2, 4, 6, 8); -- 事件初始值：0xAA
+msk = flg:bmp();
+msk:zero();
+msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 事件掩码：0xFF
+rc = flg:wait_unintr("to", true, origin, msk)
+if (rc == 0) then
+  -- 事件1,2,3,4,5,6,7,8部分发生了翻转
+  -- consumption对此种类型的等待不起作用
+  -- origin为翻转后的事件状态
 else
   -- 错误发生
 end
 ]]
-function flgsp:wait_to(flgsp, trigger, consumption, origin, msk, to)
+function flgsp:wait_unintr(flgsp, trigger, consumption, origin, msk)
 end

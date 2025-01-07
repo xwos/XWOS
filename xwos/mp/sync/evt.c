@@ -98,7 +98,7 @@ xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc);
 
 static __xwmp_code
 xwer_t xwmp_flg_wait_level(struct xwmp_evt * evt,
-                           xwsq_t trigger, xwsq_t action,
+                           xwsq_t trigger, bool consumption,
                            xwbmp_t origin[], xwbmp_t msk[]);
 
 static __xwmp_code
@@ -107,7 +107,7 @@ xwer_t xwmp_flg_wait_edge(struct xwmp_evt * evt, xwsq_t trigger,
 
 static __xwmp_code
 xwer_t xwmp_flg_wait_to_level(struct xwmp_evt * evt,
-                              xwsq_t trigger, xwsq_t action,
+                              xwsq_t trigger, bool consumption,
                               xwbmp_t origin[], xwbmp_t msk[],
                               xwtm_t to);
 
@@ -118,7 +118,7 @@ xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
 
 static __xwmp_code
 xwer_t xwmp_flg_trywait_level(struct xwmp_evt * evt,
-                              xwsq_t trigger, xwsq_t action,
+                              xwsq_t trigger, bool consumption,
                               xwbmp_t origin[], xwbmp_t msk[]);
 
 static __xwmp_code
@@ -127,7 +127,7 @@ xwer_t xwmp_flg_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
 
 static __xwmp_code
 xwer_t xwmp_flg_wait_unintr_level(struct xwmp_evt * evt,
-                                  xwsq_t trigger, xwsq_t action,
+                                  xwsq_t trigger, bool consumption,
                                   xwbmp_t origin[], xwbmp_t msk[]);
 
 static __xwmp_code
@@ -645,7 +645,7 @@ xwer_t xwmp_flg_read(struct xwmp_evt * evt, xwbmp_t out[])
 
 static __xwmp_code
 xwer_t xwmp_flg_wait_level(struct xwmp_evt * evt,
-                           xwsq_t trigger, xwsq_t action,
+                           xwsq_t trigger, bool consumption,
                            xwbmp_t origin[], xwbmp_t msk[])
 {
         xwreg_t cpuirq;
@@ -659,7 +659,7 @@ xwer_t xwmp_flg_wait_level(struct xwmp_evt * evt,
                 if (NULL != origin) {
                         xwbmpop_assign(origin, evt->bmp, evt->num);
                 }
-                if ((xwsq_t)XWMP_FLG_ACTION_CONSUMPTION == action) {
+                if (consumption) {
                         switch (trigger) {
                         case XWMP_FLG_TRIGGER_SET_ALL:
                                 triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk,
@@ -790,13 +790,13 @@ xwer_t xwmp_flg_wait_edge(struct xwmp_evt * evt, xwsq_t trigger,
 
 __xwmp_api
 xwer_t xwmp_flg_wait(struct xwmp_evt * evt,
-                     xwsq_t trigger, xwsq_t action,
+                     xwsq_t trigger, bool consumption,
                      xwbmp_t origin[], xwbmp_t msk[])
 {
         xwer_t rc;
 
         if (trigger <= (xwsq_t)XWMP_FLG_TRIGGER_CLR_ANY) {
-                rc = xwmp_flg_wait_level(evt, trigger, action, origin, msk);
+                rc = xwmp_flg_wait_level(evt, trigger, consumption, origin, msk);
         } else {
                 rc = xwmp_flg_wait_edge(evt, trigger, origin, msk);
         }
@@ -805,7 +805,7 @@ xwer_t xwmp_flg_wait(struct xwmp_evt * evt,
 
 static __xwmp_code
 xwer_t xwmp_flg_wait_to_level(struct xwmp_evt * evt,
-                              xwsq_t trigger, xwsq_t action,
+                              xwsq_t trigger, bool consumption,
                               xwbmp_t origin[], xwbmp_t msk[],
                               xwtm_t to)
 {
@@ -820,7 +820,7 @@ xwer_t xwmp_flg_wait_to_level(struct xwmp_evt * evt,
                 if (NULL != origin) {
                         xwbmpop_assign(origin, evt->bmp, evt->num);
                 }
-                if ((xwsq_t)XWMP_FLG_ACTION_CONSUMPTION == action) {
+                if (consumption) {
                         switch (trigger) {
                         case XWMP_FLG_TRIGGER_SET_ALL:
                                 triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk,
@@ -952,14 +952,14 @@ xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
 
 __xwmp_api
 xwer_t xwmp_flg_wait_to(struct xwmp_evt * evt,
-                        xwsq_t trigger, xwsq_t action,
+                        xwsq_t trigger, bool consumption,
                         xwbmp_t origin[], xwbmp_t msk[],
                         xwtm_t to)
 {
         xwer_t rc;
 
         if (trigger <= (xwsq_t)XWMP_FLG_TRIGGER_CLR_ANY) {
-                rc = xwmp_flg_wait_to_level(evt, trigger, action, origin, msk, to);
+                rc = xwmp_flg_wait_to_level(evt, trigger, consumption, origin, msk, to);
         } else {
                 rc = xwmp_flg_wait_to_edge(evt, trigger, origin, msk, to);
         }
@@ -968,7 +968,7 @@ xwer_t xwmp_flg_wait_to(struct xwmp_evt * evt,
 
 static __xwmp_code
 xwer_t xwmp_flg_trywait_level(struct xwmp_evt * evt,
-                              xwsq_t trigger, xwsq_t action,
+                              xwsq_t trigger, bool consumption,
                               xwbmp_t origin[], xwbmp_t msk[])
 {
         xwreg_t cpuirq;
@@ -980,7 +980,7 @@ xwer_t xwmp_flg_trywait_level(struct xwmp_evt * evt,
         if (NULL != origin) {
                 xwbmpop_assign(origin, evt->bmp, evt->num);
         }
-        if ((xwsq_t)XWMP_FLG_ACTION_CONSUMPTION == action) {
+        if (consumption) {
                 switch (trigger) {
                 case XWMP_FLG_TRIGGER_SET_ALL:
                         triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk, evt->num);
@@ -1076,13 +1076,13 @@ xwer_t xwmp_flg_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
 
 __xwmp_api
 xwer_t xwmp_flg_trywait(struct xwmp_evt * evt,
-                        xwsq_t trigger, xwsq_t action,
+                        xwsq_t trigger, bool consumption,
                         xwbmp_t origin[], xwbmp_t msk[])
 {
         xwer_t rc;
 
         if (trigger <= (xwsq_t)XWMP_FLG_TRIGGER_CLR_ANY) {
-                rc = xwmp_flg_trywait_level(evt, trigger, action, origin, msk);
+                rc = xwmp_flg_trywait_level(evt, trigger, consumption, origin, msk);
         } else {
                 rc = xwmp_flg_trywait_edge(evt, trigger, origin, msk);
         }
@@ -1091,7 +1091,7 @@ xwer_t xwmp_flg_trywait(struct xwmp_evt * evt,
 
 static __xwmp_code
 xwer_t xwmp_flg_wait_unintr_level(struct xwmp_evt * evt,
-                                  xwsq_t trigger, xwsq_t action,
+                                  xwsq_t trigger, bool consumption,
                                   xwbmp_t origin[], xwbmp_t msk[])
 {
         xwreg_t cpuirq;
@@ -1105,7 +1105,7 @@ xwer_t xwmp_flg_wait_unintr_level(struct xwmp_evt * evt,
                 if (NULL != origin) {
                         xwbmpop_assign(origin, evt->bmp, evt->num);
                 }
-                if ((xwsq_t)XWMP_FLG_ACTION_CONSUMPTION == action) {
+                if (consumption) {
                         switch (trigger) {
                         case XWMP_FLG_TRIGGER_SET_ALL:
                                 triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk,
@@ -1236,13 +1236,13 @@ xwer_t xwmp_flg_wait_unintr_edge(struct xwmp_evt * evt, xwsq_t trigger,
 
 __xwmp_api
 xwer_t xwmp_flg_wait_unintr(struct xwmp_evt * evt,
-                            xwsq_t trigger, xwsq_t action,
+                            xwsq_t trigger, bool consumption,
                             xwbmp_t origin[], xwbmp_t msk[])
 {
         xwer_t rc;
 
         if (trigger <= (xwsq_t)XWMP_FLG_TRIGGER_CLR_ANY) {
-                rc = xwmp_flg_wait_unintr_level(evt, trigger, action, origin, msk);
+                rc = xwmp_flg_wait_unintr_level(evt, trigger, consumption, origin, msk);
         } else {
                 rc = xwmp_flg_wait_unintr_edge(evt, trigger, origin, msk);
         }
