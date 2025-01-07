@@ -277,9 +277,10 @@ xwos_sel_d xwos_sel_get_d(struct xwos_sel * sel)
  * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * + 上下文：任意
- * - 绑定方式：非独占绑定
+ * + 绑定方式：非独占绑定
  * @details
- * 多个信号选择器可以依次绑定，形成信号传递链。但不可循环绑定，否则会造成无限循环传递。
+ * 多个信号选择器可以依次绑定，形成信号传递链。
+ * 但不可循环绑定，否则会造成无限循环传递。
  */
 static __xwos_inline_api
 xwer_t xwos_sel_bind(struct xwos_sel * src, struct xwos_sel * dst, xwsq_t pos)

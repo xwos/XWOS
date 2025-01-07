@@ -291,7 +291,7 @@ xwos_sem_d xwos_sem_get_d(struct xwos_sem * sem)
  * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * + 上下文：任意
- * - 绑定方式：独占绑定
+ * + 绑定方式：独占绑定
  */
 static __xwos_inline_api
 xwer_t xwos_sem_bind(struct xwos_sem * sem, struct xwos_sel * sel, xwsq_t pos)

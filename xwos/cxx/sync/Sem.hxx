@@ -14,6 +14,7 @@
 #define __xwos_cxx_sync_Sem_hxx__
 
 #include <xwos/osal/sync/sem.hxx>
+#include <xwos/cxx/sync/Sel.hxx>
 
 namespace xwos {
 namespace sync {
@@ -170,6 +171,74 @@ class Sem
         xwssq_t value;
         xwos_sem_get_value(mSemPtr, &value);
         return value;
+    }
+
+    /**
+     * @brief 绑定信号量对象到信号选择器
+     * @param[in] sel: 信号选择器的指针
+     * @param[in] pos: 信号量对象映射到信号选择器位图中的位置
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ECHRNG: 位置超出范围
+     * @retval -EALREADY: 同步对象已经绑定到事件对象
+     * @retval -EBUSY: 通道已经被其他同步对象独占
+     * @note
+     * + 上下文：任意
+     * + 绑定方式：独占绑定
+     */
+    template<xwsz_t TSelNum>
+    xwer_t bind(Sel<TSelNum> * sel, xwsq_t pos) {
+        return xwos_sem_bind(mSemPtr, sel->getXwosObj(), pos);
+    }
+
+    /**
+     * @brief 绑定信号量对象到信号选择器
+     * @param[in] sel: 信号选择器的引用
+     * @param[in] pos: 信号量对象映射到信号选择器位图中的位置
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ECHRNG: 位置超出范围
+     * @retval -EALREADY: 同步对象已经绑定到事件对象
+     * @retval -EBUSY: 通道已经被其他同步对象独占
+     * @note
+     * + 上下文：任意
+     * + 绑定方式：独占绑定
+     */
+    template<xwsz_t TSelNum>
+    xwer_t bind(Sel<TSelNum> & sel, xwsq_t pos) {
+        return xwos_sem_bind(mSemPtr, sel.getXwosObj(), pos);
+    }
+
+    /**
+     * @brief 从信号选择器上解绑信号量对象
+     * @param[in] sel: 信号选择器的引用
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
+     * @note
+     * + 上下文：任意
+     */
+    template<xwsz_t TSelNum>
+    xwer_t unbind(Sel<TSelNum> * sel) {
+        return xwos_sem_unbind(mSemPtr, sel->getXwosObj());
+    }
+
+    /**
+     * @brief 从信号选择器上解绑信号量对象
+     * @param[in] sel: 信号选择器的引用
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
+     * @note
+     * + 上下文：任意
+     */
+    template<xwsz_t TSelNum>
+    xwer_t unbind(Sel<TSelNum> & sel) {
+        return xwos_sem_unbind(mSemPtr, sel.getXwosObj());
     }
 
     /**

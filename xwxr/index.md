@@ -55,6 +55,15 @@
     + @subpage xwos_cxx_sync_Cond
     + @subpage xwos_cxx_sync_SCond
     + @subpage xwos_cxx_sync_DCond
+    + @subpage xwos_cxx_sync_Flg
+    + @subpage xwos_cxx_sync_SFlg
+    + @subpage xwos_cxx_sync_DFlg
+    + @subpage xwos_cxx_sync_Br
+    + @subpage xwos_cxx_sync_SBr
+    + @subpage xwos_cxx_sync_DBr
+    + @subpage xwos_cxx_sync_Sel
+    + @subpage xwos_cxx_sync_SSel
+    + @subpage xwos_cxx_sync_DSel
 + @subpage xwmd
   + @subpage xwmd_isc
     + @subpage xwmd_isc_xwcq

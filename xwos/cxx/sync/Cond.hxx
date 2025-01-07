@@ -14,6 +14,7 @@
 #define __xwos_cxx_sync_Cond_hxx__
 
 #include <xwos/osal/sync/cond.hxx>
+#include <xwos/cxx/sync/Sel.hxx>
 
 namespace xwos {
 namespace sync {
@@ -98,6 +99,76 @@ class Cond
      *   对未冻结的条件量对象调用此函数将返回错误码 `-EALREADY` 。
      */
     xwer_t thaw() { return xwos_cond_thaw(mCondPtr); }
+
+    /**
+     * @brief 绑定条件量对象到信号选择器
+     * @param[in] sel: 信号选择器的指针
+     * @param[in] pos: 条件量对象映射到信号选择器位图中的位置
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -ECHRNG: 位置超出范围
+     * @retval -EALREADY: 同步对象已经绑定到事件对象
+     * @retval -EBUSY: 通道已经被其他同步对象独占
+     * @note
+     * + 上下文：任意
+     * + 绑定方式：非独占绑定
+     * + 绑定了信号选择器的条件量对象，只有 **广播** 才会向信号选择器发送信号。
+     */
+    template<xwsz_t TSelNum>
+    xwer_t bind(Sel<TSelNum> * sel, xwsq_t pos) {
+        return xwos_cond_bind(mCondPtr, sel->getXwosObj(), pos);
+    }
+
+    /**
+     * @brief 绑定条件量对象到信号选择器
+     * @param[in] sel: 信号选择器的引用
+     * @param[in] pos: 条件量对象映射到信号选择器位图中的位置
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -ECHRNG: 位置超出范围
+     * @retval -EALREADY: 同步对象已经绑定到事件对象
+     * @retval -EBUSY: 通道已经被其他同步对象独占
+     * @note
+     * + 上下文：任意
+     * + 绑定方式：非独占绑定
+     * + 绑定了信号选择器的条件量对象，只有 **广播** 才会向信号选择器发送信号。
+     */
+    template<xwsz_t TSelNum>
+    xwer_t bind(Sel<TSelNum> & sel, xwsq_t pos) {
+        return xwos_cond_bind(mCondPtr, sel.getXwosObj(), pos);
+    }
+
+    /**
+     * @brief 从信号选择器上解绑条件量对象
+     * @param[in] sel: 信号选择器的引用
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
+     * @note
+     * + 上下文：任意
+     */
+    template<xwsz_t TSelNum>
+    xwer_t unbind(Sel<TSelNum> * sel) {
+        return xwos_cond_unbind(mCondPtr, sel->getXwosObj());
+    }
+
+    /**
+     * @brief 从信号选择器上解绑条件量对象
+     * @param[in] sel: 信号选择器的引用
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
+     * @note
+     * + 上下文：任意
+     */
+    template<xwsz_t TSelNum>
+    xwer_t unbind(Sel<TSelNum> & sel) {
+        return xwos_cond_unbind(mCondPtr, sel.getXwosObj());
+    }
 
     /**
      * @brief 获取XWOS对象指针
