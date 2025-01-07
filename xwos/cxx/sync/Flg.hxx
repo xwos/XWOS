@@ -26,6 +26,11 @@ namespace sync {
  * @defgroup xwos_cxx_sync_Flg 事件标志基类
  * @ingroup xwos_cxx_sync
  *
+ * ## C++ API
+ *
+ * 头文件： @ref xwos/cxx/sync/Flg.hxx
+ *
+ * @{
  */
 
 /**

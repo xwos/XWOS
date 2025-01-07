@@ -43,11 +43,16 @@
   + @subpage xwos_cxx_SSwt
   + @subpage xwos_cxx_DThd
   + @subpage xwos_cxx_lock
+    + @subpage xwos_cxx_lock_Mtx
     + @subpage xwos_cxx_lock_SMtx
     + @subpage xwos_cxx_lock_DMtx
     + @subpage xwos_cxx_lock_Spinlock
     + @subpage xwos_cxx_lock_Seqlock
   + @subpage xwos_cxx_sync
+    + @subpage xwos_cxx_sync_Sem
+    + @subpage xwos_cxx_sync_SSem
+    + @subpage xwos_cxx_sync_DSem
+    + @subpage xwos_cxx_sync_Cond
     + @subpage xwos_cxx_sync_SCond
     + @subpage xwos_cxx_sync_DCond
 + @subpage xwmd
