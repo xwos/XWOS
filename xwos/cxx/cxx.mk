@@ -63,10 +63,7 @@ endif
 
 ######## ######## ######## ######## Lock ######## ######## ######## ########
 ifeq ($(XWOSCFG_LOCK_MTX_CXX), y)
-  XWOS_CXXSRCS += cxx/lock/SMtx.cxx
-  ifeq ($(XWOSCXXRULE_DMTX),y)
-    XWOS_CXXSRCS += cxx/lock/DMtx.cxx
-  endif
+  XWOS_CXXSRCS += cxx/lock/Mtx.cxx
 endif
 
 ifeq ($(XWOSCFG_LOCK_SPLK_CXX), y)
