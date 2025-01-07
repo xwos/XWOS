@@ -45,7 +45,7 @@ class SCond
     /**
      * @brief 构造函数
      */
-    SCond() : Cond(nullptr) {
+    SCond() : Cond() {
         mCtorRc = xwos_cond_init(&mCond);
         if (XWOK == mCtorRc) {
             Cond::mCondPtr = &mCond;
@@ -53,64 +53,6 @@ class SCond
     }
     ~SCond() { xwos_cond_fini(&mCond); } /**< 析构函数 */
     xwer_t getCtorRc() { return mCtorRc; } /**< 获取静态条件量构造的结果 */
-
-    /**
-     * @brief 单播条件量
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 无效的指针或空指针
-     * @retval -ENEGATIVE: 条件量对象已被冻结
-     * @note
-     * + 上下文：任意
-     * @details
-     * + 单播条件量会唤醒第一个等待的线程。
-     * + 此C++API只对未冻结的条件量对象起作用，已冻结的条件量对象将返回
-     *   错误码 `-ENEGATIVE` 。
-     */
-    xwer_t unicast() { return Cond::unicast(); }
-
-    /**
-     * @brief 广播条件量
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 无效的指针或空指针
-     * @retval -ENEGATIVE: 条件量对象已被冻结
-     * @note
-     * + 上下文：任意
-     * @details
-     * + 广播条件量会唤醒所有等待的线程。
-     * + 此C++API只对未冻结的条件量对象起作用，已冻结的条件量对象将返回
-     *   错误码 `-ENEGATIVE` 。
-     */
-    xwer_t broadcast() { return Cond::broadcast(); }
-
-    /**
-     * @brief 冻结条件量
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 无效的指针或空指针
-     * @retval -EALREADY: 条件量对象已被冻结
-     * @note
-     * + 上下文：任意
-     * @details
-     * + 已冻结的条件量不允许单播或广播，但可以被线程等待。
-     * + 对已经冻结的条件量再次冻结，将返回 `-EALREADY` 。
-     */
-    xwer_t freeze() { return Cond::freeze(); }
-
-    /**
-     * @brief 解冻条件量
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 无效的指针或空指针
-     * @retval -EALREADY: 条件量对象未被冻结
-     * @note
-     * + 上下文：任意
-     * @details
-     * + 此函数只对已冻结的条件量对象起作用，
-     *   对未冻结的条件量对象调用此函数将返回错误码 `-EALREADY` 。
-     */
-    xwer_t thaw() { return Cond::thaw(); }
 
     /* 生命周期管理 */
     xwer_t grab() { return xwos_cond_grab(&mCond); } /**< 增加引用计数 */

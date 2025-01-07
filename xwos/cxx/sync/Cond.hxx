@@ -32,15 +32,71 @@ class Cond
   protected:
     struct xwos_cond * mCondPtr;
   protected:
-    explicit Cond(xwos_cond * cond) : mCondPtr(cond) {}
+    Cond() : mCondPtr(nullptr) {}
     ~Cond() { mCondPtr = nullptr; }
 
+  public:
+    /**
+     * @brief 单播条件量
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -ENEGATIVE: 条件量对象已被冻结
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 单播条件量会唤醒第一个等待的线程。
+     * + 此C++API只对未冻结的条件量对象起作用，已冻结的条件量对象将返回
+     *   错误码 `-ENEGATIVE` 。
+     */
     xwer_t unicast() { return xwos_cond_unicast(mCondPtr); }
+
+    /**
+     * @brief 广播条件量
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -ENEGATIVE: 条件量对象已被冻结
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 广播条件量会唤醒所有等待的线程。
+     * + 此C++API只对未冻结的条件量对象起作用，已冻结的条件量对象将返回
+     *   错误码 `-ENEGATIVE` 。
+     */
     xwer_t broadcast() { return xwos_cond_broadcast(mCondPtr); }
+
+    /**
+     * @brief 冻结条件量
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -EALREADY: 条件量对象已被冻结
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 已冻结的条件量不允许单播或广播，但可以被线程等待。
+     * + 对已经冻结的条件量再次冻结，将返回 `-EALREADY` 。
+     */
     xwer_t freeze() { return xwos_cond_freeze(mCondPtr); }
+
+    /**
+     * @brief 解冻条件量
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 无效的指针或空指针
+     * @retval -EALREADY: 条件量对象未被冻结
+     * @note
+     * + 上下文：任意
+     * @details
+     * + 此函数只对已冻结的条件量对象起作用，
+     *   对未冻结的条件量对象调用此函数将返回错误码 `-EALREADY` 。
+     */
     xwer_t thaw() { return xwos_cond_thaw(mCondPtr); }
 
-  public:
+    /**
+     * @brief 获取XWOS对象指针
+     */
     struct xwos_cond * getXwosObj() { return mCondPtr; }
 };
 
