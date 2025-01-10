@@ -34,24 +34,21 @@ namespace sync {
  * @brief 静态信号选择器
  */
 template<xwsz_t TNum>
-class SSel
-    : public Sel<TNum>
+class SSel : public Sel<TNum>
 {
-  public:
-
-
   private:
     struct xwos_sel mSel; /**< 信号选择器结构体 */
-    typename Sel<TNum>::SelBmp mBitmap; /**< 事件位图 */
-    typename Sel<TNum>::SelBmp mMask; /**< 事件掩码 */
+    xwos::Bmp<TNum> mObjBmp; /**< 同步对象位图 */
+    xwos::Bmp<TNum> mObjMsk; /**< 同步对象掩码 */
     xwer_t mCtorRc; /**< 信号选择器构造的结果 */
 
   public:
     /**
      * @brief 构造函数
      */
-    SSel() : Sel<TNum>() {
-        mCtorRc = xwos_sel_init(&mSel, TNum, mBitmap, mMask);
+    SSel() : Sel<TNum>()
+    {
+        mCtorRc = xwos_sel_init(&mSel, TNum, mObjBmp.mData, mMask);
         if (XWOK == mCtorRc) {
             Sel<TNum>::mSelPtr = &mSel;
         }

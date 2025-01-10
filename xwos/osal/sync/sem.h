@@ -366,7 +366,8 @@ xwer_t xwos_sem_thaw(struct xwos_sem * sem)
  * @note
  * + 上下文：任意
  * @details
- * 此CAPI只对未冻结的信号量对象起作用，已冻结的信号量对象将得到错误码 `-ENEGATIVE` 。
+ * + 此CAPI只对未冻结的信号量对象起作用，对已冻结的信号量对象调用此CAPI将
+ *   返回错误码 `-ENEGATIVE` 。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_post(struct xwos_sem * sem)

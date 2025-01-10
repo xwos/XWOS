@@ -34,24 +34,22 @@ namespace sync {
  * @brief 静态事件标志
  */
 template<xwsz_t TNum>
-class SFlg
-    : public Flg<TNum>
+class SFlg : public Flg<TNum>
 {
-  public:
-
-
   private:
     struct xwos_flg mFlg; /**< 事件标志结构体 */
-    typename Flg<TNum>::FlgBmp mBitmap; /**< 事件位图 */
-    typename Flg<TNum>::FlgBmp mMask; /**< 事件掩码 */
+    xwos::Bmp<TNum> mEventBmp; /**< 事件位图 */
+    xwos::Bmp<TNum> mEventMsk; /**< 事件掩码 */
     xwer_t mCtorRc; /**< 事件标志构造的结果 */
 
   public:
     /**
      * @brief 构造函数
      */
-    SFlg() : Flg<TNum>() {
-        mCtorRc = xwos_flg_init(&mFlg, TNum, mBitmap, mMask);
+    SFlg()
+        : Flg<TNum>()
+    {
+        mCtorRc = xwos_flg_init(&mFlg, TNum, mEventBmp.mData, mEventMsk.mData);
         if (XWOK == mCtorRc) {
             Flg<TNum>::mFlgPtr = &mFlg;
         }

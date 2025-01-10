@@ -53,7 +53,8 @@ class DSwt
      * @param[in] origin: 软件定时器的初始时间
      * @param[in] period: 软件定时器的周期时间
      */
-    xwer_t start(xwtm_t origin, xwtm_t period) {
+    xwer_t start(xwtm_t origin, xwtm_t period)
+    {
         return xwos_swt_start(mSwtDesc.swt, origin, period,
                               (xwos_swt_f)sSwtAlarmFunction, this);
     }

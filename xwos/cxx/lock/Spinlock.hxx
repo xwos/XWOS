@@ -370,7 +370,11 @@ class Spinlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        LkGrd(): mSpinlock(nullptr), mStatus(SpinlockUnlocked) {}
+        LkGrd()
+            : mSpinlock(nullptr)
+            , mStatus(SpinlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -383,8 +387,7 @@ class Spinlock
      * @note
      * + 上下文：线程
      */
-    class TryLkGrd
-        : public LkGrd
+    class TryLkGrd : public LkGrd
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -536,7 +539,11 @@ class Spinlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        LkThGrd(): mSpinlock(nullptr), mStatus(SpinlockUnlocked) {}
+        LkThGrd()
+            : mSpinlock(nullptr)
+            , mStatus(SpinlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -550,8 +557,7 @@ class Spinlock
      * @note
      * + 上下文：任意
      */
-    class TryLkThGrd
-        : public LkThGrd
+    class TryLkThGrd : public LkThGrd
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -701,7 +707,11 @@ class Spinlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        LkBhGrd(): mSpinlock(nullptr), mStatus(SpinlockUnlocked) {}
+        LkBhGrd()
+            : mSpinlock(nullptr)
+            , mStatus(SpinlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -715,8 +725,7 @@ class Spinlock
      * @note
      * + 上下文：线程、中断底半部
      */
-    class TryLkBhGrd
-        : public LkBhGrd
+    class TryLkBhGrd : public LkBhGrd
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -759,7 +768,7 @@ class Spinlock
      * @note
      * + 上下文：线程、`TIrqList` 列表中的中断
      */
-    template<xwirq_t ... TIrqList>
+    template<xwirq_t... TIrqList>
     class LkIrqsGrd
     {
       protected:
@@ -773,25 +782,63 @@ class Spinlock
          * @brief 构造自旋锁的RAII机制守卫
          * @param[in] spinlock: 自旋锁对象指针
          */
-        LkIrqsGrd(Spinlock * spinlock);
+        LkIrqsGrd(Spinlock * spinlock)
+            : mSpinlock(spinlock)
+            , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
+            , mIrqs{ TIrqList... }
+        {
+            if (nullptr != mSpinlock) {
+                xwos_splk_lock_irqssv(&mSpinlock->mLock, mIrqs, mIrqFlags,
+                                      sizeof...(TIrqList));
+                mStatus = Spinlock::LockStatus::SpinlockLocked;
+            }
+        }
 
         /**
          * @brief 构造自旋锁的RAII机制守卫
          * @param[in] spinlock: 自旋锁对象引用
          */
-        LkIrqsGrd(Spinlock & spinlock);
+        LkIrqsGrd(Spinlock & spinlock)
+            : mSpinlock(&spinlock)
+            , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
+            , mIrqs{ TIrqList... }
+        {
+            if (nullptr != mSpinlock) {
+                xwos_splk_lock_irqssv(&mSpinlock->mLock, mIrqs, mIrqFlags,
+                                      sizeof...(TIrqList));
+                mStatus = Spinlock::LockStatus::SpinlockLocked;
+            }
+        }
 
         /**
          * @brief 析构自旋锁的RAII机制守卫
          */
-        ~LkIrqsGrd();
+        ~LkIrqsGrd()
+        {
+            if (nullptr != mSpinlock) {
+                if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+                    mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+                    xwos_splk_unlock_irqsrs(&mSpinlock->mLock, mIrqs, mIrqFlags,
+                                            sizeof...(TIrqList));
+                }
+            }
+        }
 
         /**
          * @brief 解锁自旋锁
          * @details
          * + 主动解锁后，析构函数将不再解锁。
          */
-        void unlock();
+        void unlock()
+        {
+            if (nullptr != mSpinlock) {
+                if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+                    mStatus = Spinlock::LockStatus::SpinlockUnlocked;
+                    xwos_splk_unlock_irqsrs(&mSpinlock->mLock, mIrqs, mIrqFlags,
+                                            sizeof...(TIrqList));
+                }
+            }
+        }
 
         /**
          * @brief 获取锁状态
@@ -819,7 +866,29 @@ class Spinlock
          * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
          *   使用 `getStatus()` 确认是否上锁成功。
          */
-        xwer_t wait(sync::Cond * cond);
+        xwer_t wait(sync::Cond * cond)
+        {
+            xwer_t rc;
+            if (nullptr != mSpinlock) {
+                if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+                    union xwos_ulock lock;
+                    xwsq_t lkst;
+                    lock.osal.splk = &mSpinlock->mLock;
+                    rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr,
+                                        &lkst);
+                    if (rc < 0) {
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                            xwos_splk_lock(&mSpinlock->mLock);
+                        }
+                    }
+                } else {
+                    rc = -ENOLCK;
+                }
+            } else {
+                rc = -EFAULT;
+            }
+            return rc;
+        }
 
         /**
          * @brief 等待条件量
@@ -856,7 +925,29 @@ class Spinlock
          * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
          *   使用 `getStatus()` 确认是否上锁成功。
          */
-        xwer_t wait(sync::Cond * cond, xwtm_t to);
+        xwer_t wait(sync::Cond * cond, xwtm_t to)
+        {
+            xwer_t rc;
+            if (nullptr != mSpinlock) {
+                if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
+                    union xwos_ulock lock;
+                    xwsq_t lkst;
+                    lock.osal.splk = &mSpinlock->mLock;
+                    rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK,
+                                           nullptr, to, &lkst);
+                    if (rc < 0) {
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                            xwos_splk_lock(&mSpinlock->mLock);
+                        }
+                    }
+                } else {
+                    rc = -ENOLCK;
+                }
+            } else {
+                rc = -EFAULT;
+            }
+            return rc;
+        }
 
         /**
          * @brief 限时等待条件量
@@ -871,7 +962,11 @@ class Spinlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        LkIrqsGrd(): mSpinlock(nullptr), mStatus(SpinlockUnlocked) {}
+        LkIrqsGrd()
+            : mSpinlock(nullptr)
+            , mStatus(SpinlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -887,9 +982,8 @@ class Spinlock
      * @note
      * + 上下文：线程、`TIrqList` 列表中的中断
      */
-    template<xwirq_t ... TIrqList>
-    class TryLkIrqsGrd
-        : public LkIrqsGrd<TIrqList ...>
+    template<xwirq_t... TIrqList>
+    class TryLkIrqsGrd : public LkIrqsGrd<TIrqList...>
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -899,13 +993,45 @@ class Spinlock
          * @brief 构造自旋锁的RAII机制守卫
          * @param[in] spinlock: 自旋锁对象指针
          */
-        TryLkIrqsGrd(Spinlock * spinlock);
+        TryLkIrqsGrd(Spinlock * spinlock)
+            : LkIrqsGrd<TIrqList...>()
+        {
+            LkIrqsGrd<TIrqList...>::mSpinlock = spinlock;
+            if (nullptr != LkIrqsGrd<TIrqList...>::mSpinlock) {
+                mRc = xwos_splk_trylock_irqssv(
+                    &LkIrqsGrd<TIrqList...>::mSpinlock->mLock,
+                    LkIrqsGrd<TIrqList...>::mIrqs, LkIrqsGrd<TIrqList...>::mIrqFlags,
+                    sizeof...(TIrqList));
+                if (XWOK != mRc) {
+                    LkIrqsGrd<TIrqList...>::mSpinlock = nullptr;
+                } else {
+                    LkIrqsGrd<TIrqList...>::mStatus =
+                        Spinlock::LockStatus::SpinlockLocked;
+                }
+            }
+        }
 
         /**
          * @brief 构造自旋锁的RAII机制守卫
          * @param[in] spinlock: 自旋锁对象引用
          */
-        TryLkIrqsGrd(Spinlock & spinlock);
+        TryLkIrqsGrd(Spinlock & spinlock)
+            : LkIrqsGrd<TIrqList...>()
+        {
+            LkIrqsGrd<TIrqList...>::mSpinlock = spinlock;
+            if (nullptr != LkIrqsGrd<TIrqList...>::mSpinlock) {
+                mRc = xwos_splk_trylock_irqssv(
+                    &LkIrqsGrd<TIrqList...>::mSpinlock->mLock,
+                    LkIrqsGrd<TIrqList...>::mIrqs, LkIrqsGrd<TIrqList...>::mIrqFlags,
+                    sizeof...(TIrqList));
+                if (XWOK != mRc) {
+                    LkIrqsGrd<TIrqList...>::mSpinlock = nullptr;
+                } else {
+                    LkIrqsGrd<TIrqList...>::mStatus =
+                        Spinlock::LockStatus::SpinlockLocked;
+                }
+            }
+        }
 
         /**
          * @brief 析构自旋锁的RAII机制守卫

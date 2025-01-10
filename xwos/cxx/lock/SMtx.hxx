@@ -71,8 +71,7 @@ namespace lock {
 /**
  * @brief 静态互斥锁
  */
-class SMtx
-    : public Mtx
+class SMtx : public Mtx
 {
   private:
     struct xwos_mtx mMtx; /**< 互斥锁结构体 */
@@ -83,7 +82,9 @@ class SMtx
      * @brief 构造函数
      * @param[in] pr: 互斥锁的天花板优先级
      */
-    explicit SMtx(xwpr_t pr = XWOS_SKD_PRIORITY_RT_MAX) : Mtx() {
+    explicit SMtx(xwpr_t pr = XWOS_SKD_PRIORITY_RT_MAX)
+        : Mtx()
+    {
         mCtorRc = xwos_mtx_init(&mMtx, pr);
         if (XWOK == mCtorRc) {
             Mtx::mMtxPtr = &mMtx;

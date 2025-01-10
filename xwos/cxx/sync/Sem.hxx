@@ -48,8 +48,9 @@ class Sem
 
   protected:
     struct xwos_sem * mSemPtr;
+
   protected:
-    explicit Sem() : mSemPtr(nullptr) {}
+    Sem() : mSemPtr(nullptr) {}
     ~Sem() { mSemPtr = nullptr; }
 
   public:
@@ -63,7 +64,8 @@ class Sem
      * @note
      * + 上下文：任意
      * @details
-     * + 此C++API只对未冻结的信号量对象起作用，已冻结的信号量对象将得到错误码 `-ENEGATIVE` 。
+     * + 此C++API只对未冻结的信号量对象起作用，对已冻结的信号量对象调用此C++API将
+     *   返回错误码 `-ENEGATIVE` 。
      */
     xwer_t post() { return xwos_sem_post(mSemPtr); }
 
@@ -98,7 +100,8 @@ class Sem
      *   + `Sem::WaitMode::SemWaitUninterruptable` 不可中断等待模式。
      *   + `Sem::WaitMode::SemTryWait` 尝试模式（只测试不等待）。
      */
-    xwer_t wait(enum WaitMode mode = WaitMode::SemWait, xwtm_t to = XWTM_MAX) {
+    xwer_t wait(enum WaitMode mode = WaitMode::SemWait, xwtm_t to = XWTM_MAX)
+    {
         xwer_t rc;
         switch (mode) {
             case WaitMode::SemWait:
@@ -155,7 +158,8 @@ class Sem
      * @note
      * + 上下文：任意
      */
-    xwssq_t max() {
+    xwssq_t max()
+    {
         xwssq_t max;
         xwos_sem_get_max(mSemPtr, &max);
         return max;
@@ -167,7 +171,8 @@ class Sem
      * @note
      * + 上下文：任意
      */
-    xwssq_t value() {
+    xwssq_t value()
+    {
         xwssq_t value;
         xwos_sem_get_value(mSemPtr, &value);
         return value;
@@ -188,8 +193,9 @@ class Sem
      * + 绑定方式：独占绑定
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> * sel, xwsq_t pos) {
-        return xwos_sem_bind(mSemPtr, sel->getXwosObj(), pos);
+    xwer_t bind(Sel<TSelNum> * sel, long pos)
+    {
+        return xwos_sem_bind(mSemPtr, sel->getXwosObj(), (xwsq_t)pos);
     }
 
     /**
@@ -207,8 +213,9 @@ class Sem
      * + 绑定方式：独占绑定
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> & sel, xwsq_t pos) {
-        return xwos_sem_bind(mSemPtr, sel.getXwosObj(), pos);
+    xwer_t bind(Sel<TSelNum> & sel, long pos)
+    {
+        return xwos_sem_bind(mSemPtr, sel.getXwosObj(), (xwsq_t)pos);
     }
 
     /**
@@ -222,7 +229,8 @@ class Sem
      * + 上下文：任意
      */
     template<xwsz_t TSelNum>
-    xwer_t unbind(Sel<TSelNum> * sel) {
+    xwer_t unbind(Sel<TSelNum> * sel)
+    {
         return xwos_sem_unbind(mSemPtr, sel->getXwosObj());
     }
 
@@ -237,7 +245,8 @@ class Sem
      * + 上下文：任意
      */
     template<xwsz_t TSelNum>
-    xwer_t unbind(Sel<TSelNum> & sel) {
+    xwer_t unbind(Sel<TSelNum> & sel)
+    {
         return xwos_sem_unbind(mSemPtr, sel.getXwosObj());
     }
 

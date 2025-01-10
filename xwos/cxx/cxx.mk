@@ -74,6 +74,8 @@ ifeq ($(XWOSCFG_LOCK_SQLK_CXX), y)
   XWOS_CXXSRCS += cxx/lock/Seqlock.cxx
 endif
 
+######## ######## ######## ######## sync ######## ######## ######## ########
+
 ######## ######## ######## ######## Pm ######## ######## ######## ########
 ifeq ($(XWOSCFG_PM_CXX), y)
   XWOS_CXXSRCS += cxx/Pm.cxx

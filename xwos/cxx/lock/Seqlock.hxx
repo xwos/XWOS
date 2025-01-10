@@ -591,7 +591,11 @@ class Seqlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        RdexLkGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
+        RdexLkGrd()
+            : mSeqlock(nullptr)
+            , mStatus(SeqlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -604,8 +608,7 @@ class Seqlock
      * @note
      * + 上下文：线程
      */
-    class TryRdexLkGrd
-        : public RdexLkGrd
+    class TryRdexLkGrd : public RdexLkGrd
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -759,7 +762,11 @@ class Seqlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        RdexLkThGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
+        RdexLkThGrd()
+            : mSeqlock(nullptr)
+            , mStatus(SeqlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -773,8 +780,7 @@ class Seqlock
      * @note
      * + 上下文：任意
      */
-    class TryRdexLkThGrd
-        : public RdexLkThGrd
+    class TryRdexLkThGrd : public RdexLkThGrd
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -926,7 +932,11 @@ class Seqlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        RdexLkBhGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
+        RdexLkBhGrd()
+            : mSeqlock(nullptr)
+            , mStatus(SeqlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -940,8 +950,7 @@ class Seqlock
      * @note
      * + 上下文：线程、中断底半部
      */
-    class TryRdexLkBhGrd
-        : public RdexLkBhGrd
+    class TryRdexLkBhGrd : public RdexLkBhGrd
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -983,7 +992,7 @@ class Seqlock
      * @note
      * + 上下文：线程、`TIrqList` 列表中的中断
      */
-    template<xwirq_t ... TIrqList>
+    template<xwirq_t... TIrqList>
     class RdexLkIrqsGrd
     {
       protected:
@@ -997,25 +1006,63 @@ class Seqlock
          * @brief 构造顺序锁的RAII机制守卫
          * @param[in] seqlock: 顺序锁对象指针
          */
-        RdexLkIrqsGrd(Seqlock * seqlock);
+        RdexLkIrqsGrd(Seqlock * seqlock)
+            : mSeqlock(seqlock)
+            , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
+            , mIrqs{ TIrqList... }
+        {
+            if (nullptr != mSeqlock) {
+                xwos_sqlk_rdex_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                           sizeof...(TIrqList));
+                mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
+            }
+        }
 
         /**
          * @brief 构造顺序锁的RAII机制守卫
          * @param[in] seqlock: 顺序锁对象引用
          */
-        RdexLkIrqsGrd(Seqlock & seqlock);
+        RdexLkIrqsGrd(Seqlock & seqlock)
+            : mSeqlock(&seqlock)
+            , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
+            , mIrqs{ TIrqList... }
+        {
+            if (nullptr != mSeqlock) {
+                xwos_sqlk_rdex_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                           sizeof...(TIrqList));
+                mStatus = Seqlock::LockStatus::SeqlockRdexLocked;
+            }
+        }
 
         /**
          * @brief 析构顺序锁的RAII机制守卫
          */
-        ~RdexLkIrqsGrd();
+        ~RdexLkIrqsGrd()
+        {
+            if (nullptr != mSeqlock) {
+                if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+                    mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+                    xwos_sqlk_rdex_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                                 sizeof...(TIrqList));
+                }
+            }
+        }
 
         /**
          * @brief 解锁顺序锁
          * @details
          * + 主动解锁后，析构函数将不再解锁。
          */
-        void unlock();
+        void unlock()
+        {
+            if (nullptr != mSeqlock) {
+                if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+                    mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+                    xwos_sqlk_rdex_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                                 sizeof...(TIrqList));
+                }
+            }
+        }
 
         /**
          * @brief 获取锁状态
@@ -1044,7 +1091,29 @@ class Seqlock
          * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
          *   使用 `getStatus()` 确认是否上锁成功。
          */
-        xwer_t wait(sync::Cond * cond);
+        xwer_t wait(sync::Cond * cond)
+        {
+            xwer_t rc;
+            if (nullptr != mSeqlock) {
+                if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+                    union xwos_ulock lock;
+                    xwsq_t lkst;
+                    lock.osal.sqlk = &mSeqlock->mLock;
+                    rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX,
+                                        nullptr, &lkst);
+                    if (rc < 0) {
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                            xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                        }
+                    }
+                } else {
+                    rc = -ENOLCK;
+                }
+            } else {
+                rc = -EFAULT;
+            }
+            return rc;
+        }
 
         /**
          * @brief 等待条件量
@@ -1082,7 +1151,29 @@ class Seqlock
          * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
          *   使用 `getStatus()` 确认是否上锁成功。
          */
-        xwer_t wait(sync::Cond * cond, xwtm_t to);
+        xwer_t wait(sync::Cond * cond, xwtm_t to)
+        {
+            xwer_t rc;
+            if (nullptr != mSeqlock) {
+                if (Seqlock::LockStatus::SeqlockRdexLocked == mStatus) {
+                    union xwos_ulock lock;
+                    xwsq_t lkst;
+                    lock.osal.sqlk = &mSeqlock->mLock;
+                    rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_RDEX,
+                                           nullptr, to, &lkst);
+                    if (rc < 0) {
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                            xwos_sqlk_rdex_lock(&mSeqlock->mLock);
+                        }
+                    }
+                } else {
+                    rc = -ENOLCK;
+                }
+            } else {
+                rc = -EFAULT;
+            }
+            return rc;
+        }
 
         /**
          * @brief 限时等待条件量
@@ -1097,7 +1188,11 @@ class Seqlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        RdexLkIrqsGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
+        RdexLkIrqsGrd()
+            : mSeqlock(nullptr)
+            , mStatus(SeqlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -1112,9 +1207,8 @@ class Seqlock
      * @note
      * + 上下文：线程、`TIrqList` 列表中的中断
      */
-    template<xwirq_t ... TIrqList>
-    class TryRdexLkIrqsGrd
-        : public RdexLkIrqsGrd<TIrqList ...>
+    template<xwirq_t... TIrqList>
+    class TryRdexLkIrqsGrd : public RdexLkIrqsGrd<TIrqList...>
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -1124,13 +1218,39 @@ class Seqlock
          * @brief 构造顺序锁的RAII机制守卫
          * @param[in] seqlock: 顺序锁对象指针
          */
-        TryRdexLkIrqsGrd(Seqlock * seqlock);
+        TryRdexLkIrqsGrd(Seqlock * seqlock)
+            : RdexLkIrqsGrd<TIrqList...>()
+        {
+            RdexLkIrqsGrd<TIrqList...>::mSeqlock = seqlock;
+            if (nullptr != RdexLkIrqsGrd<TIrqList...>::mSeqlock) {
+                mRc = xwos_sqlk_rdex_trylock_irqssv(
+                    &RdexLkIrqsGrd<TIrqList...>::mSeqlock->mLock,
+                    RdexLkIrqsGrd<TIrqList...>::mIrqs,
+                    RdexLkIrqsGrd<TIrqList...>::mIrqFlags, sizeof...(TIrqList));
+                if (XWOK != mRc) {
+                    RdexLkIrqsGrd<TIrqList...>::mSeqlock = nullptr;
+                }
+            }
+        }
 
         /**
          * @brief 构造顺序锁的RAII机制守卫
          * @param[in] seqlock: 顺序锁对象引用
          */
-        TryRdexLkIrqsGrd(Seqlock & seqlock);
+        TryRdexLkIrqsGrd(Seqlock & seqlock)
+            : RdexLkIrqsGrd<TIrqList...>()
+        {
+            RdexLkIrqsGrd<TIrqList...>::mSeqlock = seqlock;
+            if (nullptr != RdexLkIrqsGrd<TIrqList...>::mSeqlock) {
+                mRc = xwos_sqlk_rdex_trylock_irqssv(
+                    &RdexLkIrqsGrd<TIrqList...>::mSeqlock->mLock,
+                    RdexLkIrqsGrd<TIrqList...>::mIrqs,
+                    RdexLkIrqsGrd<TIrqList...>::mIrqFlags, sizeof...(TIrqList));
+                if (XWOK != mRc) {
+                    RdexLkIrqsGrd<TIrqList...>::mSeqlock = nullptr;
+                }
+            }
+        }
 
         /**
          * @brief 析构顺序锁的RAII机制守卫
@@ -1266,7 +1386,11 @@ class Seqlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        WrLkGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
+        WrLkGrd()
+            : mSeqlock(nullptr)
+            , mStatus(SeqlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -1279,8 +1403,7 @@ class Seqlock
      * @note
      * + 上下文：线程
      */
-    class TryWrLkGrd
-        : public WrLkGrd
+    class TryWrLkGrd : public WrLkGrd
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -1434,7 +1557,11 @@ class Seqlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        WrLkThGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
+        WrLkThGrd()
+            : mSeqlock(nullptr)
+            , mStatus(SeqlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -1448,8 +1575,7 @@ class Seqlock
      * @note
      * + 上下文：任意
      */
-    class TryWrLkThGrd
-        : public WrLkThGrd
+    class TryWrLkThGrd : public WrLkThGrd
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -1601,7 +1727,11 @@ class Seqlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        WrLkBhGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
+        WrLkBhGrd()
+            : mSeqlock(nullptr)
+            , mStatus(SeqlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -1615,8 +1745,7 @@ class Seqlock
      * @note
      * + 上下文：线程、中断底半部
      */
-    class TryWrLkBhGrd
-        : public WrLkBhGrd
+    class TryWrLkBhGrd : public WrLkBhGrd
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -1658,7 +1787,7 @@ class Seqlock
      * @note
      * + 上下文：线程、`TIrqList` 列表中的中断
      */
-    template<xwirq_t ... TIrqList>
+    template<xwirq_t... TIrqList>
     class WrLkIrqsGrd
     {
       protected:
@@ -1672,25 +1801,63 @@ class Seqlock
          * @brief 构造顺序锁的RAII机制守卫
          * @param[in] seqlock: 顺序锁对象指针
          */
-        WrLkIrqsGrd(Seqlock * seqlock);
+        WrLkIrqsGrd(Seqlock * seqlock)
+            : mSeqlock(seqlock)
+            , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
+            , mIrqs{ TIrqList... }
+        {
+            if (nullptr != mSeqlock) {
+                xwos_sqlk_wr_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                         sizeof...(TIrqList));
+                mStatus = Seqlock::LockStatus::SeqlockWrLocked;
+            }
+        }
 
         /**
          * @brief 构造顺序锁的RAII机制守卫
          * @param[in] seqlock: 顺序锁对象引用
          */
-        WrLkIrqsGrd(Seqlock & seqlock);
+        WrLkIrqsGrd(Seqlock & seqlock)
+            : mSeqlock(&seqlock)
+            , mStatus(Seqlock::LockStatus::SeqlockUnlocked)
+            , mIrqs{ TIrqList... }
+        {
+            if (nullptr != mSeqlock) {
+                xwos_sqlk_wr_lock_irqssv(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                         sizeof...(TIrqList));
+                mStatus = Seqlock::LockStatus::SeqlockWrLocked;
+            }
+        }
 
         /**
          * @brief 析构顺序锁的RAII机制守卫
          */
-        ~WrLkIrqsGrd();
+        ~WrLkIrqsGrd()
+        {
+            if (nullptr != mSeqlock) {
+                if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+                    mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+                    xwos_sqlk_wr_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                               sizeof...(TIrqList));
+                }
+            }
+        }
 
         /**
          * @brief 解锁顺序锁
          * @details
          * + 主动解锁后，析构函数将不再解锁。
          */
-        void unlock();
+        void unlock()
+        {
+            if (nullptr != mSeqlock) {
+                if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+                    mStatus = Seqlock::LockStatus::SeqlockUnlocked;
+                    xwos_sqlk_wr_unlock_irqsrs(&mSeqlock->mLock, mIrqs, mIrqFlags,
+                                               sizeof...(TIrqList));
+                }
+            }
+        }
 
         /**
          * @brief 获取锁状态
@@ -1719,7 +1886,29 @@ class Seqlock
          * + 如果此C++API返回 **非** `XWOK` 的错误码后，应该
          *   使用 `getStatus()` 确认是否上锁成功。
          */
-        xwer_t wait(sync::Cond * cond);
+        xwer_t wait(sync::Cond * cond)
+        {
+            xwer_t rc;
+            if (nullptr != mSeqlock) {
+                if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+                    union xwos_ulock lock;
+                    xwsq_t lkst;
+                    lock.osal.sqlk = &mSeqlock->mLock;
+                    rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR,
+                                        nullptr, &lkst);
+                    if (rc < 0) {
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                            xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                        }
+                    }
+                } else {
+                    rc = -ENOLCK;
+                }
+            } else {
+                rc = -EFAULT;
+            }
+            return rc;
+        }
 
         /**
          * @brief 等待条件量
@@ -1757,7 +1946,29 @@ class Seqlock
          * + 如果此C++API返回 **非** `XWOK` 的错误码，应该
          *   使用 `getStatus()` 确认是否上锁成功。
          */
-        xwer_t wait(sync::Cond * cond, xwtm_t to);
+        xwer_t wait(sync::Cond * cond, xwtm_t to)
+        {
+            xwer_t rc;
+            if (nullptr != mSeqlock) {
+                if (Seqlock::LockStatus::SeqlockWrLocked == mStatus) {
+                    union xwos_ulock lock;
+                    xwsq_t lkst;
+                    lock.osal.sqlk = &mSeqlock->mLock;
+                    rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SQLK_WR,
+                                           nullptr, to, &lkst);
+                    if (rc < 0) {
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                            xwos_sqlk_wr_lock(&mSeqlock->mLock);
+                        }
+                    }
+                } else {
+                    rc = -ENOLCK;
+                }
+            } else {
+                rc = -EFAULT;
+            }
+            return rc;
+        }
 
         /**
          * @brief 限时等待条件量
@@ -1772,7 +1983,11 @@ class Seqlock
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
 
       protected:
-        WrLkIrqsGrd(): mSeqlock(nullptr), mStatus(SeqlockUnlocked) {}
+        WrLkIrqsGrd()
+            : mSeqlock(nullptr)
+            , mStatus(SeqlockUnlocked)
+        {
+        }
     };
 
     /**
@@ -1787,9 +2002,8 @@ class Seqlock
      * @note
      * + 上下文：线程、`TIrqList` 列表中的中断
      */
-    template<xwirq_t ... TIrqList>
-    class TryWrLkIrqsGrd
-        : public WrLkIrqsGrd<TIrqList ...>
+    template<xwirq_t... TIrqList>
+    class TryWrLkIrqsGrd : public WrLkIrqsGrd<TIrqList...>
     {
       private:
         xwer_t mRc; /**< 尝试上锁的结果 */
@@ -1799,13 +2013,39 @@ class Seqlock
          * @brief 构造顺序锁的RAII机制守卫
          * @param[in] seqlock: 顺序锁对象指针
          */
-        TryWrLkIrqsGrd(Seqlock * seqlock);
+        TryWrLkIrqsGrd(Seqlock * seqlock)
+            : WrLkIrqsGrd<TIrqList...>()
+        {
+            WrLkIrqsGrd<TIrqList...>::mSeqlock = seqlock;
+            if (nullptr != WrLkIrqsGrd<TIrqList...>::mSeqlock) {
+                mRc = xwos_sqlk_wr_trylock_irqssv(
+                    &WrLkIrqsGrd<TIrqList...>::mSeqlock->mLock,
+                    WrLkIrqsGrd<TIrqList...>::mIrqs,
+                    WrLkIrqsGrd<TIrqList...>::mIrqFlags, sizeof...(TIrqList));
+                if (XWOK != mRc) {
+                    WrLkIrqsGrd<TIrqList...>::mSeqlock = nullptr;
+                }
+            }
+        }
 
         /**
          * @brief 构造顺序锁的RAII机制守卫
          * @param[in] seqlock: 顺序锁对象引用
          */
-        TryWrLkIrqsGrd(Seqlock & seqlock);
+        TryWrLkIrqsGrd(Seqlock & seqlock)
+            : WrLkIrqsGrd<TIrqList...>()
+        {
+            WrLkIrqsGrd<TIrqList...>::mSeqlock = seqlock;
+            if (nullptr != WrLkIrqsGrd<TIrqList...>::mSeqlock) {
+                mRc = xwos_sqlk_wr_trylock_irqssv(
+                    &WrLkIrqsGrd<TIrqList...>::mSeqlock->mLock,
+                    WrLkIrqsGrd<TIrqList...>::mIrqs,
+                    WrLkIrqsGrd<TIrqList...>::mIrqFlags, sizeof...(TIrqList));
+                if (XWOK != mRc) {
+                    WrLkIrqsGrd<TIrqList...>::mSeqlock = nullptr;
+                }
+            }
+        }
 
         /**
          * @brief 析构顺序锁的RAII机制守卫

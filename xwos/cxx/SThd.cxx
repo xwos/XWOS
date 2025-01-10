@@ -15,10 +15,9 @@
 namespace xwos {
 
 /* Non-static Member */
-SThd::SThd(const char * name,
-           xwstk_t * stack, xwsz_t stack_size, xwsz_t stack_guard_size,
-           xwpr_t priority, bool detached, bool privileged)
-    : mThdDesc{nullptr, 0}
+SThd::SThd(const char * name, xwstk_t * stack, xwsz_t stack_size,
+           xwsz_t stack_guard_size, xwpr_t priority, bool detached, bool privileged)
+    : mThdDesc{ nullptr, 0 }
 {
     struct xwos_thd_attr attr({
         .name = name,
@@ -29,7 +28,8 @@ SThd::SThd(const char * name,
         .detached = detached,
         .privileged = privileged,
     });
-    mCtorRc = xwos_thd_init(&mThd, &mThdDesc, &attr, (xwos_thd_f)sThdMainFunction, this);
+    mCtorRc = xwos_thd_init(&mThd, &mThdDesc, &attr, (xwos_thd_f)sThdMainFunction,
+                            this);
 }
 
 SThd::~SThd()

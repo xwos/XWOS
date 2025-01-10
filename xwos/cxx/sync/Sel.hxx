@@ -13,10 +13,10 @@
 #ifndef __xwos_cxx_sync_Sel_hxx__
 #define __xwos_cxx_sync_Sel_hxx__
 
-#include <xwos/osal/sync/sel.hxx>
+#include <xwos/cxx/Bmp.hxx>
 
 extern "C" {
-#include <xwos/lib/xwbop.h>
+#include <xwos/osal/sync/sel.h>
 }
 
 namespace xwos {
@@ -41,11 +41,6 @@ class Sel
 {
   public:
     /**
-     * @brief 事件位图
-     */
-    typedef xwbmp_t SelBmp[BITS_TO_XWBMP_T(TNum)];
-
-    /**
      * @brief 等待模式枚举
      */
     enum WaitMode : xwu32_t {
@@ -57,8 +52,12 @@ class Sel
 
   protected:
     struct xwos_sel * mSelPtr;
+
   protected:
-    Sel() : mSelPtr(nullptr) {}
+    Sel()
+        : mSelPtr(nullptr)
+    {
+    }
     ~Sel() { mSelPtr = nullptr; }
 
   public:
@@ -70,7 +69,7 @@ class Sel
     /**
      * @brief 等待信号选择器
      * @param[in] msk: 同步对象位图掩码，表示只关注掩码内的同步对象
-     * @param[out] trg: 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
+     * @param[out] trigger: 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
      * @param[in] mode: 等待模式，取值 @ref Sel::WaitMode
      *   @arg Sel::WaitMode::SelWait
      *   @arg Sel::WaitMode::SelWaitTimed
@@ -98,23 +97,25 @@ class Sel
      *   + `Sel::WaitMode::SelWaitUninterruptable` 不可中断等待模式。
      *   + `Sel::WaitMode::SelTryWait` 尝试模式（只测试不等待）。
      */
-    xwer_t select(SelBmp * msk, SelBmp * trigger, enum WaitMode mode, xwtm_t to) {
+    xwer_t select(xwos::Bmp<TNum> * msk, xwos::Bmp<TNum> * trigger, enum WaitMode mode,
+                  xwtm_t to)
+    {
         xwer_t rc;
         switch (mode) {
             case WaitMode::SelWait:
-                rc = xwos_sel_select(mSelPtr, msk, trigger);
+                rc = xwos_sel_select(mSelPtr, msk->mData, trigger->mData);
                 break;
             case WaitMode::SelWaitTimed:
-                rc = xwos_sel_select_to(mSelPtr, msk, trigger, to);
+                rc = xwos_sel_select_to(mSelPtr, msk->mData, trigger->mData, to);
                 break;
             case WaitMode::SelWaitUninterruptable:
-                rc = xwos_sel_select_unintr(mSelPtr, msk, trigger);
+                rc = xwos_sel_select_unintr(mSelPtr, msk->mData, trigger->mData);
                 break;
             case WaitMode::SelTryWait:
-                rc = xwos_sel_tryselect(mSelPtr, msk, trigger);
+                rc = xwos_sel_tryselect(mSelPtr, msk->mData, trigger->mData);
                 break;
             default:
-                rc = xwos_sel_select(mSelPtr, msk, trigger);
+                rc = xwos_sel_select(mSelPtr, msk->mData, trigger->mData);
                 break;
         }
         return rc;
@@ -138,8 +139,9 @@ class Sel
      *   但不可循环绑定，否则会造成无限循环传递。
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> * src, xwsq_t pos) {
-        return xwos_sel_bind(src->getXwosObj(), mSelPtr, pos);
+    xwer_t bind(Sel<TSelNum> * src, long pos)
+    {
+        return xwos_sel_bind(src->getXwosObj(), mSelPtr, (xwsq_t)pos);
     }
 
     /**
@@ -160,8 +162,9 @@ class Sel
      *   但不可循环绑定，否则会造成无限循环传递。
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> & src, xwsq_t pos) {
-        return xwos_sel_bind(src.getXwosObj(), mSelPtr, pos);
+    xwer_t bind(Sel<TSelNum> & src, long pos)
+    {
+        return xwos_sel_bind(src.getXwosObj(), mSelPtr, (xwsq_t)pos);
     }
 
     /**
@@ -175,7 +178,8 @@ class Sel
      * + 上下文：任意
      */
     template<xwsz_t TSelNum>
-    xwer_t unbind(Sel<TSelNum> * src) {
+    xwer_t unbind(Sel<TSelNum> * src)
+    {
         return xwos_sel_unbind(src->getXwosObj(), mSelPtr);
     }
 
@@ -190,7 +194,8 @@ class Sel
      * + 上下文：任意
      */
     template<xwsz_t TSelNum>
-    xwer_t unbind(Sel<TSelNum> & src) {
+    xwer_t unbind(Sel<TSelNum> & src)
+    {
         return xwos_sel_unbind(src.getXwosObj(), mSelPtr);
     }
 

@@ -37,6 +37,7 @@ class Cond
 {
   protected:
     struct xwos_cond * mCondPtr;
+
   protected:
     Cond() : mCondPtr(nullptr) {}
     ~Cond() { mCondPtr = nullptr; }
@@ -116,8 +117,9 @@ class Cond
      * + 绑定了信号选择器的条件量对象，只有 **广播** 才会向信号选择器发送信号。
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> * sel, xwsq_t pos) {
-        return xwos_cond_bind(mCondPtr, sel->getXwosObj(), pos);
+    xwer_t bind(Sel<TSelNum> * sel, long pos)
+    {
+        return xwos_cond_bind(mCondPtr, sel->getXwosObj(), (xwsq_t)pos);
     }
 
     /**
@@ -136,8 +138,9 @@ class Cond
      * + 绑定了信号选择器的条件量对象，只有 **广播** 才会向信号选择器发送信号。
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> & sel, xwsq_t pos) {
-        return xwos_cond_bind(mCondPtr, sel.getXwosObj(), pos);
+    xwer_t bind(Sel<TSelNum> & sel, long pos)
+    {
+        return xwos_cond_bind(mCondPtr, sel.getXwosObj(), (xwsq_t)pos);
     }
 
     /**
@@ -151,7 +154,8 @@ class Cond
      * + 上下文：任意
      */
     template<xwsz_t TSelNum>
-    xwer_t unbind(Sel<TSelNum> * sel) {
+    xwer_t unbind(Sel<TSelNum> * sel)
+    {
         return xwos_cond_unbind(mCondPtr, sel->getXwosObj());
     }
 
@@ -166,7 +170,8 @@ class Cond
      * + 上下文：任意
      */
     template<xwsz_t TSelNum>
-    xwer_t unbind(Sel<TSelNum> & sel) {
+    xwer_t unbind(Sel<TSelNum> & sel)
+    {
         return xwos_cond_unbind(mCondPtr, sel.getXwosObj());
     }
 

@@ -35,8 +35,7 @@ namespace sync {
  * @brief 动态信号选择器
  */
 template<xwsz_t TNum>
-class DSel
-    : public Sel<TNum>
+class DSel : public Sel<TNum>
 {
   private:
     xwos_sel_d mSelDesc; /**< 信号选择器对象描述符 */
@@ -46,7 +45,8 @@ class DSel
     /**
      * @brief 构造函数
      */
-    DSel() : Sel<TNum>() {
+    DSel() : Sel<TNum>()
+    {
         mCtorRc = xwos_sel_create(&mSelDesc, TNum);
         if (XWOK == mCtorRc) {
             Sel<TNum>::mSelPtr = mSelDesc.sel;

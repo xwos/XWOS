@@ -35,8 +35,7 @@ namespace sync {
  * @brief 动态事件标志
  */
 template<xwsz_t TNum>
-class DFlg
-    : public Flg<TNum>
+class DFlg : public Flg<TNum>
 {
   private:
     xwos_flg_d mFlgDesc; /**< 事件标志对象描述符 */
@@ -46,7 +45,9 @@ class DFlg
     /**
      * @brief 构造函数
      */
-    DFlg() : Flg<TNum>() {
+    DFlg()
+        : Flg<TNum>()
+    {
         mCtorRc = xwos_flg_create(&mFlgDesc, TNum);
         if (XWOK == mCtorRc) {
             Flg<TNum>::mFlgPtr = mFlgDesc.flg;

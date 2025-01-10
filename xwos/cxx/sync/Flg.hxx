@@ -13,11 +13,11 @@
 #ifndef __xwos_cxx_sync_Flg_hxx__
 #define __xwos_cxx_sync_Flg_hxx__
 
-#include <xwos/osal/sync/flg.hxx>
+#include <xwos/cxx/Bmp.hxx>
 #include <xwos/cxx/sync/Sel.hxx>
 
 extern "C" {
-#include <xwos/lib/xwbop.h>
+#include <xwos/osal/sync/flg.h>
 }
 
 namespace xwos {
@@ -41,11 +41,6 @@ template<xwsz_t TNum>
 class Flg
 {
   public:
-    /**
-     * @brief 事件位图
-     */
-    typedef xwbmp_t FlgBmp[BITS_TO_XWBMP_T(TNum)];
-
     /**
      * @brief 触发条件枚举
      */
@@ -86,11 +81,11 @@ class Flg
      * @note
      * + 上下文：任意
      */
-    void read(FlgBmp * out) { return xwos_flg_read(mFlgPtr, out); }
+    void read(xwos::Bmp<TNum> * out) { xwos_flg_read(mFlgPtr, out->mData); }
 
     /**
      * @brief 同时设置多个事件标志位
-     * @param[in] msk: 事件标志对象的位图掩码
+     * @param[in] msk: 事件掩码
      * @return 错误码
      * @retval XWOK: 没有错误
      * @retval -EFAULT: 无效的指针或空指针
@@ -102,8 +97,11 @@ class Flg
      * + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
      *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
      */
-    xwer_t set(FlgBmp * msk) { return xwos_flg_s1m(mFlgPtr, msk); }
-
+    xwer_t set(xwos::Bmp<TNum> * msk) { return xwos_flg_s1m(mFlgPtr, msk->mData); }
+    /**
+     * @brief 同时设置多个事件标志位
+     */
+    xwer_t set(xwos::Bmp<TNum> & msk) { return xwos_flg_s1m(mFlgPtr, msk.mData); }
     /**
      * @brief 设置单个事件标志位
      * @param[in] pos: 事件的序号
@@ -119,7 +117,11 @@ class Flg
      * + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
      *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
      */
-    xwer_t set(xwsq_t pos) { return xwos_flg_s1i(mFlgPtr, pos); }
+    xwer_t set(unsigned long pos) { return xwos_flg_s1i(mFlgPtr, pos); }
+    /**
+     * @brief 设置单个事件标志位
+     */
+    xwer_t set(long pos) { return xwos_flg_s1i(mFlgPtr, (xwsq_t)pos); }
 
     /**
      * @brief 同时清除多个事件标志位
@@ -135,8 +137,7 @@ class Flg
      * + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
      *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
      */
-    xwer_t clear(FlgBmp * msk) { return xwos_flg_c0m(mFlgPtr, msk); }
-
+    xwer_t clear(xwos::Bmp<TNum> * msk) { return xwos_flg_c0m(mFlgPtr, msk->mData); }
     /**
      * @brief 清除单个事件标志位
      * @param[in] pos: 事件的序号
@@ -152,7 +153,11 @@ class Flg
      * + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
      *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
      */
-    xwer_t clear(xwsq_t pos) { return xwos_flg_c0i(mFlgPtr, pos); }
+    xwer_t clear(unsigned long pos) { return xwos_flg_c0i(mFlgPtr, (xwsq_t)pos); }
+    /**
+     * @brief 清除单个事件标志位
+     */
+    xwer_t clear(long pos) { return xwos_flg_c0i(mFlgPtr, (xwsq_t)pos); }
 
 
     /**
@@ -169,7 +174,7 @@ class Flg
      * + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
      *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
      */
-    xwer_t toggle(FlgBmp * msk) { return xwos_flg_x1m(mFlgPtr, msk); }
+    xwer_t toggle(xwos::Bmp<TNum> * msk) { return xwos_flg_x1m(mFlgPtr, msk->mData); }
 
     /**
      * @brief 翻转单个事件标志位
@@ -186,7 +191,11 @@ class Flg
      * + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
      *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
      */
-    xwer_t toggle(xwsq_t pos) { return xwos_flg_x1i(mFlgPtr, pos); }
+    xwer_t toggle(unsigned long pos) { return xwos_flg_x1i(mFlgPtr, (xwsq_t)pos); }
+    /**
+     * @brief 翻转单个事件标志位
+     */
+    xwer_t toggle(long pos) { return xwos_flg_x1i(mFlgPtr, (xwsq_t)pos); }
 
     /**
      * @brief 等待事件标志
@@ -216,7 +225,8 @@ class Flg
      *   @arg Flg::WaitMode::FlgWaitTimed
      *   @arg Flg::WaitMode::FlgWaitUninterruptable
      *   @arg Flg::WaitMode::FlgTryWait
-     * @param[in] to: 期望唤醒的时间点，仅当 `mode == Flg::WaitMode::FlgWaitTimed` 时有效。
+     * @param[in] to: 期望唤醒的时间点，
+     *                仅当 `mode == Flg::WaitMode::FlgWaitTimed` 时有效。
      * @return 错误码
      * @retval XWOK: 没有错误
      * @retval -EFAULT: 空指针
@@ -238,24 +248,29 @@ class Flg
      *   + `Flg::WaitMode::FlgTryWait` 尝试模式（只测试不等待）。
      */
     xwer_t wait(enum Trigger trigger, bool consumption,
-                FlgBmp * origin, FlgBmp * msk,
-                enum WaitMode mode, xwtm_t to) {
+                xwos::Bmp<TNum> * origin, xwos::Bmp<TNum> * msk,
+                enum WaitMode mode = WaitMode::FlgWait, xwtm_t to = XWTM_MAX) {
         xwer_t rc;
         switch (mode) {
             case WaitMode::FlgWait:
-                rc = xwos_flg_wait(mFlgPtr, trigger, consumption, origin, msk);
+                rc = xwos_flg_wait(mFlgPtr, (enum xwos_flg_trigger_em)trigger,
+                                   consumption, origin->mData, msk->mData);
                 break;
             case WaitMode::FlgWaitTimed:
-                rc = xwos_flg_wait_to(mFlgPtr, trigger, consumption, origin, msk, to);
+                rc = xwos_flg_wait_to(mFlgPtr, (enum xwos_flg_trigger_em)trigger,
+                                      consumption, origin->mData, msk->mData, to);
                 break;
             case WaitMode::FlgWaitUninterruptable:
-                rc = xwos_flg_wait_unintr(mFlgPtr, trigger, consumption, origin, msk);
+                rc = xwos_flg_wait_unintr(mFlgPtr, (enum xwos_flg_trigger_em)trigger,
+                                          consumption, origin->mData, msk->mData);
                 break;
             case WaitMode::FlgTryWait:
-                rc = xwos_flg_trywait(mFlgPtr, trigger, consumption, origin, msk);
+                rc = xwos_flg_trywait(mFlgPtr, (enum xwos_flg_trigger_em)trigger,
+                                      consumption, origin->mData, msk->mData);
                 break;
             default:
-                rc = xwos_flg_wait(mFlgPtr, trigger, consumption, origin, msk);
+                rc = xwos_flg_wait(mFlgPtr, (enum xwos_flg_trigger_em)trigger,
+                                   consumption, origin->mData, msk->mData);
                 break;
         }
         return rc;
@@ -276,8 +291,8 @@ class Flg
      * + 绑定方式：非独占绑定
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> * sel, xwsq_t pos) {
-        return xwos_flg_bind(mFlgPtr, sel->getXwosObj(), pos);
+    xwer_t bind(Sel<TSelNum> * sel, long pos) {
+        return xwos_flg_bind(mFlgPtr, sel->getXwosObj(), (xwsq_t)pos);
     }
 
     /**
@@ -295,8 +310,8 @@ class Flg
      * + 绑定方式：非独占绑定
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> & sel, xwsq_t pos) {
-        return xwos_flg_bind(mFlgPtr, sel.getXwosObj(), pos);
+    xwer_t bind(Sel<TSelNum> & sel, long pos) {
+        return xwos_flg_bind(mFlgPtr, sel.getXwosObj(), (xwsq_t)pos);
     }
 
     /**
