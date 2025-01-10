@@ -87,8 +87,8 @@ xwer_t Spinlock::LkGrd::wait(sync::Cond * cond, xwtm_t to)
             union xwos_ulock lock;
             xwsq_t lkst;
             lock.osal.splk = &mSpinlock->mLock;
-            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr,
-                                   to, &lkst);
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr, to,
+                                   &lkst);
             if (rc < 0) {
                 if (XWOS_LKST_UNLOCKED == lkst) {
                     xwos_splk_lock(&mSpinlock->mLock);
@@ -204,8 +204,8 @@ xwer_t Spinlock::LkThGrd::wait(sync::Cond * cond, xwtm_t to)
             union xwos_ulock lock;
             xwsq_t lkst;
             lock.osal.splk = &mSpinlock->mLock;
-            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr,
-                                   to, &lkst);
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr, to,
+                                   &lkst);
             if (rc < 0) {
                 if (XWOS_LKST_UNLOCKED == lkst) {
                     xwos_splk_lock(&mSpinlock->mLock);
@@ -321,8 +321,8 @@ xwer_t Spinlock::LkBhGrd::wait(sync::Cond * cond, xwtm_t to)
             union xwos_ulock lock;
             xwsq_t lkst;
             lock.osal.splk = &mSpinlock->mLock;
-            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr,
-                                   to, &lkst);
+            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr, to,
+                                   &lkst);
             if (rc < 0) {
                 if (XWOS_LKST_UNLOCKED == lkst) {
                     xwos_splk_lock(&mSpinlock->mLock);
@@ -367,139 +367,8 @@ Spinlock::TryLkBhGrd::TryLkBhGrd(Spinlock & spinlock)
 }
 
 /* Spinlock::LkIrqsGrd Non-static Member */
-template<xwirq_t ... TIrqList>
-Spinlock::LkIrqsGrd<TIrqList ...>::LkIrqsGrd(Spinlock * spinlock)
-    : mSpinlock(spinlock)
-    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
-    , mIrqs{TIrqList ...}
-{
-    if (nullptr != mSpinlock) {
-        xwos_splk_lock_irqssv(&mSpinlock->mLock, mIrqs, mIrqFlags, sizeof...(TIrqList));
-        mStatus = Spinlock::LockStatus::SpinlockLocked;
-    }
-}
-
-template<xwirq_t ... TIrqList>
-Spinlock::LkIrqsGrd<TIrqList ...>::LkIrqsGrd(Spinlock & spinlock)
-    : mSpinlock(&spinlock)
-    , mStatus(Spinlock::LockStatus::SpinlockUnlocked)
-    , mIrqs{TIrqList ...}
-{
-    if (nullptr != mSpinlock) {
-        xwos_splk_lock_irqssv(&mSpinlock->mLock, mIrqs, mIrqFlags, sizeof...(TIrqList));
-        mStatus = Spinlock::LockStatus::SpinlockLocked;
-    }
-}
-
-template<xwirq_t ... TIrqList>
-Spinlock::LkIrqsGrd<TIrqList ...>::~LkIrqsGrd()
-{
-    if (nullptr != mSpinlock) {
-        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
-            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
-            xwos_splk_unlock_irqsrs(&mSpinlock->mLock, mIrqs, mIrqFlags,
-                                    sizeof...(TIrqList));
-        }
-    }
-}
-
-template<xwirq_t ... TIrqList>
-void Spinlock::LkIrqsGrd<TIrqList ...>::unlock()
-{
-    if (nullptr != mSpinlock) {
-        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
-            mStatus = Spinlock::LockStatus::SpinlockUnlocked;
-            xwos_splk_unlock_irqsrs(&mSpinlock->mLock, mIrqs, mIrqFlags,
-                                    sizeof...(TIrqList));
-        }
-    }
-}
-
-template <xwirq_t ... TIrqList>
-xwer_t Spinlock::LkIrqsGrd<TIrqList ...>::wait(sync::Cond * cond)
-{
-    xwer_t rc;
-    if (nullptr != mSpinlock) {
-        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
-            union xwos_ulock lock;
-            xwsq_t lkst;
-            lock.osal.splk = &mSpinlock->mLock;
-            rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr, &lkst);
-            if (rc < 0) {
-                if (XWOS_LKST_UNLOCKED == lkst) {
-                    xwos_splk_lock(&mSpinlock->mLock);
-                }
-            }
-        } else {
-            rc = -ENOLCK;
-        }
-    } else {
-        rc = -EFAULT;
-    }
-    return rc;
-}
-
-template <xwirq_t ... TIrqList>
-xwer_t Spinlock::LkIrqsGrd<TIrqList ...>::wait(sync::Cond * cond, xwtm_t to)
-{
-    xwer_t rc;
-    if (nullptr != mSpinlock) {
-        if (Spinlock::LockStatus::SpinlockLocked == mStatus) {
-            union xwos_ulock lock;
-            xwsq_t lkst;
-            lock.osal.splk = &mSpinlock->mLock;
-            rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_SPLK, nullptr,
-                                   to, &lkst);
-            if (rc < 0) {
-                if (XWOS_LKST_UNLOCKED == lkst) {
-                    xwos_splk_lock(&mSpinlock->mLock);
-                }
-            }
-        } else {
-            rc = -ENOLCK;
-        }
-    } else {
-        rc = -EFAULT;
-    }
-    return rc;
-}
 
 /* Spinlock::LkIrqsGrd Non-static Member */
-template<xwirq_t ... TIrqList>
-Spinlock::TryLkIrqsGrd<TIrqList ...>::TryLkIrqsGrd(Spinlock * spinlock)
-    : LkIrqsGrd<TIrqList ...>()
-{
-    LkIrqsGrd<TIrqList ...>::mSpinlock = spinlock;
-    if (nullptr != LkIrqsGrd<TIrqList ...>::mSpinlock) {
-        mRc = xwos_splk_trylock_irqssv(&LkIrqsGrd<TIrqList ...>::mSpinlock->mLock,
-                                       LkIrqsGrd<TIrqList ...>::mIrqs,
-                                       LkIrqsGrd<TIrqList ...>::mIrqFlags,
-                                       sizeof...(TIrqList));
-        if (XWOK != mRc) {
-            LkIrqsGrd<TIrqList ...>::mSpinlock = nullptr;
-        } else {
-            LkIrqsGrd<TIrqList ...>::mStatus = Spinlock::LockStatus::SpinlockLocked;
-        }
-    }
-}
-
-template<xwirq_t ... TIrqList>
-Spinlock::TryLkIrqsGrd<TIrqList ...>::TryLkIrqsGrd(Spinlock & spinlock)
-    : LkIrqsGrd<TIrqList ...>()
-{
-    LkIrqsGrd<TIrqList ...>::mSpinlock = spinlock;
-    if (nullptr != LkIrqsGrd<TIrqList ...>::mSpinlock) {
-        mRc = xwos_splk_trylock_irqssv(&LkIrqsGrd<TIrqList ...>::mSpinlock->mLock,
-                                       LkIrqsGrd<TIrqList ...>::mIrqs,
-                                       LkIrqsGrd<TIrqList ...>::mIrqFlags,
-                                       sizeof...(TIrqList));
-        if (XWOK != mRc) {
-            LkIrqsGrd<TIrqList ...>::mSpinlock = nullptr;
-        } else {
-            LkIrqsGrd<TIrqList ...>::mStatus = Spinlock::LockStatus::SpinlockLocked;
-        }
-    }
-}
 
 /* Spinlock Non-static Member */
 Spinlock::Spinlock()
@@ -511,5 +380,5 @@ Spinlock::~Spinlock()
 {
 }
 
-} // namespace xwos
 } // namespace lock
+} // namespace xwos

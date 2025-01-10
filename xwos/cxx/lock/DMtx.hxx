@@ -70,8 +70,7 @@ namespace lock {
 /**
  * @brief 动态互斥锁
  */
-class DMtx
-    : public Mtx
+class DMtx : public Mtx
 {
   private:
     xwos_mtx_d mMtxDesc; /**< 互斥锁对象描述符 */
@@ -82,7 +81,8 @@ class DMtx
      * @brief 构造函数
      * @param[in] pr: 互斥锁的天花板优先级
      */
-    explicit DMtx(xwpr_t pr = XWOS_SKD_PRIORITY_RT_MAX) {
+    explicit DMtx(xwpr_t pr = XWOS_SKD_PRIORITY_RT_MAX)
+    {
         mCtorRc = xwos_mtx_create(&mMtxDesc, pr);
         if (XWOK == mCtorRc) {
             Mtx::mMtxPtr = mMtxDesc.mtx;

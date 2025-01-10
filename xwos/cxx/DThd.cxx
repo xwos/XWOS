@@ -15,10 +15,9 @@
 namespace xwos {
 
 /* Non-static Member */
-DThd::DThd(const char * name,
-           xwsz_t stack_size, xwsz_t stack_guard_size,
+DThd::DThd(const char * name, xwsz_t stack_size, xwsz_t stack_guard_size,
            xwpr_t priority, bool detached, bool privileged)
-    : mThdDesc{nullptr, 0}
+    : mThdDesc{ nullptr, 0 }
 {
     struct xwos_thd_attr attr({
         .name = name,

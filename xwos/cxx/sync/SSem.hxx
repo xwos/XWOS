@@ -34,8 +34,7 @@ namespace sync {
 /**
  * @brief 静态信号量
  */
-class SSem
-    : public Sem
+class SSem : public Sem
 {
   private:
     struct xwos_sem mSem; /**< 信号量结构体 */
@@ -45,7 +44,9 @@ class SSem
     /**
      * @brief 构造函数
      */
-    SSem(xwssq_t val = 0, xwssq_t max = XWSSQ_MAX) : Sem() {
+    SSem(xwssq_t val = 0, xwssq_t max = XWSSQ_MAX)
+        : Sem()
+    {
         mCtorRc = xwos_sem_init(&mSem, val, max);
         if (XWOK == mCtorRc) {
             Sem::mSemPtr = &mSem;

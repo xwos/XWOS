@@ -34,24 +34,21 @@ namespace sync {
  * @brief 静态事件标志
  */
 template<xwsz_t TNum>
-class SBr
-    : public Br<TNum>
+class SBr : public Br<TNum>
 {
-  public:
-
-
   private:
     struct xwos_br mBr; /**< 事件标志结构体 */
-    typename Br<TNum>::BrBmp mBitmap; /**< 事件位图 */
-    typename Br<TNum>::BrBmp mMask; /**< 事件掩码 */
+    xwos::Bmp<TNum> mThdBmp; /**< 线程位图 */
+    xwos::Bmp<TNum> mThdMsk; /**< 线程掩码 */
     xwer_t mCtorRc; /**< 事件标志构造的结果 */
 
   public:
     /**
      * @brief 构造函数
      */
-    SBr() : Br<TNum>() {
-        mCtorRc = xwos_br_init(&mBr, TNum, mBitmap, mMask);
+    SBr() : Br<TNum>()
+    {
+        mCtorRc = xwos_br_init(&mBr, TNum, mThdBmp.mData, mMask);
         if (XWOK == mCtorRc) {
             Br<TNum>::mBrPtr = &mBr;
         }

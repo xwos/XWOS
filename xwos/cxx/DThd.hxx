@@ -58,8 +58,14 @@ class DThd
     xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态线程构造的结果 */
     xwer_t intr() { return xwos_thd_intr(mThdDesc); } /**< 中断线程的阻塞态和睡眠态 */
     xwer_t quit() { return xwos_thd_quit(mThdDesc); } /**< 通知线程退出 */
-    xwer_t join(xwer_t * trc) { return xwos_thd_join(mThdDesc, trc); } /**< 等待线程结束并获取它的返回值 */
-    xwer_t stop(xwer_t * trc) { return xwos_thd_stop(mThdDesc, trc); } /**< 通知线程退出，等待线程结束并获取它的返回值 */
+    xwer_t join(xwer_t * trc)
+    {
+        return xwos_thd_join(mThdDesc, trc);
+    } /**< 等待线程结束并获取它的返回值 */
+    xwer_t stop(xwer_t * trc)
+    {
+        return xwos_thd_stop(mThdDesc, trc);
+    } /**< 通知线程退出，等待线程结束并获取它的返回值 */
     xwer_t detach() { return xwos_thd_detach(mThdDesc); } /**< 终止线程并等待它退出 */
     struct xwos_thd * getXwosObj() { return mThdDesc.thd; } /**< 获取XWOS对象指针 */
 
@@ -72,11 +78,23 @@ class DThd
     /* 只能在当前线程函数中调用的API */
     void yield() { xwos_cthd_yield(); } /**< 当前线程通知调度器重新调度 */
     void exit(xwer_t rc) { xwos_cthd_exit(rc); } /**< 退出当前线程 */
-    bool shouldFreeze() { return xwos_cthd_shld_frz(); } /**< 判断当前线程是否可被冻结 */
+    bool shouldFreeze()
+    {
+        return xwos_cthd_shld_frz();
+    } /**< 判断当前线程是否可被冻结 */
     bool shouldStop() { return xwos_cthd_shld_stop(); } /**< 判断当前线程是否可以退出 */
-    xwer_t sleep(xwtm_t dur) { return xwos_cthd_sleep(dur); } /**< 当前线程睡眠一段时间 */
-    xwer_t sleepTo(xwtm_t to) { return xwos_cthd_sleep_to(to); } /**< 当前线程睡眠到一个时间点 */
-    xwer_t sleepFrom(xwtm_t * from, xwtm_t dur) { return xwos_cthd_sleep_from(from, dur); } /**< 当前线程从一个时间起点睡眠到另一个时间点 */
+    xwer_t sleep(xwtm_t dur)
+    {
+        return xwos_cthd_sleep(dur);
+    } /**< 当前线程睡眠一段时间 */
+    xwer_t sleepTo(xwtm_t to)
+    {
+        return xwos_cthd_sleep_to(to);
+    } /**< 当前线程睡眠到一个时间点 */
+    xwer_t sleepFrom(xwtm_t * from, xwtm_t dur)
+    {
+        return xwos_cthd_sleep_from(from, dur);
+    } /**< 当前线程从一个时间起点睡眠到另一个时间点 */
     xwer_t freeze(void) { return xwos_cthd_freeze(); } /**< 冻结当前线程 */
 
   private:

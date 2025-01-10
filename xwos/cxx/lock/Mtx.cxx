@@ -77,9 +77,11 @@ xwer_t Mtx::Grd::wait(sync::Cond * cond)
             xwsq_t lkst;
             lock.osal.mtx = mMtx->mMtxPtr;
             if (Mtx::LockMode::MtxLockUninterruptable == mLockMode) {
-                rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
+                rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX,
+                                           nullptr, &lkst);
             } else {
-                rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
+                rc = xwos_cond_wait(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr,
+                                    &lkst);
             }
             if (rc < 0) {
                 if (XWOS_LKST_UNLOCKED == lkst) {
@@ -104,9 +106,11 @@ xwer_t Mtx::Grd::wait(sync::Cond * cond, xwtm_t to)
             xwsq_t lkst;
             lock.osal.mtx = mMtx->mMtxPtr;
             if (Mtx::LockMode::MtxLockUninterruptable == mLockMode) {
-                rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, &lkst);
+                rc = xwos_cond_wait_unintr(cond->getXwosObj(), lock, XWOS_LK_MTX,
+                                           nullptr, &lkst);
             } else {
-                rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr, to, &lkst);
+                rc = xwos_cond_wait_to(cond->getXwosObj(), lock, XWOS_LK_MTX, nullptr,
+                                       to, &lkst);
             }
             if (rc < 0) {
                 if (XWOS_LKST_UNLOCKED == lkst) {
@@ -122,5 +126,5 @@ xwer_t Mtx::Grd::wait(sync::Cond * cond, xwtm_t to)
     return rc;
 }
 
-} // namespace xwos
 } // namespace lock
+} // namespace xwos

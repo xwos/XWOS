@@ -53,9 +53,10 @@ class SSwt
      * @param[in] origin: 软件定时器的初始时间
      * @param[in] period: 软件定时器的周期时间
      */
-    xwer_t start(xwtm_t origin, xwtm_t period) {
-        return xwos_swt_start(&mSwt, origin, period,
-                              (xwos_swt_f)sSwtAlarmFunction, this);
+    xwer_t start(xwtm_t origin, xwtm_t period)
+    {
+        return xwos_swt_start(&mSwt, origin, period, (xwos_swt_f)sSwtAlarmFunction,
+                              this);
     }
     xwer_t stop() { return xwos_swt_stop(&mSwt); } /**< 停止软件定时器 */
     struct xwos_swt * getXwosObj() { return &mSwt; } /**< 获取XWOS对象指针 */

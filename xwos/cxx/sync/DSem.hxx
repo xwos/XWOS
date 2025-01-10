@@ -34,8 +34,7 @@ namespace sync {
 /**
  * @brief 动态信号量
  */
-class DSem
-    : public Sem
+class DSem : public Sem
 {
   private:
     xwos_sem_d mSemDesc; /**< 信号量对象描述符 */
@@ -45,7 +44,9 @@ class DSem
     /**
      * @brief 构造函数
      */
-    DSem(xwssq_t val = 0, xwssq_t max = XWSSQ_MAX) : Sem() {
+    DSem(xwssq_t val = 0, xwssq_t max = XWSSQ_MAX)
+        : Sem()
+    {
         mCtorRc = xwos_sem_create(&mSemDesc, val, max);
         if (XWOK == mCtorRc) {
             Sem::mSemPtr = mSemDesc.sem;

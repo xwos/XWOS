@@ -234,8 +234,12 @@ class Mtx
 
   protected:
     struct xwos_mtx * mMtxPtr;
+
   protected:
-    Mtx() : mMtxPtr(nullptr) {}
+    Mtx()
+        : mMtxPtr(nullptr)
+    {
+    }
     ~Mtx() { mMtxPtr = nullptr; }
 
   public:

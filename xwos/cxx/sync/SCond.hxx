@@ -34,8 +34,7 @@ namespace sync {
 /**
  * @brief 静态条件量
  */
-class SCond
-    : public Cond
+class SCond : public Cond
 {
   private:
     struct xwos_cond mCond; /**< 条件量结构体 */
@@ -45,7 +44,8 @@ class SCond
     /**
      * @brief 构造函数
      */
-    SCond() : Cond() {
+    SCond() : Cond()
+    {
         mCtorRc = xwos_cond_init(&mCond);
         if (XWOK == mCtorRc) {
             Cond::mCondPtr = &mCond;

@@ -13,11 +13,11 @@
 #ifndef __xwos_cxx_sync_Br_hxx__
 #define __xwos_cxx_sync_Br_hxx__
 
-#include <xwos/osal/sync/br.hxx>
+#include <xwos/cxx/Bmp.hxx>
 #include <xwos/cxx/sync/Sel.hxx>
 
 extern "C" {
-#include <xwos/lib/xwbop.h>
+#include <xwos/osal/sync/br.h>
 }
 
 namespace xwos {
@@ -41,11 +41,6 @@ template<xwsz_t TNum>
 class Br
 {
   public:
-    /**
-     * @brief 事件位图
-     */
-    typedef xwbmp_t BrBmp[BITS_TO_XWBMP_T(TNum)];
-
     /**
      * @brief 等待模式枚举
      */
@@ -93,7 +88,8 @@ class Br
      *     + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
      *   + `Br::WaitMode::BrWaitUninterruptable` 不可中断等待模式。
      */
-    xwer_t wait(enum WaitMode mode, xwtm_t to) {
+    xwer_t wait(enum WaitMode mode, xwtm_t to)
+    {
         xwer_t rc;
         switch (mode) {
             case WaitMode::BrWait:
@@ -129,8 +125,9 @@ class Br
      * + 当所有线程到达线程栅栏时，线程栅栏将向信号选择器发送信号。
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> * sel, xwsq_t pos) {
-        return xwos_br_bind(mBrPtr, sel->getXwosObj(), pos);
+    xwer_t bind(Sel<TSelNum> * sel, long pos)
+    {
+        return xwos_br_bind(mBrPtr, sel->getXwosObj(), (xwsq_t)pos);
     }
 
     /**
@@ -150,8 +147,9 @@ class Br
      * + 当所有线程到达线程栅栏时，线程栅栏将向信号选择器发送信号。
      */
     template<xwsz_t TSelNum>
-    xwer_t bind(Sel<TSelNum> & sel, xwsq_t pos) {
-        return xwos_br_bind(mBrPtr, sel.getXwosObj(), pos);
+    xwer_t bind(Sel<TSelNum> & sel, long pos)
+    {
+        return xwos_br_bind(mBrPtr, sel.getXwosObj(), (xwsq_t)pos);
     }
 
     /**
@@ -165,7 +163,8 @@ class Br
      * + 上下文：任意
      */
     template<xwsz_t TSelNum>
-    xwer_t unbind(Sel<TSelNum> * sel) {
+    xwer_t unbind(Sel<TSelNum> * sel)
+    {
         return xwos_br_unbind(mBrPtr, sel->getXwosObj());
     }
 
@@ -180,7 +179,8 @@ class Br
      * + 上下文：任意
      */
     template<xwsz_t TSelNum>
-    xwer_t unbind(Sel<TSelNum> & sel) {
+    xwer_t unbind(Sel<TSelNum> & sel)
+    {
         return xwos_br_unbind(mBrPtr, sel.getXwosObj());
     }
 

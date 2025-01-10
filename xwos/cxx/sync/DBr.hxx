@@ -35,8 +35,7 @@ namespace sync {
  * @brief 动态事件标志
  */
 template<xwsz_t TNum>
-class DBr
-    : public Br<TNum>
+class DBr : public Br<TNum>
 {
   private:
     xwos_br_d mBrDesc; /**< 事件标志对象描述符 */
@@ -46,7 +45,8 @@ class DBr
     /**
      * @brief 构造函数
      */
-    DBr() : Br<TNum>() {
+    DBr() : Br<TNum>()
+    {
         mCtorRc = xwos_br_create(&mBrDesc, TNum);
         if (XWOK == mCtorRc) {
             Br<TNum>::mBrPtr = mBrDesc.br;
