@@ -450,9 +450,28 @@ namespace lock {
  * ```
  *
  *
- * ## C++ API
+ * ## 等待条件量并解锁
  *
- * 头文件： @ref xwos/cxx/lock/Seqlock.hxx
+ * + `Seqlock::RdexLkGrd::wait()`
+ * + `Seqlock::TryRdexLkGrd::wait()`
+ * + `Seqlock::RdexLkThGrd::wait()`
+ * + `Seqlock::TryRdexLkThGrd::wait()`
+ * + `Seqlock::RdexLkBhGrd::wait()`
+ * + `Seqlock::TryRdexLkBhGrd::wait()`
+ * + `Seqlock::RdexLkIrqsGrd::wait()`
+ * + `Seqlock::TryRdexLkIrqsGrd::wait()`
+ * + `Seqlock::WrLkGrd::wait()`
+ * + `Seqlock::TryWrLkGrd::wait()`
+ * + `Seqlock::WrLkThGrd::wait()`
+ * + `Seqlock::TryWrLkThGrd::wait()`
+ * + `Seqlock::WrLkBhGrd::wait()`
+ * + `Seqlock::TryWrLkBhGrd::wait()`
+ * + `Seqlock::WrLkIrqsGrd::wait()`
+ * + `Seqlock::TryWrLkIrqsGrd::wait()`
+ *
+ * ## 头文件
+ *
+ * @ref xwos/cxx/lock/Seqlock.hxx
  *
  * @{
  */

@@ -20,8 +20,8 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_SSem 静态信号量
- * @ingroup xwos_cxx_sync
+ * @defgroup xwos_cxx_sync_Sem_SSem 静态信号量
+ * @ingroup xwos_cxx_sync_Sem
  *
  *
  * ## C++ API

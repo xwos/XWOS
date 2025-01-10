@@ -20,8 +20,57 @@ namespace xwos {
 namespace lock {
 
 /**
- * @defgroup xwos_cxx_lock_Mtx 互斥锁基类
+ * @defgroup xwos_cxx_lock_Mtx 互斥锁
  * @ingroup xwos_cxx_lock
+ *
+ * ## 互斥锁的RAII机制守卫
+ *
+ * `Mtx::Grd` 构造时会上锁互斥锁，析构时会自动解锁互斥锁。
+ * `Mtx::Grd` 上锁模式分为：
+ * + `Mtx::LockMode::MtxUnlock` 未上锁。
+ * + `Mtx::LockMode::MtxLock` 如果无法上锁，调用线程会阻塞等待上锁。
+ * + `Mtx::LockMode::MtxLockTimed` 定时等待模式，如果无法上锁，
+ *   调用线程会定时阻塞等待上锁。
+ * + `Mtx::LockMode::MtxLockUninterruptable` 不可中断等待模式，
+ *   如果无法上锁，调用线程会阻塞等待上锁，且不可被中断。
+ * + `Mtx::LockMode::MtxLockTry` 尝试上锁模式，如果无法上锁，
+ *   调用线程不会阻塞等待，尝试失败立即返回。
+ *
+ * ### 示例
+ *
+ * ```Cpp
+ * #include <xwos/cxx/lock/SMtx.hxx>
+ * #include <xwos/cxx/lock/DMtx.hxx>
+ *
+ * xwos::lock::SMtx gSlock; // 构造静态互斥锁
+ *
+ * void foo()
+ * {
+ *     // 静态互斥锁上锁与解锁
+ *     { // 构造 `grd` 时会自动对互斥锁上锁
+ *         xwos::lock::Mtx::Grd grd(gSlock, xwos::lock::Mtx::LockMode::MtxLock);
+ *         if (XWOK == grd.getRc()) {
+ *             // 上锁成功，进入临界区
+ *         } else {
+ *             // 上锁失败
+ *         }
+ *     } // 如果上锁成功，grd析构时会自动解锁互斥锁
+ *     // 动态互斥锁上锁与解锁
+ *     xwos::lock::DMtx * dlock = new xwos::lock::DMtx(); // 创建动态互斥锁
+ *     { // 构造 `grd` 时会自动对互斥锁上锁
+ *         xwos::lock::Mtx::Grd grd(dlock, xwos::lock::Mtx::LockMode::MtxLock);
+ *         if (XWOK == grd.getRc()) {
+ *             // 上锁成功，进入临界区
+ *         } else {
+ *             // 上锁失败
+ *         }
+ *     } // 如果上锁成功，grd析构时会自动解锁互斥锁
+ * }
+ * ```
+ *
+ * ## 等待条件量
+ *
+ * + `Mtx::Grd::wait()` ：等待条件量并解锁
  *
  *
  * ## C++ API
@@ -172,15 +221,8 @@ class Mtx
          *   使用 `Mtx::Grd::getLockMode()` 确认是否上锁成功。
          */
         xwer_t wait(sync::Cond * cond);
-
         /**
-         * @brief 等待条件量
-         * @param[in] cond: 条件量对象的引用
-         * @return 错误码
-         * @note
-         * + 上下文：线程
-         * @details
-         * + 同 `wait(sync::Cond * cond)` 。
+         * @overload xwer_t wait(sync::Cond & cond)
          */
         xwer_t wait(sync::Cond & cond) { return wait(&cond); }
 
@@ -218,16 +260,8 @@ class Mtx
          *   使用 `Mtx::Grd::getLockMode()` 确认是否上锁成功。
          */
         xwer_t wait(sync::Cond * cond, xwtm_t to);
-
         /**
-         * @brief 限时等待条件量
-         * @param[in] cond: 条件量对象的引用
-         * @param[in] to: 期望唤醒的时间点
-         * @return 错误码
-         * @note
-         * + 上下文：线程
-         * @details
-         * + 同 `wait(sync::Cond * cond, xwtm_t to)` 。
+         * @overload xwer_t wait(sync::Cond & cond, xwtm_t to)
          */
         xwer_t wait(sync::Cond & cond, xwtm_t to) { return wait(&cond, to); }
     };
@@ -236,10 +270,7 @@ class Mtx
     struct xwos_mtx * mMtxPtr;
 
   protected:
-    Mtx()
-        : mMtxPtr(nullptr)
-    {
-    }
+    Mtx() : mMtxPtr(nullptr) {}
     ~Mtx() { mMtxPtr = nullptr; }
 
   public:

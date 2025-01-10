@@ -231,9 +231,21 @@ namespace lock {
  * ```
  *
  *
- * ## C++ API
+ * ## 等待条件量并解锁
  *
- * 头文件： @ref xwos/cxx/lock/Spinlock.hxx
+ * + `Spinlock::LkGrd::wait()`
+ * + `Spinlock::TryLkGrd::wait()`
+ * + `Spinlock::LkThGrd::wait()`
+ * + `Spinlock::TryLkThGrd::wait()`
+ * + `Spinlock::LkBhGrd::wait()`
+ * + `Spinlock::TryLkBhGrd::wait()`
+ * + `Spinlock::LkIrqsGrd::wait()`
+ * + `Spinlock::TryLkIrqsGrd::wait()`
+ *
+ *
+ * ## 头文件
+ *
+ * @ref xwos/cxx/lock/Spinlock.hxx
  *
  * @{
  */

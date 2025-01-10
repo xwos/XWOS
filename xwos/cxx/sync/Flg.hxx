@@ -24,12 +24,32 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_Flg 事件标志基类
+ * @defgroup xwos_cxx_sync_Flg 事件标志
  * @ingroup xwos_cxx_sync
  *
- * ## C++ API
+ * ## 获取事件的状态
  *
- * 头文件： @ref xwos/cxx/sync/Flg.hxx
+ * + `Flg::num()` ：获取事件标志中总共有多少个事件
+ * + `Flg::read()` ：读取事件标志位图的值
+ *
+ * ## 产生事件
+ *
+ * + `Flg::set()` ：设置事件标志位
+ * + `Flg::clear()` ：清除事件标志位
+ * + `Flg::toggle()` ：翻转事件标志位
+ *
+ * ## 等待事件
+ *
+ * + `Flg::wait()` ：等待事件
+ *
+ * ## 使用信号选择器选择事件标志
+ *
+ * + `Flg::bind()` ：绑定到 [信号选择器](group__xwos__cxx__sync__Sel.html) 上
+ * + `Flg::unbind()` ：从 [信号选择器](group__xwos__cxx__sync__Sel.html) 上解绑
+ *
+ * ## 头文件
+ *
+ * @ref xwos/cxx/sync/Flg.hxx
  *
  * @{
  */
@@ -99,27 +119,15 @@ class Flg
      */
     xwer_t set(xwos::Bmp<TNum> * msk) { return xwos_flg_s1m(mFlgPtr, msk->mData); }
     /**
-     * @brief 同时设置多个事件标志位
+     * @overload xwer_t set(xwos::Bmp<TNum> & msk)
      */
     xwer_t set(xwos::Bmp<TNum> & msk) { return xwos_flg_s1m(mFlgPtr, msk.mData); }
     /**
-     * @brief 设置单个事件标志位
-     * @param[in] pos: 事件的序号
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 无效的指针或空指针
-     * @retval -ECHRNG: 位置超出范围
-     * @note
-     * + 上下文：任意
-     * @details
-     * + 此CAPI会将事件标志位图中，序号为 `pos` 的单个位设置为 **1** ，
-     *   然后 **广播** 所有正在等待的线程。
-     * + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
-     *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
+     * @overload xwer_t set(unsigned long pos)
      */
     xwer_t set(unsigned long pos) { return xwos_flg_s1i(mFlgPtr, pos); }
     /**
-     * @brief 设置单个事件标志位
+     * @overload xwer_t set(long pos)
      */
     xwer_t set(long pos) { return xwos_flg_s1i(mFlgPtr, (xwsq_t)pos); }
 
@@ -139,23 +147,15 @@ class Flg
      */
     xwer_t clear(xwos::Bmp<TNum> * msk) { return xwos_flg_c0m(mFlgPtr, msk->mData); }
     /**
-     * @brief 清除单个事件标志位
-     * @param[in] pos: 事件的序号
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 无效的指针或空指针
-     * @retval -ECHRNG: 位置超出范围
-     * @note
-     * + 上下文：任意
-     * @details
-     * + 此CAPI会将事件标志位图中，序号为 `pos` 的单个位清 **0** ，
-     *   然后 **广播** 所有正在等待的线程。
-     * + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
-     *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
+     * @overload xwer_t clear(xwos::Bmp<TNum> & msk)
+     */
+    xwer_t clear(xwos::Bmp<TNum> & msk) { return xwos_flg_c0m(mFlgPtr, msk.mData); }
+    /**
+     * @overload xwer_t clear(unsigned long pos)
      */
     xwer_t clear(unsigned long pos) { return xwos_flg_c0i(mFlgPtr, (xwsq_t)pos); }
     /**
-     * @brief 清除单个事件标志位
+     * @overload xwer_t clear(long pos)
      */
     xwer_t clear(long pos) { return xwos_flg_c0i(mFlgPtr, (xwsq_t)pos); }
 
@@ -175,25 +175,16 @@ class Flg
      *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
      */
     xwer_t toggle(xwos::Bmp<TNum> * msk) { return xwos_flg_x1m(mFlgPtr, msk->mData); }
-
     /**
-     * @brief 翻转单个事件标志位
-     * @param[in] pos: 事件的序号
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 无效的指针或空指针
-     * @retval -ECHRNG: 位置超出范围
-     * @note
-     * + 上下文：任意
-     * @details
-     * + 此CAPI会将事件标志位图中，序号为 `pos` 的单个位翻转，
-     *   然后 **广播** 所有正在等待的线程。
-     * + 线程唤醒后通过比对位图状态，确定事件是否已经满足触发条件，
-     *   若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
+     * @overload xwer_t toggle(xwos::Bmp<TNum> & msk)
+     */
+    xwer_t toggle(xwos::Bmp<TNum> & msk) { return xwos_flg_x1m(mFlgPtr, msk.mData); }
+    /**
+     * @overload xwer_t toggle(unsigned long pos)
      */
     xwer_t toggle(unsigned long pos) { return xwos_flg_x1i(mFlgPtr, (xwsq_t)pos); }
     /**
-     * @brief 翻转单个事件标志位
+     * @overload xwer_t toggle(long pos)
      */
     xwer_t toggle(long pos) { return xwos_flg_x1i(mFlgPtr, (xwsq_t)pos); }
 
@@ -220,7 +211,7 @@ class Flg
      *   + (I) 输入时，作为评估事件位图是否发生变化的初始状态
      *   + (O) 输出时，返回触发后的事件标志位图状态（可作为下一次调用的初始值）
      * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
-     * @param[in] mode: 等待模式，取值 @ref Flg::WaitMode
+     * @param[in] mode: 等待模式，取值 @ref Flg::WaitMode ：
      *   @arg Flg::WaitMode::FlgWait
      *   @arg Flg::WaitMode::FlgWaitTimed
      *   @arg Flg::WaitMode::FlgWaitUninterruptable
@@ -294,20 +285,8 @@ class Flg
     xwer_t bind(Sel<TSelNum> * sel, long pos) {
         return xwos_flg_bind(mFlgPtr, sel->getXwosObj(), (xwsq_t)pos);
     }
-
     /**
-     * @brief 绑定事件标志对象到信号选择器
-     * @param[in] sel: 信号选择器的引用
-     * @param[in] pos: 事件标志对象映射到信号选择器位图中的位置
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 无效的指针或空指针
-     * @retval -ECHRNG: 位置超出范围
-     * @retval -EALREADY: 同步对象已经绑定到事件对象
-     * @retval -EBUSY: 通道已经被其他同步对象独占
-     * @note
-     * + 上下文：任意
-     * + 绑定方式：非独占绑定
+     * @overload xwer_t bind(Sel<TSelNum> & sel, long pos)
      */
     template<xwsz_t TSelNum>
     xwer_t bind(Sel<TSelNum> & sel, long pos) {
@@ -328,16 +307,8 @@ class Flg
     xwer_t unbind(Sel<TSelNum> * sel) {
         return xwos_flg_unbind(mFlgPtr, sel->getXwosObj());
     }
-
     /**
-     * @brief 从信号选择器上解绑事件标志对象
-     * @param[in] sel: 信号选择器的引用
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 空指针
-     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
-     * @note
-     * + 上下文：任意
+     * @overload xwer_t unbind(Sel<TSelNum> & sel)
      */
     template<xwsz_t TSelNum>
     xwer_t unbind(Sel<TSelNum> & sel) {

@@ -24,12 +24,25 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_Br 线程栅栏基类
+ * @defgroup xwos_cxx_sync_Br 线程栅栏
  * @ingroup xwos_cxx_sync
  *
- * ## C++ API
+ * ## 获取事件的状态
  *
- * 头文件： @ref xwos/cxx/sync/Br.hxx
+ * + `Br::num()` ：获取线程栅栏中线程槽数量
+ *
+ * ## 同步线程
+ *
+ * + `Br::wait()` ：等待所有线程到达栅栏
+ *
+ * ## 使用信号选择器选择条件量
+ *
+ * + `Br::bind()` ：绑定到 [信号选择器](group__xwos__cxx__sync__Sel.html) 上
+ * + `Br::unbind()` ：从 [信号选择器](group__xwos__cxx__sync__Sel.html) 上解绑
+ *
+ * ## 头文件
+ *
+ * @ref xwos/cxx/sync/Br.hxx
  *
  * @{
  */

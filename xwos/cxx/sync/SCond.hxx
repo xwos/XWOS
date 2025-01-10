@@ -20,8 +20,8 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_SCond 静态条件量
- * @ingroup xwos_cxx_sync
+ * @defgroup xwos_cxx_sync_Cond_SCond 静态条件量
+ * @ingroup xwos_cxx_sync_Cond
  *
  *
  * ## C++ API

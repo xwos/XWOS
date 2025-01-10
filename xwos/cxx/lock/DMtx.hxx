@@ -21,48 +21,14 @@ namespace xwos {
 namespace lock {
 
 /**
- * @defgroup xwos_cxx_lock_DMtx 动态互斥锁
- * @ingroup xwos_cxx_lock
+ * @defgroup xwos_cxx_lock_Mtx_DMtx 动态互斥锁
+ * @ingroup xwos_cxx_lock_Mtx
  *
  * 动态互斥锁是指互斥锁所需要的内存在编译期由编译器分配。
  *
+ * ## 头文件
  *
- * ## 动态互斥锁的RAII机制守卫
- *
- * `Mtx::Grd` 构造时会上锁互斥锁，析构时会自动解锁互斥锁。
- * `Mtx::Grd` 上锁模式分为：
- * + `Mtx::LockMode::MtxUnlock` 未上锁。
- * + `Mtx::LockMode::MtxLock` 如果无法上锁，调用线程会阻塞等待上锁。
- * + `Mtx::LockMode::MtxLockTimed` 定时等待模式，如果无法上锁，
- *   调用线程会定时阻塞等待上锁。
- * + `Mtx::LockMode::MtxLockUninterruptable` 不可中断等待模式，
- *   如果无法上锁，调用线程会阻塞等待上锁，且不可被中断。
- * + `Mtx::LockMode::MtxLockTry` 尝试上锁模式，如果无法上锁，
- *   调用线程不会阻塞等待，尝试失败立即返回。
- *
- * ### 示例
- *
- * ```Cpp
- * #include <xwos/cxx/lock/DMtx.hxx>
- *
- * void foo()
- * {
- *     xwos::lock::DMtx * dlock = new xwos::lock::DMtx(); // 创建动态互斥锁
- *     { // 构造 `grd` 时会自动对互斥锁上锁
- *         xwos::lock::Mtx::Grd grd(dlock, xwos::lock::Mtx::LockMode::MtxLock);
- *         if (XWOK == grd.getRc()) {
- *             // 上锁成功，进入临界区
- *         } else {
- *             // 上锁失败
- *         }
- *     } // 如果上锁成功，grd析构时会自动解锁互斥锁
- * }
- * ```
- *
- *
- * ## C++ API
- *
- * 头文件： @ref xwos/cxx/lock/DMtx.hxx
+ * @ref xwos/cxx/lock/DMtx.hxx
  *
  * @{
  */

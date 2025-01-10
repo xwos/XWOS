@@ -22,9 +22,9 @@ namespace xwos {
  * @ingroup xwos_cxx
  *
  *
- * ## C++ API
+ * ## 头文件
  *
- * 头文件： @ref xwos/cxx/Pm.hxx
+ * @ref xwos/cxx/Pm.hxx
  *
  * @{
  */

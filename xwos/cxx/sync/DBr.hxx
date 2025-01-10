@@ -20,8 +20,8 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_DBr 动态事件标志
- * @ingroup xwos_cxx_sync
+ * @defgroup xwos_cxx_sync_Br_DBr 动态事件标志
+ * @ingroup xwos_cxx_sync_Br
  *
  *
  * ## C++ API
