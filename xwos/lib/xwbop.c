@@ -611,7 +611,7 @@ xwsz_t xwbop_weight64(xwu64_t x)
 #endif
 
 __xwlib_code
-void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
+void xwbmpop_assign(xwbmp_t * bmp, const xwbmp_t opd[], xwsz_t num)
 {
         xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
@@ -622,7 +622,7 @@ void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 }
 
 __xwlib_code
-xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
+xwssq_t xwbmpop_cmp(xwbmp_t * bmp, const xwbmp_t opd[], xwsz_t num)
 {
         xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
@@ -675,7 +675,7 @@ void xwbmpop_s1i(xwbmp_t * bmp, xwsq_t n)
 #endif
 
 __xwlib_code
-void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+void xwbmpop_s1m(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -696,7 +696,7 @@ void xwbmpop_c0i(xwbmp_t * bmp, xwsq_t n)
 #endif
 
 __xwlib_code
-void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+void xwbmpop_c0m(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -717,7 +717,7 @@ void xwbmpop_x1i(xwbmp_t * bmp, xwsq_t n)
 #endif
 
 __xwlib_code
-void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+void xwbmpop_x1m(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -738,7 +738,7 @@ bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n)
 #endif
 
 __xwlib_code
-bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+bool xwbmpop_t1ma(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -756,7 +756,7 @@ bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 __xwlib_code
-bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -779,7 +779,7 @@ bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 __xwlib_code
-bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+bool xwbmpop_t1mo(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -797,7 +797,7 @@ bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 __xwlib_code
-bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -820,7 +820,7 @@ bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 __xwlib_code
-bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+bool xwbmpop_t0ma(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -838,7 +838,7 @@ bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 __xwlib_code
-bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -861,7 +861,7 @@ bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 __xwlib_code
-bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+bool xwbmpop_t0mo(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -879,7 +879,7 @@ bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 __xwlib_code
-bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
+bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -914,7 +914,7 @@ void xwbmpop_not(xwbmp_t * bmp, xwsz_t num)
 }
 
 __xwlib_code
-void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
+void xwbmpop_and(xwbmp_t * bmp, const xwbmp_t opd[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -926,7 +926,7 @@ void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 }
 
 __xwlib_code
-void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
+void xwbmpop_or(xwbmp_t * bmp, const xwbmp_t opd[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
@@ -938,7 +938,7 @@ void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 }
 
 __xwlib_code
-void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
+void xwbmpop_xor(xwbmp_t * bmp, const xwbmp_t opd[], xwsz_t num)
 {
         xwsq_t i;
         xwsz_t size;
