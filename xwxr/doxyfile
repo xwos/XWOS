@@ -681,7 +681,7 @@ INLINE_INFO            = YES
 # name. If set to NO, the members will appear in declaration order.
 # The default value is: YES.
 
-SORT_MEMBER_DOCS       = YES
+SORT_MEMBER_DOCS       = NO
 
 # If the SORT_BRIEF_DOCS tag is set to YES then doxygen will sort the brief
 # descriptions of file, namespace and class members alphabetically by member
@@ -948,8 +948,36 @@ INPUT                  = xwxr/index.md \
                          xwos/standard.hxx \
                          xwos/version.h \
                          xwos/osal \
-                         xwos/cxx \
-                         xwos/cxx/lock \
+                         xwos/cxx/group.dox \
+                         xwos/cxx/Bmp.hxx \
+                         xwos/cxx/Cpu.hxx \
+                         xwos/cxx/Pm.hxx \
+                         xwos/cxx/SThd.hxx \
+                         xwos/cxx/DThd.hxx \
+                         xwos/cxx/SSwt.hxx \
+                         xwos/cxx/DSwt.hxx \
+                         xwos/cxx/lock/group.dox \
+                         xwos/cxx/lock/Mtx.hxx \
+                         xwos/cxx/lock/SMtx.hxx \
+                         xwos/cxx/lock/DMtx.hxx \
+                         xwos/cxx/lock/Spinlock.hxx \
+                         xwos/cxx/lock/Seqlock.hxx \
+                         xwos/cxx/sync/group.dox \
+                         xwos/cxx/sync/Sem.hxx \
+                         xwos/cxx/sync/SSem.hxx \
+                         xwos/cxx/sync/DSem.hxx \
+                         xwos/cxx/sync/Cond.hxx \
+                         xwos/cxx/sync/SCond.hxx \
+                         xwos/cxx/sync/DCond.hxx \
+                         xwos/cxx/sync/Flg.hxx \
+                         xwos/cxx/sync/SFlg.hxx \
+                         xwos/cxx/sync/DFlg.hxx \
+                         xwos/cxx/sync/Br.hxx \
+                         xwos/cxx/sync/SBr.hxx \
+                         xwos/cxx/sync/DBr.hxx \
+                         xwos/cxx/sync/Sel.hxx \
+                         xwos/cxx/sync/SSel.hxx \
+                         xwos/cxx/sync/DSel.hxx \
                          xwos/mm \
                          xwos/lib \
                          xwmd/group.dox \

@@ -1,3 +1,13 @@
 /**
  * @defgroup xwos_cxx XWOS内核C++API
  */
+
+/**
+ * @defgroup xwos_cxx_Thd 线程
+ * @ingroup xwos_cxx
+ */
+
+/**
+ * @defgroup xwos_cxx_Swt 软件定时器
+ * @ingroup xwos_cxx
+ */

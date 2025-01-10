@@ -18,15 +18,15 @@
 namespace xwos {
 
 /**
- * @defgroup xwos_cxx_SSwt 静态软件定时器
- * @ingroup xwos_cxx
+ * @defgroup xwos_cxx_Swt_SSwt 静态软件定时器
+ * @ingroup xwos_cxx_Swt
  *
  * 静态软件定时器是指软件定时器所需要的内存在编译期由编译器分配。
  *
  *
- * ## C++ API
+ * ## 头文件
  *
- * 头文件： @ref xwos/cxx/SSwt.hxx
+ * @ref xwos/cxx/SSwt.hxx
  *
  * @{
  */

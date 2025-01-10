@@ -19,8 +19,8 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_SFlg 静态事件标志
- * @ingroup xwos_cxx_sync
+ * @defgroup xwos_cxx_sync_Flg_SFlg 静态事件标志
+ * @ingroup xwos_cxx_sync_Flg
  *
  *
  * ## C++ API

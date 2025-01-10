@@ -38,32 +38,34 @@
     + @subpage xwos_lib_xwsc
 + @subpage xwos_cxx
   + @subpage xwos_cxx_Cpu
-  + @subpage xwos_cxx_SThd
-  + @subpage xwos_cxx_DThd
-  + @subpage xwos_cxx_SSwt
-  + @subpage xwos_cxx_DThd
+  + @subpage xwos_cxx_Thd
+    + @subpage xwos_cxx_Thd_SThd
+    + @subpage xwos_cxx_Thd_DThd
+  + @subpage xwos_cxx_Swt
+    + @subpage xwos_cxx_Swt_SSwt
+    + @subpage xwos_cxx_Swt_DSwt
   + @subpage xwos_cxx_lock
     + @subpage xwos_cxx_lock_Mtx
-    + @subpage xwos_cxx_lock_SMtx
-    + @subpage xwos_cxx_lock_DMtx
+      + @subpage xwos_cxx_lock_Mtx_SMtx
+      + @subpage xwos_cxx_lock_Mtx_DMtx
     + @subpage xwos_cxx_lock_Spinlock
     + @subpage xwos_cxx_lock_Seqlock
   + @subpage xwos_cxx_sync
     + @subpage xwos_cxx_sync_Sem
-    + @subpage xwos_cxx_sync_SSem
-    + @subpage xwos_cxx_sync_DSem
+      + @subpage xwos_cxx_sync_Sem_SSem
+      + @subpage xwos_cxx_sync_Sem_DSem
     + @subpage xwos_cxx_sync_Cond
-    + @subpage xwos_cxx_sync_SCond
-    + @subpage xwos_cxx_sync_DCond
+      + @subpage xwos_cxx_sync_Cond_SCond
+      + @subpage xwos_cxx_sync_Cond_DCond
     + @subpage xwos_cxx_sync_Flg
-    + @subpage xwos_cxx_sync_SFlg
-    + @subpage xwos_cxx_sync_DFlg
+      + @subpage xwos_cxx_sync_Flg_SFlg
+      + @subpage xwos_cxx_sync_Flg_DFlg
     + @subpage xwos_cxx_sync_Br
-    + @subpage xwos_cxx_sync_SBr
-    + @subpage xwos_cxx_sync_DBr
+      + @subpage xwos_cxx_sync_Br_SBr
+      + @subpage xwos_cxx_sync_Br_DBr
     + @subpage xwos_cxx_sync_Sel
-    + @subpage xwos_cxx_sync_SSel
-    + @subpage xwos_cxx_sync_DSel
+      + @subpage xwos_cxx_sync_Sel_SSel
+      + @subpage xwos_cxx_sync_Sel_DSel
 + @subpage xwmd
   + @subpage xwmd_isc
     + @subpage xwmd_isc_xwcq

@@ -18,15 +18,15 @@
 namespace xwos {
 
 /**
- * @defgroup xwos_cxx_DThd 动态线程
- * @ingroup xwos_cxx
+ * @defgroup xwos_cxx_Thd_DThd 动态线程
+ * @ingroup xwos_cxx_Thd
  *
  * 动态线程是指线程所需要的内存空间是在运行时动态申请的。
  *
  *
- * ## C++ API
+ * ## 头文件
  *
- * 头文件： @ref xwos/cxx/DThd.hxx
+ * @ref xwos/cxx/DThd.hxx
  *
  * @{
  */

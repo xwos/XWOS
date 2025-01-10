@@ -25,9 +25,9 @@ namespace xwos {
  *
  * XWOS位图库
  *
- * ## C++ API
+ * ## 头文件
  *
- * 头文件： @ref xwos/cxx/Bmp.hxx
+ * @ref xwos/cxx/Bmp.hxx
  *
  * @{
  */

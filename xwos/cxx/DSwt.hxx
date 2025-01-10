@@ -18,15 +18,15 @@
 namespace xwos {
 
 /**
- * @defgroup xwos_cxx_DSwt 动态软件定时器
- * @ingroup xwos_cxx
+ * @defgroup xwos_cxx_Swt_DSwt 动态软件定时器
+ * @ingroup xwos_cxx_Swt
  *
  * 动态软件定时器是指软件定时器所需要的内存空间是在运行时动态申请的。
  *
  *
- * ## C++ API
+ * ## 头文件
  *
- * 头文件： @ref xwos/cxx/DSwt.hxx
+ * @ref xwos/cxx/DSwt.hxx
  *
  * @{
  */

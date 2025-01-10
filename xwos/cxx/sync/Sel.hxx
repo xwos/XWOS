@@ -23,12 +23,26 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_Sel 信号选择器基类
+ * @defgroup xwos_cxx_sync_Sel 信号选择器
  * @ingroup xwos_cxx_sync
  *
- * ## C++ API
  *
- * 头文件： @ref xwos/cxx/sync/Sel.hxx
+ * ## 获取事件的状态
+ *
+ * + `Sel::num()` ：获取信号选择器中的信号槽的数量
+ *
+ * ## 选择信号
+ *
+ * + `Sel::select()` ：等待信号选择器
+ *
+ * ## 信号选择器的级联
+ *
+ * + `Sel::bind()` ：绑定另一个到信号选择器上
+ * + `Sel::unbind()` ：从另一个信号选择器上解绑
+ *
+ * ## 头文件
+ *
+ * @ref xwos/cxx/sync/Sel.hxx
  *
  * @{
  */
@@ -62,7 +76,7 @@ class Sel
 
   public:
     /**
-     * @brief 获取事件的最大数量
+     * @brief 获取信号选择器中的信号槽的数量
      */
     xwsz_t num() { return TNum; }
 
@@ -143,23 +157,8 @@ class Sel
     {
         return xwos_sel_bind(src->getXwosObj(), mSelPtr, (xwsq_t)pos);
     }
-
     /**
-     * @brief 绑定源信号选择器到本信号选择器
-     * @param[in] src: 源信号选择器对象的引用
-     * @param[in] pos: 源信号选择器对象映射到位图中的位置
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 空指针
-     * @retval -ECHRNG: 位置超出范围
-     * @retval -EALREADY: 同步对象已经绑定到事件对象
-     * @retval -EBUSY: 通道已经被其他同步对象独占
-     * @note
-     * + 上下文：任意
-     * + 绑定方式：非独占绑定
-     * @details
-     * + 多个信号选择器可以依次绑定，形成信号传递链。
-     *   但不可循环绑定，否则会造成无限循环传递。
+     * @overload xwer_t bind(Sel<TSelNum> & sel, long pos)
      */
     template<xwsz_t TSelNum>
     xwer_t bind(Sel<TSelNum> & src, long pos)
@@ -182,16 +181,8 @@ class Sel
     {
         return xwos_sel_unbind(src->getXwosObj(), mSelPtr);
     }
-
     /**
-     * @brief 从目的信号选择器上解绑源信号选择器
-     * @param[in] src: 源信号选择器对象的引用
-     * @return 错误码
-     * @retval XWOK: 没有错误
-     * @retval -EFAULT: 空指针
-     * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
-     * @note
-     * + 上下文：任意
+     * @overload xwer_t unbind(Sel<TSelNum> & sel)
      */
     template<xwsz_t TSelNum>
     xwer_t unbind(Sel<TSelNum> & src)

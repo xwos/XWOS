@@ -20,12 +20,35 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_Sem 信号量基类
+ * @defgroup xwos_cxx_sync_Sem 信号量
  * @ingroup xwos_cxx_sync
  *
- * ## C++ API
+ * ## 发布信号量
  *
- * 头文件： @ref xwos/cxx/sync/Sem.hxx
+ * + `Sem::post()` ：发布信号量
+ *
+ * ## 等待信号量
+ *
+ * + `Sem::wait()` ：等待信号量
+ *
+ * ## 获取信号量的状态
+ *
+ * + `Sem::max()` ：获取信号量中计数器的最大值
+ * + `Sem::value()` ：获取信号量中计数器的值
+ *
+ * ## 冻结与解冻信号量
+ *
+ * + `Sem::freeze()` ：冻结
+ * + `Sem::thaw()` ：解冻
+ *
+ * ## 使用信号选择器选择信号量
+ *
+ * + `Sem::bind()` ：绑定到 [信号选择器](group__xwos__cxx__sync__Sel.html) 上
+ * + `Sem::unbind()` ：从 [信号选择器](group__xwos__cxx__sync__Sel.html) 上解绑
+ *
+ * ## 头文件
+ *
+ * @ref xwos/cxx/sync/Sem.hxx
  *
  * @{
  */

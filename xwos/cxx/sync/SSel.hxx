@@ -19,8 +19,8 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_SSel 静态信号选择器
- * @ingroup xwos_cxx_sync
+ * @defgroup xwos_cxx_sync_Sel_SSel 静态信号选择器
+ * @ingroup xwos_cxx_sync_Sel
  *
  *
  * ## C++ API

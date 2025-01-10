@@ -18,15 +18,15 @@
 namespace xwos {
 
 /**
- * @defgroup xwos_cxx_SThd 静态线程
- * @ingroup xwos_cxx
+ * @defgroup xwos_cxx_Thd_SThd 静态线程
+ * @ingroup xwos_cxx_Thd
  *
  * 静态线程是指线程所需要的内存在编译期由编译器分配。
  *
  *
- * ## C++ API
+ * ## 头文件
  *
- * 头文件： @ref xwos/cxx/SThd.hxx
+ * @ref xwos/cxx/SThd.hxx
  *
  * @{
  */
