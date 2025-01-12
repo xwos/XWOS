@@ -25,6 +25,7 @@
 
 void soc_isr_reset(void);
 void soc_relocate_ivt(void);
+void soc_relocate_standby_data(void);
 void soc_relocate_data(void);
 
 #endif /* xwcd/soc/arm/v7m/m7/fc7300/soc_init.h */

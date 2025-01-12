@@ -244,6 +244,10 @@ extern xwu8_t dtcm_data_vma_end[];
 extern xwu8_t dtcm_bss_vma_base[];
 extern xwu8_t dtcm_bss_vma_end[];
 
+extern xwu8_t standby_data_lma_base[];
+extern xwu8_t standby_data_vma_base[];
+extern xwu8_t standby_data_vma_end[];
+
 extern xwu8_t xwos_data_lma_base[];
 extern xwu8_t xwos_data_vma_base[];
 extern xwu8_t xwos_data_vma_end[];
@@ -275,6 +279,33 @@ extern xwu8_t shareable_data_vma_end[];
 
 extern xwu8_t shareable_bss_vma_base[];
 extern xwu8_t shareable_bss_vma_end[];
+
+
+/**
+ * @brief 重定向STANDBY数据到内存
+ */
+__xwbsp_init_code
+void soc_relocate_standby_data(void)
+{
+        xwid_t cpuid;
+        xwsz_t cnt;
+        xwsz_t i;
+        xwu8_t * src;
+        xwu8_t * dst;
+
+        cpuid = xwospl_skd_get_cpuid_lc();
+        if (0U == cpuid) {
+                src = standby_data_lma_base;
+                dst = standby_data_vma_base;
+                if (dst != src) {
+                        cnt = ((xwsz_t)standby_data_vma_end -
+                               (xwsz_t)standby_data_vma_base);
+                        for (i = 0; i < cnt; i++) {
+                                dst[i] = src[i];
+                        }
+                }
+        }
+}
 
 /**
  * @brief 重定向数据区到内存
@@ -407,7 +438,8 @@ extern xwu8_t armv7m_ivt_vma_end[];
 __xwos_init_code
 void soc_relocate_ivt(void)
 {
-        xwsz_t cnt, i;
+        xwsz_t cnt;
+        xwsz_t i;
         xwu8_t * src;
         xwu8_t * dst;
 

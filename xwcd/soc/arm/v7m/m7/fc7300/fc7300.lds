@@ -181,6 +181,14 @@ SECTIONS {
         } > dtcm_mr
         dtcm_bss_vma_base = ADDR(.dtcm.bss);
 
+        .standby.data : ALIGN(32) {
+                *(.standby.data)
+                . = ALIGN(32);
+                standby_data_vma_end = .;
+        } > standby_data_mr AT> code_mr
+        standby_data_vma_base = ADDR(.standby.data);
+        standby_data_lma_base = LOADADDR(.standby.data);
+
         .xwos.data : ALIGN(32) {
                 *(.xwos.data)
                 . = ALIGN(32);
