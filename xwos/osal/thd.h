@@ -582,7 +582,7 @@ void xwos_cthd_yield(void)
 
 /**
  * @brief XWOS API：退出当前线程
- * @param[in] rc: 线程退出时的返回值
+ * @param[in] rc: 线程退出时抛出的返回值
  * @note
  * + 上下文：线程
  * @details
@@ -674,7 +674,7 @@ bool xwos_cthd_frz_shld_stop(bool * frozen)
 }
 
 /**
- * @brief XWOS API：线程睡眠一段时间
+ * @brief XWOS API：当前线程睡眠一段时间
  * @param[in] dur: 期望睡眠的时间
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -721,8 +721,8 @@ xwer_t xwos_cthd_sleep_to(xwtm_t to)
 /**
  * @brief XWOS API：线程从一个时间起点睡眠到另一个时间点
  * @param[in,out] from: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，作为时间起点
- * + (O) 作为输出时，返回线程被唤醒的时间（可作为下一次时间起点，形成精确的周期）
+ * + (I) 输入时，作为时间起点
+ * + (O) 输出时，返回线程被唤醒的时间（可作为下一次时间起点，形成精确的周期）
  * @param[in] dur: 期望被唤醒的时间增量（相对于时间原点）
  * @return 错误码
  * @retval XWOK: 没有错误
