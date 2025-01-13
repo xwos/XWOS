@@ -15,6 +15,7 @@
 
 extern "C" {
 #include <xwos/lib/xwbop.h>
+#include <string.h>
 }
 
 namespace xwos {
@@ -122,6 +123,60 @@ class Bmp
     Bmp()
     {
         xwbmpop_c0all(mData, TNum);
+    }
+    Bmp(unsigned long long x)
+    {
+        xwbmpop_c0all(mData, TNum);
+        if (sizeof(x) < sizeof(mData)) {
+            memcpy(mData, &x, sizeof(x));
+        } else {
+            memcpy(mData, &x, sizeof(mData));
+        }
+    }
+    Bmp(unsigned long x)
+    {
+        xwbmpop_c0all(mData, TNum);
+        if (sizeof(x) < sizeof(mData)) {
+            memcpy(mData, &x, sizeof(x));
+        } else {
+            memcpy(mData, &x, sizeof(mData));
+        }
+    }
+    Bmp(unsigned int x)
+    {
+        xwbmpop_c0all(mData, TNum);
+        if (sizeof(x) < sizeof(mData)) {
+            memcpy(mData, &x, sizeof(x));
+        } else {
+            memcpy(mData, &x, sizeof(mData));
+        }
+    }
+    Bmp(long long x)
+    {
+        xwbmpop_c0all(mData, TNum);
+        if (sizeof(x) < sizeof(mData)) {
+            memcpy(mData, &x, sizeof(x));
+        } else {
+            memcpy(mData, &x, sizeof(mData));
+        }
+    }
+    Bmp(long x)
+    {
+        xwbmpop_c0all(mData, TNum);
+        if (sizeof(x) < sizeof(mData)) {
+            memcpy(mData, &x, sizeof(x));
+        } else {
+            memcpy(mData, &x, sizeof(mData));
+        }
+    }
+    Bmp(int x)
+    {
+        xwbmpop_c0all(mData, TNum);
+        if (sizeof(x) < sizeof(mData)) {
+            memcpy(mData, &x, sizeof(x));
+        } else {
+            memcpy(mData, &x, sizeof(mData));
+        }
     }
     ~Bmp()
     {
