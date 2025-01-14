@@ -217,11 +217,30 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
                         xwsq_t out);
 
 /**
+ * @brief XWDS API：读取GPIO的输出值
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
+ * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的或运算
+ * @param[out] outbuf: 返回GPIO的输出值的缓冲区
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: GPIO PORT错误
+ * @retval -EPERM: GPIO PIN未被申请
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * + 上下文：中断、中断底半部、线程
+ */
+xwer_t xwds_gpio_read_output(struct xwds_soc * soc,
+                             xwid_t port, xwsq_t pinmask,
+                             xwsq_t * outbuf);
+
+/**
  * @brief XWDS API：并行读取多个SOC的GPIO
  * @param[in] soc: SOC对象指针
  * @param[in] port: GPIO端口，取值 @ref xwds_gpio_port_em 中的一项
  * @param[in] pinmask: 引脚的掩码，取值 @ref xwds_gpio_pin_em 中的任意项的或运算
- * @param[out] inbuf: 输入缓冲区
+ * @param[out] inbuf: 返回GPIO的输入值的缓冲区
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针

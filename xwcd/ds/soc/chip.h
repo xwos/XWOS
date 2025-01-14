@@ -85,10 +85,6 @@ struct xwds_soc_driver {
                             xwid_t /*port*/,
                             xwsq_t /*pinmask*/,
                             void * /*cfg*/); /**< 配置GPIO */
-        xwer_t (* gpio_output)(struct xwds_soc *,
-                               xwid_t /*port*/,
-                               xwsq_t /*pinmask*/,
-                               xwsq_t /*out*/); /**< 输出GPIO */
         xwer_t (* gpio_set)(struct xwds_soc * /*soc*/,
                             xwid_t /*port*/,
                             xwsq_t /*pinmask*/); /**< 将GPIO置为高电平 */
@@ -98,10 +94,18 @@ struct xwds_soc_driver {
         xwer_t (* gpio_toggle)(struct xwds_soc * /*soc*/,
                                xwid_t /*port*/,
                                xwsq_t /*pinmask*/); /**< 反转GPIO电平*/
+        xwer_t (* gpio_output)(struct xwds_soc *,
+                               xwid_t /*port*/,
+                               xwsq_t /*pinmask*/,
+                               xwsq_t /*out*/); /**< 输出GPIO */
+        xwer_t (* gpio_read_output)(struct xwds_soc * /*soc*/,
+                                    xwid_t /*port*/,
+                                    xwsq_t /*pinmask*/,
+                                    xwsq_t * /*outbuf*/); /**< 读取GPIO的输出 */
         xwer_t (* gpio_input)(struct xwds_soc * /*soc*/,
                               xwid_t /*port*/,
                               xwsq_t /*pinmask*/,
-                              xwsq_t * /*inbuf*/); /**< 读取GPIO上的输入 */
+                              xwsq_t * /*inbuf*/); /**< 读取GPIO的输入 */
 #endif
 
 #if defined(XWCDCFG_ds_SOC_EIRQ) && (1 == XWCDCFG_ds_SOC_EIRQ)
