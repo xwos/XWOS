@@ -16,9 +16,9 @@
 #include <xwmd/autosarcp/os/StdTypesWrapper.h>
 #include <xwos/arcos/resource.h>
 
-typedef struct xwarcos_resource * ResourceType;
-#define DeclareResource(name) extern struct xwarcos_resource name
-#define RES_SCHEDULER XWARCOS_RES_SCHEDULER
+typedef xwu32_t ResourceType;
+#define DeclareResource(name)
+#define RES_SCHEDULER (0xFFFFFFFF)
 
 StatusType GetResource(ResourceType ResID);
 StatusType ReleaseResource(ResourceType ResID);
