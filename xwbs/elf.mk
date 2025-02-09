@@ -187,6 +187,19 @@ $(XWOS_OBJ_DIR)/%.o: %.S
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_AS) $(AS) -c $(AS_ARGS) $< -o $@
 
+$(XWOS_OBJ_DIR)/%.s: %.sx
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_AS) $(AS) -E $(AS_ARGS) $< -o $@
+
+$(XWOS_OBJ_DIR)/%.o.d: %.sx
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_MM) $(CC) $(MM_ARGS) $(AS_ARGS) $< > $@;
+	@sed -i 's|\(^.*\)\.o[ :]*|$(XWOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
+
+$(XWOS_OBJ_DIR)/%.o: %.sx
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_AS) $(AS) -c $(AS_ARGS) $< -o $@
+
 $(XWOS_OBJ_DIR)/%.i: %.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CC) $(CC) -E $(CC_ARGS) $< -o $@

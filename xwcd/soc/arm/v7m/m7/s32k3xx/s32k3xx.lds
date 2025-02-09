@@ -176,7 +176,7 @@ SECTIONS {
         .tdata : ALIGN(32) {
                 *(.tdata .tdata.* .gnu.linkonce.td.*)
                 tdata_vma_end = .;
-	} > cacheable_data_mr AT> code_mr
+        } > cacheable_data_mr AT> code_mr
         tdata_vma_base = ADDR(.tdata);
         tdata_lma_base = LOADADDR(.tdata);
 
@@ -233,9 +233,6 @@ SECTIONS {
         cacheable_bss_vma_base = ADDR(.cacheable_bss);
 
         .libc.heap (NOLOAD) : ALIGN(16) {
-                xwmm_dkma_mmz_start = .;
-                . = ORIGIN(cacheable_data_mr) + LENGTH(cacheable_data_mr) - 2048 + 256;
-                xwmm_dkma_mmz_end = .;
                 PROVIDE(end = .); /* 被libc中的sbrk()使用 */
                 PROVIDE(_end = .); /* 被libc中的sbrk()使用 */
         } > cacheable_data_mr
@@ -262,9 +259,13 @@ SECTIONS {
                 acfls_code_ram_stop = .;
         } > int_sram_fls_rsv
 
-	int_results (NOLOAD): {
+        int_results (NOLOAD): {
                 KEEP(*(.int_results))
-	} > int_sram_results
+        } > int_sram_results
+
+        .stack (NOLOAD) : {
+                KEEP(*(.stack))
+        } > stack_mr
 
         /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */
         .rel.dyn : {

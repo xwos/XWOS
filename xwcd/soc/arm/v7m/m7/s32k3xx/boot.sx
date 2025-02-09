@@ -1,0 +1,144 @@
+/**
+ * @file
+ * @brief S32K3启动
+ * @author
+ * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+ * @copyright
+ * + Copyright © 2015 xwos.tech, All Rights Reserved.
+ * > Licensed under the Apache License, Version 2.0 (the "License");
+ * > you may not use this file except in compliance with the License.
+ * > You may obtain a copy of the License at
+ * >
+ * >         http://www.apache.org/licenses/LICENSE-2.0
+ * >
+ * > Unless required by applicable law or agreed to in writing, software
+ * > distributed under the License is distributed on an "AS IS" BASIS,
+ * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * > See the License for the specific language governing permissions and
+ * > limitations under the License.
+ */
+
+        .syntax unified
+        .arch armv7-m
+
+#define MCME_CTL_KEY            0x402DC000U
+#define MCME_PRTN1_PUPD         0x402DC304U
+#define MCME_PRTN1_STAT         0x402DC308U
+#define MCME_PRTN1_COFB0_CLKEN  0x402DC330U
+#define MCME_PRTN1_COFB0_STAT   0x402DC310U
+#define MCME_MSCM_REQ           (1U << 24U)
+#define MCME_KEY                0x5AF0U
+#define MCME_INV_KEY            0xA50FU
+#define CM7_ITCMCR              0xE000EF90U
+#define CM7_DTCMCR              0xE000EF94U
+
+.set s32k3_reset_handler_funcptr, s32k3_reset_handler + 1
+.globl s32k3_reset_handler_funcptr
+
+.globl xwos_preinit
+.globl xwos_init
+.globl xwos_postinit
+.globl xwos_main
+
+.section ".startup","ax"
+.thumb
+.thumb_func
+.globl s32k3_reset_handler
+s32k3_reset_handler:
+        cpsid   i
+        mov     r0, #0
+        mov     r1, #0
+        mov     r2, #0
+        mov     r3, #0
+        mov     r4, #0
+        mov     r5, #0
+        mov     r6, #0
+        mov     r7, #0
+
+InitMSCMClock:
+        /* If the MSCM clock is enabled, skip this sequence */
+        ldr     r0, =MCME_PRTN1_COFB0_STAT
+        ldr     r1, [r0]
+        ldr     r2, =MCME_MSCM_REQ
+        and     r1, r1, r2
+        cmp     r1, 0
+        bne     InitMSCMClockEnd
+         /* Enable clock in PRTN1 */
+        ldr     r0, =MCME_PRTN1_COFB0_CLKEN
+        ldr     r1, [r0]
+        ldr     r2, =MCME_MSCM_REQ
+        orr     r1, r2
+        str     r1, [r0]
+        /* Set PUPD field */
+        ldr     r0, =MCME_PRTN1_PUPD
+        ldr     r1, [r0]
+        ldr     r2, =1
+        orr     r1, r2
+        str     r1, [r0]
+        /* Trigger update */
+        ldr     r0, =MCME_CTL_KEY
+        ldr     r1, =MCME_KEY
+        str     r1, [r0]
+        ldr     r1, =MCME_INV_KEY
+        str     r1, [r0]
+        /* Check MSCM clock in PRTN1 */
+WaitForClock:
+        ldr     r0, =MCME_PRTN1_COFB0_STAT
+        ldr     r1, [r0]
+        ldr     r2, =MCME_MSCM_REQ
+        and     r1, r1, r2
+        cmp     r1, 0
+        beq     WaitForClock
+InitMSCMClockEnd:
+
+
+InitDTCM:
+        /* Initialize DTCM ECC */
+        /* Enable DCM and Disable RETEN bit */
+        ldr r1, =CM7_DTCMCR
+        ldr r0, [r1]
+        bic r0, r0, #0x4
+        orr r0, r0, #0x1
+        str r0, [r1]
+        /* Fill 0 */
+        ldr     r1, =dtcm_mr_origin
+        ldr     r2, =dtcm_mr_size
+        movs    r0, 0
+        movs    r3, 0
+InitDTCMLoop:
+        stm     r1!, {r0, r3}
+        subs    r2, #8
+        bgt     InitDTCMLoop
+InitDTCMEnd:
+
+InitITCM:
+        /* Initialize ITCM ECC */
+        /* Enable TCM and Disable RETEN bit */
+        ldr r1, =CM7_ITCMCR
+        ldr r0, [r1]
+        bic r0, r0, #0x4
+        orr r0, r0, #0x1
+        str r0, [r1]
+        /* Fill 0 */
+        ldr     r1, =itcm_mr_origin
+        ldr     r2, =itcm_mr_size
+        movs    r0, 0
+        movs    r3, 0
+InitITCMLoop:
+        stm     r1!, {r0, r3}
+        subs    r2, #8
+        bgt     InitITCMLoop
+InitITCMEnd:
+
+XwosBoot:
+        ldr     r0, =armv7m_isr_stack_top
+        msr     msp, r0
+        bl      xwos_preinit
+        bl      xwos_init
+        bl      xwos_postinit
+        bl      xwos_main
+XwosBootEnd:
+
+
+.align  4
+.ltorg
