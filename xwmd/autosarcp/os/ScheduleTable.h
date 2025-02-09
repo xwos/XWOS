@@ -23,9 +23,9 @@ typedef enum xwarcos_schedtbl_status_em ScheduleTableStatusType;
 #define SCHEDULETABLE_RUNNING XWARCOS_SCHEDTBL_STATUS_RUNNING
 typedef ScheduleTableStatusType * ScheduleTableStatusRefType;
 
-typedef struct xwarcos_schedtbl * ScheduleTableType;
+typedef xwu32_t ScheduleTableType;
 typedef ScheduleTableType * ScheduleTableRefType;
-#define DeclareScheduleTable(x) extern ScheduleTableType x
+#define DeclareScheduleTable(x)
 
 StatusType StartScheduleTableRel(ScheduleTableType ScheduleTableID, TickType Offset);
 StatusType StartScheduleTableAbs(ScheduleTableType ScheduleTableID, TickType Start);

@@ -18,8 +18,8 @@
 
 typedef xwtk_t TickType;
 typedef TickType * TickRefType;
-typedef struct xwarcos_counter * CounterType;
-#define DeclareCounter(x) extern CounterType x
+typedef xwu32_t CounterType;
+#define DeclareCounter(x)
 
 StatusType IncrementCounter(CounterType CounterID);
 StatusType GetCounterValue(CounterType CounterID, TickRefType Value);

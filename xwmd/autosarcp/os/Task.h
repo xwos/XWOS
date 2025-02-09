@@ -23,9 +23,9 @@ typedef enum xwarcos_task_state_em TaskStateType;
 #define RUNNING XWARCOS_TASK_STATE_RUNNING
 typedef TaskStateType * TaskStateRefType;
 
-typedef struct xwarcos_task * TaskType;
+typedef xwu32_t TaskType;
 typedef TaskType * TaskRefType;
-#define DeclareTask(x) extern TaskType x
+#define DeclareTask(x)
 #define TASK(x) void x##_Func(void)
 
 StatusType ActivateTask(TaskType TaskID);
