@@ -13,26 +13,47 @@
 #include <xwmd/autosarcp/os/Spinlock.h>
 #include <xwmd/autosarcp/os/Error.h>
 
+extern struct xwarcos_spinlock * const xwarcos_spinlock_table[];
+extern const xwu32_t xwarcos_spinlock_num;
+
 StatusType GetSpinlock(SpinlockIdType SpinlockID)
 {
         xwer_t xwrc;
+        struct xwarcos_spinlock * spinlock;
 
-        xwrc = xwarcos_spinlock_get(SpinlockID);
+        if (SpinlockID >= xwarcos_spinlock_num) {
+                xwrc = E_XWARCOS_ID;
+        } else {
+                spinlock = xwarcos_spinlock_table[SpinlockID];
+                xwrc = xwarcos_spinlock_get(spinlock);
+        }
         return E_XWARCOS_TO_STATUSTYPE(xwrc);
 }
 
 StatusType TryToGetSpinlock(SpinlockIdType SpinlockID, TryToGetSpinlockType * Success)
 {
         xwer_t xwrc;
+        struct xwarcos_spinlock * spinlock;
 
-        xwrc = xwarcos_spinlock_try_to_get(SpinlockID, Success);
+        if (SpinlockID >= xwarcos_spinlock_num) {
+                xwrc = E_XWARCOS_ID;
+        } else {
+                spinlock = xwarcos_spinlock_table[SpinlockID];
+                xwrc = xwarcos_spinlock_try_to_get(spinlock, Success);
+        }
         return E_XWARCOS_TO_STATUSTYPE(xwrc);
 }
 
 StatusType ReleaseSpinlock(SpinlockIdType SpinlockID)
 {
         xwer_t xwrc;
+        struct xwarcos_spinlock * spinlock;
 
-        xwrc = xwarcos_spinlock_release(SpinlockID);
+        if (SpinlockID >= xwarcos_spinlock_num) {
+                xwrc = E_XWARCOS_ID;
+        } else {
+                spinlock = xwarcos_spinlock_table[SpinlockID];
+                xwrc = xwarcos_spinlock_release(spinlock);
+        }
         return E_XWARCOS_TO_STATUSTYPE(xwrc);
 }

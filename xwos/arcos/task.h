@@ -329,6 +329,7 @@ typedef void (* xwarcos_task_f)(void);
  * @brief AUTOSAR CP OS Task
  */
 struct xwarcos_task {
+        xwu32_t id;
         const struct xwarcos_task_config * cfg;
         struct xwos_thd thd;
         xwos_thd_d thdd;

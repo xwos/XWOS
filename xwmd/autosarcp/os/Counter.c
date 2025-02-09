@@ -13,19 +13,34 @@
 #include <xwmd/autosarcp/os/Counter.h>
 #include <xwmd/autosarcp/os/Error.h>
 
+extern struct xwarcos_counter * const xwarcos_counter_table[];
+extern const xwu32_t xwarcos_counter_num;
+
 StatusType IncrementCounter(CounterType CounterID)
 {
         xwer_t xwrc;
+        struct xwarcos_counter * counter;
 
-        xwrc = xwarcos_counter_increment(CounterID);
+        if (CounterID >= xwarcos_counter_num) {
+                xwrc = E_XWARCOS_ID;
+        } else {
+                counter = xwarcos_counter_table[CounterID];
+                xwrc = xwarcos_counter_increment(counter);
+        }
         return E_XWARCOS_TO_STATUSTYPE(xwrc);
 }
 
 StatusType GetCounterValue(CounterType CounterID, TickRefType Value)
 {
         xwer_t xwrc;
+        struct xwarcos_counter * counter;
 
-        xwrc = xwarcos_counter_get_value(CounterID, Value);
+        if (CounterID >= xwarcos_counter_num) {
+                xwrc = E_XWARCOS_ID;
+        } else {
+                counter = xwarcos_counter_table[CounterID];
+                xwrc = xwarcos_counter_get_value(counter, Value);
+        }
         return E_XWARCOS_TO_STATUSTYPE(xwrc);
 }
 
@@ -33,7 +48,13 @@ StatusType GetElapsedValue(CounterType CounterID, TickRefType Value,
                            TickRefType ElapsedValue)
 {
         xwer_t xwrc;
+        struct xwarcos_counter * counter;
 
-        xwrc = xwarcos_counter_get_elapsed_value(CounterID, Value, ElapsedValue);
+        if (CounterID >= xwarcos_counter_num) {
+                xwrc = E_XWARCOS_ID;
+        } else {
+                counter = xwarcos_counter_table[CounterID];
+                xwrc = xwarcos_counter_get_elapsed_value(counter, Value, ElapsedValue);
+        }
         return E_XWARCOS_TO_STATUSTYPE(xwrc);
 }

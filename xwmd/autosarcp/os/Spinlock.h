@@ -16,7 +16,8 @@
 #include <xwmd/autosarcp/os/StdTypesWrapper.h>
 #include <xwos/arcos/spinlock.h>
 
-typedef struct xwarcos_spinlock * SpinlockIdType;
+typedef xwu32_t SpinlockIdType;
+#define DeclareSpinlock(x)
 
 typedef enum xwarcos_try_to_get_spinlock_status_em TryToGetSpinlockType;
 #define TRYTOGETSPINLOCK_SUCCESS XWARCOS_TRYTOGETSPINLOCK_SUCCESS
