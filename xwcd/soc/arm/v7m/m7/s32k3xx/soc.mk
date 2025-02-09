@@ -24,7 +24,7 @@ SOC_CFLAGS := -mfpu=fpv5-sp-d16
 SOC_CXXFLAGS := -mfpu=fpv5-sp-d16
 SOC_LDFLAGS := -mfpu=fpv5-sp-d16
 
-SOC_ASRCS :=
+SOC_ASRCS := boot.sx
 SOC_CSRCS :=
 SOC_CXXSRCS :=
 

@@ -50,7 +50,7 @@ SECTIONS {
                 *(.xwos.text)
                 . = ALIGN(8);
 
-                *(.mcal_text)
+                *(.mcal_text .mcal_text.*)
                 . = ALIGN(8);
 
                 *(.acmcu_code_rom)
@@ -73,9 +73,11 @@ SECTIONS {
                 *(.xwos.rodata)
                 . = ALIGN(8);
 
-                *(.mcal_const_cfg)
+                *(.mcal_const_cfg .mcal_const_cfg.*)
                 . = ALIGN(8);
-                *(.mcal_const)
+                *(.mcal_const .mcal_const.*)
+                . = ALIGN(8);
+                *(.mcal_const_no_cacheable .mcal_const_no_cacheable.*)
                 . = ALIGN(8);
 
                 *(.gnu.warning)
@@ -166,7 +168,7 @@ SECTIONS {
                 . = ALIGN(8);
                 *(.data .data.* .gnu.linkonce.d.*)
                 . = ALIGN(8);
-                *(.mcal_data)
+                *(.mcal_data .mcal_data.*)
                 . = ALIGN(32);
                 cacheable_data_vma_end = .;
         } > cacheable_data_mr AT> code_mr
@@ -176,7 +178,7 @@ SECTIONS {
         .tdata : ALIGN(32) {
                 *(.tdata .tdata.* .gnu.linkonce.td.*)
                 tdata_vma_end = .;
-	} > cacheable_data_mr AT> code_mr
+        } > cacheable_data_mr AT> code_mr
         tdata_vma_base = ADDR(.tdata);
         tdata_lma_base = LOADADDR(.tdata);
 
@@ -191,9 +193,7 @@ SECTIONS {
         tls_offset = MAX(8, tls_align);
 
         .non_cacheable_data : ALIGN(32) {
-                *(.mcal_data_no_cacheable)
-                . = ALIGN(8);
-                *(.mcal_const_no_cacheable)
+                *(.mcal_data_no_cacheable .mcal_data_no_cacheable.*)
                 . = ALIGN(8);
                 HSE_LOOP_ADDR = .;
                 LONG(0x0);
@@ -203,7 +203,7 @@ SECTIONS {
         non_cacheable_data_lma_base = LOADADDR(.non_cacheable_data);
 
         .shareable_data : ALIGN(32) {
-                KEEP(*(.mcal_shared_data))
+                KEEP(*(.mcal_shared_data .mcal_shared_data.*))
                 . = ALIGN(8);
                 shareable_data_vma_end = .;
         } > shareable_data_mr AT> code_mr
@@ -225,7 +225,7 @@ SECTIONS {
                 *(.dynbss)
                 *(.bss .bss.* .gnu.linkonce.b.*)
                 . = ALIGN(16);
-                *(.mcal_bss)
+                *(.mcal_bss .mcal_bss.*)
                 *(COMMON)
                 . = ALIGN(16);
                 cacheable_bss_vma_end = .;
@@ -233,16 +233,13 @@ SECTIONS {
         cacheable_bss_vma_base = ADDR(.cacheable_bss);
 
         .libc.heap (NOLOAD) : ALIGN(16) {
-                xwmm_dkma_mmz_start = .;
-                . = ORIGIN(cacheable_data_mr) + LENGTH(cacheable_data_mr) - 2048 + 256;
-                xwmm_dkma_mmz_end = .;
                 PROVIDE(end = .); /* 被libc中的sbrk()使用 */
                 PROVIDE(_end = .); /* 被libc中的sbrk()使用 */
         } > cacheable_data_mr
 
         .non_cacheable_bss (NOLOAD) : {
                 . = ALIGN(16);
-                *(.mcal_bss_no_cacheable)
+                *(.mcal_bss_no_cacheable .mcal_bss_no_cacheable.*)
                 . = ALIGN(16);
                 non_cacheable_bss_vma_end = .;
         } > non_cacheable_data_mr
@@ -250,7 +247,7 @@ SECTIONS {
 
         .shareable_bss (NOLOAD) : {
                 . = ALIGN(16);
-                *(.mcal_shared_bss)
+                *(.mcal_shared_bss .mcal_shared_bss.*)
                 . = ALIGN(16);
                 shareable_bss_vma_end = .;
         } > shareable_data_mr
@@ -262,9 +259,13 @@ SECTIONS {
                 acfls_code_ram_stop = .;
         } > int_sram_fls_rsv
 
-	int_results (NOLOAD): {
+        int_results (NOLOAD): {
                 KEEP(*(.int_results))
-	} > int_sram_results
+        } > int_sram_results
+
+        .stack (NOLOAD) : {
+                KEEP(*(.stack))
+        } > stack_mr
 
         /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */
         .rel.dyn : {
