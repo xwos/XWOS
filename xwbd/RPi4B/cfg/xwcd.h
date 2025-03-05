@@ -88,6 +88,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  CAN transceiver  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWCDCFG_peripheral_can_transceiver_tja1042              0
+#define XWCDCFG_peripheral_can_transceiver_xxx10xx              0
 
 #endif /* cfg/xwcd.h */
