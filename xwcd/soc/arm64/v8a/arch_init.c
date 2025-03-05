@@ -92,7 +92,7 @@ void armv8a_init(void)
                 armv8a_sysreg_read(&sctlr, sctlr_el2);
                 sctlr &= ~(ARMV8A_SCTLR_EE); /* EE: little-endian */
                 sctlr |= (ARMV8A_SCTLR_SA /* Stack Alignment Check */
-                           /* | ARMV8A_SCTLR_A */ /* Alignment Check. May cause exception */);
+                          /* | ARMV8A_SCTLR_A */ /* Alignment Check. May cause exception */);
                 armv8a_sysreg_write(sctlr_el2, sctlr);
                 soc_show_sysreg(sctlr_el2);
 
