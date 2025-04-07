@@ -160,9 +160,32 @@ SECTIONS {
         } > code_mr AT> code_mr
         /* -------- Global Offset Table -------- */
 
+        /* CPU私有内存 */
+        .itcm_code :  ALIGN(32) {
+                KEEP(*(.itcm_code))
+                KEEP(*(.ramcode))
+                itcm_code_vma_end = .;
+        } > itcm_code_mr AT> code_mr
+        itcm_code_vma_base = ADDR(.itcm_code);
+        itcm_code_lma_base = LOADADDR(.itcm_code);
+
+        .dtcm_data :  ALIGN(32) {
+                KEEP(*(.dtcm_data))
+                dtcm_data_vma_end = .;
+        } > dtcm_data_mr AT> code_mr
+        dtcm_data_vma_base = ADDR(.dtcm_data);
+        dtcm_data_lma_base = LOADADDR(.dtcm_data);
+
+        /* 低功耗保持数据 */
+        .lpmr_data :  ALIGN(32) {
+                KEEP(*(.lpmr_data))
+                lpmr_data_vma_end = .;
+        } > lpmr_data_mr AT> code_mr
+        lpmr_data_vma_base = ADDR(.lpmr_data);
+        lpmr_data_lma_base = LOADADDR(.lpmr_data);
+
         /* 全局变量与静态变量 */
         .cacheable_data : ALIGN(32) {
-                *(.ramcode) /* RTD中的RAMCODE */
                 . = ALIGN(8);
                 *(.xwos.data)
                 . = ALIGN(8);
@@ -262,10 +285,6 @@ SECTIONS {
         int_results (NOLOAD): {
                 KEEP(*(.int_results))
         } > int_sram_results
-
-        .stack (NOLOAD) : {
-                KEEP(*(.stack))
-        } > stack_mr
 
         /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */
         .rel.dyn : {
