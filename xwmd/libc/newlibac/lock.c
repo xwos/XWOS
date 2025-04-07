@@ -163,4 +163,9 @@ void __retarget_lock_release_recursive(_LOCK_T lock)
         __retarget_lock_release(lock);
 }
 
+#else
+void newlibac_lock_init(void)
+{
+}
+
 #endif
