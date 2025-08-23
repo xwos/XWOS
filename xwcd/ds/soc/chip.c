@@ -103,6 +103,29 @@ err_soc_grab:
         return rc;
 }
 
+__xwds_api
+xwer_t xwds_soc_get_wkup_source(struct xwds_soc * soc, xwu64_t * source)
+{
+        const struct xwds_soc_driver * drv;
+        xwer_t rc;
+
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(reason, "nullptr", -EFAULT);
+
+        rc = xwds_soc_grab(soc);
+        if (rc < 0) {
+                goto err_soc_grab;
+        }
+        drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
+        if ((drv) && (drv->get_wkup_source)) {
+                rc = drv->get_wkup_source(soc, source);
+        } else {
+                rc = -ENOSYS;
+        }
+        xwds_soc_put(soc);
+err_soc_grab:
+        return rc;
+}
 
 /******** ******** base virtual operations ******** ********/
 /**
