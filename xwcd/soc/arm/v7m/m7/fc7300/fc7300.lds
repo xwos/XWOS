@@ -220,7 +220,7 @@ SECTIONS {
                 *(.tdata* .gnu.linkonce.td.*)
                 . = ALIGN(32);
                 tdata_vma_end = .;
-	} > data_mr AT> code_mr
+        } > data_mr AT> code_mr
         tdata_vma_base = ADDR(.tdata);
         tdata_lma_base = LOADADDR(.tdata);
 

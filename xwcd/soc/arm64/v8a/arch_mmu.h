@@ -252,7 +252,7 @@ typedef union {
  */
 typedef union {
         struct {
-                xwu64_t type:2; /**< IA[0:1] type, must be 1U */
+                xwu64_t type:2; /**< IA[0:1] type, must be 3U */
                 xwu64_t memattr:3; /**< IA[2:4] memory attribute selector */
                 xwu64_t ns:1; /**< IA[5] Non-secure */
                 xwu64_t ap:2; /**< IA[6:7] Data Access Permissions */
