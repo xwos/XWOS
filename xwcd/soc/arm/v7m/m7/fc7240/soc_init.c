@@ -49,31 +49,17 @@ void soc_isr_reset(void)
         "       mov     r10, #0\n"
         "       mov     r11, #0\n"
         "       mov     r12, #0\n");
-        /* ++++++++ Detect CPU ID ++++++++ */
+
+        /* ++++++++ ErrataSheet::Err_Debug_001 ++++++++ */
         __asm__ volatile(
-        "       ldr     r1, =0xE0080000\n"
-        "       ldr     r0, [r1, #4]\n"
-        "       ldr     r1, [r1, #32]\n"
-        "       ubfx    r0, r0, #17, #3\n");
-        __asm__ volatile(
-        "       tbh     [pc, r0, lsl #1]\n"
-        "switch_table_cpuid:\n"
-        "       .2byte  (cpu0_startup - switch_table_cpuid) / 2\n"
-        "       .2byte  (cpu1_startup - switch_table_cpuid) / 2\n"
-        "       .2byte  (cpu2_startup - switch_table_cpuid) / 2\n"
-        "       .2byte  (unified_startup - switch_table_cpuid) / 2\n"
-        "       .align  2\n");
-        /* ++++++++ ++++++++ ++++++++ CPU0 ++++++++ ++++++++ ++++++++ */
-        __asm__ volatile(
-        "cpu0_startup:\n");
-        /* ++++++++ Errata MCU debug Issue 1: lockstep lost ++++++++ */
-        __asm__ volatile(
-        "       ldr     r0, =0xE000EDFC\n"
+        "       ldr     r0, =0xE000EDFC\n" /* Enable DWT and ITM features */
         "       ldr     r1, =0x01000000\n"
         "       str     r1, [r0, #0]\n"
-        "       ldr     r0, =0xE0001004\n"
+        "       ldr     r0, =0xE0001004\n" /* Clear DWT_CYCCNT */
         "       ldr     r1, =0x0\n"
         "       str     r1, [r0, #0]\n");
+        /* -------- ErrataSheet::Err_Debug_001 -------- */
+
         /* ++++++++ Disable wdog 0 ++++++++ */
         __asm__ volatile(
         "       ldr     r0, =0x40022004\n"
@@ -85,86 +71,8 @@ void soc_isr_reset(void)
         "       ldr     r0, =0x40022008\n"
         "       ldr     r1, =0xF000\n"
         "       str     r1, [r0, #0]\n");
-        /* ++++++++ Errata MCU debug Issue 2: ITCM error hardfault ++++++++ */
-        /* Shoult set ITCM initial auto enable in NVR */
-        /* Disable AXBS/CPU0/1/2/ ECC */
-        __asm__ volatile(
-        "       ldr     r0, =0x40072020\n"
-        "       ldr     r1, =0xAAAAAAAA\n"
-        "       str     r1, [r0, #0]\n");
-        __asm__ volatile(
-        "       ldr     r0, =0x40072024\n"
-        "       ldr     r1, =0x000003AA\n"
-        "       str     r1, [r0, #0]\n");
-        __asm__ volatile(
-        "       ldr     r0, =0x40072028\n"
-        "       ldr     r1, =0x00000AAA\n"
-        "       str     r1, [r0, #0]\n");
-        __asm__ volatile(
-        "       ldr     r0, =0x40072030\n"
-        "       ldr     r1, =0x00000AAA\n"
-        "       str     r1, [r0, #0]\n");
-        __asm__ volatile(
-        "       ldr     r0, =0x40072038\n"
-        "       ldr     r1, =0x00000AAA\n"
-        "       str     r1, [r0, #0]\n");
-        /* Enable PCC.STCU */
-        __asm__ volatile(
-        "       ldr     r0, =0x400241FC\n"
-        "       ldr     r1, =0x00800000\n"
-        "       str     r1, [r0, #0]\n");
-        /* Clear except itcm dtcm sram */
-        __asm__ volatile(
-        "       ldr     r0, =0x4007f050\n"
-        "       ldr     r1, =0x1FF0\n"
-        "       str     r1, [r0,#0]\n");
-        __asm__ volatile(
-        "       ldr     r0, =0x4007f048\n"
-        "       ldr     r1, =0x1\n"
-        "       str     r1,[r0,#0]\n");
-        __asm__ volatile(
-        "       mov     r2, #1\n"
-        "loop_busy:\n"
-        "       ldr     r0, =0x4007f04C\n"
-        "       ldr     r1, [r0, #0]\n"
-        "       cmp     r1, r2\n"
-        "       bne     loop_busy\n");
-        /* Enable AXBS/CPU0/1/2/ ECC */
-        __asm__ volatile(
-        "       ldr     r0 ,=0x40072020\n"
-        "       ldr     r1, =0x0FFFFFFF\n"
-        "       str     r1, [r0, #0]\n");
-        __asm__ volatile(
-        "       ldr     r0, =0x40072024\n"
-        "       ldr     r1, =0x000003FF\n"
-        "       str     r1, [r0, #0]\n");
-        __asm__ volatile(
-        "       ldr     r0, =0x40072028\n"
-        "       ldr     r1, =0x00000FFF\n"
-        "       str     r1, [r0, #0]\n");
-        __asm__ volatile(
-        "       ldr     r0, =0x40072030\n"
-        "       ldr     r1, =0x00000FFF\n"
-        "       str     r1, [r0, #0]\n");
-        __asm__ volatile(
-        "       ldr     r0, =0x40072038\n"
-        "       ldr     r1, =0x00000FFF\n"
-        "       str     r1, [r0, #0]\n");
-        /* ++++++++ Jump to unified flow ++++++++ */
-        __asm__ volatile(
-        "       b       unified_startup\n");
-        /* -------- -------- -------- CPU0 -------- -------- -------- */
-        /* ++++++++ ++++++++ ++++++++ CPU1 ++++++++ ++++++++ ++++++++ */
-        __asm__ volatile(
-        "cpu1_startup:\n");
-        /* ++++++++ Errata MCU debug Issue 1: lockstep lost ++++++++ */
-        __asm__ volatile(
-        "       ldr     r0, =0xE000EDFC\n"
-        "       ldr     r1, =0x01000000\n"
-        "       str     r1, [r0, #0]\n"
-        "       ldr     r0, =0xE0001004\n"
-        "       ldr     r1, =0x0\n"
-        "       str     r1, [r0, #0]\n");
+        /* -------- Disable wdog 0 -------- */
+
         /* ++++++++ Disable wdog 1 ++++++++ */
         __asm__ volatile(
         "       ldr     r0, =0x40433004\n"
@@ -176,61 +84,84 @@ void soc_isr_reset(void)
         "       ldr     r0, =0x40433008\n"
         "       ldr     r1, =0xF000\n"
         "       str     r1, [r0, #0]\n");
-        /* ++++++++ Jump to unified flow ++++++++ */
+        /* -------- Disable wdog 1 -------- */
+
+        /* ++++++++ Disable AXBS/CPU0 ECC ++++++++ */
         __asm__ volatile(
-        "       b       unified_startup\n");
-        /* -------- -------- -------- CPU1 -------- -------- -------- */
-        /* ++++++++ ++++++++ ++++++++ CPU2 ++++++++ ++++++++ ++++++++ */
-        __asm__ volatile(
-        "cpu2_startup:\n");
-        /* ++++++++ Disable wdog 2 ++++++++ */
-        __asm__ volatile(
-        "       ldr     r0, =0x40434004\n"
-        "       ldr     r1, =0x08181982\n"
-        "       str     r1, [r0, #0]\n"
-        "       ldr     r0, =0x40434000\n"
-        "       ldr     r1, =0x1920\n"
-        "       str     r1, [r0, #0]\n"
-        "       ldr     r0, =0x40434008\n"
-        "       ldr     r1, =0xF000\n"
+        "       ldr     r0, =0x40072020\n"
+        "       ldr     r1, =0x02AA8A2A\n"
         "       str     r1, [r0, #0]\n");
-        /* ++++++++ Jump to unified flow ++++++++ */
         __asm__ volatile(
-        "       b       unified_startup\n");
-        /* -------- -------- -------- CPU2 -------- -------- -------- */
+        "       ldr     r0, =0x40072024\n"
+        "       ldr     r1, =0x00002922\n"
+        "       str     r1, [r0, #0]\n");
         __asm__ volatile(
-        "unified_startup:\n");
-        /* ++++++++ Fill TCM with 0 ++++++++ */
+        "       ldr     r0, =0x40072028\n"
+        "       ldr     r1, =0x00000AAA\n"
+        "       str     r1, [r0, #0]\n");
+        /* -------- Disable AXBS/CPU0 ECC -------- */
+
+        /* ++++++++ Init TCM ++++++++ */
+        /* Enable PCC.STCU */
         __asm__ volatile(
-        "       ldr     r0, =dtcm_mr_origin\n"
-        "       ldr     r1, =dtcm_mr_size\n"
-        "       movs    r2, 0\n"
-        "       movs    r3, 0\n"
-        "loop_dtcm_init:\n"
-        "       stm     r0!, {r2,r3}\n"
-        "       subs    r1, #8\n"
-        "       bgt     loop_dtcm_init\n");
+        "       ldr     r0, =0x400241FC\n"
+        "       ldr     r1, =0x00800000\n"
+        "       str     r1, [r0, #0]\n");
+        /* Clear itcm & dtcm */
         __asm__ volatile(
-        "       ldr     r0, =itcm_mr_origin\n"
-        "       ldr     r1, =itcm_mr_size\n"
-        "       movs    r2, 0\n"
-        "       movs    r3, 0\n"
-        "loop_itcm_init:\n"
-        "       stm     r0!, {r2,r3}\n"
-        "       subs    r1, #8\n"
-        "       bgt     loop_itcm_init\n");
-        /* -------- Fill TCM with 0 -------- */
+        "       ldr     r0, =0x4007f050\n"
+        "       ldr     r1, =0xE\n"
+        "       str     r1, [r0,#0]\n");
+        __asm__ volatile(
+        "       ldr     r0, =0x4007f048\n"
+        "       ldr     r1, =0x1\n"
+        "       str     r1,[r0,#0]\n");
+        __asm__ volatile(
+        "       mov     r2, #1\n"
+        "wait_done:\n"
+        "       ldr     r0, =0x4007f04C\n"
+        "       ldr     r1, [r0, #0]\n"
+        "       cmp     r1, r2\n"
+        "       bne     wait_done\n");
+        /* -------- Init TCM -------- */
+
+        /* ++++++++ Call xwos_preinit() ++++++++ */
         __asm__ volatile(
         "       ldr     r0, =armv7m_isr_stack_top\n"
         "       msr     msp, r0\n");
         __asm__ volatile(
         "       bl      xwos_preinit");
+        /* -------- Call xwos_preinit() -------- */
+
+        /* ++++++++ Enable AXBS/CPU0 ECC ++++++++ */
+        __asm__ volatile(
+        "       ldr     r0 ,=0x40072020\n"
+        "       ldr     r1, =0x03FFCF3F\n"
+        "       str     r1, [r0, #0]\n");
+        __asm__ volatile(
+        "       ldr     r0, =0x40072024\n"
+        "       ldr     r1, =0x00003D33\n"
+        "       str     r1, [r0, #0]\n");
+        __asm__ volatile(
+        "       ldr     r0, =0x40072028\n"
+        "       ldr     r1, =0x00000FFF\n"
+        "       str     r1, [r0, #0]\n");
+        /* -------- Enable AXBS/CPU0 ECC -------- */
+
+        /* ++++++++ Call xwos_init() ++++++++ */
         __asm__ volatile(
         "       bl      xwos_init");
+        /* -------- Call xwos_init() -------- */
+
+        /* ++++++++ Call xwos_postinit() ++++++++ */
         __asm__ volatile(
         "       bl      xwos_postinit");
+        /* -------- Call xwos_postinit() -------- */
+
+        /* ++++++++ Call xwos_main() ++++++++ */
         __asm__ volatile(
         "       bl      xwos_main");
+        /* -------- Call xwos_main() -------- */
 }
 
 extern xwu8_t itcm_code_lma_base[];
