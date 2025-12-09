@@ -1,9 +1,39 @@
 {
     "C_Cpp.clang_format_style": "file",
     "editor.tabSize": 8,
-    "editor.formatOnSave": true,
-    "editor.formatOnType": true,
-    "editor.formatOnPaste": true,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+    "[c]": {
+        "editor.tabSize": 8,
+        "editor.insertSpaces": true
+    },
+    "[cpp]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "[lua]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+    "[rust]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "[python]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "[lisp]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+    "[shellscript]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+    "editor.formatOnSave": false,
+    "editor.formatOnType": false,
+    "editor.formatOnPaste": false,
     "files.encoding": "utf8",
     "files.autoGuessEncoding": true,
     "files.trimTrailingWhitespace": true,
@@ -18,8 +48,9 @@
         "*.h++": "cpp",
         "*.c++": "cpp",
         "*.hh": "cpp",
-        "*.cc": "cpp",
+        "*.cc": "cpp"
     },
     "files.eol": "\n",
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "diffEditor.codeLens": false,
 }
