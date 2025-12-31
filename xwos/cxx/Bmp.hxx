@@ -124,6 +124,15 @@ class Bmp
     {
         xwbmpop_c0all(mData, TNum);
     }
+    Bmp(xwu8_t x[], xwsz_t sz)
+    {
+        xwbmpop_c0all(mData, TNum);
+        if (sz < sizeof(mData)) {
+            memcpy(mData, x, sz);
+        } else {
+            memcpy(mData, x, sizeof(mData));
+        }
+    }
     Bmp(unsigned long long x)
     {
         xwbmpop_c0all(mData, TNum);
