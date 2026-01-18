@@ -41,8 +41,9 @@ struct xwds_w25qxx_driver {
                       xwsz_t * /*size*/, xwtm_t /*to*/);
 };
 
-extern struct xwds_w25qxx_cmd xwds_w25q64jv_cmd[XWDS_W25QXX_CMD_NUM];
-extern struct xwds_w25qxx_cmd xwds_w25q128jv_cmd[XWDS_W25QXX_CMD_NUM];
+extern const struct xwds_w25qxx_cmd xwds_w25q32jv_cmd[XWDS_W25QXX_CMD_NUM];
+extern const struct xwds_w25qxx_cmd xwds_w25q64jv_cmd[XWDS_W25QXX_CMD_NUM];
+extern const struct xwds_w25qxx_cmd xwds_w25q128jv_cmd[XWDS_W25QXX_CMD_NUM];
 
 /******** ******** base driver ******** ********/
 /**

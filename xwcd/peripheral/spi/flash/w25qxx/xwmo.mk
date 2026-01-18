@@ -25,6 +25,7 @@ $(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_MASTER,y))
 $(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_PERIPHERAL,y))
 
 XWMO_CSRCS := device.c driver.c
+XWMO_CSRCS += chip/w25q32jv.c
 XWMO_CSRCS += chip/w25q64jv.c
 XWMO_CSRCS += chip/w25q128jv.c
 XWMO_CFLAGS :=

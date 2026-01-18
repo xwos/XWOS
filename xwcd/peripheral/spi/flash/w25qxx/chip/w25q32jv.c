@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SPI Flash W25Q128JV Driver
+ * @brief SPI Flash W25Q64JV Driver
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -22,7 +22,7 @@
 #include <xwcd/peripheral/spi/flash/w25qxx/device.h>
 
 __xwbsp_data
-const struct xwds_w25qxx_cmd xwds_w25q128jv_cmd[XWDS_W25QXX_CMD_NUM] = {
+const struct xwds_w25qxx_cmd xwds_w25q32jv_cmd[XWDS_W25QXX_CMD_NUM] = {
         [XWDS_W25QXX_CMD_WRITE_DISABLE] = {
                 .existing = 1,
                 .instruction = 0x4U,
