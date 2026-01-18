@@ -2,7 +2,7 @@
  * @file
  * @brief 原子操作库: xwaop__xws16_t__tne_then_write
  * @author
- * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+ * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > Licensed under the Apache License, Version 2.0 (the "License");

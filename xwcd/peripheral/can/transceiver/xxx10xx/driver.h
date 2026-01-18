@@ -2,7 +2,7 @@
  * @file
  * @brief 玄武设备栈：CAN收发器：通用型104x/105x系列收发器：驱动
  * @author
- * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+ * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > Licensed under the Apache License, Version 2.0 (the "License");

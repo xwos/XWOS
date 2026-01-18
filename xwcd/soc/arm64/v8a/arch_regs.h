@@ -2,7 +2,7 @@
  * @file
  * @brief 架构描述层：寄存器
  * @author
- * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+ * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > Licensed under the Apache License, Version 2.0 (the "License");

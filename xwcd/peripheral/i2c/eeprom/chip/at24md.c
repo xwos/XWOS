@@ -2,7 +2,7 @@
  * @file
  * @brief 中等密度(32Ki/64Ki/128Ki/256Ki/512Ki/1Mi/2Mi bits)EEPROM驱动
  * @author
- * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+ * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > Licensed under the Apache License, Version 2.0 (the "License");

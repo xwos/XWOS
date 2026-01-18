@@ -2,7 +2,7 @@
  * @file
  * @brief XWOS内存管理：内存池：分配器接口
  * @author
- * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+ * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public

@@ -2,7 +2,7 @@
 //!
 //! # author
 //!
-//! + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+//! + 隐星曜 (Roy Sun) <xwos@xwos.tech>
 //!
 //! # License: [MIT](https://opensource.org/licenses/MIT)
 //!

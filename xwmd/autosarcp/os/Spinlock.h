@@ -2,7 +2,7 @@
  * @file
  * @brief AUTOSAR::CP::Os::Spinlock
  * @author
- * + 隐星魂 (Roy Sun) <xwos@xwos.tec>
+ * + 隐星曜 (Roy Sun) <xwos@xwos.tec>
  * @copyright
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public

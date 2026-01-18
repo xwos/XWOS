@@ -2,7 +2,7 @@
  * @file
  * @brief 小密度(1Ki/2Ki/4Ki/8Ki/16Ki bits)EEPROM驱动
  * @author
- * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+ * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > Licensed under the Apache License, Version 2.0 (the "License");

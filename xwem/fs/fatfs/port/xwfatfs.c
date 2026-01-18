@@ -2,7 +2,7 @@
  * @file
  * @brief FatFs适配层
  * @author
- * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+ * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  */
 
 #include <stdlib.h>
