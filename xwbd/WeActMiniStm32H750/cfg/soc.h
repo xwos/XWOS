@@ -25,10 +25,10 @@
  ******** ********          soc specification          ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** IRQ ******** ********/
-#define SOCCFG_EXC_NUM                          16U
-#define SOCCFG_IRQ_NUM                          240U
-#define SOCCFG_NVIC_PRIO_BITNUM                 4U
-#define SOCCFG_NVIC_SUBPRIO_BITIDX              4U
+#define SOCCFG_EXC_NUM                          (16U)
+#define SOCCFG_IRQ_NUM                          (240U)
+#define SOCCFG_NVIC_PRIO_BITNUM                 (4U)
+#define SOCCFG_NVIC_SUBPRIO_BITIDX              (4U)
 
 /******** Debug ********/
 #define SOCCFG_BUG                              1

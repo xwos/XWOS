@@ -23,12 +23,12 @@
 
 /******** ******** SOC ******** ********/
 #define SOCCFG_PERI_HIGH                        1
-#define SOCCFG_EXC_NUM                          64U
-#define SOCCFG_IRQ_NUM                          512U
+#define SOCCFG_EXC_NUM                          (64U)
+#define SOCCFG_IRQ_NUM                          (512U)
 
 /******** ******** Debug ******** ********/
-#define SOCCFG_DEBUG_LV                         3U
+#define SOCCFG_DEBUG_LV                         (3U)
 #define SOCCFG_BUG                              1
-#define SOCCFG_DBGLOGBUF_SIZE                   512U
+#define SOCCFG_DBGLOGBUF_SIZE                   (512U)
 
 #endif /* cfg/soc.h */

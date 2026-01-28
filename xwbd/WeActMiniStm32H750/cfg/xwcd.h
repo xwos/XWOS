@@ -66,8 +66,8 @@
 #define XWCDCFG_ds_CAN                                          1
 #define XWCDCFG_ds_CAN_CONTROLLER                               1
 #define XWCDCFG_ds_CAN_CONTROLLER_ROCBT                         0
-#define XWCDCFG_ds_CAN_CONTROLLER_SDU_MAXSIZE                   8U
-#define XWCDCFG_ds_CAN_CONTROLLER_RXQNUM                        8U
+#define XWCDCFG_ds_CAN_CONTROLLER_SDU_MAXSIZE                   (8U)
+#define XWCDCFG_ds_CAN_CONTROLLER_RXQNUM                        (8U)
 #define XWCDCFG_ds_CAN_TRANSCEIVER                              1
 
 /******** ******** misc device ******** ********/
