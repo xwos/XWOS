@@ -55,9 +55,6 @@
 #define XWSSC_CRC32_SIZE        (4U)
 #define XWSSC_SDU_MAX_SIZE      (XWSSC_MEMPOOL_SIZE / 8)
 
-#define XWSSC_TXTHD_STACK       (4096U)
-#define XWSSC_RXTHD_STACK       (4096U)
-
 #if defined(XWMDCFG_isc_xwssc_LOG) && (1 == XWMDCFG_isc_xwssc_LOG)
 #  define xwssclogf(xwssc, lv, fmt, ...) xwlogf(lv, "%s", \
                                                 fmt, xwssc->name, ##__VA_ARGS__)
@@ -71,7 +68,7 @@
 #if defined(XWMDCFG_CHECK_PARAMETERS) && (1 == XWMDCFG_CHECK_PARAMETERS)
 #define XWSSC_VALIDATE(exp, errstr, ...)        \
         if (!(exp)) {                           \
-            return __VA_ARGS__;                 \
+                return __VA_ARGS__;             \
         }
 #else
 #  define XWSSC_VALIDATE(exp, errstr, ...)
@@ -79,7 +76,7 @@
 
 #define XWSSC_VALIDATE_FORCE(exp, errstr, ...)  \
         if (!(exp)) {                           \
-            return __VA_ARGS__;                 \
+                return __VA_ARGS__;             \
         }
 
 /**
@@ -162,7 +159,7 @@ struct xwssc {
         struct xwos_object xwobj; /**< C语言面向对象：继承 `struct xwos_object` */
         const char * name;
         atomic_xwsq_t hwifst; /**< 硬件层状态 */
-        const struct xwssc_hwifal_operation * hwifops; /**< 硬件接口抽象层操作函数 */
+        struct xwssc_hwifal_operation * hwifops; /**< 硬件接口抽象层操作函数 */
         void * hwifcb; /**< 接口硬件 */
 
         /* 内存池 */
@@ -170,7 +167,6 @@ struct xwssc {
         struct xwmm_bma * mempool; /**< 内存池分配器 */
 
         /* 发送状态机 */
-        __xwcc_alignl1cache xwu8_t txthd_stack[XWSSC_TXTHD_STACK]; /**< 发送线程的栈 */
         struct xwos_thd txthdobj; /**< 发送线程的线程结构体 */
         xwos_thd_d txthd; /**< 发送线程的线程描述符 */
         struct {
@@ -192,7 +188,6 @@ struct xwssc {
         } txq; /**< 发送队列 */
 
         /* 接收状态机 */
-        __xwcc_alignl1cache xwu8_t rxthd_stack[XWSSC_RXTHD_STACK]; /**< 接收线程的栈 */
         struct xwos_thd rxthdobj; /**< 接收线程的线程结构体 */
         xwos_thd_d rxthd; /**< 接收线程的线程描述符 */
         struct {

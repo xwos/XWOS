@@ -38,8 +38,10 @@ xwer_t xwssc_gc(struct xwos_object * obj);
 
 __xwmd_api
 xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
-                   const struct xwssc_hwifal_operation * hwifops, void * hwifcb,
-                   xwu8_t * mem, xwsz_t memsize)
+                   struct xwssc_hwifal_operation * hwifops, void * hwifcb,
+                   xwu8_t * mem, xwsz_t memsize,
+                   xwstk_t * rxthd_stack, xwsz_t rxthd_stack_size,
+                   xwstk_t * txthd_stack, xwsz_t txthd_stack_size)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;
@@ -146,8 +148,8 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
         /* 创建线程 */
         xwos_thd_attr_init(&attr);
         attr.name = "xwmd.isc.xwssc.rxthd";
-        attr.stack = (xwstk_t *)xwssc->rxthd_stack;
-        attr.stack_size = sizeof(xwssc->rxthd_stack);
+        attr.stack = rxthd_stack;
+        attr.stack_size = rxthd_stack_size;
         attr.priority = XWSSC_RXTHD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
@@ -160,8 +162,8 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
 
         xwos_thd_attr_init(&attr);
         attr.name = "xwmd.isc.xwssc.txthd";
-        attr.stack = (xwstk_t *)xwssc->txthd_stack;
-        attr.stack_size = sizeof(xwssc->txthd_stack);
+        attr.stack = txthd_stack;
+        attr.stack_size = txthd_stack_size;
         attr.priority = XWSSC_TXTHD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
@@ -307,19 +309,16 @@ struct xwssc_txcb_arg {
 static __xwmd_code
 void xwssc_txcb_notify(struct xwssc * xwssc, xwssc_txh_t txh, xwer_t rc, void * arg)
 {
-        struct xwssc_carrier * car;
         struct xwssc_txcb_arg * cbarg;
 
         XWOS_UNUSED(xwssc);
-        car = txh;
+        XWOS_UNUSED(txh);
         xwssclogf(xwssc, V, "[A][TXCB] txh:0x%lX, rc:%d\r\n", (xwptr_t)txh, rc);
-        if ((xwu32_t)XWSSC_CRS_FINISH == car->state) {
-                cbarg = arg;
-                xwos_splk_lock(&cbarg->splk);
-                cbarg->rc = rc;
-                xwos_splk_unlock(&cbarg->splk);
-                xwos_cond_unicast(&cbarg->cond);
-        }
+        cbarg = arg;
+        xwos_splk_lock(&cbarg->splk);
+        cbarg->rc = rc;
+        xwos_splk_unlock(&cbarg->splk);
+        xwos_cond_unicast(&cbarg->cond);
 }
 
 __xwmd_api

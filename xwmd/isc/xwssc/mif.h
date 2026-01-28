@@ -107,7 +107,12 @@ typedef void (* xwssc_ntf_f)(struct xwssc * /* xwssc */,
  * @param[in] name: XWSSC实例的名字
  * @param[in] hwifops: 硬件接口抽象层操作函数集合
  * @param[in] hwifcb: 硬件接口控制块指针
- * @param[in] mem: 连续的内存块
+ * @param[in] mem: 接收与发送缓冲区内存池
+ * @param[in] memsize: 连续的内存块大小，值必须为 @ref XWSSC_MEMPOOL_SIZE
+ * @param[in] rxthdstatck: 接收线程的线程栈
+ * @param[in] rxthd_statck_size: 接收线程的线程栈大小
+ * @param[in] txthd_statck: 发送线程的线程栈
+ * @param[in] txthd_statck_size: 发送线程的线程栈大小
  * @param[in] memsize: 连续的内存块大小，值必须为 @ref XWSSC_MEMPOOL_SIZE
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -124,8 +129,10 @@ typedef void (* xwssc_ntf_f)(struct xwssc * /* xwssc */,
  * + 重入性：不可重入
  */
 xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
-                   const struct xwssc_hwifal_operation * hwifops, void * hwifcb,
-                   xwu8_t * mem, xwsz_t memsize);
+                   struct xwssc_hwifal_operation * hwifops, void * hwifcb,
+                   xwu8_t * mem, xwsz_t memsize,
+                   xwstk_t * rxthd_stack, xwsz_t rxthd_stack_size,
+                   xwstk_t * txthd_stack, xwsz_t txthd_stack_size);
 
 /**
  * @brief XWSSC API: 停止XWSSC

@@ -1126,6 +1126,7 @@ xwer_t xwssc_connect(struct xwssc * xwssc)
 static __xwmd_code
 void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
 {
+        union xwssc_slot * slot;
         xwu8_t ack;
         xwu8_t rmtid;
 
@@ -1150,10 +1151,11 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                                                     xwssc_callback_rc[XWSSC_ACK_OK],
                                                     car->slot->tx.cbarg);
                         }
+                        slot = car->slot;
+                        car->slot = NULL;
                         xwos_splk_unlock(&xwssc->txq.notiflk);
                         // cppcheck-suppress [misra-c2012-17.7]
-                        xwmm_bma_free(xwssc->mempool, car->slot);
-                        car->slot = NULL;
+                        xwmm_bma_free(xwssc->mempool, slot);
                         xwssc_txq_carrier_free(xwssc, car);
                         break;
                 case XWSSC_ACK_EALREADY:
@@ -1167,10 +1169,11 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                                                     xwssc_callback_rc[XWSSC_ACK_OK],
                                                     car->slot->tx.cbarg);
                         }
+                        slot = car->slot;
+                        car->slot = NULL;
                         xwos_splk_unlock(&xwssc->txq.notiflk);
                         // cppcheck-suppress [misra-c2012-17.7]
-                        xwmm_bma_free(xwssc->mempool, car->slot);
-                        car->slot = NULL;
+                        xwmm_bma_free(xwssc->mempool, slot);
                         xwssc_txq_carrier_free(xwssc, car);
                         break;
                 case XWSSC_ACK_ECONNRESET:
@@ -1204,6 +1207,7 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
 static __xwmd_code
 xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
 {
+        union xwssc_slot * slot;
         xwu32_t txcnt;
         xwu8_t id;
         xwsz_t calsz;
@@ -1301,10 +1305,11 @@ xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
                                             xwssc_callback_rc[XWSSC_ACK_OK],
                                             car->slot->tx.cbarg);
                 }
+                slot = car->slot;
+                car->slot = NULL;
                 xwos_splk_unlock(&xwssc->txq.notiflk);
                 // cppcheck-suppress [misra-c2012-17.7]
-                xwmm_bma_free(xwssc->mempool, car->slot);
-                car->slot = NULL;
+                xwmm_bma_free(xwssc->mempool, slot);
                 xwssc_txq_carrier_free(xwssc, car);
         }
 
@@ -1322,6 +1327,7 @@ static __xwmd_code
 xwer_t xwssc_txfsm(struct xwssc * xwssc)
 {
         struct xwssc_carrier * car;
+        union xwssc_slot * slot;
         xwu32_t state;
         xwsq_t hwifst;
         xwer_t rc;
@@ -1355,28 +1361,27 @@ xwer_t xwssc_txfsm(struct xwssc * xwssc)
                                 goto err_tx_frm;
                         }
                 } else {
+                        xwos_splk_lock(&xwssc->txq.notiflk);
                         if ((xwu32_t)XWSSC_CRS_ABORT == state) {
-                                xwos_splk_lock(&xwssc->txq.notiflk);
                                 if (NULL != car->slot->tx.ntfcb) {
                                         car->slot->tx.ntfcb(xwssc,
                                                             (xwssc_txh_t)car,
                                                             -ECONNABORTED,
                                                             car->slot->tx.cbarg);
                                 }
-                                xwos_splk_unlock(&xwssc->txq.notiflk);
                         } else {
-                                xwos_splk_lock(&xwssc->txq.notiflk);
                                 if (NULL != car->slot->tx.ntfcb) {
                                         car->slot->tx.ntfcb(xwssc,
                                                             (xwssc_txh_t)car,
                                                             -EPROTO,
                                                             car->slot->tx.cbarg);
                                 }
-                                xwos_splk_unlock(&xwssc->txq.notiflk);
                         }
-                        // cppcheck-suppress [misra-c2012-17.7]
-                        xwmm_bma_free(xwssc->mempool, car->slot);
+                        slot = car->slot;
                         car->slot = NULL;
+                        xwos_splk_unlock(&xwssc->txq.notiflk);
+                        // cppcheck-suppress [misra-c2012-17.7]
+                        xwmm_bma_free(xwssc->mempool, slot);
                         xwssc_txq_carrier_free(xwssc, car);
                 }
         } else {

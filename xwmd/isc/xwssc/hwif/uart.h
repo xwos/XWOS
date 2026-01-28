@@ -22,8 +22,18 @@
  * @{
  */
 
-extern
-const struct xwssc_hwifal_operation xwsscif_uart_ops; /**< UART接口操作函数集 */
+extern struct xwssc_hwifal_operation xwsscif_uart_ops; /**< UART接口操作函数集 */
+
+/**
+ * @brief XWSSCIF API: 设置状态通知回调函数
+ * @param[in] notification: 回调函数
+ * @details
+ * + 当XWSSC与远程端连接成功，会通过 `notification(xwssc, XWSSC_HWIFNTF_CONNECT)`
+ *   通知用户
+ * + 当XWSSC与远程端连接断开，会通过 `notification(xwssc, XWSSC_HWIFNTF_NETUNREACH)`
+ *   通知用户
+ */
+void xwsscif_uart_set_notification(void (* notification)(struct xwssc * , xwsq_t));
 
 /**
  * @} xwmd_isc_xwssc_hwif_uart
