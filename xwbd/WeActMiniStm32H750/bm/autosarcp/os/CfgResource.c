@@ -13,3 +13,9 @@
 #include "bm/autosarcp/os/CfgResource.h"
 
 struct xwarcos_resource Rte_Resource_Object = XWARCOS_RESOURCE_INITIALIZER;
+
+struct xwarcos_resource * const xwarcos_resource_table[] = {
+        [0] = &Rte_Resource_Object,
+};
+
+const xwu32_t xwarcos_resource_num = xw_array_size(xwarcos_resource_table);

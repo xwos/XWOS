@@ -15,9 +15,9 @@
 
 #include <xwmd/autosarcp/os/Counter.h>
 
-extern struct xwarcos_counter Rte_TickCounter_Object;
-DeclareCounter(Rte_TickCounter);
+#define Rte_TickCounter 0
 
+extern struct xwarcos_counter Rte_TickCounter_Object;
 void Rte_TickCounter_Drive(void);
 void Rte_TickCounter_Init(void);
 

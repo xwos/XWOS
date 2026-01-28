@@ -85,3 +85,4 @@ xwer_t MX_USART_Putc(xwu32_t hwid, xwu8_t byte);
 #endif
 
 #endif /* __USART_H__ */
+

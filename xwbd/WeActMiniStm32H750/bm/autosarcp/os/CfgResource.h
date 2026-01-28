@@ -15,7 +15,6 @@
 
 #include <xwmd/autosarcp/os/Resource.h>
 
-DeclareResource(Rte_Resource_Object);
-#define RTE_RESOURCE (&Rte_Resource_Object)
+#define RTE_RESOURCE 0
 
 #endif /* bm/autosarcp/os/CfgResource.h */

@@ -15,10 +15,10 @@
 
 #include <xwmd/autosarcp/os/Task.h>
 
-DeclareTask(OsCycleTask_Bsw10ms);
+#define OsCycleTask_Bsw10ms 1
 
 extern TASK(OsCycleTask_Bsw10ms);
 
-extern void Rte_Task_Init(void);
+extern void Rte_Tasks_Init(void);
 
 #endif /* bm/autosarcp/os/CfgTask.h */

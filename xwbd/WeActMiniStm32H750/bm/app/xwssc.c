@@ -25,8 +25,9 @@
 #include "board/xwac/xwds/device.h"
 
 struct xwssc board_xwssc;
-
 XWSSC_DEF_MEMPOOL(board_xwssc_mem);
+xwstk_t board_xwssc_rxthd_stack[(4096U / sizeof(xwstk_t))];
+xwstk_t board_xwssc_txthd_stack[(4096U / sizeof(xwstk_t))];
 
 xwer_t board_xwssc_init(void)
 {
@@ -34,7 +35,9 @@ xwer_t board_xwssc_init(void)
 
         rc = xwssc_start(&board_xwssc, "board.xwssc",
                          &xwsscif_uart_ops, &stm32xwds_usart3,
-                         board_xwssc_mem, sizeof(board_xwssc_mem));
+                         board_xwssc_mem, sizeof(board_xwssc_mem),
+                         board_xwssc_rxthd_stack, sizeof(board_xwssc_rxthd_stack),
+                         board_xwssc_txthd_stack, sizeof(board_xwssc_txthd_stack));
         return rc;
 }
 

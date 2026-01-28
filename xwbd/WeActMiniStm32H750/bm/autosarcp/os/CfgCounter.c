@@ -30,7 +30,12 @@ struct xwarcos_counter Rte_TickCounter_Object = {
         .head = XWLIB_BCLST_HEAD_INIT(Rte_TickCounter_Object.head),
         .lock = XWOS_SQLK_INITIALIZER,
 };
-CounterType Rte_TickCounter = &Rte_TickCounter_Object;
+
+struct xwarcos_counter * const xwarcos_counter_table[] = {
+        [0] = &Rte_TickCounter_Object
+};
+
+const xwu32_t xwarcos_counter_num = xw_array_size(xwarcos_counter_table);
 
 void Rte_TickCounter_Drive(void)
 {

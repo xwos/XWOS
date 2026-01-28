@@ -15,6 +15,6 @@
 void AutosarCp_OsCfg_Init(void)
 {
         Rte_TickCounter_Init();
-        Rte_Task_Init();
+        Rte_Tasks_Init();
         Rte_ScheduleTable_Init();
 }

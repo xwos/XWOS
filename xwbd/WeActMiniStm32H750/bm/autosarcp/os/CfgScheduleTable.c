@@ -204,13 +204,17 @@ struct xwarcos_schedtbl Rte_ScheduleTable_Object = {
         .epidx = 0,
 };
 
-ScheduleTableType Rte_ScheduleTable = &Rte_ScheduleTable_Object;
+struct xwarcos_schedtbl * const xwarcos_schedtbl_table[] = {
+        [0] = &Rte_ScheduleTable_Object,
+};
+
+const xwu32_t xwarcos_schedtbl_num = xw_array_size(xwarcos_schedtbl_table);
 
 void Rte_ScheduleTable_Init(void)
 {
         xwer_t xwrc;
 
-        xwrc = xwarcos_schedtbl_validate_and_init(Rte_ScheduleTable);
+        xwrc = xwarcos_schedtbl_validate_and_init(&Rte_ScheduleTable_Object);
         if (xwrc < 0) {
                 xwlogf(INFO, LOGTAG, "Init Rte_ScheduleTable ... xwrc:%d\r\n", xwrc);
         }

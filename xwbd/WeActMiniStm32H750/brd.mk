@@ -39,6 +39,7 @@ BRD_LDFLAGS_gcc := -Wl,--no-warn-rwx-segment
 
 BRD_CXXFLAGS += -Wno-sign-conversion
 BRD_CFLAGS += -Wno-sign-conversion
+BRD_CFLAGS += -Wno-error=undef
 
 BRD_EOBJS :=
 

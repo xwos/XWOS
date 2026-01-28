@@ -28,7 +28,8 @@ XWMO_CSRCS += $(call XwmoWildcard,*.c,Core/Src)
 XWMO_CSRCS += $(call XwmoWildcard,*.c,Drivers/STM32H7xx_HAL_Driver/Src)
 
 # 定义编译选项
-XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter -Wno-sign-conversion
+XWMO_CFLAGS := -Wno-undef -Wno-unused-parameter -Wno-sign-conversion
+XWMO_CFLAGS += -Wno-error=undef
 
 # 定义头文件路径
 XWMO_INCDIRS :=

@@ -15,7 +15,7 @@
 
 #include <xwmd/autosarcp/os/ScheduleTable.h>
 
-DeclareScheduleTable(Rte_ScheduleTable);
+#define Rte_ScheduleTable 0
 
 extern void Rte_ScheduleTable_Init(void);
 

@@ -29,13 +29,18 @@ struct xwarcos_task OsCycleTask_Bsw10ms_Object = {
         .splk = XWOS_SPLK_INITIALIZER,
         .state = SUSPENDED,
 };
-TaskType OsCycleTask_Bsw10ms = &OsCycleTask_Bsw10ms_Object;
 
-void Rte_Task_Init(void)
+struct xwarcos_task * const xwarcos_task_table[] = {
+        [0] = &OsCycleTask_Bsw10ms_Object,
+};
+
+const xwu32_t xwarcos_task_num = xw_array_size(xwarcos_task_table);
+
+void Rte_Tasks_Init(void)
 {
         xwer_t xwrc;
 
-        xwrc = xwarcos_task_validate_and_init(OsCycleTask_Bsw10ms);
+        xwrc = xwarcos_task_validate_and_init(&OsCycleTask_Bsw10ms_Object);
         if (xwrc < 0) {
                 xwlogf(INFO, LOGTAG, "Init OsCycleTask_Bsw10ms ... %d\r\n", xwrc);
         }
