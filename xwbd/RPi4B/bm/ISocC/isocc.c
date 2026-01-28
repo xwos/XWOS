@@ -29,6 +29,8 @@
 
 struct xwssc isocc_xwssc;
 XWSSC_DEF_MEMPOOL(isocc_xwssc_mem);
+xwstk_t isocc_xwssc_rxthd_stack[(4096U / sizeof(xwstk_t))];
+xwstk_t isocc_xwssc_txthd_stack[(4096U / sizeof(xwstk_t))];
 
 xwer_t isocc_init(void)
 {
@@ -36,7 +38,9 @@ xwer_t isocc_init(void)
 
         rc = xwssc_start(&isocc_xwssc, "ISocC", &xwsscif_uart_ops,
                          &rpi4bxwds_uart5, isocc_xwssc_mem,
-                         sizeof(isocc_xwssc_mem));
+                         sizeof(isocc_xwssc_mem),
+                         isocc_xwssc_rxthd_stack, sizeof(isocc_xwssc_rxthd_stack),
+                         isocc_xwssc_txthd_stack, sizeof(isocc_xwssc_txthd_stack));
         return rc;
 }
 
