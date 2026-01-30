@@ -50,9 +50,9 @@ SECTIONS {
                 KEEP (*(.fini))
                 *(.text* .gnu.linkonce.t.*)
                 *(.rodata* .gnu.linkonce.r.*)
-                *(.mcal_text*)
-                *(.mcal_rodata*)
-                *(.mcal_const_cfg*)
+                *(.*mcal_text*)
+                *(.*mcal_rodata*)
+                *(.*mcal_const_cfg*)
 
                 *(.gnu.warning)
                 *(.glue_7) /* glue arm to thumb code */
@@ -63,7 +63,7 @@ SECTIONS {
 
         .itcm.code : ALIGN(8) {
                 *(.itcm.code*)
-                *(.mcal_ramcode)
+                *(.*mcal_ramcode)
                 *(.bsp_ramcode)
                 itcm_code_vma_end = .;
         } > itcm_code_mr AT> code_mr
@@ -185,7 +185,7 @@ SECTIONS {
 
         .data : ALIGN(32) {
                 *(.data* .gnu.linkonce.d.*)
-                *(.mcal_data*)
+                *(.*mcal_data*)
                 . = ALIGN(32);
                 data_vma_end = .;
         } > data_mr AT> code_mr
@@ -195,7 +195,7 @@ SECTIONS {
         .bss (NOLOAD) : ALIGN(4) {
                 *(.dynbss)
                 *(.bss* .gnu.linkonce.b.*)
-                *(.mcal_bss*)
+                *(.*mcal_bss*)
                 *(COMMON)
                 . = ALIGN(32);
                 bss_vma_end = .;
@@ -223,7 +223,7 @@ SECTIONS {
         data_vma_end = tbss_vma_end;
 
         .noncacheable.data : ALIGN(32) {
-                *(.mcal_nocacheable_data*)
+                *(.*mcal_nocacheable_data*)
                 . = ALIGN(32);
                 noncacheable_data_vma_end = .;
         } > noncacheable_data_mr AT> code_mr
@@ -231,14 +231,14 @@ SECTIONS {
         noncacheable_data_lma_base = LOADADDR(.noncacheable.data);
 
         .noncacheable.bss (NOLOAD) : ALIGN(4) {
-                *(.mcal_nocacheable_bss*)
+                *(.*mcal_nocacheable_bss*)
                 . = ALIGN(32);
                 noncacheable_bss_vma_end = .;
         } > noncacheable_data_mr
         noncacheable_bss_vma_base = ADDR(.noncacheable.bss);
 
         .shareable.data : ALIGN(32) {
-                *(.mcal_shareable_data*)
+                *(.*mcal_shareable_data*)
                 . = ALIGN(32);
                 shareable_data_vma_end = .;
         } > shareable_data_mr AT> code_mr
@@ -246,7 +246,7 @@ SECTIONS {
         shareable_data_lma_base = LOADADDR(.shareable.data);
 
         .shareable.bss (NOLOAD) : ALIGN(4) {
-                *(.mcal_shareable_bss*)
+                *(.*mcal_shareable_bss*)
                 . = ALIGN(32);
                 shareable_bss_vma_end = .;
         } > shareable_data_mr
