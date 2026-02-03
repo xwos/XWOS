@@ -64,7 +64,10 @@ file = {
 'xwos/sync/br.lua', 'xwos/sync/brsp.lua',
 'xwos/sync/sel.lua', 'xwos/sync/selsp.lua',
 'xwos/pm.lua',
-'xwds/soc.lua', 'xwds/uart.lua', 'xwds/i2cm.lua', 'xwds/spim.lua',
+'xwds/soc.lua',
+'xwds/uart.lua',
+'xwds/spim.lua',
+'xwds/i2cm.lua', 'xwds/i2cm_msg.lua'
 }
 style = '!new'
 dir = '../../wkspc/luadoc'

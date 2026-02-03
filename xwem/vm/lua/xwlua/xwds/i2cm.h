@@ -32,11 +32,19 @@
  */
 
 /**
- * @brief XWLUA I2C主机控制器对象
+ * @brief XWLUA I2C 主机控制器对象
  */
 struct xwlua_i2cm {
         struct xwds_i2cm * i2cm; /**< XWDS的I2C主机控制器对象指针 */
         xwsq_t tik; /**< 对象的标签 */
+};
+
+/**
+ * @brief XWLUA I2C 主机消息
+ */
+struct xwlua_i2cm_msg {
+        xwsz_t num; /**< 通讯消息的数量 */
+        struct xwds_i2c_msg msg[0]; /**< 通讯消息数组 */
 };
 
 /**

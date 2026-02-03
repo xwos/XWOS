@@ -39,13 +39,13 @@ XWLUA模块：SPI主机模式控制器
 
 @tparam number size (**in**) 本次传输的数据大小
 
-@tparam number time (**in** , **optional**) 期望的阻塞等待时间
+@tparam number to (**in** , **optional**) 期望的阻塞等待时间
 
 @treturn number 错误码<br>
 　● **0** 没有错误<br>
 　● **-EINTR** 等待被中断<br>
 　● **-ENOTTHDCTX** 不在线程上下文中<br>
-　● **-ETIMEDOUT** 超时，仅当存在可选参数 **time** 时才会出现此错误值
+　● **-ETIMEDOUT** 超时，仅当存在可选参数 **to** 时才会出现此错误值
 
 @treturn number 实际接受的大小
 
@@ -67,5 +67,5 @@ rc, size = spim1:xfer(spi1m, 0, txd, false, #txd, xwtm.ft(xwtm.s(2)))
 -- 设置总线参数为配置0，不发送数据，接收数据，接收缓冲区8字节，期望等待时间2s
 rc, size, rxd = spim1:xfer(spi1m, 0, nil, true, 8, xwtm.ft(xwtm.s(2)))
 ]]
-function xfer(spim, cfgid, txd, rx, size, time)
+function xfer(spim, cfgid, txd, rx, size, to)
 end
