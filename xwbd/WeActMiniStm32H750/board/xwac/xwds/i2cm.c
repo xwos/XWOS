@@ -42,13 +42,8 @@ xwer_t stm32xwds_i2c1m_drv_resume(struct xwds_device * dev);
 
 static
 xwer_t stm32xwds_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
-                                struct xwds_i2c_msg * msg,
+                                struct xwds_i2c_msg * msg, xwsz_t num,
                                 xwtm_t to);
-
-static
-xwer_t stm32xwds_i2c1m_drv_abort(struct xwds_i2cm * i2cm,
-                                 xwu16_t address, xwu16_t addrmode,
-                                 xwtm_t to);
 
 const struct xwds_i2cm_driver stm32xwds_i2c1m_drv = {
         .base = {
@@ -63,7 +58,6 @@ const struct xwds_i2cm_driver stm32xwds_i2c1m_drv = {
 #endif
         },
         .xfer = stm32xwds_i2c1m_drv_xfer,
-        .abort = stm32xwds_i2c1m_drv_abort,
 };
 
 struct xwds_i2cm stm32xwds_i2c1m = {
@@ -116,9 +110,9 @@ xwer_t stm32xwds_i2c1m_drv_suspend(struct xwds_device * dev)
 #endif
 
 static
-xwer_t stm32xwds_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
-                                struct xwds_i2c_msg * msg,
-                                xwtm_t to)
+xwer_t stm32xwds_i2c1m_xfer(struct xwds_i2cm * i2cm,
+                            struct xwds_i2c_msg * msg,
+                            xwtm_t to)
 {
         struct MX_I2C_MasterDriverData * drvdata;
         xwu32_t addm;
@@ -127,11 +121,14 @@ xwer_t stm32xwds_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
         xwsq_t lkst;
         xwer_t rc;
 
-        addm = MX_I2C1_GetAddressingMode();
-        if ((msg->flag & XWDS_I2C_F_ADDRMSK) != addm) {
-                MX_I2C1_ReInit(msg->flag & XWDS_I2C_F_ADDRMSK);
-        }
         drvdata = i2cm->dev.data;
+        addm = MX_I2C1_GetAddressingMode();
+        if ((msg->flag & XWDS_I2C_F_10BITADDR) != addm) {
+                MX_I2C1_ReInit(msg->flag & XWDS_I2C_F_10BITADDR);
+        }
+        if (0U == (msg->flag & XWDS_I2C_F_10BITADDR)) {
+                msg->addr <<= 1U;
+        }
         ulk.osal.splk = &drvdata->splk;
         xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
         drvdata->rc = -EINPROGRESS;
@@ -160,21 +157,21 @@ xwer_t stm32xwds_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
 }
 
 static
-xwer_t stm32xwds_i2c1m_drv_abort(struct xwds_i2cm * i2cm,
-                                 xwu16_t address, xwu16_t addrmode,
-                                 xwtm_t to)
+xwer_t stm32xwds_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
+                                struct xwds_i2c_msg * msg,
+                                xwsz_t num,
+                                xwtm_t to)
 {
-        xwu32_t addm;
         xwer_t rc;
+        xwsq_t i;
 
-        XWOS_UNUSED(i2cm);
-        XWOS_UNUSED(to);
-
-        addm = MX_I2C1_GetAddressingMode();
-        if ((addrmode & XWDS_I2C_F_ADDRMSK) != addm) {
-                MX_I2C1_ReInit(addrmode & XWDS_I2C_F_ADDRMSK);
+        rc = XWOK;
+        for (i = 0; i < num; i++) {
+                rc = stm32xwds_i2c1m_xfer(i2cm, &msg[i], to);
+                if (rc < 0) {
+                        break;
+                }
         }
-        rc = MX_I2C1_Abort(address);
         return rc;
 }
 

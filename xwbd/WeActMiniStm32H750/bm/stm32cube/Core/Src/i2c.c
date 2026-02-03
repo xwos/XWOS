@@ -243,7 +243,7 @@ xwu16_t MX_I2C1_GetAddressingMode(void)
   xwu16_t addm;
 
   if (hi2c1.Init.AddressingMode) {
-    addm = XWDS_I2C_F_7BITADDR;
+    addm = 0U;
   } else {
     addm = XWDS_I2C_F_10BITADDR;
   }

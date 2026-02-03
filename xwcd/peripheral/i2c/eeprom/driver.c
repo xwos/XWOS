@@ -249,28 +249,3 @@ xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
         }
         return rc;
 }
-
-__xwbsp_api
-xwer_t xwds_eeprom_reset(struct xwds_eeprom * eeprom, xwtm_t to)
-{
-        struct xwds_i2c_msg msg;
-        xwu8_t dummy;
-        xwer_t rc;
-
-        dummy = 0xFF;
-        msg.addr = 0xFE;
-        msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_WR;
-        msg.data = &dummy;
-        msg.size = 1;
-        rc = xwds_i2cm_xfer(eeprom->i2cp.bus, &msg, to);
-        if (-EADDRNOTAVAIL == rc) {
-                msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_WR | XWDS_I2C_F_STOP;
-                msg.data = NULL;
-                msg.size = 0;
-                rc = xwds_i2cm_xfer(eeprom->i2cp.bus, &msg, to);
-                if (-EADDRNOTAVAIL == rc) {
-                        rc = XWOK;
-                }
-        }
-        return rc;
-}

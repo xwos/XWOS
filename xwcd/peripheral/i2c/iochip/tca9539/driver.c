@@ -42,12 +42,10 @@ xwer_t xwds_tca9539_write(struct xwds_tca9539 * tca9539,
         txdata[0] = (xwu8_t)reg;
         txdata[1] = (xwu8_t)data;
         msg.addr = tca9539->iochip.bc.i2cp.addr;
-        msg.flag = ((xwu16_t)XWDS_I2C_F_START |
-                    (xwu16_t)XWDS_I2C_F_WR |
-                    (xwu16_t)XWDS_I2C_F_STOP);
+        msg.flag = ((xwu16_t)XWDS_I2C_F_START | (xwu16_t)XWDS_I2C_F_STOP);
         msg.data = txdata;
         msg.size = sizeof(txdata);
-        rc = xwds_i2cm_xfer(bus, &msg, to);
+        rc = xwds_i2cm_xfer(bus, &msg, 1U, to);
         return rc;
 }
 
@@ -58,23 +56,19 @@ xwer_t xwds_tca9539_read(struct xwds_tca9539 * tca9539,
 {
         xwer_t rc;
         struct xwds_i2cm * bus;
-        struct xwds_i2c_msg msg;
+        struct xwds_i2c_msg msg[2];
 
         bus = tca9539->iochip.bc.i2cp.bus;
-        msg.addr = tca9539->iochip.bc.i2cp.addr;
-        msg.flag = ((xwu16_t)XWDS_I2C_F_START | (xwu16_t)XWDS_I2C_F_WR);
-        msg.data = &reg;
-        msg.size = 1;
-        rc = xwds_i2cm_xfer(bus, &msg, to);
-        if (XWOK == rc) {
-                msg.addr = tca9539->iochip.bc.i2cp.addr;
-                msg.flag = ((xwu16_t)XWDS_I2C_F_START |
-                            (xwu16_t)XWDS_I2C_F_RD |
-                            (xwu16_t)XWDS_I2C_F_STOP);
-                msg.data = buf;
-                msg.size = 1;
-                rc = xwds_i2cm_xfer(bus, &msg, to);
-        }
+        msg[0].addr = tca9539->iochip.bc.i2cp.addr;
+        msg[0].flag = (xwu16_t)XWDS_I2C_F_START;
+        msg[0].data = &reg;
+        msg[0].size = 1U;
+        msg[1].addr = msg[0].addr;
+        msg[1].flag = ((xwu16_t)XWDS_I2C_F_START | (xwu16_t)XWDS_I2C_F_RD |
+                       (xwu16_t)XWDS_I2C_F_STOP);
+        msg[1].data = buf;
+        msg[1].size = 1U;
+        rc = xwds_i2cm_xfer(bus, msg, 2U, to);
         return rc;
 }
 

@@ -198,7 +198,9 @@ xwer_t xwds_i2cm_vop_resume(struct xwds_i2cm * i2cm)
 
 /******** ******** ******** APIs ******** ******** ********/
 __xwds_api
-xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg, xwtm_t to)
+xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm,
+                      struct xwds_i2c_msg * msg, xwsz_t num,
+                      xwtm_t to)
 {
         xwer_t rc;
         const struct xwds_i2cm_driver * drv;
@@ -217,7 +219,7 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg, xwtm_t
         }
         drv = xwds_cast(const struct xwds_i2cm_driver *, i2cm->dev.drv);
         if ((drv) && (drv->xfer)) {
-                rc = drv->xfer(i2cm, msg, to);
+                rc = drv->xfer(i2cm, msg, num, to);
         } else {
                 rc = -ENOSYS;
         }
@@ -230,45 +232,6 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg, xwtm_t
 
 err_drv_xfer:
         xwos_mtx_unlock(&i2cm->xfer.apimtx);
-err_i2cm_lock:
-        xwds_i2cm_put(i2cm);
-err_i2cm_grab:
-        return rc;
-}
-
-__xwds_api
-xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
-                       xwu16_t address, xwu16_t addrmode,
-                       xwtm_t to)
-{
-        xwer_t rc;
-        const struct xwds_i2cm_driver * drv;
-
-        XWDS_VALIDATE(i2cm, "nullptr", -EFAULT);
-
-        rc = xwds_i2cm_grab(i2cm);
-        if (rc < 0) {
-                goto err_i2cm_grab;
-        }
-        rc = xwos_mtx_lock_to(&i2cm->abort.apimtx, to);
-        if (rc < 0) {
-                goto err_i2cm_lock;
-        }
-        drv = xwds_cast(const struct xwds_i2cm_driver *, i2cm->dev.drv);
-        if ((drv) && (drv->abort)) {
-                rc = drv->abort(i2cm, address, addrmode, to);
-        } else {
-                rc = -ENOSYS;
-        }
-        if (rc < 0) {
-                goto err_drv_abort;
-        }
-        xwos_mtx_unlock(&i2cm->abort.apimtx);
-        xwds_i2cm_put(i2cm);
-        return XWOK;
-
-err_drv_abort:
-        xwos_mtx_unlock(&i2cm->abort.apimtx);
 err_i2cm_lock:
         xwds_i2cm_put(i2cm);
 err_i2cm_grab:

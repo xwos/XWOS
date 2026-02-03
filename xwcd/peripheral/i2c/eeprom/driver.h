@@ -216,26 +216,6 @@ xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
                           xwtm_t to);
 
 /**
- * @brief EEPROM API：复位EEPROM的I2C总线
- * @param[in] eeprom: I2C EEPROM对象的指针
- * @param[in] to: 期望唤醒的时间点
- * @retrun 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 设备对象不可引用
- * @retval -ESHUTDOWN: 设备没有运行
- * @retval -EADDRNOTAVAIL: 地址无响应
- * @retval -ETIMEDOUT: 超时
- * @note
- * + 上下文：线程
- * @details
- * `to` 表示等待超时的时间点：
- * + `to` 通常是未来的时间，即 **当前系统时间** + `delta` ，
- *   可以使用 `xwtm_ft(delta)` 表示；
- * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
-xwer_t xwds_eeprom_reset(struct xwds_eeprom * eeprom, xwtm_t to);
-
-/**
  * @} xwcd_peripheral_i2c_eeprom
  */
 

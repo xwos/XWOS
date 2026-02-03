@@ -34,7 +34,7 @@ struct xwds_eeprom stm32xwds_eeprom256k = {
                         .data = NULL,
                 },
                 .bus = &stm32xwds_i2c1m,
-                .addr = 0xA0,
+                .addr = 0x50,
         },
         .parameter = {
                 .page_size = 64,
