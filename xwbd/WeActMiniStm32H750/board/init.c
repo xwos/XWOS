@@ -23,10 +23,9 @@
 #include <xwcd/soc/arm/v7m/m7/stm32/soc_init.h>
 #include <string.h>
 #include <xwos/mm/mempool/allocator.h>
+#include <bm/Stm32Hal/mi.h>
 #include "board/xwac/xwos/pm.h"
 #include "board/xwac/xwlib/crc.h"
-#include "board/xwac/xwds/device.h"
-#include "bm/stm32cube/mif.h"
 
 extern xwsz_t axisram_mr_origin[];
 extern xwsz_t axisram_mr_size[];
@@ -89,10 +88,9 @@ void xwos_preinit(void)
 {
         arch_init();
         soc_init();
-        stm32cube_preinit();
+        stm32hal_preinit();
         soc_relocate_data();
         soc_relocate_ivt();
-        stm32cube_init();
 }
 
 /**
@@ -101,8 +99,7 @@ void xwos_preinit(void)
 __xwbsp_init_code
 void xwos_postinit(void)
 {
-        stm32xwds_init();
-        stm32xwds_soc_init();
+        stm32hal_init();
         xwosac_pmcb_init();
         xwlibac_crc_init();
         board_mm_init();

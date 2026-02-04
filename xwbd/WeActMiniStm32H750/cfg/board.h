@@ -55,11 +55,11 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BMCFG_stm32cube                         1
-#define BMCFG_autosarcp_os                      1
-#define BMCFG_autosarcp_rte                     1
-#define BMCFG_rustapp                           1
-#define BMCFG_app                               1
-#define BMCFG_test                              1
+#define BMCFG_Stm32Hal                          1
+#define BMCFG_AutosarCp_os                      1
+#define BMCFG_AutosarCp_rte                     1
+#define BMCFG_RustApp                           1
+#define BMCFG_MainThread                        1
+#define BMCFG_Test                              1
 
 #endif /* cfg/board.h */

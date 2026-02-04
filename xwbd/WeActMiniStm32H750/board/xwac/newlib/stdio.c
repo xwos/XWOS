@@ -20,7 +20,7 @@
 
 #include "board/std.h"
 #include <xwos/lib/errno.h>
-#include "board/xwac/xwds/device.h"
+#include "bm/Stm32Hal/xwds/device.h"
 
 xwssz_t newlibac_fops_read_stdin(int fd, void * buf, xwsz_t cnt)
 {

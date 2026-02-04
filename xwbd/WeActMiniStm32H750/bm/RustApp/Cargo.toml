@@ -1,0 +1,28 @@
+[package]
+name = "RustApp"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "RustApp"
+crate-type = ["staticlib"]
+
+[dependencies]
+cortex-m = "0.7"
+xwrust = {path = "../../../../xwmd/xwrust"}
+xwrust_example_vector = {path = "../../../../xwam/xwrust-example/xwrust_example_vector"}
+xwrust_example_swt = {path = "../../../../xwam/xwrust-example/xwrust_example_swt"}
+xwrust_example_dthd = {path = "../../../../xwam/xwrust-example/xwrust_example_dthd"}
+xwrust_example_sthd = {path = "../../../../xwam/xwrust-example/xwrust_example_sthd"}
+xwrust_example_mutex = {path = "../../../../xwam/xwrust-example/xwrust_example_mutex"}
+xwrust_example_spinlock = {path = "../../../../xwam/xwrust-example/xwrust_example_spinlock"}
+xwrust_example_seqlock = {path = "../../../../xwam/xwrust-example/xwrust_example_seqlock"}
+xwrust_example_sem = {path = "../../../../xwam/xwrust-example/xwrust_example_sem"}
+xwrust_example_cond = {path = "../../../../xwam/xwrust-example/xwrust_example_cond"}
+xwrust_example_flg = {path = "../../../../xwam/xwrust-example/xwrust_example_flg"}
+xwrust_example_br = {path = "../../../../xwam/xwrust-example/xwrust_example_br"}
+xwrust_example_sel = {path = "../../../../xwam/xwrust-example/xwrust_example_sel"}
+xwrust_example_xwcq = {path = "../../../../xwam/xwrust-example/xwrust_example_xwcq"}
+xwrust_example_xwmq = {path = "../../../../xwam/xwrust-example/xwrust_example_xwmq"}
+libc-print = "0.1"
+# lazy_static = { version = "1.4", features = ["spin_no_std"] }

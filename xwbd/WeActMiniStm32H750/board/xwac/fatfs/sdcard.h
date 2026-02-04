@@ -18,13 +18,13 @@
  * > limitations under the License.
  */
 
-#ifndef __board_xwac_fatfs_sdcard_h__
-#define __board_xwac_fatfs_sdcard_h__
+#ifndef board_xwac_fatfs_sdcard_h__
+#define board_xwac_fatfs_sdcard_h__
 
 #include "board/std.h"
 
-xwer_t sdcard_fatfs_mount(void);
-xwer_t sdcard_fatfs_unmount(void);
+void sdcard_fatfs_mount(void);
+void sdcard_fatfs_unmount(void);
 void sdcard_fatfs_tst(void);
 
 #endif /* board/xwac/fatfs/sdcard.h */
