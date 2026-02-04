@@ -22,10 +22,10 @@
 #include <xwos/osal/pm.h>
 #include <xwcd/ds/xwds.h>
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
-#include "bm/stm32cube/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_cortex.h"
-#include "bm/stm32cube/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_pwr.h"
-#include "bm/stm32cube/Core/Inc/main.h"
-#include "board/xwac/xwds/device.h"
+#include "bm/Stm32Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_cortex.h"
+#include "bm/Stm32Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_pwr.h"
+#include "bm/Stm32Hal/CubeMX/Core/Inc/main.h"
+#include "bm/Stm32Hal/xwds/device.h"
 
 extern void SystemClock_Config(void);
 

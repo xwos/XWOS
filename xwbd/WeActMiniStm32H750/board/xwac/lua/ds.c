@@ -23,7 +23,7 @@
 #include <xwem/vm/lua/xwlua/xwds/soc.h>
 #include <xwem/vm/lua/xwlua/xwds/uart.h>
 #include <xwem/vm/lua/xwlua/xwds/spim.h>
-#include "board/xwac/xwds/device.h"
+#include "bm/Stm32Hal/xwds/device.h"
 
 void xwlua_open_brdlibs(lua_State * L)
 {

@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __board_dtcm_h__
-#define __board_dtcm_h__
+#ifndef board_dtcm_h__
+#define board_dtcm_h__
 
 #include "board/std.h"
 #include <xwos/mm/mempool/allocator.h>

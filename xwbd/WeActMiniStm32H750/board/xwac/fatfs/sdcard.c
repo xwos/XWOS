@@ -22,11 +22,14 @@
 #include <stdlib.h>
 #include <xwem/fs/fatfs/ff.h>
 #include <xwem/fs/fatfs/diskio.h>
-#include "bm/stm32cube/Core/Inc/sdmmc.h"
+#include "bm/Stm32Hal/CubeMX/Core/Inc/sdmmc.h"
+
+#include <xwos/lib/xwlog.h>
+#define LOGTAG "sdcard"
 
 FATFS sdcard_fatfs;
 
-xwer_t sdcard_fatfs_mount(void)
+void sdcard_fatfs_mount(void)
 {
         xwer_t rc;
         FRESULT frc;
@@ -34,35 +37,24 @@ xwer_t sdcard_fatfs_mount(void)
         MX_SDMMC1_SD_Init();
         rc = MX_SDMMC1_SD_TrimClk(10);
         if (rc < 0) {
-                goto err_sd_init;
+                xwlogf(ERR, LOGTAG, "MX_SDMMC1_SD_TrimClk() ... <rc:%d>\n", rc);
+        } else {
+                frc = f_mount(&sdcard_fatfs, "sd:", 1);
+                if (FR_OK != frc) {
+                        xwlogf(ERR, LOGTAG, "f_mount() ... <rc:%d>\n", rc);
+                }
         }
-        frc = f_mount(&sdcard_fatfs, "sd:", 1);
-        if (FR_OK != frc) {
-                rc = -EIO;
-                goto err_mount;
-        }
-        return XWOK;
-
-err_mount:
-err_sd_init:
-        return rc;
 }
 
-xwer_t sdcard_fatfs_unmount(void)
+void sdcard_fatfs_unmount(void)
 {
-        xwer_t rc;
         FRESULT frc;
 
         frc = f_unmount("sd:");
         if (FR_OK != frc) {
-                rc = -EIO;
-                goto err_unmount;
+                xwlogf(ERR, LOGTAG, "f_unmount() ... <rc:%d>\n", frc);
         }
         MX_SDMMC1_SD_DeInit();
-        return XWOK;
-
-err_unmount:
-        return rc;
 }
 
 void sdcard_fatfs_tst(void)

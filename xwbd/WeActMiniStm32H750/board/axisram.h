@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __board_axisram_h__
-#define __board_axisram_h__
+#ifndef board_axisram_h__
+#define board_axisram_h__
 
 #include "board/std.h"
 #include <xwos/mm/mempool/allocator.h>

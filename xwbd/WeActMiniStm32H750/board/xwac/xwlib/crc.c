@@ -24,7 +24,7 @@
 #include <xwos/osal/skd.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/lock/mtx.h>
-#include "bm/stm32cube/Core/Inc/crc.h"
+#include "bm/Stm32Hal/CubeMX/Core/Inc/crc.h"
 
 struct xwos_splk xwlibac_crc_splk;
 struct xwos_mtx xwlibac_crc_mtx;

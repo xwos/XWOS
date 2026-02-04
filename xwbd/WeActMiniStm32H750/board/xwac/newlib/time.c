@@ -20,7 +20,7 @@
 
 #include "board/std.h"
 #include <time.h>
-#include "bm/stm32cube/Core/Inc/rtc.h"
+#include "bm/Stm32Hal/CubeMX/Core/Inc/rtc.h"
 
 xwer_t newlibac_rtc_set_datetime(struct tm * tm, suseconds_t ms)
 {

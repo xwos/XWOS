@@ -21,7 +21,7 @@
 #include "board/std.h"
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include <xwos/ospl/skd.h>
-#include "bm/autosarcp/os/OsCfg.h"
+#include "bm/AutosarCp/os/OsCfg.h"
 
 __xwos_code
 void board_xwskd_idle_hook(struct xwospl_skd * xwskd)

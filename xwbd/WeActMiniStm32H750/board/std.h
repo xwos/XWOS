@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __board_std_h__
-#define __board_std_h__
+#ifndef board_std_h__
+#define board_std_h__
 
 #include <xwos/standard.h>
 

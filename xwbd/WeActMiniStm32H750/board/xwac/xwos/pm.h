@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __board_xwac_xwos_pm_h__
-#define __board_xwac_xwos_pm_h__
+#ifndef board_xwac_xwos_pm_h__
+#define board_xwac_xwos_pm_h__
 
 #include "board/std.h"
 
