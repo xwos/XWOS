@@ -24,7 +24,7 @@
 #include <xwos/osal/sync/cond.h>
 #include <xwmd/isc/xwssc/protocol.h>
 #include <xwmd/isc/xwssc/hwifal.h>
-#include <xwmd/isc/xwssc/mif.h>
+#include <xwmd/isc/xwssc/mi.h>
 
 /**
  * @ingroup xwmd_isc_xwssc_protocol

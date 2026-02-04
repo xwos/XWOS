@@ -14,7 +14,7 @@
 #define __xwmd_isc_xwcq_cxx_XwcqProxy_hxx__
 
 extern "C" {
-#include "xwmd/isc/xwcq/mif.h"
+#include "xwmd/isc/xwcq/mi.h"
 }
 
 namespace xwisc {

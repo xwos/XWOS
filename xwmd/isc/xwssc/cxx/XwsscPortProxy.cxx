@@ -13,7 +13,7 @@
 #include "xwmd/isc/xwssc/cxx/XwsscPortProxy.hxx"
 
 extern "C" {
-#include "xwmd/isc/xwssc/mif.h"
+#include "xwmd/isc/xwssc/mi.h"
 #include "xwmd/isc/xwssc/protocol.h"
 }
 

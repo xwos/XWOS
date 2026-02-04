@@ -14,7 +14,7 @@
 #define __xwmd_isc_xwssc_cxx_XwsscProxy_hxx__
 
 extern "C" {
-#include "xwmd/isc/xwssc/mif.h"
+#include "xwmd/isc/xwssc/mi.h"
 }
 
 namespace xwisc {

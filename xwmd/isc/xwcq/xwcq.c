@@ -16,7 +16,7 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/sem.h>
-#include <xwmd/isc/xwcq/mif.h>
+#include <xwmd/isc/xwcq/mi.h>
 
 /**
  * @brief 循环队列对象的构造函数

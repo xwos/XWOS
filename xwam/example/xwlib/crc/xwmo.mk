@@ -26,7 +26,7 @@ $(eval $(call XwmoReqCfg,XWLIBCFG_CRC8_0X07,y))
 $(eval $(call XwmoReqCfg,XWLIBCFG_CRC8_0X31,y))
 $(eval $(call XwmoReqCfg,XWLIBCFG_CRC8_0X9B,y))
 
-XWMO_CSRCS := mif.c
+XWMO_CSRCS := mi.c
 XWMO_CFLAGS := -Wno-unused-value
 XWMO_INCDIRS :=
 include xwbs/xwmo.mk

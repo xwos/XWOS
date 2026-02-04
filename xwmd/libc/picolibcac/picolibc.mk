@@ -9,7 +9,7 @@
 # > License, v. 2.0. If a copy of the MPL was not distributed with this
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
-XWMO_CSRCS := mif.c
+XWMO_CSRCS := mi.c
 XWMO_CSRCS += errno.c
 XWMO_CSRCS += lock.c
 XWMO_CSRCS += sysconf.c

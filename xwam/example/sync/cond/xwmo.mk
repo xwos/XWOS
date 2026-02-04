@@ -21,7 +21,7 @@
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include xwbs/functions.mk
 
-XWMO_CSRCS := mif.c
+XWMO_CSRCS := mi.c
 XWMO_CFLAGS := -Wno-unused-value
 XWMO_CFLAGS_gcc :=-Wno-unused-but-set-variable
 XWMO_INCDIRS :=
