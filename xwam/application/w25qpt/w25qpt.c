@@ -30,7 +30,7 @@
 #include <xwam/application/w25qpt/w25qpt.h>
 #include <xwam/application/w25qpt/hwifal.h>
 #include <xwam/application/w25qpt/protocol.h>
-#include <xwam/application/w25qpt/mif.h>
+#include <xwam/application/w25qpt/mi.h>
 
 #define W25QPT_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 

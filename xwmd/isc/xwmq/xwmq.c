@@ -13,7 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/mm/memslice.h>
-#include <xwmd/isc/xwmq/mif.h>
+#include <xwmd/isc/xwmq/mi.h>
 
 static __xwmd_code
 void xwmq_msg_construct(struct xwmq_msg * msg);

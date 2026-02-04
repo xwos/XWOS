@@ -11,7 +11,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwmd/isc/xwmq/mif.h>
+#include <xwmd/isc/xwmq/mi.h>
 
 
 xwer_t xwrustffi_xwmq_acquire(struct xwmq * mq, xwsq_t tik)

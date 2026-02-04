@@ -14,7 +14,7 @@ include xwbs/functions.mk
 
 $(eval $(call XwmoReqCfg,XWLIBCFG_CRC32,y))
 
-XWMO_CSRCS := protocol.c hwifal.c hwif/uart.c mif.c
+XWMO_CSRCS := protocol.c hwifal.c hwif/uart.c mi.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
 
