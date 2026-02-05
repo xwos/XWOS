@@ -159,7 +159,6 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     HAL_NVIC_SetPriority(I2C1_ER_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
   /* USER CODE BEGIN I2C1_MspInit 1 */
-    hi2c1_drvdata.halhdl = &hi2c1;
     xwos_splk_init(&hi2c1_drvdata.splk);
     xwos_cond_init(&hi2c1_drvdata.cond);
     hi2c1_drvdata.msg = NULL;
@@ -342,7 +341,7 @@ xwer_t MX_I2C1_Abort(xwu16_t addr)
 static
 void MX_I2C1_MasterTxCpltCallback(I2C_HandleTypeDef * hi2c)
 {
-  stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, XWOK);
+  stm32xwds_i2cm_on_complete(hi2c1_drvdata.i2cm, XWOK);
 }
 
 static
@@ -354,29 +353,29 @@ void MX_I2C1_MasterRxCpltCallback(I2C_HandleTypeDef * hi2c)
                                                     CPUCFG_L1_CACHELINE_SIZE));
 #endif /* BRDCFG_DCACHE */
   memcpy(hi2c1_drvdata.msg->data, hi2c1_drvdata.mem, hi2c1_drvdata.size);
-  stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, XWOK);
+  stm32xwds_i2cm_on_complete(hi2c1_drvdata.i2cm, XWOK);
 }
 
 static
 void MX_I2C1_ErrorCallback(I2C_HandleTypeDef * hi2c)
 {
   if (hi2c->ErrorCode & HAL_I2C_ERROR_AF) {
-    stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -EADDRNOTAVAIL);
+    stm32xwds_i2cm_on_complete(hi2c1_drvdata.i2cm, -EADDRNOTAVAIL);
   } else if (hi2c->ErrorCode &
              (HAL_I2C_ERROR_BERR | HAL_I2C_ERROR_ARLO |
               HAL_I2C_ERROR_OVR | HAL_I2C_ERROR_DMA | HAL_I2C_ERROR_SIZE)) {
-    stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -EIO);
+    stm32xwds_i2cm_on_complete(hi2c1_drvdata.i2cm, -EIO);
   } else if (hi2c->ErrorCode & HAL_I2C_ERROR_TIMEOUT) {
-    stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -ETIMEDOUT);
+    stm32xwds_i2cm_on_complete(hi2c1_drvdata.i2cm, -ETIMEDOUT);
   } else {
-    stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -EBUG);
+    stm32xwds_i2cm_on_complete(hi2c1_drvdata.i2cm, -EBUG);
   }
 }
 
 static
 void MX_I2C1_AbortCpltCallback(I2C_HandleTypeDef * hi2c)
 {
-  stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -ECONNABORTED);
+  stm32xwds_i2cm_on_complete(hi2c1_drvdata.i2cm, -ECONNABORTED);
 }
 
 /* Redefine HAL weak callback */
@@ -406,6 +405,91 @@ void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef * hi2c)
   if (&hi2c1 == hi2c) {
     MX_I2C1_AbortCpltCallback(hi2c);
   }
+}
+
+
+/* Unified XWDS to HAL interfaces */
+void MX_I2C_Init(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1U:
+      MX_I2C1_Init();
+      break;
+    default:
+      break;
+  }
+}
+
+void MX_I2C_DeInit(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1U:
+      MX_I2C1_DeInit();
+      break;
+    default:
+      break;
+  }
+}
+
+void MX_I2C_ReInit(xwu32_t hwid, xwu16_t addm)
+{
+  switch (hwid) {
+    case 1U:
+      MX_I2C1_ReInit(addm);
+      break;
+    default:
+      break;
+  }
+}
+
+xwer_t MX_I2C_GetAddressingMode(xwu32_t hwid, xwu16_t * m)
+{
+  xwer_t rc;
+  xwu16_t addrm;
+
+  switch (hwid) {
+    case 1U:
+      addrm = MX_I2C1_GetAddressingMode();
+      if (m) {
+          *m = addrm;
+      }
+      rc = XWOK;
+      break;
+    default:
+      rc = -ENXIO;
+      break;
+  }
+  return rc;
+}
+
+xwer_t MX_I2C_Xfer(xwu32_t hwid, struct xwds_i2c_msg * msg)
+{
+  xwer_t rc;
+
+  switch (hwid) {
+    case 1U:
+      rc = MX_I2C1_Xfer(msg);
+      break;
+    default:
+      rc = -ENXIO;
+      break;
+  }
+  return rc;
+}
+
+xwer_t MX_I2C_Abort(xwu32_t hwid, xwu16_t addr)
+{
+  xwer_t rc;
+
+  switch (hwid) {
+    case 1U:
+      rc = MX_I2C1_Abort(addr);
+      break;
+    default:
+      rc = -ENXIO;
+      break;
+  }
+  return rc;
 }
 
 /* USER CODE END 1 */

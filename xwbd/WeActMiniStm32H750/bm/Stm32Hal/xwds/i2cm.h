@@ -24,6 +24,6 @@
 #include <board/std.h>
 #include <xwcd/ds/i2c/master.h>
 
-void stm32xwds_i2cm1_cb_xfercplt(struct xwds_i2cm * i2cm, xwer_t xrc);
+void stm32xwds_i2cm_on_complete(struct xwds_i2cm * i2cm, xwer_t xrc);
 
 #endif /* bm/Stm32Hal/xwds/i2cm.h */
