@@ -71,7 +71,7 @@ struct xwds_st7735 stm32xwds_st7735 = {
                         .drv = xwds_cast(struct xwds_driver *, &stm32xwds_st7735_drv),
                         .data = NULL,
                 },
-                .bus = &stm32xwds_spi4m,
+                .bus = &stm32xwds_spim4,
                 .buscfgid = 0,
         },
         .parameter = {

@@ -727,15 +727,14 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef * huart)
   }
 }
 
-
 /* Unified XWDS to HAL interfaces */
 void MX_USART_UART_Init(xwu32_t hwid)
 {
   switch (hwid) {
-    case 1:
+    case 1U:
       MX_USART1_UART_Init();
       break;
-    case 3:
+    case 3U:
       MX_USART3_UART_Init();
       break;
     default:
@@ -746,10 +745,10 @@ void MX_USART_UART_Init(xwu32_t hwid)
 void MX_USART_UART_DeInit(xwu32_t hwid)
 {
   switch (hwid) {
-    case 1:
+    case 1U:
       MX_USART1_UART_DeInit();
       break;
-    case 3:
+    case 3U:
       MX_USART3_UART_DeInit();
       break;
     default:
@@ -760,10 +759,10 @@ void MX_USART_UART_DeInit(xwu32_t hwid)
 void MX_USART_Timer_Init(xwu32_t hwid)
 {
   switch (hwid) {
-    case 1:
+    case 1U:
       MX_USART1_Timer_Init();
       break;
-    case 3:
+    case 3U:
       MX_USART3_Timer_Init();
       break;
     default:
@@ -774,10 +773,10 @@ void MX_USART_Timer_Init(xwu32_t hwid)
 void MX_USART_Timer_DeInit(xwu32_t hwid)
 {
   switch (hwid) {
-    case 1:
+    case 1U:
       MX_USART1_Timer_DeInit();
       break;
-    case 3:
+    case 3U:
       MX_USART3_Timer_DeInit();
       break;
     default:
@@ -788,10 +787,10 @@ void MX_USART_Timer_DeInit(xwu32_t hwid)
 void MX_USART_Timer_Start(xwu32_t hwid)
 {
   switch (hwid) {
-    case 1:
+    case 1U:
       MX_USART1_Timer_Start();
       break;
-    case 3:
+    case 3U:
       MX_USART3_Timer_Start();
       break;
     default:
@@ -802,10 +801,10 @@ void MX_USART_Timer_Start(xwu32_t hwid)
 void MX_USART_Timer_Stop(xwu32_t hwid)
 {
   switch (hwid) {
-    case 1:
+    case 1U:
       MX_USART1_Timer_Stop();
       break;
-    case 3:
+    case 3U:
       MX_USART3_Timer_Stop();
       break;
     default:
@@ -818,10 +817,10 @@ xwer_t MX_USART_RXDMA_Start(xwu32_t hwid, xwu8_t * mem, xwsz_t size)
   xwer_t rc;
 
   switch (hwid) {
-    case 1:
+    case 1U:
       rc = MX_USART1_RXDMA_Start(mem, size);
       break;
-    case 3:
+    case 3U:
       rc = MX_USART3_RXDMA_Start(mem, size);
       break;
     default:
@@ -836,14 +835,14 @@ xwsq_t MX_USART_RXDMA_GetCounter(xwu32_t hwid)
   xwsq_t cnt;
 
   switch (hwid) {
-    case 1:
+    case 1U:
       cnt = MX_USART1_RXDMA_GetCounter();
       break;
-    case 3:
+    case 3U:
       cnt = MX_USART3_RXDMA_GetCounter();
       break;
     default:
-      cnt = 0;
+      cnt = 0U;
       break;
   }
   return cnt;
@@ -852,10 +851,10 @@ xwsq_t MX_USART_RXDMA_GetCounter(xwu32_t hwid)
 void MX_USART_TXDMA_Prepare(xwu32_t hwid, const xwu8_t * mem, xwsz_t size)
 {
   switch (hwid) {
-    case 1:
+    case 1U:
       MX_USART1_TXDMA_Prepare(mem, size);
       break;
-    case 3:
+    case 3U:
       MX_USART3_TXDMA_Prepare(mem, size);
       break;
     default:
@@ -868,10 +867,10 @@ xwer_t MX_USART_TXDMA_Start(xwu32_t hwid)
   xwer_t rc;
 
   switch (hwid) {
-    case 1:
+    case 1U:
       rc = MX_USART1_TXDMA_Start();
       break;
-    case 3:
+    case 3U:
       rc = MX_USART3_TXDMA_Start();
       break;
     default:
@@ -886,10 +885,10 @@ xwer_t MX_USART_Putc(xwu32_t hwid, xwu8_t byte)
   xwer_t rc;
 
   switch (hwid) {
-    case 1:
+    case 1U:
       rc = MX_USART1_Putc(byte);
       break;
-    case 3:
+    case 3U:
       rc = MX_USART3_Putc(byte);
       break;
     default:

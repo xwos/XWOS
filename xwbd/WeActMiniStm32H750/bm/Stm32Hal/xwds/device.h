@@ -49,8 +49,8 @@ xwer_t stm32xwds_uart_init(void);
 xwer_t stm32xwds_uart_fini(void);
 
 /******** ******** spi ******** ********/
-extern struct xwds_spim stm32xwds_spi1m;
-extern struct xwds_spim stm32xwds_spi4m;
+extern struct xwds_spim stm32xwds_spim1;
+extern struct xwds_spim stm32xwds_spim4;
 xwer_t stm32xwds_spi_init(void);
 xwer_t stm32xwds_spi_fini(void);
 
@@ -63,7 +63,7 @@ xwer_t stm32xwds_w25q64jv_init(void);
 xwer_t stm32xwds_w25q64jv_fini(void);
 
 /******** ******** i2c ******** ********/
-extern struct xwds_i2cm stm32xwds_i2c1m;
+extern struct xwds_i2cm stm32xwds_i2cm1;
 xwer_t stm32xwds_i2c_init(void);
 xwer_t stm32xwds_i2c_fini(void);
 

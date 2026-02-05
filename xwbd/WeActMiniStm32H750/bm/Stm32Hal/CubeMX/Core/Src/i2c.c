@@ -342,7 +342,7 @@ xwer_t MX_I2C1_Abort(xwu16_t addr)
 static
 void MX_I2C1_MasterTxCpltCallback(I2C_HandleTypeDef * hi2c)
 {
-  stm32xwds_i2c1m_cb_xfercplt(hi2c1_drvdata.i2cm, XWOK);
+  stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, XWOK);
 }
 
 static
@@ -354,29 +354,29 @@ void MX_I2C1_MasterRxCpltCallback(I2C_HandleTypeDef * hi2c)
                                                     CPUCFG_L1_CACHELINE_SIZE));
 #endif /* BRDCFG_DCACHE */
   memcpy(hi2c1_drvdata.msg->data, hi2c1_drvdata.mem, hi2c1_drvdata.size);
-  stm32xwds_i2c1m_cb_xfercplt(hi2c1_drvdata.i2cm, XWOK);
+  stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, XWOK);
 }
 
 static
 void MX_I2C1_ErrorCallback(I2C_HandleTypeDef * hi2c)
 {
   if (hi2c->ErrorCode & HAL_I2C_ERROR_AF) {
-    stm32xwds_i2c1m_cb_xfercplt(hi2c1_drvdata.i2cm, -EADDRNOTAVAIL);
+    stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -EADDRNOTAVAIL);
   } else if (hi2c->ErrorCode &
              (HAL_I2C_ERROR_BERR | HAL_I2C_ERROR_ARLO |
               HAL_I2C_ERROR_OVR | HAL_I2C_ERROR_DMA | HAL_I2C_ERROR_SIZE)) {
-    stm32xwds_i2c1m_cb_xfercplt(hi2c1_drvdata.i2cm, -EIO);
+    stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -EIO);
   } else if (hi2c->ErrorCode & HAL_I2C_ERROR_TIMEOUT) {
-    stm32xwds_i2c1m_cb_xfercplt(hi2c1_drvdata.i2cm, -ETIMEDOUT);
+    stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -ETIMEDOUT);
   } else {
-    stm32xwds_i2c1m_cb_xfercplt(hi2c1_drvdata.i2cm, -EBUG);
+    stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -EBUG);
   }
 }
 
 static
 void MX_I2C1_AbortCpltCallback(I2C_HandleTypeDef * hi2c)
 {
-  stm32xwds_i2c1m_cb_xfercplt(hi2c1_drvdata.i2cm, -ECONNABORTED);
+  stm32xwds_i2cm1_cb_xfercplt(hi2c1_drvdata.i2cm, -ECONNABORTED);
 }
 
 /* Redefine HAL weak callback */

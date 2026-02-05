@@ -63,7 +63,7 @@ struct xwds_w25qxx stm32xwds_w25q64jv = {
                         .drv = xwds_cast(struct xwds_driver *, &stm32xwds_w25q64jv_drv),
                         .data = NULL,
                 },
-                .bus = &stm32xwds_spi1m,
+                .bus = &stm32xwds_spim1,
                 .buscfgid = 0,
         },
         .parameter = {

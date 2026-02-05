@@ -33,7 +33,7 @@ struct xwds_eeprom stm32xwds_eeprom256k = {
                         .drv = xwds_cast(struct xwds_driver *, &at24md_drv),
                         .data = NULL,
                 },
-                .bus = &stm32xwds_i2c1m,
+                .bus = &stm32xwds_i2cm1,
                 .addr = 0x50,
         },
         .parameter = {

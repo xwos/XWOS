@@ -30,6 +30,7 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
+#include <board/std.h>
 
 /* USER CODE END Includes */
 
@@ -40,6 +41,13 @@ extern "C" {
 void MX_CRC_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+xwer_t MX_CRC32_Cal(xwu32_t * crc32,
+                    bool refin, xwu32_t polynomial, xwu32_t direction,
+                    const xwu8_t stream[], xwsz_t * size);
+
+xwer_t MX_CRC8_Cal(xwu8_t * crc8,
+                   bool refin, xwu8_t polynomial,
+                   const xwu8_t stream[], xwsz_t * size);
 
 /* USER CODE END Prototypes */
 
@@ -48,4 +56,3 @@ void MX_CRC_Init(void);
 #endif
 
 #endif /* __CRC_H__ */
-
