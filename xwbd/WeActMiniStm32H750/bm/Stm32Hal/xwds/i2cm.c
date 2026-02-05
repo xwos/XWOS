@@ -27,53 +27,53 @@
 #include "bm/Stm32Hal/xwds/i2cm.h"
 
 static
-xwer_t stm32xwds_i2cm1_drv_start(struct xwds_device * dev);
+xwer_t stm32xwds_i2cm_drv_start(struct xwds_device * dev);
 
 static
-xwer_t stm32xwds_i2cm1_drv_stop(struct xwds_device * dev);
+xwer_t stm32xwds_i2cm_drv_stop(struct xwds_device * dev);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32xwds_i2cm1_drv_suspend(struct xwds_device * dev);
+xwer_t stm32xwds_i2cm_drv_suspend(struct xwds_device * dev);
 
 static
-xwer_t stm32xwds_i2cm1_drv_resume(struct xwds_device * dev);
+xwer_t stm32xwds_i2cm_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32xwds_i2cm1_drv_xfer(struct xwds_i2cm * i2cm,
-                                struct xwds_i2c_msg * msg, xwsz_t num,
-                                xwtm_t to);
+xwer_t stm32xwds_i2cm_drv_xfer(struct xwds_i2cm * i2cm,
+                               struct xwds_i2c_msg * msg, xwsz_t num,
+                               xwtm_t to);
 
-const struct xwds_i2cm_driver stm32xwds_i2cm1_drv = {
+const struct xwds_i2cm_driver stm32xwds_i2cm_drv = {
         .base = {
-                .name = "stm32xwds.i2cm1",
+                .name = "stm32xwds.i2cm",
                 .probe = NULL,
                 .remove = NULL,
-                .start = stm32xwds_i2cm1_drv_start,
-                .stop = stm32xwds_i2cm1_drv_stop,
+                .start = stm32xwds_i2cm_drv_start,
+                .stop = stm32xwds_i2cm_drv_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-                .suspend = stm32xwds_i2cm1_drv_suspend,
-                .resume =  stm32xwds_i2cm1_drv_resume,
+                .suspend = stm32xwds_i2cm_drv_suspend,
+                .resume =  stm32xwds_i2cm_drv_resume,
 #endif
         },
-        .xfer = stm32xwds_i2cm1_drv_xfer,
+        .xfer = stm32xwds_i2cm_drv_xfer,
 };
 
 struct xwds_i2cm stm32xwds_i2cm1 = {
         /* attributes */
         .dev = {
-                .name = "stm32xwds.i2cm1",
+                .name = "stm32xwds.i2cm",
                 .id = 1,
                 .resources = NULL,
-                .drv = xwds_cast(struct xwds_driver *, &stm32xwds_i2cm1_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32xwds_i2cm_drv),
                 .data = (void *)&hi2c1_drvdata,
         },
         .xwccfg = NULL,
 };
 
 static
-xwer_t stm32xwds_i2cm1_drv_start(struct xwds_device * dev)
+xwer_t stm32xwds_i2cm_drv_start(struct xwds_device * dev)
 {
         struct xwds_i2cm * i2cm;
         struct MX_I2C_MasterDriverData * drvdata;
@@ -82,49 +82,47 @@ xwer_t stm32xwds_i2cm1_drv_start(struct xwds_device * dev)
         drvdata = i2cm->dev.data;
         drvdata->i2cm = i2cm;
 
-        MX_I2C1_Init();
+        MX_I2C_Init(dev->id);
         return XWOK;
 }
 
 static
-xwer_t stm32xwds_i2cm1_drv_stop(struct xwds_device * dev)
+xwer_t stm32xwds_i2cm_drv_stop(struct xwds_device * dev)
 {
-        XWOS_UNUSED(dev);
-
-        MX_I2C1_DeInit();
+        MX_I2C_DeInit(dev->id);
         return XWOK;
 }
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32xwds_i2cm1_drv_resume(struct xwds_device * dev)
+xwer_t stm32xwds_i2cm_drv_resume(struct xwds_device * dev)
 {
-        return stm32xwds_i2cm1_drv_start(dev);
+        return stm32xwds_i2cm_drv_start(dev);
 }
 
 static
-xwer_t stm32xwds_i2cm1_drv_suspend(struct xwds_device * dev)
+xwer_t stm32xwds_i2cm_drv_suspend(struct xwds_device * dev)
 {
-        return stm32xwds_i2cm1_drv_stop(dev);
+        return stm32xwds_i2cm_drv_stop(dev);
 }
 #endif
 
 static
-xwer_t stm32xwds_i2cm1_xfer(struct xwds_i2cm * i2cm,
-                            struct xwds_i2c_msg * msg,
-                            xwtm_t to)
+xwer_t stm32xwds_i2cm_xfer(struct xwds_i2cm * i2cm,
+                           struct xwds_i2c_msg * msg,
+                           xwtm_t to)
 {
         struct MX_I2C_MasterDriverData * drvdata;
-        xwu32_t addm;
+        xwu16_t addm;
         union xwos_ulock ulk;
         xwreg_t cpuirq;
         xwsq_t lkst;
         xwer_t rc;
 
         drvdata = i2cm->dev.data;
-        addm = MX_I2C1_GetAddressingMode();
+        MX_I2C_GetAddressingMode(i2cm->dev.id, &addm);
         if ((msg->flag & XWDS_I2C_F_10BITADDR) != addm) {
-                MX_I2C1_ReInit(msg->flag & XWDS_I2C_F_10BITADDR);
+                MX_I2C_ReInit(i2cm->dev.id, msg->flag & XWDS_I2C_F_10BITADDR);
         }
         if (0U == (msg->flag & XWDS_I2C_F_10BITADDR)) {
                 msg->addr <<= 1U;
@@ -133,7 +131,7 @@ xwer_t stm32xwds_i2cm1_xfer(struct xwds_i2cm * i2cm,
         xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
         drvdata->rc = -EINPROGRESS;
         drvdata->msg = msg;
-        rc = MX_I2C1_Xfer(msg);
+        rc = MX_I2C_Xfer(i2cm->dev.id, msg);
         if (XWOK == rc) {
                 rc = xwos_cond_wait_to(&drvdata->cond,
                                        ulk, XWOS_LK_SPLK, NULL,
@@ -157,17 +155,17 @@ xwer_t stm32xwds_i2cm1_xfer(struct xwds_i2cm * i2cm,
 }
 
 static
-xwer_t stm32xwds_i2cm1_drv_xfer(struct xwds_i2cm * i2cm,
-                                struct xwds_i2c_msg * msg,
-                                xwsz_t num,
-                                xwtm_t to)
+xwer_t stm32xwds_i2cm_drv_xfer(struct xwds_i2cm * i2cm,
+                               struct xwds_i2c_msg * msg,
+                               xwsz_t num,
+                               xwtm_t to)
 {
         xwer_t rc;
         xwsq_t i;
 
         rc = XWOK;
         for (i = 0; i < num; i++) {
-                rc = stm32xwds_i2cm1_xfer(i2cm, &msg[i], to);
+                rc = stm32xwds_i2cm_xfer(i2cm, &msg[i], to);
                 if (rc < 0) {
                         break;
                 }
@@ -175,7 +173,7 @@ xwer_t stm32xwds_i2cm1_drv_xfer(struct xwds_i2cm * i2cm,
         return rc;
 }
 
-void stm32xwds_i2cm1_cb_xfercplt(struct xwds_i2cm * i2cm, xwer_t xrc)
+void stm32xwds_i2cm_on_complete(struct xwds_i2cm * i2cm, xwer_t xrc)
 {
         struct MX_I2C_MasterDriverData * drvdata;
         xwreg_t cpuirq;

@@ -42,7 +42,6 @@ extern I2C_HandleTypeDef hi2c1;
 #define MX_I2C_MEM_MAXSIZE     256U /**< 单次最大发送的字节数 */
 
 struct MX_I2C_MasterDriverData {
-  I2C_HandleTypeDef * halhdl;
   struct xwds_i2cm * i2cm;
   struct xwos_cond cond; /**< 条件量 */
   struct xwos_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
@@ -59,11 +58,12 @@ extern struct MX_I2C_MasterDriverData hi2c1_drvdata;
 void MX_I2C1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void MX_I2C1_DeInit(void);
-void MX_I2C1_ReInit(xwu16_t addm);
-xwu16_t MX_I2C1_GetAddressingMode(void);
-xwer_t MX_I2C1_Xfer(struct xwds_i2c_msg * msg);
-xwer_t MX_I2C1_Abort(xwu16_t addr);
+void MX_I2C_Init(xwu32_t hwid);
+void MX_I2C_DeInit(xwu32_t hwid);
+void MX_I2C_ReInit(xwu32_t hwid, xwu16_t addm);
+xwer_t MX_I2C_GetAddressingMode(xwu32_t hwid, xwu16_t * m);
+xwer_t MX_I2C_Xfer(xwu32_t hwid, struct xwds_i2c_msg * msg);
+xwer_t MX_I2C_Abort(xwu32_t hwid, xwu16_t addr);
 
 /* USER CODE END Prototypes */
 
@@ -72,4 +72,3 @@ xwer_t MX_I2C1_Abort(xwu16_t addr);
 #endif
 
 #endif /* __I2C_H__ */
-
