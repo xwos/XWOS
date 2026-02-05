@@ -19,7 +19,7 @@
  */
 
 #include "board/std.h"
-#include "bm/Stm32Hal/xwds/device.h"
+#include <bm/Stm32Hal/mi.h>
 
 xwer_t board_log_write(const char * s, xwsz_t * n)
 {

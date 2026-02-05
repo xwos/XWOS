@@ -23,13 +23,15 @@
 #include <xwem/vm/lua/xwlua/xwds/soc.h>
 #include <xwem/vm/lua/xwlua/xwds/uart.h>
 #include <xwem/vm/lua/xwlua/xwds/spim.h>
+#include <xwem/vm/lua/xwlua/xwds/i2cm.h>
 #include "bm/Stm32Hal/xwds/device.h"
 
 void xwlua_open_brdlibs(lua_State * L)
 {
         xwlua_soc_register(L, "stm32", &stm32xwds_soc);
-        xwlua_uart_register(L, "usart1", &stm32xwds_usart1);
-        xwlua_uart_register(L, "usart3", &stm32xwds_usart3);
-        xwlua_spim_register(L, "spi1", &stm32xwds_spi1m);
-        xwlua_spim_register(L, "spi4", &stm32xwds_spi4m);
+        xwlua_uart_register(L, "uart1", &stm32xwds_usart1);
+        xwlua_uart_register(L, "uart3", &stm32xwds_usart3);
+        xwlua_spim_register(L, "spim1", &stm32xwds_spim1);
+        xwlua_spim_register(L, "spim4", &stm32xwds_spim4);
+        xwlua_i2cm_register(L, "i2cm1", &stm32xwds_i2cm1);
 }

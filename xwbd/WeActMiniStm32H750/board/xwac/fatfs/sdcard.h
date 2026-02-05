@@ -25,6 +25,5 @@
 
 void sdcard_fatfs_mount(void);
 void sdcard_fatfs_unmount(void);
-void sdcard_fatfs_tst(void);
 
 #endif /* board/xwac/fatfs/sdcard.h */

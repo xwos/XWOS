@@ -31,6 +31,7 @@ extern "C" {
 
 /* USER CODE BEGIN Includes */
 #include "stm32h7xx_ll_rtc.h"
+#include <time.h>
 
 /* USER CODE END Includes */
 
@@ -43,6 +44,8 @@ extern RTC_HandleTypeDef hrtc;
 void MX_RTC_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+xwer_t MX_RTC_Set_DateTime(struct tm * tm, suseconds_t ms);
+xwer_t MX_RTC_Get_DateTime(struct tm * tm, suseconds_t * ms);
 
 /* USER CODE END Prototypes */
 
@@ -51,4 +54,3 @@ void MX_RTC_Init(void);
 #endif
 
 #endif /* __RTC_H__ */
-

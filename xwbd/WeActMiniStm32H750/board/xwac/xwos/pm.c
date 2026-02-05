@@ -20,55 +20,39 @@
 
 #include "board/std.h"
 #include <xwos/osal/pm.h>
-#include <xwcd/ds/xwds.h>
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
-#include "bm/Stm32Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_cortex.h"
-#include "bm/Stm32Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_pwr.h"
-#include "bm/Stm32Hal/CubeMX/Core/Inc/main.h"
-#include "bm/Stm32Hal/xwds/device.h"
-
-extern void SystemClock_Config(void);
+#include <bm/Stm32Hal/mi.h>
 
 void xwosac_pmcb_resume(void * arg)
 {
-        __xwcc_unused xwer_t rc;
+        xwsq_t ctx;
         xwirq_t irq;
 
         XWOS_UNUSED(arg);
-        rc = xwos_irq_get_id(&irq); /* 获取中断号，用于调试 */
-        xwds_pm_resume(&stm32xwds); /* 恢复所有设备 */
+        xwos_skd_get_context_lc(&ctx, &irq); /* 获取上下文以及中断号，用于调试 */
+        stm32hal_resume();
 }
 
 void xwosac_pmcb_suspend(void * arg)
 {
-        __xwcc_unused xwer_t rc;
+        xwsq_t ctx;
         xwirq_t irq;
 
         XWOS_UNUSED(arg);
-        rc = xwos_irq_get_id(&irq); /* 获取中断号或上下文，用于调试 */
-        xwds_pm_suspend(&stm32xwds); /* 暂停所有设备 */
-
-        /* 设置休眠方式为STOP模式：
-           STOP模式下寄存器与内部RAM数据不丢失，
-           因此休眠方式为SuspendToRAM，唤醒后运行状态可恢复。*/
-        LL_PWR_SetRegulModeDS(LL_PWR_REGU_DSMODE_LOW_POWER);
-        LL_PWR_EnableFlashPowerDown();
-        LL_PWR_CPU_SetD1PowerMode(LL_PWR_CPU_MODE_D1STOP);
-        LL_PWR_CPU_SetD2PowerMode(LL_PWR_CPU_MODE_D2STOP);
-        LL_PWR_CPU_SetD3PowerMode(LL_PWR_CPU_MODE_D3STOP);
-        LL_LPM_EnableDeepSleep();
+        xwos_skd_get_context_lc(&ctx, &irq); /* 获取上下文以及中断号，用于调试 */
+        stm32hal_suspend();
 }
 
 void xwosac_pmcb_wakeup(void * arg)
 {
         XWOS_UNUSED(arg);
-        LL_LPM_EnableSleep(); /* 清除DEEPSLEEP位 */
-        SystemClock_Config(); /* 从STOP模式恢复后，需要重新配置时钟 */
+        stm32hal_wakeup();
 }
 
 void xwosac_pmcb_sleep(void * arg)
 {
         XWOS_UNUSED(arg);
+        stm32hal_sleep();
         armv7m_wfi(); /* 通过 WFI 指令进入STOP模式 */
 }
 

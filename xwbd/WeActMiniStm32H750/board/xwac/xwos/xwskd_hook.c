@@ -21,7 +21,8 @@
 #include "board/std.h"
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include <xwos/ospl/skd.h>
-#include "bm/AutosarCp/os/OsCfg.h"
+#include <bm/AutosarCp/os/OsCfg.h>
+#include <bm/Stm32Hal/mi.h>
 
 __xwos_code
 void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
@@ -30,14 +31,11 @@ void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
         armv7m_wfi();
 }
 
-extern
-void HAL_IncTick(void);
-
 __xwos_code
 void board_xwskd_syshwt_hook(struct xwospl_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
-        HAL_IncTick();
+        stm32hal_inc_tick();
         Rte_TickCounter_Drive();
 }
 

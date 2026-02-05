@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：XWOS适配层：库：CRC32
+ * @brief 板级描述层：XWOS适配层：库：CRC
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __board_xwac_xwlib_crc_h__
-#define __board_xwac_xwlib_crc_h__
+#ifndef board_xwac_xwlib_crc_h__
+#define board_xwac_xwlib_crc_h__
 
 #include "board/std.h"
 
