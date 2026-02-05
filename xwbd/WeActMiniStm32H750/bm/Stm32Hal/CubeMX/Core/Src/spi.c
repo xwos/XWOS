@@ -215,7 +215,6 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
     HAL_NVIC_SetPriority(SPI1_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(SPI1_IRQn);
   /* USER CODE BEGIN SPI1_MspInit 1 */
-    hspi1_drvdata.halhdl = &hspi1;
     xwos_splk_init(&hspi1_drvdata.splk);
     xwos_cond_init(&hspi1_drvdata.cond);
     hspi1_drvdata.txd = NULL;
@@ -296,7 +295,6 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
     HAL_NVIC_SetPriority(SPI4_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(SPI4_IRQn);
   /* USER CODE BEGIN SPI4_MspInit 1 */
-    hspi4_drvdata.halhdl = &hspi4;
     xwos_splk_init(&hspi4_drvdata.splk);
     xwos_cond_init(&hspi4_drvdata.cond);
     hspi4_drvdata.txd = NULL;
@@ -373,22 +371,6 @@ void MX_SPI1_DeInit(void)
   HAL_SPI_DeInit(&hspi1);
 }
 
-xwer_t MX_SPI1_ReInit(const SPI_InitTypeDef * cfg)
-{
-  HAL_StatusTypeDef hrc;
-  xwer_t rc;
-
-  HAL_SPI_DeInit(&hspi1);
-  hspi1.Init = *cfg;
-  hrc = HAL_SPI_Init(&hspi1);
-  if (HAL_OK != hrc) {
-    rc = -EIO;
-  } else {
-    rc = XWOK;
-  }
-  return rc;
-}
-
 xwer_t MX_SPI1_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size)
 {
   HAL_StatusTypeDef hrc;
@@ -446,7 +428,7 @@ xwer_t MX_SPI1_Abort(void)
 
 void MX_SPI1_TxCpltCallback(SPI_HandleTypeDef * hspi)
 {
-  stm32xwds_spim1_cb_xfercplt(hspi1_drvdata.spim, XWOK);
+  stm32xwds_spim_on_complete(hspi1_drvdata.spim, XWOK);
 }
 
 void MX_SPI1_RxCpltCallback(SPI_HandleTypeDef * hspi)
@@ -455,7 +437,7 @@ void MX_SPI1_RxCpltCallback(SPI_HandleTypeDef * hspi)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi1_drvdata.mem.rx, MX_SPI_MEM_MAXSIZE);
 #endif
   memcpy(hspi1_drvdata.rxb, hspi1_drvdata.mem.rx, hspi1_drvdata.size);
-  stm32xwds_spim1_cb_xfercplt(hspi1_drvdata.spim, XWOK);
+  stm32xwds_spim_on_complete(hspi1_drvdata.spim, XWOK);
 }
 
 void MX_SPI1_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
@@ -464,7 +446,7 @@ void MX_SPI1_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi1_drvdata.mem.rx, MX_SPI_MEM_MAXSIZE);
 #endif
   memcpy(hspi1_drvdata.rxb, hspi1_drvdata.mem.rx, hspi1_drvdata.size);
-  stm32xwds_spim1_cb_xfercplt(hspi1_drvdata.spim, XWOK);
+  stm32xwds_spim_on_complete(hspi1_drvdata.spim, XWOK);
 }
 
 void MX_SPI1_TxHalfCpltCallback(SPI_HandleTypeDef * hspi)
@@ -482,39 +464,23 @@ void MX_SPI1_TxRxHalfCpltCallback(SPI_HandleTypeDef * hspi)
 void MX_SPI1_ErrorCallback(SPI_HandleTypeDef * hspi)
 {
   if (hspi->ErrorCode & HAL_SPI_ERROR_TIMEOUT) {
-    stm32xwds_spim1_cb_xfercplt(hspi1_drvdata.spim, -ETIMEDOUT);
+    stm32xwds_spim_on_complete(hspi1_drvdata.spim, -ETIMEDOUT);
   } else if (HAL_SPI_ERROR_NONE != hspi->ErrorCode) {
-    stm32xwds_spim1_cb_xfercplt(hspi1_drvdata.spim, -EIO);
+    stm32xwds_spim_on_complete(hspi1_drvdata.spim, -EIO);
   } else {
-    stm32xwds_spim1_cb_xfercplt(hspi1_drvdata.spim, -EBUG);
+    stm32xwds_spim_on_complete(hspi1_drvdata.spim, -EBUG);
   }
 }
 
 void MX_SPI1_AbortCpltCallback(SPI_HandleTypeDef * hspi)
 {
-  stm32xwds_spim1_cb_xfercplt(hspi1_drvdata.spim, -ECONNABORTED);
+  stm32xwds_spim_on_complete(hspi1_drvdata.spim, -ECONNABORTED);
 }
 
 /* SPI4 */
 void MX_SPI4_DeInit(void)
 {
   HAL_SPI_DeInit(&hspi4);
-}
-
-xwer_t MX_SPI4_ReInit(const SPI_InitTypeDef * cfg)
-{
-  HAL_StatusTypeDef hrc;
-  xwer_t rc;
-
-  HAL_SPI_DeInit(&hspi4);
-  hspi4.Init = *cfg;
-  hrc = HAL_SPI_Init(&hspi4);
-  if (HAL_OK != hrc) {
-    rc = -EIO;
-  } else {
-    rc = XWOK;
-  }
-  return rc;
 }
 
 xwer_t MX_SPI4_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size)
@@ -574,7 +540,7 @@ xwer_t MX_SPI4_Abort(void)
 
 void MX_SPI4_TxCpltCallback(SPI_HandleTypeDef * hspi)
 {
-  stm32xwds_spim4_cb_xfercplt(hspi4_drvdata.spim, XWOK);
+  stm32xwds_spim_on_complete(hspi4_drvdata.spim, XWOK);
 }
 
 void MX_SPI4_RxCpltCallback(SPI_HandleTypeDef * hspi)
@@ -583,7 +549,7 @@ void MX_SPI4_RxCpltCallback(SPI_HandleTypeDef * hspi)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi4_drvdata.mem.rx, MX_SPI_MEM_MAXSIZE);
 #endif
   memcpy(hspi4_drvdata.rxb, hspi4_drvdata.mem.rx, hspi4_drvdata.size);
-  stm32xwds_spim4_cb_xfercplt(hspi4_drvdata.spim, XWOK);
+  stm32xwds_spim_on_complete(hspi4_drvdata.spim, XWOK);
 }
 
 void MX_SPI4_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
@@ -592,7 +558,7 @@ void MX_SPI4_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi4_drvdata.mem.rx, MX_SPI_MEM_MAXSIZE);
 #endif
   memcpy(hspi4_drvdata.rxb, hspi4_drvdata.mem.rx, hspi4_drvdata.size);
-  stm32xwds_spim4_cb_xfercplt(hspi4_drvdata.spim, XWOK);
+  stm32xwds_spim_on_complete(hspi4_drvdata.spim, XWOK);
 }
 
 void MX_SPI4_TxHalfCpltCallback(SPI_HandleTypeDef * hspi)
@@ -610,17 +576,17 @@ void MX_SPI4_TxRxHalfCpltCallback(SPI_HandleTypeDef * hspi)
 void MX_SPI4_ErrorCallback(SPI_HandleTypeDef * hspi)
 {
   if (hspi->ErrorCode & HAL_SPI_ERROR_TIMEOUT) {
-    stm32xwds_spim4_cb_xfercplt(hspi4_drvdata.spim, -ETIMEDOUT);
+    stm32xwds_spim_on_complete(hspi4_drvdata.spim, -ETIMEDOUT);
   } else if (HAL_SPI_ERROR_NONE != hspi->ErrorCode) {
-    stm32xwds_spim4_cb_xfercplt(hspi4_drvdata.spim, -EIO);
+    stm32xwds_spim_on_complete(hspi4_drvdata.spim, -EIO);
   } else {
-    stm32xwds_spim4_cb_xfercplt(hspi4_drvdata.spim, -EBUG);
+    stm32xwds_spim_on_complete(hspi4_drvdata.spim, -EBUG);
   }
 }
 
 void MX_SPI4_AbortCpltCallback(SPI_HandleTypeDef * hspi)
 {
-  stm32xwds_spim4_cb_xfercplt(hspi4_drvdata.spim, -ECONNABORTED);
+  stm32xwds_spim_on_complete(hspi4_drvdata.spim, -ECONNABORTED);
 }
 
 /* Redefine HAL weak callback */
@@ -694,6 +660,71 @@ void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef * hspi)
   } else if (&hspi4 == hspi) {
     MX_SPI4_AbortCpltCallback(hspi);
   }
+}
+
+/* Unified XWDS to HAL interfaces */
+void MX_SPI_Init(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1U:
+      MX_SPI1_Init();
+      break;
+    case 4U:
+      MX_SPI4_Init();
+      break;
+    default:
+      break;
+  }
+}
+
+void MX_SPI_DeInit(xwu32_t hwid)
+{
+  switch (hwid) {
+    case 1U:
+      MX_SPI1_DeInit();
+      break;
+    case 4U:
+      MX_SPI4_DeInit();
+      break;
+    default:
+      break;
+  }
+}
+
+xwer_t MX_SPI_Xfer(xwu32_t hwid, const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size)
+{
+  xwer_t rc;
+
+  switch (hwid) {
+    case 1U:
+      rc = MX_SPI1_Xfer(txd, rxb, size);
+      break;
+    case 4U:
+      rc = MX_SPI4_Xfer(txd, rxb, size);
+      break;
+    default:
+      rc = -ENXIO;
+      break;
+  }
+  return rc;
+}
+
+xwer_t MX_SPI_Abort(xwu32_t hwid)
+{
+  xwer_t rc;
+
+  switch (hwid) {
+    case 1U:
+      rc = MX_SPI1_Abort();
+      break;
+    case 4U:
+      rc = MX_SPI4_Abort();
+      break;
+    default:
+      rc = -ENXIO;
+      break;
+  }
+  return rc;
 }
 
 /* USER CODE END 1 */
