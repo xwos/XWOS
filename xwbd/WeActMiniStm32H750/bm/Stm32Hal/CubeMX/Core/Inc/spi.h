@@ -44,7 +44,6 @@ extern SPI_HandleTypeDef hspi4;
 #define MX_SPI_MEM_MAXSIZE     128U /**< 单次最大发送的字节数 */
 
 struct MX_SPI_MasterDriverData {
-  SPI_HandleTypeDef * halhdl;
   struct xwds_spim * spim;
   struct xwos_cond cond; /**< 条件量 */
   struct xwos_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
@@ -67,15 +66,10 @@ void MX_SPI1_Init(void);
 void MX_SPI4_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void MX_SPI1_DeInit(void);
-xwer_t MX_SPI1_ReInit(const SPI_InitTypeDef * cfg);
-xwer_t MX_SPI1_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size);
-xwer_t MX_SPI1_Abort(void);
-
-void MX_SPI4_DeInit(void);
-xwer_t MX_SPI4_ReInit(const SPI_InitTypeDef * cfg);
-xwer_t MX_SPI4_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size);
-xwer_t MX_SPI4_Abort(void);
+void MX_SPI_Init(xwu32_t hwid);
+void MX_SPI_DeInit(xwu32_t hwid);
+xwer_t MX_SPI_Xfer(xwu32_t hwid, const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size);
+xwer_t MX_SPI_Abort(xwu32_t hwid);
 
 /* USER CODE END Prototypes */
 
@@ -84,4 +78,3 @@ xwer_t MX_SPI4_Abort(void);
 #endif
 
 #endif /* __SPI_H__ */
-
