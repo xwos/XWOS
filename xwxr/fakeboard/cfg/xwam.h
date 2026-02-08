@@ -43,7 +43,7 @@
 #define XWAMCFG_example_isc_xwmq                1
 #define XWAMCFG_example_isc_xwcq                1
 
-#define XWAMCFG_application_w25qrpt             1
+#define XWAMCFG_application_w25qpt              1
 #define XWAMCFG_application_ramcode             0
 
 #endif /* cfg/xwam.h */
