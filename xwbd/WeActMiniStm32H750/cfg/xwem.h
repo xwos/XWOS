@@ -26,6 +26,7 @@
 #define XWEMCFG_fs_littlefs                             1
 #define XWEMCFG_fs_spiffs                               0
 #define XWEMCFG_fs_dhara                                0
+#define XWEMCFG_cli_cherryrl                            1
 
 #define XWEMCFG_vm_lua                                  1
 #define XWEMCFG_vm_lua_INT_TYPE                         (LUA_INT_LONG)
