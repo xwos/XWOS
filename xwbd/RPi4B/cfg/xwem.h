@@ -27,11 +27,6 @@
 #define XWEMCFG_fs_spiffs                               0
 #define XWEMCFG_fs_dhara                                0
 #define XWEMCFG_cli_cherryrl                            1
-
 #define XWEMCFG_vm_lua                                  0
-#define XWEMCFG_vm_lua_INT_TYPE                         (LUA_INT_LONG)
-#define XWEMCFG_vm_lua_FLOAT_TYPE                       (LUA_FLOAT_DOUBLE)
-#define XWEMCFG_vm_lua_THD_STACK_SIZE                   (16384U)
-#define XWEMCFG_vm_lua_BRDLIBS                          1
 
 #endif /* cfg/xwem.h */

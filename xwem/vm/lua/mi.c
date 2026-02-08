@@ -21,6 +21,7 @@
 #include <xwos/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/thd.h>
+#include <xwem/vm/lua/xwlua/prefix.h>
 #include <xwem/vm/lua/xwlua/port.h>
 #include <xwem/vm/lua/mi.h>
 
