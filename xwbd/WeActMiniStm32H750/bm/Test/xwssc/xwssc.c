@@ -24,7 +24,7 @@
 #include <xwos/osal/thd.h>
 #include <board/xwac/xwssc/xwssc.h>
 
-#define LOGTAG "TST|XWSSC"
+#define LOGTAG "TST|XWSSC3"
 
 xwer_t xwssc3_txtsttask(void * arg)
 {

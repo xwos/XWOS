@@ -60,6 +60,8 @@
 #define BMCFG_AutosarCp_rte                     1
 #define BMCFG_RustApp                           1
 #define BMCFG_MainThread                        1
-#define BMCFG_Test                              1
+#define BMCFG_Test_eeprom                       1
+#define BMCFG_Test_w25qxx                       1
+#define BMCFG_Test_xwssc                        1
 
 #endif /* cfg/board.h */
