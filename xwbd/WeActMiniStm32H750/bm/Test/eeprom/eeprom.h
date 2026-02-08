@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 测试程序：xwssc
+ * @brief 测试程序：eeprom
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,12 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef bm_Test_xwssc_h__
-#define bm_Test_xwssc_h__
+#ifndef bm_Test_eeprom_eeprom_h__
+#define bm_Test_eeprom_eeprom_h__
 
 #include <board/std.h>
 
-void xwssc3_txtstthd_start(void);
-void xwssc3_rxtstthd_start(void);
+void tst_eeprom_init(void);
 
-#endif /* bm/Test/xwssc.h */
+#endif /* bm/Test/eeprom/eeprom.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 测试程序：W25QXX
+ * @brief 测试程序：xwssc
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef bm_Test_w25qxx_h__
-#define bm_Test_w25qxx_h__
+#ifndef bm_Test_xwssc_xwssc_h__
+#define bm_Test_xwssc_xwssc_h__
 
 #include <board/std.h>
 
-void tst_w25qxx_init(void);
+void xwssc3_txtstthd_start(void);
+void xwssc3_rxtstthd_start(void);
 
-#endif /* bm/Test/w25qxx.h */
+#endif /* bm/Test/xwssc/xwssc.h */

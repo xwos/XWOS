@@ -101,15 +101,15 @@ xwer_t mainthd_mainfunc(void * arg)
         xwlogf(I, MAINTHD_LOGTAG, "Init XWSSC.UART3 ...\r\n");
         xwssc3_init();
 
+        xwlogf(I, MAINTHD_LOGTAG, "Start Rust Applications ...\r\n");
+        xwrust_main();
+
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
         rc = xwlua_start();
         if (rc < 0) {
                 xwlogf(ERR, MAINTHD_LOGTAG, "Start Lua VM ... <rc:%d>", rc);
         }
 #endif
-
-        xwlogf(I, MAINTHD_LOGTAG, "Start Rust Applications ...\r\n");
-        xwrust_main();
 
         xwlogf(I, MAINTHD_LOGTAG, "Start the Blinky LED ...\r\n");
         xwds_gpio_req(&stm32xwds_soc, XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);

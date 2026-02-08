@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：用户程序：C++应用程序入口
+ * @brief 测试程序：W25QXX
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,6 +18,11 @@
  * > limitations under the License.
  */
 
-#include "xwam/example/cxx/CxxTestSThd.hxx"
+#ifndef bm_Test_w25qxx_w25qxx_h__
+#define bm_Test_w25qxx_w25qxx_h__
 
-CxxTestSThd gCxxTestSThd;
+#include <board/std.h>
+
+void tst_w25qxx_init(void);
+
+#endif /* bm/Test/w25qxx/w25qxx.h */
