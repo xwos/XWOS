@@ -42,12 +42,21 @@
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 #define XWMDCFG_isc_xwssc_TXTHD_PRIORITY                        \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define XWMDCFG_isc_xwssc_CXX                                   1
 
 /******** ******** Message Queue ******** ********/
 #define XWMDCFG_isc_xwmq                                        1
 
 /******** ******** Circular Queue ******** ********/
 #define XWMDCFG_isc_xwcq                                        1
+#define XWMDCFG_isc_xwcq_CXX                                    1
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      AUTOSAR classical Platform     ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+/******** ******** OS ******** ********/
+#define XWMDCFG_autosarcp_os                                    1
+#define XWMDCFG_autosarcp_os_USING_STDTYPES_H                   0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            C/C++ Runtime            ******** ********
@@ -57,11 +66,13 @@
 #define XWMDCFG_libc_newlibac_MEM                               1
 #define XWMDCFG_libc_newlibac_SPRINTF                           0
 #define XWMDCFG_libc_newlibac_FOPS                              1
+#define XWMDCFG_libc_newlibac_FATFS                             1
 #define XWMDCFG_libc_newlibac_TIME                              1
 #define XWMDCFG_libc_picolibcac_SETJMP                          1
 #define XWMDCFG_libc_picolibcac_MEM                             1
 #define XWMDCFG_libc_picolibcac_SPRINTF                         0
 #define XWMDCFG_libc_picolibcac_FOPS                            1
+#define XWMDCFG_libc_picolibcac_FATFS                           1
 #define XWMDCFG_libc_picolibcac_TIME                            1
 
 /******** ******** ******** ******** ******** ******** ******** ********
