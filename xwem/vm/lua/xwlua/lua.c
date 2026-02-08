@@ -463,8 +463,8 @@ static int handle_luainit (lua_State *L) {
 
 #else				/* }{ */
 
-#define lua_initreadline(L)     ((void)L)
-#define lua_readline(L,b,p)     xwlua_readline(L, b, p)
+#define lua_initreadline(L)     ((void)L, xwlua_cherryrl_init())
+#define lua_readline(L,b,p)     ((void)L, xwlua_cherryrl_readline(b, p))
 #define lua_saveline(L,line)	{ (void)L; (void)line; }
 #define lua_freeline(L,b)	{ (void)L; (void)b; }
 

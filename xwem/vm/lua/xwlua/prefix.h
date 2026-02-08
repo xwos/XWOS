@@ -24,10 +24,15 @@
 #include <xwos/standard.h>
 #include <xwos/lib/setjmp.h>
 
-void * xwlua_alloc(void * ud, void * ptr, size_t osize, size_t nsize);
-#define LUA_ALLOC       xwlua_alloc
+#define XWLUA_BRDLIBS           1
+#define XWLUA_THD_STACK_SIZE    (16384U)
 
-#define lua_writeline() (lua_writestring("\r\n", 2), fflush(stdout))
+#define LUA_MAXINPUT            512U
+
+void * xwlua_alloc(void * ud, void * ptr, size_t osize, size_t nsize);
+#define LUA_ALLOC               xwlua_alloc
+
+#define lua_writeline()         (lua_writestring("\r\n", 2), fflush(stdout))
 
 #define LUAI_THROW(L,c)		xwlib_longjmp((c)->b, 1)
 #define LUAI_TRY(L,c,a)		if (xwlib_setjmp((c)->b) == 0) { a }

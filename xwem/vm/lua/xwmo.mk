@@ -35,7 +35,7 @@ LUA_PORT += $(call XwmoWildcard,*.c,xwlua/xwds)
 
 XWMO_CSRCS := $(LUA_CORE) $(LUA_LIB) $(LUA_PORT)
 XWMO_CFLAGS := -Wno-sign-conversion
-XWMO_INCDIRS := $(call getXwmoDir) $(call getXwmoDir)/src
+XWMO_INCDIRS := $(call getXwmoDir) $(call getXwmoDir)/src $(call getXwmoDir)/cherryrl
 
 XWMO_CFLAGS_llvm := -Wno-format
 

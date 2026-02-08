@@ -32,7 +32,8 @@ struct xwlua_arg {
 
 extern struct xwmm_mempool * xwlua_mempool;
 
-int xwlua_readline(lua_State * L, char buffer[], const char * prompt);
+void xwlua_cherryrl_init(void);
+int xwlua_cherryrl_readline(char buffer[], const char * prompt);
 void xwlua_openlibs(lua_State * L);
 void xwlua_xt_openlibs(lua_State * L);
 xwer_t xwlua_task(void * arg);
@@ -43,7 +44,6 @@ xwer_t xwlua_task(void * arg);
 #define XWLUA_LIB_NAME          "xwlib"
 #define XWLUA_OS_NAME           "xwos"
 #define XWLUA_DS_NAME           "xwds"
-#define XWLUA_THD_STACK_SIZE    XWEMCFG_vm_lua_THD_STACK_SIZE
 
 LUAMOD_API int xwlua_open_vm(lua_State * L);
 LUAMOD_API int xwlua_open_xt(lua_State * L);
