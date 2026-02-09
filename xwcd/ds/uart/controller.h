@@ -38,15 +38,21 @@
  * CAPI `xwds_uartc_rx()` 与 `xwds_uartc_try_rx()` 用于从 **接收缓冲区** 获取数据。
  *
  *
- * ## 异步发送
- *
- * 异步发送 `xwds_uartc_eq()` 只会将数据拷贝到发送缓冲区，
- * 不会等待发送结果，可在中断中使用。
- *
- *
  * ## 同步发送
  *
  * 同步发送 `xwds_uartc_tx()` 会阻塞调用者，等待发送结果，因此只能在线程中使用。
+ *
+ *
+ * ## 紧急发送
+ *
+ * 紧急发送 `xwds_uartc_etx()` 不会阻塞调用者，但会忙等发送结果，
+ * 适用于无法进中断的场合，例如异常内。
+ *
+ *
+ * ## 异步发送
+ *
+ * 异步发送 `xwds_uartc_eq()` 只会将数据拷贝到发送缓冲区，
+ * 不会等待发送结果，发送结果通过回调函数通知，可在中断中使用。
  *
  *
  * ## **BSP驱动层** 的适配工作
@@ -83,6 +89,12 @@
  *
  * 同步发送 `xwds_uartc_tx()` 需要 **BSP驱动层** 实现 `xwds_uartc_driver.tx` 函数。
  *
+ * ### 适配 `xwds_uartc_etx()`
+ *
+ * 紧急发送 `xwds_uartc_etx()` 需要 **BSP驱动层** 实现 `xwds_uartc_driver.etx` 函数。
+ * **BSP驱动层** 需要使用 `while()` 循环忙等UART状态寄存器的标志，不触发中断进行处理。
+ *
+ *
  * ### 适配 `xwds_uartc_eq()`
  *
  * 异步发送 `xwds_uartc_eq()` 需要 **BSP驱动层** 实现 `xwds_uartc_driver.eq` 函数。
@@ -93,7 +105,6 @@
  *
  * **BSP驱动层** 还需要实现一个 **BUSY** 标志，此CAPI不阻塞，当检测到BUSY标志时
  * 需要立即返回 `-EBUSY` 。
- *
  *
  * @{
  */
@@ -180,6 +191,8 @@ struct xwds_uartc_driver {
         xwer_t (* tx)(struct xwds_uartc * /*uartc*/,
                       const xwu8_t * /*data*/, xwsz_t * /*size*/,
                       xwtm_t /*to*/); /**< 发送，并等待发送结果 */
+        xwer_t (* etx)(struct xwds_uartc * /*uartc*/,
+                       const xwu8_t * /*data*/, xwsz_t * /*size*/); /**< 紧急发送 */
         xwer_t (* eq)(struct xwds_uartc * /*uartc*/,
                       const xwu8_t * /*data*/, xwsz_t * /*size*/,
                       xwds_uartc_eqcb_f /*cb*/); /**< 发送，但不等待发送结果 */
@@ -284,6 +297,25 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc,
 xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                      const xwu8_t * data, xwsz_t * size,
                      xwtm_t to);
+
+/**
+ * @brief XWDS API：紧急发送
+ * @param[in] uartc: UART控制器对象指针
+ * @param[in] data: 待发送的数据的缓冲区
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
+ * + (O) 作为输出时，返回实际发送的数据大小
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 不支持此操作
+ * @note
+ * + 上下文：任意
+ * @details
+ * 此函数不会阻塞调用者，但会忙等发送结果，适用于无法进中断的场合，例如异常内。
+ */
+xwer_t xwds_uartc_etx(struct xwds_uartc * uartc,
+                      const xwu8_t * data, xwsz_t * size);
 
 /**
  * @brief XWDS API：异步发送

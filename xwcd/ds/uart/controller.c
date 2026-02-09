@@ -386,6 +386,39 @@ err_uartc_grab:
 }
 
 __xwds_api
+xwer_t xwds_uartc_etx(struct xwds_uartc * uartc,
+                      const xwu8_t * data, xwsz_t * size)
+{
+        const struct xwds_uartc_driver * drv;
+        xwer_t rc;
+
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(data, "nullptr", -EFAULT);
+        XWDS_VALIDATE(size, "nullptr", -EFAULT);
+
+        rc = xwds_uartc_grab(uartc);
+        if (rc < 0) {
+                goto err_uartc_grab;
+        }
+        drv = xwds_cast(const struct xwds_uartc_driver *, uartc->dev.drv);
+        if ((drv) && (drv->etx)) {
+                rc = drv->etx(uartc, data, size);
+        } else {
+                rc = -ENOSYS;
+        }
+        if (rc < 0) {
+                goto err_eq;
+        }
+        xwds_uartc_put(uartc);
+        return XWOK;
+
+err_eq:
+        xwds_uartc_put(uartc);
+err_uartc_grab:
+        return rc;
+}
+
+__xwds_api
 xwer_t xwds_uartc_eq(struct xwds_uartc * uartc,
                      const xwu8_t * data, xwsz_t * size,
                      xwds_uartc_eqcb_f cb)
