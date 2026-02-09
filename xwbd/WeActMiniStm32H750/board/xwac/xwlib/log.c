@@ -19,9 +19,27 @@
  */
 
 #include "board/std.h"
+#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <bm/Stm32Hal/mi.h>
 
 xwer_t board_log_write(const char * s, xwsz_t * n)
 {
-        return xwds_uartc_tx(&stm32xwds_usart1, (const xwu8_t *)s, n, XWTM_MAX);
+        xwsq_t ctx;
+        xwer_t rc;
+
+        xwos_skd_get_context_lc(&ctx, NULL);
+        if (XWOS_SKD_CONTEXT_BOOT == ctx) {
+                rc = -EPERM;
+        } else if (XWOS_SKD_CONTEXT_THD == ctx) {
+                if (xwos_cthd_shld_frz()) {
+                        rc = xwds_uartc_etx(&stm32xwds_usart1, (const xwu8_t *)s, n);
+                } else {
+                        rc = xwds_uartc_tx(&stm32xwds_usart1, (const xwu8_t *)s, n,
+                                           XWTM_MAX);
+                }
+        } else {
+                rc = xwds_uartc_etx(&stm32xwds_usart1, (const xwu8_t *)s, n);
+        }
+        return rc;
 }

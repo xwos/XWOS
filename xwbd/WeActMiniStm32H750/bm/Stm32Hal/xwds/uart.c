@@ -137,6 +137,13 @@ err_sem_wait_to:
 }
 
 static
+xwer_t stm32xwds_usart_drv_etx(struct xwds_uartc * uartc,
+                               const xwu8_t * data, xwsz_t * size)
+{
+        return MX_USART_ETx(uartc->dev.id, data, *size);
+}
+
+static
 xwer_t stm32xwds_usart_drv_eq(struct xwds_uartc * uartc,
                               const xwu8_t * data, xwsz_t * size,
                               xwds_uartc_eqcb_f cb)
@@ -172,6 +179,14 @@ err_sem_trywait:
         return rc;
 }
 
+static
+xwer_t stm32xwds_usart_drv_putc(struct xwds_uartc * uartc,
+                                const xwu8_t byte)
+{
+        XWOS_UNUSED(uartc);
+        return MX_USART_Putc(uartc->dev.id, byte);
+}
+
 void stm32xwds_usart_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
 {
         struct MX_UART_DriverData * drvdata;
@@ -192,14 +207,6 @@ void stm32xwds_usart_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
                 cb(uartc, dmarc);
         }
         xwos_sem_post(&drvdata->tx.available);
-}
-
-static
-xwer_t stm32xwds_usart_drv_putc(struct xwds_uartc * uartc,
-                                const xwu8_t byte)
-{
-        XWOS_UNUSED(uartc);
-        return MX_USART_Putc(uartc->dev.id, byte);
 }
 
 void stm32xwds_usart_cb_rxdma_restart(struct xwds_uartc * uartc)
@@ -244,6 +251,7 @@ const struct xwds_uartc_driver stm32xwds_usart_drv = {
         },
         .cfg = stm32xwds_usart_drv_cfg,
         .tx = stm32xwds_usart_drv_tx,
+        .etx = stm32xwds_usart_drv_etx,
         .eq = stm32xwds_usart_drv_eq,
         .putc = stm32xwds_usart_drv_putc,
 };

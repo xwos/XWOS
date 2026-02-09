@@ -78,6 +78,7 @@ xwsq_t MX_USART_RXDMA_GetCounter(xwu32_t hwid);
 void MX_USART_TXDMA_Prepare(xwu32_t hwid, const xwu8_t * mem, xwsz_t size);
 xwer_t MX_USART_TXDMA_Start(xwu32_t hwid);
 xwer_t MX_USART_Putc(xwu32_t hwid, xwu8_t byte);
+xwer_t MX_USART_ETx(xwu32_t hwid, const xwu8_t * data, xwsz_t size);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

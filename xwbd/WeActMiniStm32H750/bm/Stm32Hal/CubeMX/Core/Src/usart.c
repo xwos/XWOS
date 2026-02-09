@@ -465,11 +465,6 @@ xwer_t MX_USART1_TXDMA_Start(void)
   return rc;
 }
 
-void MX_USART1_TxCpltCallback(UART_HandleTypeDef * huart)
-{
-  stm32xwds_usart_cb_txdma_cplt(huart1_drvdata.uartc, XWOK);
-}
-
 xwer_t MX_USART1_Putc(xwu8_t byte)
 {
   HAL_StatusTypeDef ret;
@@ -486,6 +481,29 @@ xwer_t MX_USART1_Putc(xwu8_t byte)
     rc = -EIO;
   }
   return rc;
+}
+
+xwer_t MX_USART1_ETx(const xwu8_t * data, xwsz_t size)
+{
+  HAL_StatusTypeDef ret;
+  xwer_t rc;
+
+  ret = HAL_UART_Transmit(&huart1, data, size, 10000);
+  if (HAL_OK == ret) {
+    rc = XWOK;
+  } else if (HAL_TIMEOUT == ret) {
+    rc = -EIO;
+  } else if (HAL_BUSY == ret) {
+    rc = -EBUSY;
+  } else {
+    rc = -EIO;
+  }
+  return rc;
+}
+
+void MX_USART1_TxCpltCallback(UART_HandleTypeDef * huart)
+{
+  stm32xwds_usart_cb_txdma_cplt(huart1_drvdata.uartc, XWOK);
 }
 
 void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
@@ -633,11 +651,6 @@ xwer_t MX_USART3_TXDMA_Start(void)
   return rc;
 }
 
-void MX_USART3_TxCpltCallback(UART_HandleTypeDef * huart)
-{
-  stm32xwds_usart_cb_txdma_cplt(huart3_drvdata.uartc, XWOK);
-}
-
 xwer_t MX_USART3_Putc(xwu8_t byte)
 {
   HAL_StatusTypeDef ret;
@@ -647,13 +660,36 @@ xwer_t MX_USART3_Putc(xwu8_t byte)
   if (HAL_OK == ret) {
     rc = XWOK;
   } else if (HAL_TIMEOUT == ret) {
-    rc = -ETIMEDOUT;
+    rc = -EIO;
   } else if (HAL_BUSY == ret) {
     rc = -EBUSY;
   } else {
     rc = -EIO;
   }
   return rc;
+}
+
+xwer_t MX_USART3_ETx(const xwu8_t * data, xwsz_t size)
+{
+  HAL_StatusTypeDef ret;
+  xwer_t rc;
+
+  ret = HAL_UART_Transmit(&huart3, data, size, 10000);
+  if (HAL_OK == ret) {
+    rc = XWOK;
+  } else if (HAL_TIMEOUT == ret) {
+    rc = -EIO;
+  } else if (HAL_BUSY == ret) {
+    rc = -EBUSY;
+  } else {
+    rc = -EIO;
+  }
+  return rc;
+}
+
+void MX_USART3_TxCpltCallback(UART_HandleTypeDef * huart)
+{
+  stm32xwds_usart_cb_txdma_cplt(huart3_drvdata.uartc, XWOK);
 }
 
 void MX_USART3_ErrorCallback(UART_HandleTypeDef * huart)
@@ -890,6 +926,24 @@ xwer_t MX_USART_Putc(xwu32_t hwid, xwu8_t byte)
       break;
     case 3U:
       rc = MX_USART3_Putc(byte);
+      break;
+    default:
+      rc = -ENXIO;
+      break;
+  }
+  return rc;
+}
+
+xwer_t MX_USART_ETx(xwu32_t hwid, const xwu8_t * data, xwsz_t size)
+{
+  xwer_t rc;
+
+  switch (hwid) {
+    case 1U:
+      rc = MX_USART1_ETx(data, size);
+      break;
+    case 3U:
+      rc = MX_USART3_ETx(data, size);
       break;
     default:
       rc = -ENXIO;

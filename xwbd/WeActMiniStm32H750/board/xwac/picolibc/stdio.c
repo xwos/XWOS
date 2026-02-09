@@ -20,7 +20,9 @@
 
 #include "board/std.h"
 #include <xwos/lib/errno.h>
-#include "bm/Stm32Hal/xwds/device.h"
+#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
+#include <bm/Stm32Hal/mi.h>
 
 xwssz_t picolibcac_fops_read_stdin(int fd, void * buf, xwsz_t cnt)
 {
@@ -31,7 +33,9 @@ xwssz_t picolibcac_fops_read_stdin(int fd, void * buf, xwsz_t cnt)
         XWOS_UNUSED(fd);
         do {
                 cnt = bufsz;
-                rc = xwds_uartc_rx(&stm32xwds_usart1, buf, &cnt, xwtm_ft(xwtm_ms(20)));
+                rc = xwds_uartc_rx(&stm32xwds_usart1,
+                                   buf, &cnt,
+                                   xwtm_ft(xwtm_ms(20)));
                 if (-ETIMEDOUT == rc) {
                         rdsz = (xwssz_t)cnt;
                         errno = 0;
@@ -49,12 +53,27 @@ xwssz_t picolibcac_fops_read_stdin(int fd, void * buf, xwsz_t cnt)
 
 xwssz_t picolibcac_fops_write_stdout(int fd, const void * data, xwsz_t cnt)
 {
+        xwsq_t ctx;
         xwssz_t wrsz;
         xwer_t rc;
-
         XWOS_UNUSED(fd);
 
-        rc = xwds_uartc_tx(&stm32xwds_usart1, data, &cnt, XWTM_MAX);
+        xwos_skd_get_context_lc(&ctx, NULL);
+        if (XWOS_SKD_CONTEXT_BOOT == ctx) {
+                rc = -EPERM;
+        } else if (XWOS_SKD_CONTEXT_THD == ctx) {
+                if (xwos_cthd_shld_frz()) {
+                        rc = xwds_uartc_etx(&stm32xwds_usart1,
+                                            (const xwu8_t *)data, &cnt);
+                } else {
+                        rc = xwds_uartc_tx(&stm32xwds_usart1,
+                                           (const xwu8_t *)data, &cnt,
+                                           XWTM_MAX);
+                }
+        } else {
+                rc = xwds_uartc_etx(&stm32xwds_usart1,
+                                    (const xwu8_t *)data, &cnt);
+        }
         errno = -rc;
         if (rc < 0) {
                 wrsz = -1;
@@ -66,12 +85,26 @@ xwssz_t picolibcac_fops_write_stdout(int fd, const void * data, xwsz_t cnt)
 
 xwssz_t picolibcac_fops_write_stderr(int fd, const void * data, xwsz_t cnt)
 {
+        xwsq_t ctx;
         xwssz_t wrsz;
         xwer_t rc;
-
         XWOS_UNUSED(fd);
 
-        rc = xwds_uartc_tx(&stm32xwds_usart1, data, &cnt, XWTM_MAX);
+        xwos_skd_get_context_lc(&ctx, NULL);
+        if (XWOS_SKD_CONTEXT_BOOT == ctx) {
+                rc = -EPERM;
+        } else if (XWOS_SKD_CONTEXT_THD == ctx) {
+                if (xwos_cthd_shld_frz()) {
+                        rc = xwds_uartc_etx(&stm32xwds_usart1,
+                                            (const xwu8_t *)data, &cnt);
+                } else {
+                        rc = xwds_uartc_tx(&stm32xwds_usart1,
+                                           (const xwu8_t *)data, &cnt,
+                                           XWTM_MAX);
+                }
+        } else {
+                rc = xwds_uartc_etx(&stm32xwds_usart1, (const xwu8_t *)data, &cnt);
+        }
         errno = -rc;
         if (rc < 0) {
                 wrsz = -1;
