@@ -104,13 +104,13 @@ AFLAGS = -mabi=aapcs -m$(ENDIAN) -mthumb \
 
 CFLAGS = -mabi=aapcs -mthumb -std=gnu18 --sysroot=$(SYSROOT) \
          -m$(ENDIAN) -mno-unaligned-access \
-         -fno-omit-frame-pointer -ffunction-sections -fdata-sections -ftls-model=local-exec \
+         -fomit-frame-pointer -ffunction-sections -fdata-sections -ftls-model=local-exec \
          -g -g3 -gdwarf-4 -fverbose-asm \
          $(WARN) $(PERDEF)
 
 CXXFLAGS = -mabi=aapcs -mthumb -std=gnu++17 --sysroot=$(SYSROOT) \
            -m$(ENDIAN) -mno-unaligned-access \
-           -fno-omit-frame-pointer -ffunction-sections -fdata-sections -ftls-model=local-exec \
+           -fomit-frame-pointer -ffunction-sections -fdata-sections -ftls-model=local-exec \
            -g -g3 -gdwarf-4 -fverbose-asm \
            $(WARN) $(PERDEF)
 
