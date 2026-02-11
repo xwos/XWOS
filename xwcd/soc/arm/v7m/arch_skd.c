@@ -215,6 +215,8 @@ void arch_skd_init_stack(struct xwospl_skdobj_stack * stk,
         }
 }
 
+extern xwu8_t armv7m_isr_stack_top[];
+
 /**
  * @brief 启动调度器的SVC(svc 9)的处理函数
  * @param[in] xwskd: 调度器的指针
@@ -251,11 +253,16 @@ void arch_svc_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
         __asm__ volatile("      push    {lr}");
         __asm__ volatile("      sub     sp, #4");
         __asm__ volatile("      bl      xwosplcb_skd_post_start_lic");
+        __asm__ volatile("      add     sp, #4");
+        __asm__ volatile("      pop     {r0}");
         __asm__ volatile("      dsb");
         __asm__ volatile("      isb");
         __asm__ volatile("      clrex");
-        __asm__ volatile("      add     sp, #4");
-        __asm__ volatile("      pop     {pc}");
+        __asm__ volatile("      mov     sp, %[__sp_top]"
+                         :
+                         :[__sp_top] "r" (armv7m_isr_stack_top)
+                         :"r0");
+        __asm__ volatile("      bx      r0");
 }
 
 /**

@@ -56,86 +56,158 @@ void arch_isr_reset(void)
         __asm__ volatile("      bl      xwos_main");
 }
 
+#if defined(BRDCFG_ESR_NMI) && (1 == BRDCFG_ESR_NMI)
+extern void board_esr_nmi(void);
+#endif
+
 /**
  * @brief NMI ISR
  */
 __xwbsp_isr
 void arch_isr_nmi(void)
 {
-        __xwcc_unused volatile struct armv7m_scs_reg * scs;
-
-        scs = &armv7m_scs;
-        while (true) {
-        }
+#if defined(BRDCFG_ESR_NMI) && (1 == BRDCFG_ESR_NMI)
+        board_esr_nmi();
+#endif
 }
+
+#if defined(BRDCFG_ESR_HARDFAULT) && (1 == BRDCFG_ESR_HARDFAULT)
+extern void board_esr_hardfault(xwreg_t lr, xwreg_t sp);
+#endif
 
 /**
  * @brief Hardfault ISR
  */
-__xwbsp_isr
+__xwbsp_isr __xwcc_naked
 void arch_isr_hardfault(void)
 {
-        __xwcc_unused volatile struct armv7m_scs_reg * scs;
-
-        scs = &armv7m_scs;
+#if defined(BRDCFG_ESR_HARDFAULT) && (1 == BRDCFG_ESR_HARDFAULT)
+        xwreg_t lr;
+        xwreg_t sp;
+        __asm__ volatile(
+        "mov    %[__lr], lr\n"
+        "mov    %[__sp], sp\n"
+        : [__lr] "=&r" (lr),
+          [__sp] "=&r" (sp)
+        :
+        : "memory", "cc"
+        );
+        board_esr_hardfault(lr, sp);
+#else
         arch_skd_chk_stk();
+#endif
         while (true) {
         }
 }
+
+#if defined(BRDCFG_ESR_MM) && (1 == BRDCFG_ESR_MM)
+extern void board_esr_mm(xwreg_t lr, xwreg_t sp);
+#endif
 
 /**
  * @brief MM ISR
  */
-__xwbsp_isr
+__xwbsp_isr __xwcc_naked
 void arch_isr_mm(void)
 {
-        __xwcc_unused volatile struct armv7m_scs_reg * scs;
-
-        scs = &armv7m_scs;
+#if defined(BRDCFG_ESR_MM) && (1 == BRDCFG_ESR_MM)
+        xwreg_t lr;
+        xwreg_t sp;
+        __asm__ volatile(
+        "mov    %[__lr], lr\n"
+        "mov    %[__sp], sp\n"
+        : [__lr] "=&r" (lr),
+          [__sp] "=&r" (sp)
+        :
+        : "memory", "cc"
+        );
+        board_esr_mm(lr ,sp);
+#else
         arch_skd_chk_stk();
-        while (true) {
-        }
+#endif
 }
+
+#if defined(BRDCFG_ESR_BUSFAULT) && (1 == BRDCFG_ESR_BUSFAULT)
+extern void board_esr_busfault(xwreg_t lr, xwreg_t sp);
+#endif
 
 /**
  * @brief busfault ISR
  */
-__xwbsp_isr
+__xwbsp_isr __xwcc_naked
 void arch_isr_busfault(void)
 {
-        __xwcc_unused volatile struct armv7m_scs_reg * scs;
-
-        scs = &armv7m_scs;
+#if defined(BRDCFG_ESR_BUSFAULT) && (1 == BRDCFG_ESR_BUSFAULT)
+        xwreg_t lr;
+        xwreg_t sp;
+        __asm__ volatile(
+        "mov    %[__lr], lr\n"
+        "mov    %[__sp], sp\n"
+        : [__lr] "=&r" (lr),
+          [__sp] "=&r" (sp)
+        :
+        : "memory", "cc"
+        );
+        board_esr_busfault(lr, sp);
+#else
         arch_skd_chk_stk();
+#endif
         while (true) {
         }
 }
+
+#if defined(BRDCFG_ESR_USAGEFAULT) && (1 == BRDCFG_ESR_USAGEFAULT)
+extern void board_esr_usagefault(xwreg_t lr, xwreg_t sp);
+#endif
 
 /**
  * @brief usagefault ISR
  */
-__xwbsp_isr
+__xwbsp_isr __xwcc_naked
 void arch_isr_usagefault(void)
 {
-        __xwcc_unused volatile struct armv7m_scs_reg * scs;
-
-        scs = &armv7m_scs;
+#if defined(BRDCFG_ESR_USAGEFAULT) && (1 == BRDCFG_ESR_USAGEFAULT)
+        xwreg_t lr;
+        xwreg_t sp;
+        __asm__ volatile(
+        "mov    %[__lr], lr\n"
+        "mov    %[__sp], sp\n"
+        : [__lr] "=&r" (lr),
+          [__sp] "=&r" (sp)
+        :
+        : "memory", "cc"
+        );
+        board_esr_usagefault(lr, sp);
+#else
         arch_skd_chk_stk();
+#endif
         while (true) {
         }
 }
 
+#if defined(BRDCFG_ESR_DBGMON) && (1 == BRDCFG_ESR_DBGMON)
+extern void board_esr_dbgmon(xwreg_t lr, xwreg_t sp);
+#endif
+
 /**
  * @brief debugmon ISR
  */
-__xwbsp_isr
+__xwbsp_isr __xwcc_naked
 void arch_isr_dbgmon(void)
 {
-        __xwcc_unused volatile struct armv7m_scs_reg * scs;
-
-        scs = &armv7m_scs;
-        while (true) {
-        }
+#if defined(BRDCFG_ESR_DBGMON) && (1 == BRDCFG_ESR_DBGMON)
+        xwreg_t lr;
+        xwreg_t sp;
+        __asm__ volatile(
+        "mov    %[__lr], lr\n"
+        "mov    %[__sp], sp\n"
+        : [__lr] "=&r" (lr),
+          [__sp] "=&r" (sp)
+        :
+        : "memory", "cc"
+        );
+        board_esr_dbgmon(lr, sp);
+#endif
 }
 
 /**

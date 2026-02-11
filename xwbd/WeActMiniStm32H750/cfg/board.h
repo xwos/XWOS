@@ -32,6 +32,16 @@
 #define BRDCFG_XWSKD_THD_POSTINIT_HOOK          1
 
 /******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********    Fault HOOK     ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define BRDCFG_ESR_NMI                          1
+#define BRDCFG_ESR_HARDFAULT                    1
+#define BRDCFG_ESR_MM                           1
+#define BRDCFG_ESR_BUSFAULT                     1
+#define BRDCFG_ESR_USAGEFAULT                   1
+#define BRDCFG_ESR_DBGMON                       1
+
+/******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       xwlib       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BRDCFG_LOG                              1
