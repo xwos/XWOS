@@ -19,6 +19,7 @@
  */
 
 #include "board/std.h"
+#include <bm/CmBacktrace/cm_backtrace.h>
 
 __xwbsp_isr
 void board_esr_nmi(void)
@@ -28,34 +29,29 @@ void board_esr_nmi(void)
 __xwbsp_isr
 void board_esr_hardfault(xwreg_t lr, xwreg_t sp)
 {
-        XWOS_UNUSED(lr);
-        XWOS_UNUSED(sp);
+        cm_backtrace_fault(lr, sp);
 }
 
 __xwbsp_isr
 void board_esr_mm(xwreg_t lr, xwreg_t sp)
 {
-        XWOS_UNUSED(lr);
-        XWOS_UNUSED(sp);
+        cm_backtrace_fault(lr, sp);
 }
 
 __xwbsp_isr
 void board_esr_busfault(xwreg_t lr, xwreg_t sp)
 {
-        XWOS_UNUSED(lr);
-        XWOS_UNUSED(sp);
+        cm_backtrace_fault(lr, sp);
 }
 
 __xwbsp_isr
 void board_esr_usagefault(xwreg_t lr, xwreg_t sp)
 {
-        XWOS_UNUSED(lr);
-        XWOS_UNUSED(sp);
+        cm_backtrace_fault(lr, sp);
 }
 
 __xwbsp_isr
 void board_esr_dbgmon(xwreg_t lr, xwreg_t sp)
 {
-        XWOS_UNUSED(lr);
-        XWOS_UNUSED(sp);
+        cm_backtrace_fault(lr, sp);
 }
