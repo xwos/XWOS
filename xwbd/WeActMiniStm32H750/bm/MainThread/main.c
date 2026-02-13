@@ -32,7 +32,6 @@
 #include <board/xwac/fatfs/sdcard.h>
 #include <board/xwac/xwssc/xwssc.h>
 #include <bm/Stm32Hal/mi.h>
-#include <bm/AutosarCp/rte/Rte.h>
 
 #include <xwos/lib/xwlog.h>
 #define MAINTHD_LOGTAG "MainThd"
@@ -62,8 +61,6 @@ xwer_t xwos_main(void)
                 goto err_thd_create;
         }
 
-        Rte_Init();
-
         rc = xwos_skd_start_lc();
         if (rc < 0) {
                 goto err_skd_start_lc;
@@ -87,7 +84,6 @@ xwer_t mainthd_mainfunc(void * arg)
         XWOS_UNUSED(arg);
 
         stm32hal_postinit();
-        Rte_Start();
         sdcard_fatfs_mount();
         xwds_st7735_draw(&stm32xwds_st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 
