@@ -110,7 +110,7 @@ xwer_t xwds_soc_get_wkup_source(struct xwds_soc * soc, xwu64_t * source)
         xwer_t rc;
 
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
-        XWDS_VALIDATE(reason, "nullptr", -EFAULT);
+        XWDS_VALIDATE(source, "nullptr", -EFAULT);
 
         rc = xwds_soc_grab(soc);
         if (rc < 0) {

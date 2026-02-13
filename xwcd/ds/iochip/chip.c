@@ -89,8 +89,6 @@ xwer_t xwds_iochip_vop_probe(struct xwds_iochip * iochip)
 {
         xwer_t rc;
 
-        XWDS_VALIDATE(iochip->xwccfg, "nullptr", -EFAULT);
-
         rc = xwds_device_vop_probe(&iochip->bc.dev);
         return rc;
 }
