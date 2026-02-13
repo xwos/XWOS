@@ -50,8 +50,7 @@ struct xwup_plwq;
 struct xwup_thd_attr {
         const char * name; /**< 线程的名字 */
         xwstk_t * stack; /**< 栈内存的基地址 */
-        xwsz_t stack_size; /**< 线程栈的大小，以字节(byte)为单位，
-                                注意与CPU的ABI接口规定的内存边界对齐 */
+        xwsz_t stack_size; /**< 线程栈的大小 */
         xwsz_t stack_guard_size; /**< 栈内存警戒线 */
         xwpr_t priority; /**< 优先级 */
         bool detached; /**< 是否为分离态 */
@@ -179,6 +178,7 @@ xwer_t xwup_thd_release(struct xwup_thd * thd, xwsq_t tik);
 xwer_t xwup_thd_grab(struct xwup_thd * thd);
 xwer_t xwup_thd_put(struct xwup_thd * thd);
 void xwup_thd_get_attr(struct xwup_thd * thd, struct xwup_thd_attr * attr);
+void xwup_thd_get_stack_info(struct xwup_thd * thd, struct xwup_skdobj_stack * stack);
 void xwup_cthd_yield(void);
 void xwup_cthd_exit(xwer_t rc);
 void xwup_thd_quit(struct xwup_thd * thd);

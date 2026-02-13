@@ -78,6 +78,22 @@ xwer_t xwosdl_thd_get_attr(struct xwosdl_thd * thd, xwsq_t tik,
 }
 
 __xwmp_code
+xwer_t xwosdl_thd_get_stack_info(struct xwosdl_thd * thd, xwsq_t tik,
+                                 struct xwosdl_thd_stack_info * info)
+{
+        xwer_t rc;
+
+        XWOS_VALIDATE((info), "nullptr", -EFAULT);
+
+        rc = xwmp_thd_acquire(thd, tik);
+        if (XWOK == rc) {
+                xwmp_thd_get_stack_info(thd, (struct xwmp_skdobj_stack *)info);
+                xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
+        }
+        return rc;
+}
+
+__xwmp_code
 xwer_t xwosdl_thd_intr(struct xwosdl_thd * thd, xwsq_t tik)
 {
         xwer_t rc;

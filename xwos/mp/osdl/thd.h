@@ -22,6 +22,7 @@
 #endif
 
 #define xwosdl_thd_attr xwmp_thd_attr
+#define xwosdl_thd_stack_info xwmp_skdobj_stack
 #define xwosdl_thd xwmp_thd
 typedef xwmp_thd_f xwosdl_thd_f;
 
@@ -76,6 +77,9 @@ xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
 
 xwer_t xwosdl_thd_get_attr(struct xwosdl_thd * thd, xwsq_t tik,
                            struct xwosdl_thd_attr * attr);
+
+xwer_t xwosdl_thd_get_stack_info(struct xwosdl_thd * thd, xwsq_t tik,
+                                 struct xwosdl_thd_stack_info * stack);
 
 xwer_t xwosdl_thd_intr(struct xwosdl_thd * thd, xwsq_t tik);
 

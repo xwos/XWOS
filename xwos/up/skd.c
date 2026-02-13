@@ -382,7 +382,7 @@ void xwup_skd_init_idled(void)
 #  error "Unknown stack type!"
 #endif
         xwskd->idle.guard_base = xwskd->idle.tls;
-        xwskd->idle.guard = (xwsz_t)XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
+        xwskd->idle.guard_size = (xwsz_t)XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->idle.flag = (xwsq_t)XWUP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->idle, xwup_cthd_return);
 #if (defined(XWOSCFG_SKD_IDLE_TLS) && (1 == XWOSCFG_SKD_IDLE_TLS))
@@ -536,7 +536,7 @@ void xwup_skd_init_bhd(void)
 #  error "Unknown stack type!"
 #endif
         xwskd->bh.guard_base = xwskd->bh.tls;
-        xwskd->bh.guard = (xwsz_t)XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
+        xwskd->bh.guard_size = (xwsz_t)XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->bh.flag = (xwsq_t)XWUP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->bh, xwup_cthd_return);
 #if (defined(XWOSCFG_SKD_BH_TLS) && (1 == XWOSCFG_SKD_BH_TLS))

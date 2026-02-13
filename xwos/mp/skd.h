@@ -88,7 +88,7 @@ struct xwmp_skdobj_stack {
         xwstk_t * base; /**< 栈内存的基地址 */
         xwsz_t size; /**< 栈内存的大小，单位：字节 */
         xwstk_t * guard_base; /**< 栈内存警戒线的基地址 */
-        xwsz_t guard; /**< 栈内存警戒线，单位：字节 */
+        xwsz_t guard_size; /**< 栈内存警戒线，单位：字节 */
         xwmp_thd_f main; /**< 主函数 */
         void * arg; /**< 主函数的参数 */
         const char * name; /**< 名字字符串 */

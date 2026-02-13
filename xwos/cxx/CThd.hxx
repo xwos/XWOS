@@ -36,6 +36,14 @@ class CThd
 {
   public:
     /**
+     * @brief 获取当前线程的栈信息
+     * @param[out] stack: 用于返回线程栈信息的缓冲区
+     */
+    static void getStackInfo(struct xwos_thd_stack_info * stack)
+    {
+        xwos_cthd_get_stack_info(stack);
+    }
+    /**
      * @brief 当前线程通知调度器重新调度
      */
     static void yield() { xwos_cthd_yield(); }

@@ -174,6 +174,7 @@ xwer_t xwmp_thd_release(struct xwmp_thd * thd, xwsq_t tik);
 xwer_t xwmp_thd_grab(struct xwmp_thd * thd);
 xwer_t xwmp_thd_put(struct xwmp_thd * thd);
 void xwmp_thd_get_attr(struct xwmp_thd * thd, struct xwmp_thd_attr * attr);
+void xwmp_thd_get_stack_info(struct xwmp_thd * thd, struct xwmp_skdobj_stack * stack);
 void xwmp_cthd_yield(void);
 void xwmp_cthd_exit(xwer_t rc);
 void xwmp_thd_quit(struct xwmp_thd * thd);

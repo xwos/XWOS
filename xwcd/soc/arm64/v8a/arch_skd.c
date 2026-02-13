@@ -168,14 +168,14 @@ struct xwospl_skd * armv8a_skd_chk_swcx(xwreg_t psp)
         struct xwospl_skdobj_stack * cstk;
         struct xwospl_skdobj_stack * pstk;
         xwu64_t * stkbtn;
-        xwsz_t guard;
+        xwsz_t grdsz;
         xwsz_t i;
 
         cstk = xwskd->cstk;
         pstk = xwskd->pstk;
         stkbtn = (xwu64_t *)pstk->guard_base;
-        guard = pstk->guard;
-        if ((psp) < ((xwptr_t)stkbtn + guard)) {
+        grdsz = pstk->guard_size;
+        if ((psp) < ((xwptr_t)stkbtn + grdsz)) {
                 soc_logf("cstk: {.name:%s, .sp: 0x%lX}\r\n", cstk->name, cstk->sp);
                 armv8a_backtrace_frame((struct armv8a_reg_frame *)cstk->sp, cstk->name);
                 armv8a_dump((struct armv8a_reg_frame *)cstk->sp);
@@ -187,7 +187,7 @@ struct xwospl_skd * armv8a_skd_chk_swcx(xwreg_t psp)
                 armv8a_dump((struct armv8a_reg_frame *)psp);
                 soc_panic("Stack overflow! reporter:%s\r\n", __FUNCTION__);
         }
-        for (i = 0; i < guard; i += 8) {
+        for (i = 0; i < grdsz; i += 8) {
                 if ((xwu64_t)0xFFFFFFFFFFFFFFFF != stkbtn[i / 8U]) {
                         soc_panic("Stack overflow! Guard break! reporter:%s\r\n",
                                   __FUNCTION__);
@@ -208,13 +208,13 @@ struct xwospl_skd * armv8a_skd_chk_stk(xwreg_t csp)
         struct xwospl_skd * xwskd;
         struct xwospl_skdobj_stack * cstk;
         xwu64_t * stkbtn;
-        xwsz_t guard;
+        xwsz_t grdsz;
 
         xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = (xwu64_t *)cstk->guard_base;
-        guard = cstk->guard;
-        if (csp < ((xwptr_t)stkbtn + guard)) {
+        grdsz = cstk->guard_size;
+        if (csp < ((xwptr_t)stkbtn + grdsz)) {
                 soc_logf("cstk: {.name:%s, .sp: 0x%lX}\r\n", cstk->name, cstk->sp);
                 soc_logf("sp_el0: 0x%016lX\r\n", csp);
                 armv8a_backtrace_frame((struct armv8a_reg_frame *)csp, "fault");

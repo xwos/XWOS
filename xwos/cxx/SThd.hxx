@@ -60,6 +60,14 @@ class SThd
     xwer_t getCtorRc() { return mCtorRc; } /**< 获取静态线程构造的结果 */
 
     /**
+     * @brief 获取当前线程的栈信息
+     * @param[out] stack: 用于返回线程栈信息的缓冲区
+     */
+    xwer_t getStackInfo(struct xwos_thd_stack_info * stack)
+    {
+        return xwos_thd_get_stack_info(mThdDesc, stack);
+    }
+    /**
      * @brief 中断线程的阻塞态和睡眠态
      */
     xwer_t intr() { return xwos_thd_intr(mThdDesc); }

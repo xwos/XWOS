@@ -256,14 +256,14 @@ struct xwospl_skd * soc_skd_chk_swcx(void)
                 xwptr_t value;
         } stk;
         xwstk_t * stkbtn;
-        xwsz_t guard;
+        xwsz_t grdsz;
 
         xwskd = xwosplcb_skd_get_lc();
         pstk = xwskd->pstk;
         stkbtn = pstk->guard_base;
-        guard = pstk->guard;
+        grdsz = pstk->guard_size;
         stk.ptr = pstk->sp;
-        if ((stk.value - SOC_CALLEE_CONTEXT_SIZE) < ((xwptr_t)stkbtn + guard)) {
+        if ((stk.value - SOC_CALLEE_CONTEXT_SIZE) < ((xwptr_t)stkbtn + grdsz)) {
                 soc_skd_report_stk_overflow(pstk);
         }
 #else
@@ -287,18 +287,18 @@ struct xwospl_skd * soc_skd_chk_stk(void)
                 xwptr_t value;
         } stk;
         xwstk_t * stkbtn;
-        xwsz_t guard;
+        xwsz_t grdsz;
         xwsz_t i;
 
         xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = cstk->guard_base;
-        guard = cstk->guard;
+        grdsz = cstk->guard_size;
         stk.ptr = cstk->sp;
-        if ((stk.value - SOC_CALLEE_CONTEXT_SIZE) < ((xwptr_t)stkbtn + guard)) {
+        if ((stk.value - SOC_CALLEE_CONTEXT_SIZE) < ((xwptr_t)stkbtn + grdsz)) {
                 soc_skd_report_stk_overflow(cstk);
         }
-        for (i = 0; i < (guard / sizeof(xwstk_t)); i++) {
+        for (i = 0; i < (grdsz / sizeof(xwstk_t)); i++) {
                 if (0xFFFFFFFFU != stkbtn[i]) {
                         soc_skd_report_stk_overflow(cstk);
                 }

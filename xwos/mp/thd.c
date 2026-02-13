@@ -523,7 +523,7 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 #  error "Unknown stack type!"
 #endif
         thd->stack.guard_base = thd->stack.tls;
-        thd->stack.guard = attr->stack_guard_size;
+        thd->stack.guard_size = attr->stack_guard_size;
 
 #if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         xwmp_cond_init(&thd->completion); // cppcheck-suppress [misra-c2012-17.7]
@@ -613,10 +613,16 @@ void xwmp_thd_get_attr(struct xwmp_thd * thd, struct xwmp_thd_attr * attr)
         attr->name = thd->stack.name;
         attr->stack = thd->stack.base;
         attr->stack_size = thd->stack.size;
-        attr->stack_guard_size = thd->stack.guard;
+        attr->stack_guard_size = thd->stack.guard_size;
         attr->priority = thd->sprio;
         attr->detached = !!(thd->state & (xwsq_t)XWMP_SKDOBJ_ST_DETACHED);
         attr->privileged = !!(thd->stack.flag & (xwsq_t)XWMP_SKDOBJ_FLAG_PRIVILEGED);
+}
+
+__xwmp_api
+void xwmp_thd_get_stack_info(struct xwmp_thd * thd, struct xwmp_skdobj_stack * stack)
+{
+        *stack = thd->stack;
 }
 
 __xwmp_api

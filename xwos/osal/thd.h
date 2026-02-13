@@ -36,6 +36,13 @@
  * 线程可以通过 `xwos_cthd_get_attr()` 获取自身属性。
  *
  *
+ * ## 线程栈信息
+ *
+ * 已经创建或初始化的线程可以通过 `xwos_thd_get_stack_info()` 获取其属性。
+ *
+ * 线程可以通过 `xwos_cthd_get_stack_info()` 获取自身栈信息。
+ *
+ *
  * ## 静态初始化线程
  *
  * 用户可以在编译期预先定义线程对象的结构体、线程栈，
@@ -172,6 +179,18 @@ struct xwos_thd_attr {
         xwpr_t priority; /**< 优先级 */
         bool detached; /**< 是否为分离态 */
         bool privileged; /**< 是否为特权线程 */
+};
+
+/**
+ * @brief XWOS API：线程栈信息
+ */
+struct xwos_thd_stack_info {
+        xwstk_t * sp; /**< 栈指针 */
+        xwstk_t * tls; /**< TLS变量区的基地址 */
+        xwstk_t * base; /**< 栈内存的基地址 */
+        xwsz_t size; /**< 栈内存的大小，单位：字节 */
+        xwstk_t * guard_base; /**< 栈内存警戒线的基地址 */
+        xwsz_t guard_size; /**< 栈内存警戒线，单位：字节 */
 };
 
 /**
@@ -389,6 +408,35 @@ xwer_t xwos_thd_get_attr(xwos_thd_d thdd, struct xwos_thd_attr * attr)
 }
 
 /**
+ * @brief XWOS API：获取线程的栈信息
+ * @param[in] thdd: 线程对象描述符
+ * @param[out] stack: 用于返回线程栈信息的缓冲区
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EOBJDEAD: 线程对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * + 上下文：任意
+ */
+static __xwos_inline_api
+xwer_t xwos_thd_get_stack_info(xwos_thd_d thdd, struct xwos_thd_stack_info * stack)
+{
+        xwer_t rc;
+        struct xwosdl_thd_stack_info info;
+
+        rc = xwosdl_thd_get_stack_info(&thdd.thd->osthd, thdd.tik, &info);
+        if ((XWOK == rc) && (stack)) {
+                stack->sp = info.sp;
+                stack->tls = (xwstk_t *)info.tls;
+                stack->base = info.base;
+                stack->size = info.size;
+                stack->guard_base = info.guard_base;
+                stack->guard_size = info.guard_size;
+        }
+        return rc;
+}
+
+/**
  * @brief XWOS API：中断线程的阻塞态和睡眠态
  * @param[in] thdd: 线程对象描述符
  * @return 错误码
@@ -567,6 +615,19 @@ void xwos_cthd_get_attr(struct xwos_thd_attr * attr)
 {
         // cppcheck-suppress [misra-c2012-17.7]
         xwos_thd_get_attr(xwos_cthd_self(), attr);
+}
+
+/**
+ * @brief XWOS API：获取线程自身的栈信息
+ * @param[out] stack: 用于返回线程栈信息的缓冲区
+ * @note
+ * + 上下文：线程
+ */
+static __xwos_inline_api
+void xwos_cthd_get_stack_info(struct xwos_thd_stack_info * stack)
+{
+        // cppcheck-suppress [misra-c2012-17.7]
+        xwos_thd_get_stack_info(xwos_cthd_self(), stack);
 }
 
 /**

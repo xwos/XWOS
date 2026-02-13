@@ -358,20 +358,20 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
 #if defined(XWMMCFG_STACK_CHK_SWCX) && (1 == XWMMCFG_STACK_CHK_SWCX)
         struct xwospl_skdobj_stack * pstk;
         xwstk_t * stkbtn;
-        xwsz_t guard;
+        xwsz_t grdsz;
         xwptr_t psp;
 
         xwskd = xwosplcb_skd_get_lc();
         pstk = xwskd->pstk;
         stkbtn = pstk->guard_base;
-        guard = pstk->guard;
+        grdsz = pstk->guard_size;
         armv7m_get_psp(&psp);
 #  if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
-        if ((psp - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) < ((xwptr_t)stkbtn + guard)) {
+        if ((psp - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) < ((xwptr_t)stkbtn + grdsz)) {
                 arch_skd_report_stk_overflow(pstk);
         }
 #  else
-        if ((psp - ARCH_NVGR_SIZE) < (((xwptr_t)stkbtn) + guard)) {
+        if ((psp - ARCH_NVGR_SIZE) < (((xwptr_t)stkbtn) + grdsz)) {
                 arch_skd_report_stk_overflow(pstk);
         }
 #  endif
@@ -395,25 +395,25 @@ struct xwospl_skd * arch_skd_chk_stk(void)
                 xwptr_t value;
         } stk;
         xwstk_t * stkbtn;
-        xwsz_t guard;
+        xwsz_t grdsz;
         xwsz_t i;
 
         xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = cstk->guard_base;
-        guard = cstk->guard;
+        grdsz = cstk->guard_size;
         armv7m_get_psp(&stk.value);
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         if ((stk.value - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
-            ((xwptr_t)stkbtn + guard)) {
+            ((xwptr_t)stkbtn + grdsz)) {
                 arch_skd_report_stk_overflow(cstk);
         }
 #else
-        if ((stk.value - ARCH_NVGR_SIZE) < ((xwptr_t)stkbtn + guard)) {
+        if ((stk.value - ARCH_NVGR_SIZE) < ((xwptr_t)stkbtn + grdsz)) {
                 arch_skd_report_stk_overflow(cstk);
         }
 #endif
-        for (i = 0; i < (guard / sizeof(xwstk_t)); i++) {
+        for (i = 0; i < (grdsz / sizeof(xwstk_t)); i++) {
                 if (0xFFFFFFFFU != stkbtn[i]) {
                         arch_skd_report_stk_overflow(cstk);
                 }
