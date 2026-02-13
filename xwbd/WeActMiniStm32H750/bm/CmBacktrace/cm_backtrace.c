@@ -26,7 +26,7 @@
  * Created on: 2016-12-15
  */
 
-#include <cm_backtrace.h>
+#include <bm/CmBacktrace/cm_backtrace.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
@@ -220,10 +220,12 @@ static void get_cur_thread_stack_info(uint32_t *sp, uint32_t *start_addr, size_t
     *start_addr = (uint32_t)ptThread->tx_thread_stack_start;
     *size = ptThread->tx_thread_stack_size;
 #elif  (CMB_OS_PLATFORM_TYPE == CMB_OS_PLATFORM_XWOS)
-    struct xwos_thd_attr attr;
-    xwos_cthd_get_attr(&attr);
-    *start_addr = (uint32_t)attr.stack;
-    *size = (size_t)attr.stack_size;
+    struct xwos_thd_stack_info info;
+    size_t delta;
+    xwos_cthd_get_stack_info(&info);
+    delta = (size_t)info.guard_base - (size_t)info.base;
+    *start_addr = (uint32_t)info.guard_base + info.guard_size;
+    *size = (size_t)info.size - delta - info.guard_size;
     *sp = cmb_get_psp();
 #endif
 }
