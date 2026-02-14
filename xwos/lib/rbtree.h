@@ -103,7 +103,7 @@ struct __xwcc_alignptr xwlib_rbtree {
 static __xwlib_inline
 void xwlib_rbtree_init(struct xwlib_rbtree * rbt)
 {
-        rbt->root = NULL;
+        rbt->root = (struct xwlib_rbtree_node *)NULL;
 }
 
 /**
@@ -113,8 +113,8 @@ void xwlib_rbtree_init(struct xwlib_rbtree * rbt)
 static __xwlib_inline
 void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 {
-        rbn->left = NULL;
-        rbn->right = NULL;
+        rbn->left = (struct xwlib_rbtree_node *)NULL;
+        rbn->right = (struct xwlib_rbtree_node *)NULL;
         rbn->lpc.v = 0;
 }
 
@@ -360,7 +360,7 @@ void xwlib_rbtree_link(struct xwlib_rbtree_node * node, xwptr_t lpc)
 static __xwlib_inline
 void xwlib_rbtree_link_nil(struct xwlib_rbtree_node ** link)
 {
-        *link = NULL;
+        *link = (struct xwlib_rbtree_node *)NULL;
 }
 
 /**
@@ -424,7 +424,7 @@ void xwlib_rbtree_transplant(struct xwlib_rbtree_node * newn,
 static __xwlib_inline
 void xwlib_rbtree_transplant_nil(struct xwlib_rbtree_node * oldn)
 {
-        *xwlib_rbtree_get_link(oldn->lpc.v) = NULL;
+        *xwlib_rbtree_get_link(oldn->lpc.v) = (struct xwlib_rbtree_node *)NULL;
 }
 
 /**

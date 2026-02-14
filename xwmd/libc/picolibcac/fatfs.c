@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <time.h>
+#include "xwmd/libc/picolibcac/fatfs.h"
 
 #define PICOLIBCAC_FATFS_FD_NUM         32U
 #define PICOLIBCAC_FATFS_FD_OFFSET      3 /* 0,1,2 分别代表 stdin, stdout, stderr. */

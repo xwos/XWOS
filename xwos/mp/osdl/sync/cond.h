@@ -24,7 +24,7 @@ typedef struct {
         xwsq_t tik;
 } xwosdl_cond_d;
 
-#define XWOSDL_COND_NILD ((xwosdl_cond_d){NULL, 0,})
+#define XWOSDL_COND_NILD ((xwosdl_cond_d){(struct xwosdl_cond *)NULL, 0,})
 
 static __xwcc_inline
 xwer_t xwosdl_cond_init(struct xwosdl_cond * cond)
@@ -147,7 +147,8 @@ xwer_t xwosdl_cond_wait(struct xwosdl_cond * cond,
         XWOS_VALIDATE((((NULL == lock.anon) && (XWOS_LK_NONE == lktype)) ||
                        ((lock.anon) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwmp_cond_wait(cond, lock.anon, lktype, lkdata, lkst);
 }
@@ -163,7 +164,8 @@ xwer_t xwosdl_cond_wait_to(struct xwosdl_cond * cond,
         XWOS_VALIDATE((((NULL == lock.anon) && (XWOS_LK_NONE == lktype)) ||
                        ((lock.anon) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwmp_cond_wait_to(cond, lock.anon, lktype, lkdata, to, lkst);
 }
@@ -179,7 +181,8 @@ xwer_t xwosdl_cond_wait_unintr(struct xwosdl_cond * cond,
         XWOS_VALIDATE((((NULL == lock.anon) && (XWOS_LK_NONE == lktype)) ||
                        ((lock.anon) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwmp_cond_wait_unintr(cond, lock.anon, lktype, lkdata, lkst);
 }

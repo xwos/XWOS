@@ -55,11 +55,11 @@ class Bmp
         {
         }
         explicit Bit(const Bit & other)
-            : mBit(other.mBmp, other.index)
+            : mBit(other.mBmp, other.mBit)
         {
         }
         explicit Bit(const Bit && other)
-            : mBit(other.mBmp, other.index)
+            : mBit(other.mBmp, other.mBit)
         {
         }
         ~Bit()

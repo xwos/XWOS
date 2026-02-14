@@ -21,7 +21,7 @@ DThd::DThd(const char * name, xwsz_t stack_size, xwsz_t stack_guard_size,
 {
     struct xwos_thd_attr attr({
         .name = name,
-        .stack = NULL,
+        .stack = (xwstk_t *)NULL,
         .stack_size = stack_size,
         .stack_guard_size = stack_guard_size,
         .priority = priority,

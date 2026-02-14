@@ -23,16 +23,16 @@
 #  error "XWMD is not compatibled with tinystdio! Please check the build option 'tinystdio' in meson_options.txt!"
 #endif
 
-#ifndef NEWLIB_GLOBAL_ERRNO
-#  error "NEWLIB_GLOBAL_ERRNO must be defined! Please check the build option 'newlib-global-errno' in meson_options.txt!"
+#ifndef __GLOBAL_ERRNO
+#  error "__GLOBAL_ERRNO must be defined! Please check the build option 'newlib-global-errno' in meson_options.txt!"
 #endif
 
 #ifndef __PICOLIBC_ERRNO_FUNCTION
 #  error "__PICOLIBC_ERRNO_FUNCTION must be defined as __errno! Please check the build option 'errno-function' in meson_options.txt!"
 #endif
 
-#ifndef _FVWRITE_IN_STREAMIO
-#  error "_FVWRITE_IN_STREAMIO must be defined! Please check the build option 'newlib-fvwrite-in-streamio' in meson_options.txt!"
+#ifndef __FVWRITE_IN_STREAMIO
+#  error "__FVWRITE_IN_STREAMIO must be defined! Please check the build option 'newlib-fvwrite-in-streamio' in meson_options.txt!"
 #endif
 
 

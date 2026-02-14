@@ -20,6 +20,7 @@
 
 #include <board/std.h>
 #include <time.h>
+#include <sys/time.h>
 #include "bm/Stm32Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_cortex.h"
 #include "bm/Stm32Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_pwr.h"
 #include "bm/Stm32Hal/CubeMX/Core/Inc/crc.h"

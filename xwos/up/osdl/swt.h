@@ -26,7 +26,7 @@ typedef struct {
         xwsq_t tik;
 } xwosdl_swt_d;
 
-#define XWOSDL_SWT_NILD ((xwosdl_swt_d){NULL, 0,})
+#define XWOSDL_SWT_NILD ((xwosdl_swt_d){(struct xwosdl_swt *)NULL, 0,})
 
 static __xwcc_inline
 xwer_t xwosdl_swt_init(struct xwosdl_swt * swt, xwsq_t flag)

@@ -24,7 +24,7 @@ typedef struct {
         xwsq_t tik;
 } xwosdl_flg_d;
 
-#define XWOSDL_FLG_NILD ((xwosdl_flg_d){NULL, 0,})
+#define XWOSDL_FLG_NILD ((xwosdl_flg_d){(struct xwosdl_flg *)NULL, 0,})
 
 #define XWOSDL_FLG_TRIGGER_SET_ALL      XWMP_FLG_TRIGGER_SET_ALL
 #define XWOSDL_FLG_TRIGGER_SET_ANY      XWMP_FLG_TRIGGER_SET_ANY
@@ -240,7 +240,8 @@ xwer_t xwosdl_flg_wait_unintr(struct xwosdl_flg * flg, xwsq_t trigger, bool cons
         XWOS_VALIDATE((trigger < XWMP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwmp_flg_wait_unintr(flg, trigger, consumption, origin, msk);
 }
