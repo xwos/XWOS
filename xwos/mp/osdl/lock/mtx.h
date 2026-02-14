@@ -28,7 +28,7 @@ typedef struct {
         xwsq_t tik;
 } xwosdl_mtx_d;
 
-#define XWOSDL_MTX_NILD ((xwosdl_mtx_d){NULL, 0,})
+#define XWOSDL_MTX_NILD ((xwosdl_mtx_d){(struct xwosdl_mtx *)NULL, 0,})
 
 static __xwcc_inline
 xwer_t xwosdl_mtx_init(struct xwosdl_mtx * mtx, xwpr_t sprio)
@@ -92,7 +92,8 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_unlock(struct xwosdl_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwmp_mtx_unlock(mtx);
 }
@@ -101,7 +102,8 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_lock(struct xwosdl_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwmp_mtx_lock(mtx);
 }
@@ -110,7 +112,8 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_lock_to(struct xwosdl_mtx * mtx, xwtm_t to)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwmp_mtx_lock_to(mtx, to);
 }
@@ -119,7 +122,8 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_lock_unintr(struct xwosdl_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwmp_mtx_lock_unintr(mtx);
 }
@@ -129,7 +133,8 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_trylock(struct xwosdl_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwmp_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwmp_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwmp_mtx_trylock(mtx);
 }

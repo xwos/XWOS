@@ -32,6 +32,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include "stm32h7xx_ll_rtc.h"
 #include <time.h>
+#include <sys/time.h>
 
 /* USER CODE END Includes */
 

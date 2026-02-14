@@ -23,6 +23,7 @@
 
 #include <board/std.h>
 #include <time.h>
+#include <sys/time.h>
 #include "bm/Stm32Hal/xwds/device.h"
 
 /**

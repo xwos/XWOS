@@ -14,6 +14,7 @@
 #define __xwmd_libc_picolibcac_fatfs_h__
 
 #include <stdio.h>
+#include <sys/stat.h>
 
 int picolibcac_fatfs_open(const char * path, int flag, int mode);
 int picolibcac_fatfs_close(int fd);

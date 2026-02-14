@@ -15,6 +15,7 @@
 #include <xwos/osal/time.h>
 #include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
+#include <time.h>
 #include <sys/time.h>
 #include <sys/times.h>
 
