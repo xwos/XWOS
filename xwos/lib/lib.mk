@@ -43,12 +43,6 @@ ifeq ($(XWLIBCFG_XWAOP64),y)
   endif
 endif
 
-ifeq ($(XWLIBCFG_XWBMPAOP),y)
-  ifneq ($(ARCHCFG_LIB_XWBMPAOP),y)
-    XWOS_CSRCS += lib/xwaop/bmp.c
-  endif
-endif
-
 ifeq ($(XWLIBCFG_MAP),y)
   XWOS_CSRCS += lib/map.c
 endif

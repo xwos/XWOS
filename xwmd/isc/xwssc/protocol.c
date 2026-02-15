@@ -12,7 +12,6 @@
 
 #include <xwos/standard.h>
 #include <string.h>
-#include <xwos/lib/xwaop.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/crc32.h>
@@ -762,14 +761,17 @@ struct xwssc_carrier * xwssc_txq_carrier_alloc(struct xwssc * xwssc)
         struct xwssc_carrier * car;
         xwssq_t caridx;
 
-        caridx = xwbmpaop_ffz_then_s1i(xwssc->txq.carbmp, XWSSC_MEMBLK_NUM);
+        xwos_splk_lock(&xwssc->txq.qlock);
+        caridx = xwbmpop_ffz(xwssc->txq.carbmp, XWSSC_MEMBLK_NUM);
         if (caridx < 0) {
-                car = NULL;
+                car = (struct xwssc_carrier *)NULL;
         } else {
+                xwbmpop_s1i(xwssc->txq.carbmp, (xwsq_t)caridx);
                 car = &xwssc->txq.car[caridx];
                 xwlib_bclst_init_node(&car->node);
                 XWSSC_BUG_ON(car->state != (xwu32_t)XWSSC_CRS_IDLE);
         }
+        xwos_splk_unlock(&xwssc->txq.qlock);
         return car;
 }
 
@@ -781,9 +783,12 @@ struct xwssc_carrier * xwssc_txq_carrier_alloc(struct xwssc * xwssc)
 __xwmd_code
 void xwssc_txq_carrier_free(struct xwssc * xwssc, struct xwssc_carrier * car)
 {
-        xwaop_write(xwu32_t, &car->state, XWSSC_CRS_IDLE, NULL);
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwbmpaop_t1i_then_c0i(xwssc->txq.carbmp, car->idx);
+        xwos_splk_lock(&xwssc->txq.qlock);
+        xwaop_write(xwu32_t, &car->state, XWSSC_CRS_IDLE, (xwu32_t *)NULL);
+        if (xwbmpop_t1i(xwssc->txq.carbmp, car->idx)) {
+                xwbmpop_c0i(xwssc->txq.carbmp, car->idx);
+        }
+        xwos_splk_unlock(&xwssc->txq.qlock);
 }
 
 /**
