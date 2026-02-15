@@ -198,7 +198,6 @@ struct xwds_soc {
         struct {
                 xwsz_t ch_num; /**< DMA通道数量 */
                 void * ccfg; /**< SOC DMA控制器配置 */
-                atomic_xwbmp_t * chstatus; /**< DMA通道状态图 */
                 __xwds_soc_dma_tbl_qualifier xwds_dma_f * chcbs; /**< DMA通道传输结束回调函数表 */
                 __xwds_soc_dma_tbl_qualifier xwds_dma_cbarg_t * chcbargs; /**< DMA通道传输结束参数表 */
         } dma; /**< DMA描述 */
