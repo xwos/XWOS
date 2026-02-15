@@ -59,8 +59,8 @@ msg:data(0, txd) -- 设置msg[0]的data
 rc = i2cm1:xfer(msg, xwtm.ft(xwtm.s(2)))
 
 @usage
--- 从EEPROM的0地址读出4字节数据，
-txd = string.pack("B", 0) -- 打包写数据{地址0}
+-- 从EEPROM的0地址读出16字节数据，
+txd = string.pack(">H", 0x0000) -- 打包写数据{地址0x0000}
 msg = xwds.i2cm.msg(2) -- 创建2个I2C消息
 msg:addr(0, 0x50, false) -- 设置msg[0]的外设地址为0x50，7位地址模式
 msg:start(0, true) -- 设置msg[0]的START标志
@@ -71,9 +71,11 @@ msg:addr(1, 0x50, false) -- 设置msg[1]的外设地址为0x50，7位地址模�
 msg:start(1, true) -- 设置msg[1]的START标志
 msg:read(1, true) -- 设置msg[1]的READ标志
 msg:stop(1, true) -- 设置msg[1]的STOP标志
-rxd = msg:buffer(1, 4) -- 给msg[1]申请4字节读buffer
+rxd = msg:buffer(1, 16) -- 给msg[1]申请16字节读buffer
 -- 读取数据，最多等待2s
 rc = i2cm1:xfer(msg, xwtm.ft(xwtm.s(2)))
+print(rc)
+print(rxd)
 ]]
 function xfer(msg, to)
 end
