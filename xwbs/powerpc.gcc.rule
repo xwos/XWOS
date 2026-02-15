@@ -95,19 +95,16 @@ INCDIRS = -I. \
 
 PERDEF = -D__XWOS__
 
-AFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -nostdinc -nostdlib \
+AFLAGS = -g3 -nostdinc -nostdlib -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames \
          -ffunction-sections -fdata-sections \
-         -g3 \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-CFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -std=gnu11 \
-         -ffunction-sections -fdata-sections \
-         -g3 -fverbose-asm \
+CFLAGS = -g3 -std=gnu11 -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames \
+         -ffunction-sections -fdata-sections -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-CXXFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -std=gnu11 \
-           -ffunction-sections -fdata-sections \
-           -g3 -fverbose-asm \
+CXXFLAGS = -g3 -std=gnu11 -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames \
+           -ffunction-sections -fdata-sections -fverbose-asm \
            -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 MMFLAGS = -MM -MP

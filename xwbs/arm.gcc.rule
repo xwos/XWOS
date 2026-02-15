@@ -96,24 +96,26 @@ INCDIRS = -I. \
 
 PERDEF = -D__XWOS__
 
-AFLAGS = -mabi=aapcs -mno-thumb-interwork -m$(ENDIAN) -mthumb \
-         -nostdinc -nostdlib -mno-unaligned-access \
+AFLAGS = -g -g3 -gdwarf-4 -nostdinc -nostdlib \
+         -mabi=aapcs -mno-thumb-interwork -mthumb -m$(ENDIAN) -mno-unaligned-access \
          -ffunction-sections -fdata-sections \
-         -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments \
+         -fvar-tracking -fvar-tracking-assignments \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-CFLAGS = -mabi=aapcs -mthumb -std=gnu18 \
-         -fomit-frame-pointer -mtpcs-frame -mno-thumb-interwork -m$(ENDIAN) \
+CFLAGS = -std=gnu18 -g -g3 -gdwarf-4 \
+         -mabi=aapcs -mthumb -mtpcs-frame -mno-thumb-interwork -m$(ENDIAN) \
          -mno-unaligned-access \
+         -fomit-frame-pointer \
          -ffunction-sections -fdata-sections -ftls-model=local-exec \
-         -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
+         -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-CXXFLAGS = -mabi=aapcs -mthumb -std=gnu++17 \
-           -fomit-frame-pointer -mtpcs-frame -mno-thumb-interwork -m$(ENDIAN) \
+CXXFLAGS = -std=gnu++17 -g -g3 -gdwarf-4 \
+           -mabi=aapcs -mthumb -mtpcs-frame -mno-thumb-interwork -m$(ENDIAN) \
            -mno-unaligned-access \
+           -fomit-frame-pointer \
            -ffunction-sections -fdata-sections -ftls-model=local-exec \
-           -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
+           -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
            -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 MMFLAGS = -MM -MP

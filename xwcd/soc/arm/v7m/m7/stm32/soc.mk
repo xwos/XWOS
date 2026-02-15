@@ -34,5 +34,3 @@ SOC_CSRCS += soc_init.c
 SOC_CSRCS += xwosimpl_irq.c
 SOC_CSRCS += xwosimpl_skd.c
 SOC_CSRCS += xwosimpl_syshwt.c
-
-SYSROOT_llvm := armv7em_hard_fpv5_d16

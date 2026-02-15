@@ -96,22 +96,22 @@ INCDIRS = -I. \
 
 PERDEF = -D__XWOS__
 
-AFLAGS = -mabi=lp64 -m$(ENDIAN) -nostdinc -nostdlib \
-         -mstrict-align \
+AFLAGS = -g -g3 -gdwarf-4 -nostdinc -nostdlib \
+         -mabi=lp64 -m$(ENDIAN) -mstrict-align \
          -ffunction-sections -fdata-sections \
-         -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments \
+         -fvar-tracking -fvar-tracking-assignments \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-CFLAGS = -mabi=lp64 -std=gnu18 -m$(ENDIAN) \
-         -mstrict-align \
+CFLAGS = -g -g3 -gdwarf-4 -std=gnu18 \
+         -mabi=lp64 -m$(ENDIAN) -mstrict-align \
          -ffunction-sections -fdata-sections -ftls-model=local-exec \
-         -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
+         -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-CXXFLAGS = -mabi=lp64 -std=gnu++17 -m$(ENDIAN) \
-           -mstrict-align \
+CXXFLAGS = -g -g3 -gdwarf-4 -std=gnu++17 \
+           -mabi=lp64 -m$(ENDIAN) -mstrict-align \
            -ffunction-sections -fdata-sections -ftls-model=local-exec \
-           -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
+           -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
            -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 MMFLAGS = -MM -MP

@@ -23,7 +23,6 @@ XWTC ?= $(shell xwtcwd)
 XWTC := $(subst \,/,$(XWTC))
 export XWTC
 ARMTOOLS ?= $(XWTC)/arm
-SYSROOT ?= $(ARMTOOLS)/lib/clang-runtimes/aarch64-none-elf/$(SYSROOT_llvm)
 CC := $(ARMTOOLS)/bin/clang
 CXX := $(ARMTOOLS)/bin/clang++
 AS := $(CC) -x assembler-with-cpp
@@ -96,22 +95,19 @@ INCDIRS = -I. \
 
 PERDEF = -D__XWOS__
 
-AFLAGS = -m$(ENDIAN) -nostdinc -nostdlib \
-         -mstrict-align \
+AFLAGS = -g -g3 -gdwarf-4 -nostdinc -nostdlib \
+         -m$(ENDIAN) -mstrict-align \
          -ffunction-sections -fdata-sections -ftls-model=local-exec \
-         -g -g3 -gdwarf-4 \
          $(WARN) $(PERDEF)
 
-CFLAGS = -std=gnu18 --sysroot=$(SYSROOT) -m$(ENDIAN) \
-         -mstrict-align \
-         -ffunction-sections -fdata-sections -ftls-model=local-exec \
-         -g -g3 -gdwarf-4 -fverbose-asm \
+CFLAGS = -g -g3 -gdwarf-4 -std=gnu18 \
+         -m$(ENDIAN) -mstrict-align \
+         -ffunction-sections -fdata-sections -ftls-model=local-exec -fverbose-asm \
          $(WARN) $(PERDEF)
 
-CXXFLAGS = -std=gnu++17 --sysroot=$(SYSROOT) -m$(ENDIAN) \
-           -mstrict-align \
-           -ffunction-sections -fdata-sections -ftls-model=local-exec \
-           -g -g3 -gdwarf-4 -fverbose-asm \
+CXXFLAGS = -g -g3 -gdwarf-4 -std=gnu++17 \
+           -m$(ENDIAN) -mstrict-align \
+           -ffunction-sections -fdata-sections -ftls-model=local-exec -fverbose-asm \
            $(WARN) $(PERDEF)
 
 MMFLAGS = -MM -MP

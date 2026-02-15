@@ -573,4 +573,3 @@ ARCH_AFLAGS_llvm := --target=armv6m-none-eabi
 ARCH_CFLAGS_llvm := --target=armv6m-none-eabi
 ARCH_CXXFLAGS_llvm := --target=armv6m-none-eabi
 ARCH_LDFLAGS_llvm := --target=armv6m-none-eabi
-SYSROOT_llvm := armv6m_soft_nofp

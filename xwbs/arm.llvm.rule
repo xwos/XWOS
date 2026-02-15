@@ -23,7 +23,6 @@ XWTC ?= $(shell xwtcwd)
 XWTC := $(subst \,/,$(XWTC))
 export XWTC
 ARMTOOLS ?= $(XWTC)/arm
-SYSROOT ?= $(ARMTOOLS)/lib/clang-runtimes/arm-none-eabi/$(SYSROOT_llvm)
 CC := $(ARMTOOLS)/bin/clang
 CXX := $(ARMTOOLS)/bin/clang++
 AS := $(CC) -x assembler-with-cpp
@@ -96,22 +95,21 @@ INCDIRS = -I. \
 
 PERDEF = -D__XWOS__
 
-AFLAGS = -mabi=aapcs -m$(ENDIAN) -mthumb \
-         -nostdinc -nostdlib -mno-unaligned-access \
+AFLAGS = -g -g3 -gdwarf-4 -nostdinc -nostdlib \
+         -mabi=aapcs -m$(ENDIAN) -mthumb -mno-unaligned-access \
          -ffunction-sections -fdata-sections -ftls-model=local-exec \
-         -g -g3 -gdwarf-4 \
          $(WARN) $(PERDEF)
 
-CFLAGS = -mabi=aapcs -mthumb -std=gnu18 --sysroot=$(SYSROOT) \
-         -m$(ENDIAN) -mno-unaligned-access \
-         -fomit-frame-pointer -ffunction-sections -fdata-sections -ftls-model=local-exec \
-         -g -g3 -gdwarf-4 -fverbose-asm \
+CFLAGS = -std=gnu18 -g -g3 -gdwarf-4 \
+         -mabi=aapcs -mthumb -m$(ENDIAN) -mno-unaligned-access  \
+         -fomit-frame-pointer -fno-builtin -ffunction-sections -fdata-sections \
+         -ftls-model=local-exec -fverbose-asm \
          $(WARN) $(PERDEF)
 
-CXXFLAGS = -mabi=aapcs -mthumb -std=gnu++17 --sysroot=$(SYSROOT) \
-           -m$(ENDIAN) -mno-unaligned-access \
-           -fomit-frame-pointer -ffunction-sections -fdata-sections -ftls-model=local-exec \
-           -g -g3 -gdwarf-4 -fverbose-asm \
+CXXFLAGS = -std=gnu++17 -g -g3 -gdwarf-4 \
+           -mabi=aapcs -mthumb -m$(ENDIAN) -mno-unaligned-access \
+           -fomit-frame-pointer -fno-builtin -ffunction-sections -fdata-sections \
+           -ftls-model=local-exec -fverbose-asm \
            $(WARN) $(PERDEF)
 
 MMFLAGS = -MM -MP
@@ -127,7 +125,7 @@ endif
 CFLAGS += -O$(O)
 CXXFLAGS += -O$(O)
 
-LDFLAGS = -mthumb -mabi=aapcs -m$(ENDIAN) --sysroot=$(SYSROOT) -nostdlib \
+LDFLAGS = -mthumb -mabi=aapcs -m$(ENDIAN) -nostdlib \
           -L$(XWOS_SOC_DIR) -T$(XWOS_BRD_DIR)/$(XWCFG_LDSCRIPT) \
           -Wl,--allow-multiple-definition -Wl,--gc-sections -Wl,-z,norelro \
           -Wl,-Map=$(XWOS_WKSPC_DIR)/$(TARGET).map,--cref

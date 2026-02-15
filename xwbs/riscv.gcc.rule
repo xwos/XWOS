@@ -90,19 +90,19 @@ INCDIRS = -I. \
 
 PERDEF = -D__XWOS__
 
-AFLAGS = -nostdinc -nostdlib \
+AFLAGS = -g -g3 -gdwarf-4 -nostdinc -nostdlib \
          -ffunction-sections -fdata-sections -fno-common \
-         -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments \
+         -fvar-tracking -fvar-tracking-assignments \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-CFLAGS = -std=gnu11 \
+CFLAGS = -g -g3 -gdwarf-4 -std=gnu11 \
          -ffunction-sections -fdata-sections -fno-common -ftls-model=local-exec \
-         -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
+         -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-CXXFLAGS = -std=gnu++17 \
+CXXFLAGS = -g -g3 -gdwarf-4 -std=gnu++17 \
            -ffunction-sections -fdata-sections -fno-common -ftls-model=local-exec \
-           -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
+           -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
            -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 MMFLAGS = -MM -MP
