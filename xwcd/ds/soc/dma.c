@@ -20,7 +20,6 @@
 
 #include <xwcd/ds/standard.h>
 #include <string.h>
-#include <xwos/lib/xwaop.h>
 #include <xwcd/ds/soc/dma.h>
 
 __xwds_api
@@ -36,11 +35,6 @@ xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch)
         if (rc < 0) {
                 goto err_soc_grab;
         }
-        rc = xwbmpaop_t0i_then_s1i(soc->dma.chstatus, ch);
-        if (rc < 0) {
-                rc = -EBUSY;
-                goto err_busy;
-        }
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_req)) {
                 rc = drv->dma_req(soc, ch);
@@ -51,8 +45,6 @@ xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch)
         return XWOK;
 
 err_drv_dma_req:
-        xwbmpaop_s1i(soc->dma.chstatus, ch);
-err_busy:
         xwds_soc_put(soc);
 err_soc_grab:
         return rc;
@@ -67,10 +59,6 @@ xwer_t xwds_dma_rls(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (!xwbmpaop_t1i(soc->dma.chstatus, ch)) {
-                rc = -EPERM;
-                goto err_notreq;
-        }
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_rls)) {
                 rc = drv->dma_rls(soc, ch);
@@ -78,12 +66,10 @@ xwer_t xwds_dma_rls(struct xwds_soc * soc, xwid_t ch)
                         goto err_drv_dma_rls;
                 }
         }
-        xwbmpaop_c0i(soc->dma.chstatus, ch);
         xwds_soc_put(soc);
         return XWOK;
 
 err_drv_dma_rls:
-err_notreq:
         return rc;
 }
 
@@ -97,10 +83,6 @@ xwer_t xwds_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg,
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (!xwbmpaop_t1i(soc->dma.chstatus, ch)) {
-                rc = -EPERM;
-                goto err_notreq;
-        }
 #if defined(XWCDCFG_ds_SOC_DMA_ROCBT) && (1 == XWCDCFG_ds_SOC_DMA_ROCBT)
         XWOS_UNUSED(cb);
         XWOS_UNUSED(arg);
@@ -130,7 +112,6 @@ err_drv_dma_cfg:
                 soc->dma.chcbargs[ch] = NULL;
         }
 #endif
-err_notreq:
         return rc;
 }
 
@@ -143,10 +124,6 @@ xwer_t xwds_dma_enable(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (!xwbmpaop_t1i(soc->dma.chstatus, ch)) {
-                rc = -EPERM;
-                goto err_notreq;
-        }
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_enable)) {
                 rc = drv->dma_enable(soc, ch);
@@ -157,7 +134,6 @@ xwer_t xwds_dma_enable(struct xwds_soc * soc, xwid_t ch)
         return XWOK;
 
 err_drv_dma_enable:
-err_notreq:
         return rc;
 }
 
@@ -170,10 +146,6 @@ xwer_t xwds_dma_disable(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (!xwbmpaop_t1i(soc->dma.chstatus, ch)) {
-                rc = -EPERM;
-                goto err_notreq;
-        }
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_disable)) {
                 rc = drv->dma_disable(soc, ch);
@@ -184,7 +156,6 @@ xwer_t xwds_dma_disable(struct xwds_soc * soc, xwid_t ch)
         return XWOK;
 
 err_drv_dma_disable:
-err_notreq:
         return rc;
 }
 
@@ -197,10 +168,6 @@ xwer_t xwds_dma_start(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (!xwbmpaop_t1i(soc->dma.chstatus, ch)) {
-                rc = -EPERM;
-                goto err_notreq;
-        }
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_start)) {
                 rc = drv->dma_start(soc, ch);
@@ -211,7 +178,6 @@ xwer_t xwds_dma_start(struct xwds_soc * soc, xwid_t ch)
         return XWOK;
 
 err_drv_dma_start:
-err_notreq:
         return rc;
 }
 
@@ -224,10 +190,6 @@ xwer_t xwds_dma_stop(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (!xwbmpaop_t1i(soc->dma.chstatus, ch)) {
-                rc = -EPERM;
-                goto err_notreq;
-        }
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_stop)) {
                 rc = drv->dma_stop(soc, ch);
@@ -238,6 +200,5 @@ xwer_t xwds_dma_stop(struct xwds_soc * soc, xwid_t ch)
         return XWOK;
 
 err_drv_dma_stop:
-err_notreq:
         return rc;
 }
