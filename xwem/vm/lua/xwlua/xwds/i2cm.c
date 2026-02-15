@@ -255,9 +255,10 @@ int xwlua_i2cm_msg_new_buffer(lua_State * L)
         idx = (xwsz_t)luaL_checkinteger(L, 2);
         size = (xwsz_t)luaL_checkinteger(L, 3);
         if (idx < msg->num) {
-                msg->msg[idx].data = (xwu8_t *)luaL_buffinitsize(L, &b, size);;
+                luaL_buffinitsize(L, &b, size);;
                 msg->msg[idx].size = size;
-                luaL_pushresult(&b);
+                luaL_pushresultsize(&b, size);
+                msg->msg[idx].data = (xwu8_t *)luaL_checkstring(L, -1);
                 ret = 1;
         } else {
                 ret = 0;
