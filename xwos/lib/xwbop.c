@@ -728,14 +728,19 @@ void xwbmpop_x1m(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)
         }
 }
 
-#if (!defined(ARCHCFG_LIB_XWBMPOP_T1I)) || (1 != ARCHCFG_LIB_XWBMPOP_T1I)
 __xwlib_code
 bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n)
 {
         bmp = bmp + XWBOP_BMP(n);
-        return (bool)(*bmp & XWBOP_BMP_MASK(n));
+        return !!(*bmp & XWBOP_BMP_MASK(n));
 }
-#endif
+
+__xwlib_code
+bool xwbmpop_t0i(xwbmp_t * bmp, xwsq_t n)
+{
+        bmp = bmp + XWBOP_BMP(n);
+        return !(*bmp & XWBOP_BMP_MASK(n));
+}
 
 __xwlib_code
 bool xwbmpop_t1ma(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num)

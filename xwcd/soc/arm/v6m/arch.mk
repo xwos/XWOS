@@ -535,9 +535,6 @@ endif
 ifeq ($(ARCHCFG_LIB_XWBOP_RE64),y)
   ARCH_CSRCS += xwosimpl_soc_xwbop/re64.c
 endif
-ifeq ($(ARCHCFG_LIB_XWBMPOP_T1I),y)
-  ARCH_CSRCS += xwosimpl_soc_xwbop/xwbmpop_t1i.c
-endif
 ifeq ($(ARCHCFG_LIB_XWBMPOP_S1I),y)
   ARCH_CSRCS += xwosimpl_soc_xwbop/xwbmpop_s1i.c
 endif

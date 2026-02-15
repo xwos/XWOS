@@ -504,6 +504,16 @@ void xwbmpop_x1m(xwbmp_t * bmp, const xwbmp_t msk[], xwsz_t num);
 bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n);
 
 /**
+ * @brief 测试位图中的单个位是否为0
+ * @param[in] bmp: 位图的起始地址指针
+ * @param[in] n: 被测试的位的序号
+ * @return 布尔值
+ * @retval true: 置位
+ * @retval false: 复位
+ */
+bool xwbmpop_t0i(xwbmp_t * bmp, xwsq_t n);
+
+/**
  * @brief 测试位图中掩码部分是否全部为1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] msk: 掩码
