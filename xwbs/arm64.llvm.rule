@@ -23,7 +23,6 @@ XWTC ?= $(shell xwtcwd)
 XWTC := $(subst \,/,$(XWTC))
 export XWTC
 ARMTOOLS ?= $(XWTC)/arm
-SYSROOT ?= $(ARMTOOLS)/lib/clang-runtimes/aarch64-none-elf/$(SYSROOT_llvm)
 CC := $(ARMTOOLS)/bin/clang
 CXX := $(ARMTOOLS)/bin/clang++
 AS := $(CC) -x assembler-with-cpp
