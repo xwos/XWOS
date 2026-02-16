@@ -26,8 +26,8 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWCFG_ARCH                              arm
 #define XWCFG_SUBARCH                           v7m
-#define XWCFG_COMPILER                          llvm
-#define XWCFG_LIBC                              picolibc
+#define XWCFG_COMPILER                          gcc
+#define XWCFG_LIBC                              newlib
 #define XWCFG_LDSCRIPT                          brd.lds
 #include <cfg/arch.h>
 
