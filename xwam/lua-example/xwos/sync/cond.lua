@@ -59,7 +59,7 @@ function childthd_main()
     rc = tstcond:wait_to(tstmtx)
     if (rc == 0) then
       print("[Child Thread] Wait condition ... OK")
-      print("[Child Thread] Lock state:", tstmtx:get_lkst())
+      print("[Child Thread] Lock state:", tstmtx:status())
     else
       print("[Child Thread] Wait condition ... error:", rc)
     end
@@ -98,7 +98,7 @@ function childthd_main()
       print("[Child Thread] Wait condition ... OK")
     else
       print("[Child Thread] Wait condition ... error:", rc)
-      print("[Child Thread] Lock state:", tstmtx:get_lkst())
+      print("[Child Thread] Lock state:", tstmtx:status())
     end
   end
 end
