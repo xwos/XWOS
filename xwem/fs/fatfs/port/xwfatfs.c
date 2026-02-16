@@ -130,7 +130,7 @@ DSTATUS disk_initialize(BYTE pdrv)
         return STA_NOINIT;
 }
 
-DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count)
+DRESULT disk_read(BYTE pdrv, BYTE * buff, LBA_t sector, UINT count)
 {
         DRESULT res;
         int result;
@@ -179,7 +179,7 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count)
 }
 
 #if FF_FS_READONLY == 0
-DRESULT disk_write(BYTE pdrv, const BYTE *buff, LBA_t sector, UINT count)
+DRESULT disk_write(BYTE pdrv, const BYTE * buff, LBA_t sector, UINT count)
 {
         DRESULT res;
         int result;
