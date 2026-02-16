@@ -68,14 +68,12 @@
 #define ARCHCFG_LIB_XWBMPOP_S1I                 1
 #define ARCHCFG_LIB_XWBMPOP_C0I                 1
 #define ARCHCFG_LIB_XWBMPOP_X1I                 1
-#define ARCHCFG_LIB_XWBMPOP_T1I                 1
 
 /******** xwaop ********/
 #define ARCHCFG_LIB_XWAOP8                      1
 #define ARCHCFG_LIB_XWAOP16                     1
 #define ARCHCFG_LIB_XWAOP32                     1
 #define ARCHCFG_LIB_XWAOP64                     1
-#define ARCHCFG_LIB_XWBMPAOP                    1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         default configures          ******** ********

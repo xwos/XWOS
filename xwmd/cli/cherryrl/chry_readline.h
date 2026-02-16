@@ -12,8 +12,8 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "xwem/cli/cherryrl/chry_readline_keycode.h"
-#include "xwem/cli/cherryrl/chry_readline_config.h"
+#include "xwmd/cli/cherryrl/chry_readline_keycode.h"
+#include "xwmd/cli/cherryrl/chry_readline_config.h"
 
 #if defined(CONFIG_READLINE_XTERM) && defined(CONFIG_READLINE_NOBLOCK)
 #if CONFIG_READLINE_XTERM && CONFIG_READLINE_NOBLOCK

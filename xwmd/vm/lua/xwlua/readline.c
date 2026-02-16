@@ -15,7 +15,7 @@
 #include <string.h>
 #include <xwos/osal/thd.h>
 #include "xwmd/vm/lua/src/lua.h"
-#include "xwem/cli/cherryrl/chry_readline.h"
+#include "xwmd/cli/cherryrl/chry_readline.h"
 
 #include <xwos/lib/xwlog.h>
 #define LOGTAG "XWLUA.RL"
@@ -27,7 +27,7 @@ chry_readline_t xwlua_cherryrl;
 char xwlua_cherryrl_prompt[XWLUA_RL_PROMPT_MAXSIZE];
 char xwlua_cherryrl_history[XWLUA_RL_HISTORY_MAXSIZE];
 
-int xwlua_cherryrl_ucb(chry_readline_t *rl, uint8_t exec)
+int xwlua_cherryrl_ucb(chry_readline_t * rl, uint8_t exec)
 {
         /*!< user event callback will not output newline automatically */
         chry_readline_newline(rl);
