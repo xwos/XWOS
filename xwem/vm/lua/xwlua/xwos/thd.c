@@ -664,13 +664,10 @@ int xwlua_thdsp_stop(lua_State * L)
         if (XWOK == rc) {
                 lua_pushinteger(L, (lua_Integer)rc);
                 childL = err_ptr(trc);
-                xwlua_vm_dump_stack(childL);
-                xwlua_vm_dump_stack(L);
                 nres = lua_gettop(childL);
                 for (i = 1; i <= nres; i++) {
                         xwlua_vm_move_element(childL, i, L);
                 }
-                xwlua_vm_dump_stack(L);
                 lua_close(childL);
                 nres += 1;
         } else {
