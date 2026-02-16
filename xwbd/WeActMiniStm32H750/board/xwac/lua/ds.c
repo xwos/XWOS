@@ -19,11 +19,11 @@
  */
 
 #include "board/std.h"
-#include <xwem/vm/lua/src/lauxlib.h>
-#include <xwem/vm/lua/xwlua/xwds/soc.h>
-#include <xwem/vm/lua/xwlua/xwds/uart.h>
-#include <xwem/vm/lua/xwlua/xwds/spim.h>
-#include <xwem/vm/lua/xwlua/xwds/i2cm.h>
+#include <xwmd/vm/lua/src/lauxlib.h>
+#include <xwmd/vm/lua/xwlua/xwds/soc.h>
+#include <xwmd/vm/lua/xwlua/xwds/uart.h>
+#include <xwmd/vm/lua/xwlua/xwds/spim.h>
+#include <xwmd/vm/lua/xwlua/xwds/i2cm.h>
 #include "bm/Stm32Hal/xwds/device.h"
 
 void xwlua_open_brdlibs(lua_State * L)
