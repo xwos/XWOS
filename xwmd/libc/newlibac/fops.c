@@ -17,6 +17,7 @@
 #include <xwmd/libc/newlibac/check.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #if defined(XWMDCFG_libc_newlibac_FATFS) && (1 == XWMDCFG_libc_newlibac_FATFS)
 #  include <xwmd/libc/newlibac/fatfs.h>

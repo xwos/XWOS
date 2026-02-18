@@ -17,6 +17,7 @@
 #include <xwmd/libc/picolibcac/check.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #if defined(XWMDCFG_libc_picolibcac_FATFS) && (1 == XWMDCFG_libc_picolibcac_FATFS)
 #  include <xwmd/libc/picolibcac/fatfs.h>
@@ -105,6 +106,9 @@ int close(int fd)
 ssize_t read(int fd, void * buf, size_t cnt)
 {
         ssize_t ret;
+        XWOS_UNUSED(fd);
+        XWOS_UNUSED(buf);
+        XWOS_UNUSED(cnt);
 
         if (0 == fd) {
                 ret = picolibcac_fops_read_stdin(fd, buf, cnt);
@@ -147,6 +151,9 @@ ssize_t write(int fd, const void * data, size_t cnt)
 _off_t lseek(int fd, _off_t pos, int whence)
 {
         int curpos;
+        XWOS_UNUSED(fd);
+        XWOS_UNUSED(pos);
+        XWOS_UNUSED(whence);
 
         if (fd <= 2) {
                 errno = EPERM;
