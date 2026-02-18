@@ -194,28 +194,10 @@ class Bmp
     {
         xwbmpop_s1all(mData, TNum);
     }
-    void set(int pos)
+    void set(xwsq_t pos)
     {
         if ((xwsq_t)pos < TNum) {
-            xwbmpop_s1i(mData, (xwsq_t)pos);
-        }
-    }
-    void set(unsigned int pos)
-    {
-        if ((xwsq_t)pos < TNum) {
-            xwbmpop_s1i(mData, (xwsq_t)pos);
-        }
-    }
-    void set(long pos)
-    {
-        if ((xwsq_t)pos < TNum) {
-            xwbmpop_s1i(mData, (xwsq_t)pos);
-        }
-    }
-    void set(unsigned long pos)
-    {
-        if ((xwsq_t)pos < TNum) {
-            xwbmpop_s1i(mData, (xwsq_t)pos);
+            xwbmpop_s1i(mData, pos);
         }
     }
     void set(Bmp<TNum> * msk)
@@ -230,28 +212,10 @@ class Bmp
     {
         xwbmpop_c0all(mData, TNum);
     }
-    void clear(int pos)
+    void clear(xwsq_t pos)
     {
         if ((xwsq_t)pos < TNum) {
-            xwbmpop_c0i(mData, (xwsq_t)pos);
-        }
-    }
-    void clear(unsigned int pos)
-    {
-        if ((xwsq_t)pos < TNum) {
-            xwbmpop_c0i(mData, (xwsq_t)pos);
-        }
-    }
-    void clear(long pos)
-    {
-        if ((xwsq_t)pos < TNum) {
-            xwbmpop_c0i(mData, (xwsq_t)pos);
-        }
-    }
-    void clear(unsigned long pos)
-    {
-        if ((xwsq_t)pos < TNum) {
-            xwbmpop_c0i(mData, (xwsq_t)pos);
+            xwbmpop_c0i(mData, pos);
         }
     }
     void clear(Bmp<TNum> * msk)
@@ -266,28 +230,10 @@ class Bmp
     {
         xwbmpop_not(mData, TNum);
     }
-    void flip(int pos)
+    void flip(xwsq_t pos)
     {
         if ((xwsq_t)pos < TNum) {
-            xwbmpop_x1i(mData, (xwsq_t)pos);
-        }
-    }
-    void flip(unsigned int pos)
-    {
-        if ((xwsq_t)pos < TNum) {
-            xwbmpop_x1i(mData, (xwsq_t)pos);
-        }
-    }
-    void flip(long pos)
-    {
-        if ((xwsq_t)pos < TNum) {
-            xwbmpop_x1i(mData, (xwsq_t)pos);
-        }
-    }
-    void flip(unsigned long pos)
-    {
-        if ((xwsq_t)pos < TNum) {
-            xwbmpop_x1i(mData, (xwsq_t)pos);
+            xwbmpop_x1i(mData, pos);
         }
     }
     void flip(Bmp<TNum> * msk)

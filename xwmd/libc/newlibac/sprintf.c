@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <ctype.h>
+#include <stddef.h>
 #include <xwos/lib/div64.h>
 
 void newlibac_sprintf_linkage_stub(void)

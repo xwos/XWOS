@@ -123,13 +123,9 @@ class Flg
      */
     xwer_t set(xwos::Bmp<TNum> & msk) { return xwos_flg_s1m(mFlgPtr, msk.mData); }
     /**
-     * @overload xwer_t set(unsigned long pos)
+     * @overload xwer_t set(xwos::Bmp<TNum> & msk)
      */
-    xwer_t set(unsigned long pos) { return xwos_flg_s1i(mFlgPtr, pos); }
-    /**
-     * @overload xwer_t set(long pos)
-     */
-    xwer_t set(long pos) { return xwos_flg_s1i(mFlgPtr, (xwsq_t)pos); }
+    xwer_t set(xwsq_t pos) { return xwos_flg_s1i(mFlgPtr, pos); }
 
     /**
      * @brief 同时清除多个事件标志位
@@ -151,13 +147,9 @@ class Flg
      */
     xwer_t clear(xwos::Bmp<TNum> & msk) { return xwos_flg_c0m(mFlgPtr, msk.mData); }
     /**
-     * @overload xwer_t clear(unsigned long pos)
+     * @overload xwer_t clear(xwos::Bmp<TNum> & msk)
      */
-    xwer_t clear(unsigned long pos) { return xwos_flg_c0i(mFlgPtr, (xwsq_t)pos); }
-    /**
-     * @overload xwer_t clear(long pos)
-     */
-    xwer_t clear(long pos) { return xwos_flg_c0i(mFlgPtr, (xwsq_t)pos); }
+    xwer_t clear(xwsq_t pos) { return xwos_flg_c0i(mFlgPtr, pos); }
 
 
     /**
@@ -180,13 +172,9 @@ class Flg
      */
     xwer_t toggle(xwos::Bmp<TNum> & msk) { return xwos_flg_x1m(mFlgPtr, msk.mData); }
     /**
-     * @overload xwer_t toggle(unsigned long pos)
+     * @overload xwer_t toggle(xwos::Bmp<TNum> & msk)
      */
-    xwer_t toggle(unsigned long pos) { return xwos_flg_x1i(mFlgPtr, (xwsq_t)pos); }
-    /**
-     * @overload xwer_t toggle(long pos)
-     */
-    xwer_t toggle(long pos) { return xwos_flg_x1i(mFlgPtr, (xwsq_t)pos); }
+    xwer_t toggle(xwsq_t pos) { return xwos_flg_x1i(mFlgPtr, pos); }
 
     /**
      * @brief 等待事件标志
