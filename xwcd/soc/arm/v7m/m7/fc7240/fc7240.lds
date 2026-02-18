@@ -144,7 +144,7 @@ SECTIONS {
         /* -------- Global Offset Table -------- */
 
         /* ++++++++ Data ++++++++ */
-        .cpu0.thread.stack (OVERLAY) : ALIGN(32) {
+        .cpu0.thread.stack : ALIGN(32) {
                 *(.cpu0.thread.stack*)
                 . = ALIGN(32);
                 cpu0_thread_stack_vma_end = .;
