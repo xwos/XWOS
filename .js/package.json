@@ -1,13 +1,13 @@
 {
-  "name": "xwhusky",
+  "name": "xwos-denv",
   "version": "1.0.0",
-  "description": "XWOS git hooks",
+  "description": "XWOS Development Environment",
+  "license": "MIT",
+  "author": "Roy Sun",
   "main": "index.js",
   "scripts": {
-    "prepare": "cd ../../../.. && husky install xwbs/util/js/xwhusky/.husky"
+    "husky": "cd .. && husky install .js/commitlint/husky"
   },
-  "author": "Roy Sun",
-  "license": "Apache-2.0",
   "dependencies": {
     "@commitlint/cli": "^18",
     "@commitlint/config-conventional": "^18",

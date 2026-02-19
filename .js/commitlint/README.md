@@ -5,6 +5,7 @@ Husky是一个git hook的框架，可用来检查提交信息、运行测试、�
 # 安装
 
 ```shell
+cd .js
 npm i
 npm run prepare
 ```
