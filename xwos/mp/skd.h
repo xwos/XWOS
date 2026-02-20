@@ -101,9 +101,10 @@ struct xwmp_skdobj_stack {
 enum xwmp_skd_context_em {
         XWMP_SKD_CONTEXT_BOOT = 0U, /**< 启动 */
         XWMP_SKD_CONTEXT_THD = 1U, /**< 线程 */
-        XWMP_SKD_CONTEXT_ISR = 2U, /**< 中断 */
-        XWMP_SKD_CONTEXT_BH = 3U, /**< 中断底半部 */
-        XWMP_SKD_CONTEXT_IDLE = 4U, /**< 空闲任务 */
+        XWMP_SKD_CONTEXT_PWRMNT = 2U, /**< 电源管理 */
+        XWMP_SKD_CONTEXT_ISR = 3U, /**< 中断 */
+        XWMP_SKD_CONTEXT_BH = 4U, /**< 中断底半部 */
+        XWMP_SKD_CONTEXT_IDLE = 5U, /**< 空闲任务 */
 };
 
 /**
@@ -136,7 +137,8 @@ struct xwmp_skd_pm {
 enum xwmp_skd_state_em {
         XWMP_SKD_STATE_UNINIT, /**< 未初始化 */
         XWMP_SKD_STATE_INIT, /**< 已初始化 */
-        XWMP_SKD_STATE_START, /**< 开始调度 */
+        XWMP_SKD_STATE_RUNNING, /**< 正在调度 */
+        XWMP_SKD_STATE_PWRMNT, /**< 电源管理 */
 };
 
 /**

@@ -127,6 +127,11 @@
 #define XWOS_SKD_CONTEXT_THD            XWOSDL_SKD_CONTEXT_THD
 
 /**
+ * @brief XWOS API：上下文：电源管理
+ */
+#define XWOS_SKD_CONTEXT_PWRMNT         XWOSDL_SKD_CONTEXT_PWRMNT
+
+/**
  * @brief XWOS API：上下文：中断
  */
 #define XWOS_SKD_CONTEXT_ISR            XWOSDL_SKD_CONTEXT_ISR

@@ -1002,7 +1002,7 @@ xwer_t xwup_skd_swcx(void)
 __xwup_code
 struct xwup_skd * xwup_skd_post_start_lic(struct xwup_skd * xwskd)
 {
-        xwskd->state = (xwsq_t)XWUP_SKD_STATE_START;
+        xwskd->state = (xwsq_t)XWUP_SKD_STATE_RUNNING;
         xwup_skd_enpmpt_lc();
         return xwskd;
 }
@@ -1357,6 +1357,7 @@ xwer_t xwup_skd_notify_allfrz_lic(void)
         if ((xwsq_t)XWUP_SKD_WKLKCNT_FREEZING == xwskd->pm.wklkcnt) {
                 xwskd->pm.wklkcnt--;
                 xwospl_cpuirq_restore_lc(cpuirq);
+                xwskd->state = XWUP_SKD_STATE_PWRMNT;
                 xwup_syshwt_stop(&xwskd->tt.hwt); //cppcheck-suppress [misra-c2012-17.7]
                 rc = XWOK;
         } else {
@@ -1477,6 +1478,7 @@ xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
                         xwospl_cpuirq_restore_lc(cpuirq);
                         //cppcheck-suppress [misra-c2012-17.7]
                         xwup_syshwt_start(&xwskd->tt.hwt);
+                        xwskd->state = XWUP_SKD_STATE_RUNNING;
                         xwospl_cpuirq_save_lc(&cpuirq);
                 }
                 if ((xwsq_t)XWUP_SKD_WKLKCNT_THAWING == xwskd->pm.wklkcnt) {
@@ -1576,7 +1578,7 @@ void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                 }
         } else {
                 xwskd = xwup_skd_get_lc();
-                if ((xwsq_t)XWUP_SKD_STATE_START == xwskd->state) {
+                if ((xwsq_t)XWUP_SKD_STATE_RUNNING == xwskd->state) {
                         if (XWUP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
                                 ctx = (xwsq_t)XWUP_SKD_CONTEXT_IDLE;
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
@@ -1586,6 +1588,8 @@ void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                         } else {
                                 ctx = (xwsq_t)XWUP_SKD_CONTEXT_THD;
                         }
+                } else if ((xwsq_t)XWUP_SKD_STATE_PWRMNT == xwskd->state) {
+                        ctx = (xwsq_t)XWUP_SKD_CONTEXT_PWRMNT;
                 } else {
                         ctx = (xwsq_t)XWUP_SKD_CONTEXT_BOOT;
                 }

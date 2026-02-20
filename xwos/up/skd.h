@@ -99,9 +99,10 @@ struct xwup_skdobj_stack {
 enum xwup_skd_context_em {
         XWUP_SKD_CONTEXT_BOOT = 0U, /**< 初始化与反初始化 */
         XWUP_SKD_CONTEXT_THD = 1U, /**< 线程 */
-        XWUP_SKD_CONTEXT_ISR = 2U, /**< 中断 */
-        XWUP_SKD_CONTEXT_BH = 3U, /**< 中断底半部 */
-        XWUP_SKD_CONTEXT_IDLE = 4U, /**< 空闲任务 */
+        XWUP_SKD_CONTEXT_PWRMNT = 2U, /**< 电源管理 */
+        XWUP_SKD_CONTEXT_ISR = 3U, /**< 中断 */
+        XWUP_SKD_CONTEXT_BH = 4U, /**< 中断底半部 */
+        XWUP_SKD_CONTEXT_IDLE = 5U, /**< 空闲任务 */
 };
 
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
@@ -133,7 +134,8 @@ struct xwup_skd_pm {
 enum xwup_skd_state_em {
         XWUP_SKD_STATE_UNINIT, /**< 未初始化 */
         XWUP_SKD_STATE_INIT, /**< 已初始化 */
-        XWUP_SKD_STATE_START, /**< 开始调度 */
+        XWUP_SKD_STATE_RUNNING, /**< 开始调度 */
+        XWUP_SKD_STATE_PWRMNT, /**< 电源管理 */
 };
 
 /**
