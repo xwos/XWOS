@@ -1075,7 +1075,7 @@ xwer_t xwmp_skd_swcx(struct xwmp_skd * xwskd)
 __xwmp_code
 struct xwmp_skd * xwmp_skd_post_start_lic(struct xwmp_skd * xwskd)
 {
-        xwskd->state = (xwsq_t)XWMP_SKD_STATE_START;
+        xwskd->state = (xwsq_t)XWMP_SKD_STATE_RUNNING;
         xwmp_skd_enpmpt(xwskd);
         return xwskd;
 }
@@ -1361,6 +1361,7 @@ xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd)
                                 (xwsq_t)1,
                                 &nv, NULL);
         if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_ALLFRZ == nv)) {
+                xwskd->state = XWMP_SKD_STATE_PWRMNT;
                 // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_syshwt_stop(&xwskd->tt.hwt);
         } else {
@@ -1504,6 +1505,7 @@ xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd)
                 if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_THAWING == nv)) {
                         rc = xwmp_syshwt_start(&xwskd->tt.hwt);
                         XWOS_BUG_ON(rc < 0);
+                        xwskd->state = XWMP_SKD_STATE_RUNNING;
                 }
 
                 rc = xwaop_teq_then_add(xwsq_t, &xwskd->pm.wklkcnt,
@@ -1589,7 +1591,7 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                 }
         } else {
                 xwskd = xwmp_skd_get_lc();
-                if ((xwsq_t)XWMP_SKD_STATE_START == xwskd->state) {
+                if ((xwsq_t)XWMP_SKD_STATE_RUNNING == xwskd->state) {
                         if (XWMP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
                                 ctx = (xwsq_t)XWMP_SKD_CONTEXT_IDLE;
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
@@ -1599,6 +1601,8 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                         } else {
                                 ctx = (xwsq_t)XWMP_SKD_CONTEXT_THD;
                         }
+                } else if ((xwsq_t)XWMP_SKD_STATE_PWRMNT == xwskd->state) {
+                        ctx = (xwsq_t)XWMP_SKD_CONTEXT_PWRMNT;
                 } else {
                         ctx = (xwsq_t)XWMP_SKD_CONTEXT_BOOT;
                 }
