@@ -21,11 +21,5 @@
 __xwmp_init_code
 xwer_t xwmp_init(void)
 {
-        xwid_t cpuid;
-
-        cpuid = xwmp_skd_get_cpuid_lc();
-        if ((xwid_t)0 == cpuid) {
-                xwmp_pmdm_init();
-        }
         return xwmp_skd_init_lc();
 }

@@ -10,13 +10,13 @@ use core::cmp::{PartialOrd, Ordering};
 use crate::types::*;
 
 extern "C" {
-    fn xwrustffi_pm_set_cb(resume_cb: PmCallback,
-                           suspend_cb: PmCallback,
-                           wakeup_cb: PmCallback,
-                           sleep_cb: PmCallback,
+    fn xwrustffi_pm_set_cb(resume: PmCallback,
+                           suspend: PmCallback,
+                           wakeup: PmCallback,
+                           sleep: PmCallback,
                            arg: *mut c_void);
-    fn xwrustffi_pm_suspend() -> XwEr;
-    fn xwrustffi_pm_resume() -> XwEr;
+    fn xwrustffi_pm_suspend();
+    fn xwrustffi_pm_resume();
     fn xwrustffi_pm_get_stage() -> XwSq;
 }
 
@@ -27,15 +27,14 @@ pub type PmCallback = extern "C" fn(*mut c_void);
 ///
 /// # 参数说明
 ///
-/// + resume_cb: 从暂停模式恢复的回调函数
-/// + suspend_cb: 进入暂停模式的回调函数
-/// + wakeup_cb: 唤醒时回调函数
-/// + sleep_cb: 休眠时的回调函数
-pub fn set_cb(resume_cb: PmCallback, suspend_cb: PmCallback,
-              wakeup_cb: PmCallback, sleep_cb: PmCallback) {
+/// + resume: 从暂停模式恢复的回调函数
+/// + suspend: 进入暂停模式的回调函数
+/// + wakeup: 唤醒时回调函数
+/// + sleep: 休眠时的回调函数
+pub fn set_cb(resume: PmCallback, suspend: PmCallback,
+              wakeup: PmCallback, sleep: PmCallback) {
     unsafe {
-        xwrustffi_pm_set_cb(resume_cb, suspend_cb, wakeup_cb, sleep_cb,
-                            ptr::null_mut());
+        xwrustffi_pm_set_cb(resume, suspend, wakeup, sleep, ptr::null_mut());
     }
 }
 
@@ -43,20 +42,12 @@ pub fn set_cb(resume_cb: PmCallback, suspend_cb: PmCallback,
 ///
 /// 调用此方法后，所有线程都将开始冻结。冻结完成后，系统开始进入低功耗状态。
 ///
-/// # 错误码
-///
-/// + [`XWOK`] 没有错误
-/// + [`-EACCES`] 系统不是运行状态
-///
 /// # 上下文
 ///
 /// + 任意
-///
-/// [`XWOK`]: crate::errno::XWOK
-/// [`-EACCES`]: crate::errno::EACCES
-pub fn suspend() -> XwEr {
+pub fn suspend() {
     unsafe {
-        xwrustffi_pm_suspend()
+        xwrustffi_pm_suspend();
     }
 }
 
@@ -72,12 +63,9 @@ pub fn suspend() -> XwEr {
 /// # 上下文
 ///
 /// + 中断
-///
-/// [`XWOK`]: crate::errno::XWOK
-/// [`-EALREADY`]: crate::errno::EALREADY
-pub fn resume() -> XwEr {
+pub fn resume() {
     unsafe {
-        xwrustffi_pm_resume()
+        xwrustffi_pm_resume();
     }
 }
 

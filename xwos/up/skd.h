@@ -17,7 +17,6 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/up/rtrq.h>
-#include <xwos/up/pm.h>
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/up/bh.h>
 #endif
@@ -106,14 +105,31 @@ enum xwup_skd_context_em {
 };
 
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
+typedef void (* xwup_skd_pm_cb_f)(void *); /**< 电源管理回调函数 */
+
+/**
+ * @brief 调度器唤醒锁状态枚举
+ */
+enum xwup_skd_wakelock_cnt_em {
+        XWUP_SKD_WKLKCNT_SUSPENDED = 0U, /**< 调度器已暂停 */
+        XWUP_SKD_WKLKCNT_SUSPENDING = 1U, /**< 调度器正在暂停 */
+        XWUP_SKD_WKLKCNT_RESUMING = XWUP_SKD_WKLKCNT_SUSPENDING, /**< 调度器正在恢复 */
+        XWUP_SKD_WKLKCNT_ALLFRZ = 2U, /**< 调度器所有线程已冻结 */
+        XWUP_SKD_WKLKCNT_FREEZING = 3U, /**< 正在冻结线程 */
+        XWUP_SKD_WKLKCNT_THAWING = XWUP_SKD_WKLKCNT_FREEZING, /**< 正在解冻线程 */
+        XWUP_SKD_WKLKCNT_RUNNING = 4U, /**< 正常运行 */
+        XWUP_SKD_WKLKCNT_UNLOCKED = XWUP_SKD_WKLKCNT_RUNNING, /**< 唤醒锁：未加锁 */
+        XWUP_SKD_WKLKCNT_LOCKED = 5U, /**< 唤醒锁：已加锁 */
+};
+
 /**
  * @brief 电源管理回调函数集合
  */
 struct xwup_skd_pm_callback {
-        xwup_skd_pm_cb_f resume; /**< 电源管理从暂停模式恢复的回调函数 */
-        xwup_skd_pm_cb_f suspend; /**< 电源管理进入暂停模式的回调函数 */
-        xwup_skd_pm_cb_f wakeup; /**< 唤醒电源管理的回调函数 */
-        xwup_skd_pm_cb_f sleep; /**< 电源管理休眠的回调函数 */
+        xwup_skd_pm_cb_f resume; /**< 恢复 */
+        xwup_skd_pm_cb_f suspend; /**< 暂停 */
+        xwup_skd_pm_cb_f wakeup; /**< 唤醒 */
+        xwup_skd_pm_cb_f sleep; /**< 休眠*/
         void * arg; /**< 各回调函数的参数 */
 };
 

@@ -24,11 +24,12 @@
  * ## 电源管理回调
  *
  * 用户可以通过 `xwos_pm_set_cb()` 设置电源管理回调函数。
+ * 这个CAPI只影响当前运行代码的CPU，如果是多核系统，需要在每个CPU上都调用一次这个CAPI。
  *
- * + `resume_cb` ：从暂停模式恢复的回调函数
- * + `suspend_cb` ：进入暂停模式的回调函数
- * + `wakeup_cb` ：唤醒时回调函数
- * + `sleep_cb` ：休眠时的回调函数
+ * + `resume` ：从暂停模式恢复的回调函数
+ * + `suspend` ：进入暂停模式的回调函数
+ * + `wakeup` ：从休眠中唤醒的回调函数
+ * + `sleep` ：CPU进入休眠的回调函数
  *
  *
  * ## 系统休眠与唤醒
@@ -48,16 +49,6 @@
 
 /**
  * @brief 电源管理回调函数指针类型
- * @details
- * ``` C
- * void (* xwos_pmdm_cb_f)(void * arg);
- * ```
- *
- * 电源管理要求用户定义四个回调函数，通过API @ref xwos_pm_set_cb()指定：
- * + `resume_cb` ：从暂停模式恢复的回调函数
- * + `suspend_cb` ：进入暂停模式的回调函数
- * + `wakeup_cb` ：唤醒时回调函数
- * + `sleep_cb` ：休眠时的回调函数
  */
 typedef xwosdl_pm_cb_f xwos_pm_cb_f;
 
@@ -69,6 +60,7 @@ typedef xwosdl_pm_cb_f xwos_pm_cb_f;
 #define XWOS_PM_STAGE_SUSPENDED   XWOSDL_PM_STAGE_SUSPENDED /**< 已经暂停 */
 #define XWOS_PM_STAGE_SUSPENDING  XWOSDL_PM_STAGE_SUSPENDING /**< 正在暂停 */
 #define XWOS_PM_STAGE_RESUMING    XWOSDL_PM_STAGE_RESUMING /**< 正在恢复 */
+#define XWOS_PM_STAGE_ALLFRZ      XWOSDL_PM_STAGE_ALLFRZ /**< 所有线程全部冻结 */
 #define XWOS_PM_STAGE_FREEZING    XWOSDL_PM_STAGE_FREEZING /**< 正在冻结线程 */
 #define XWOS_PM_STAGE_THAWING     XWOSDL_PM_STAGE_THAWING /**< 正在解冻线程 */
 #define XWOS_PM_STAGE_RUNNING     XWOSDL_PM_STAGE_RUNNING /**< 正常运行 */
@@ -79,54 +71,48 @@ typedef xwosdl_pm_cb_f xwos_pm_cb_f;
 
 /**
  * @brief XWOS API：设置电源管理的回调函数
- * @param[in] resume_cb: 从暂停模式恢复的回调函数
- * @param[in] suspend_cb: 进入暂停模式的回调函数
- * @param[in] wakeup_cb: 唤醒时回调函数
- * @param[in] sleep_cb: 休眠时的回调函数
+ * @param[in] resume: 从暂停模式恢复的回调函数
+ * @param[in] suspend: 进入暂停模式的回调函数
+ * @param[in] wakeup: 唤醒时回调函数
+ * @param[in] sleep: 休眠时的回调函数
  * @param[in] arg: 电源管理系统调用回调函数时传递的参数
  * @note
  * + 上下文：任意
  */
 static __xwos_inline_api
-void xwos_pm_set_cb(xwos_pm_cb_f resume_cb,
-                    xwos_pm_cb_f suspend_cb,
-                    xwos_pm_cb_f wakeup_cb,
-                    xwos_pm_cb_f sleep_cb,
+void xwos_pm_set_cb(xwos_pm_cb_f resume,
+                    xwos_pm_cb_f suspend,
+                    xwos_pm_cb_f wakeup,
+                    xwos_pm_cb_f sleep,
                     void * arg)
 {
-        return xwosdl_pm_set_cb(resume_cb, suspend_cb, wakeup_cb, sleep_cb, arg);
+        return xwosdl_pm_set_cb(resume, suspend, wakeup, sleep, arg);
 }
 
 /**
  * @brief XWOS API：将系统切换为低功耗状态
- * @return 错误码
- * @retval XWOK: 成功
- * @retval -EACCES: 系统不是运行状态
  * @note
  * + 上下文：任意
  * @details
  * 调用此方法后，所有线程都将开始冻结。冻结完成后，系统开始进入低功耗状态。
  */
 static __xwos_inline_api
-xwer_t xwos_pm_suspend(void)
+void xwos_pm_suspend(void)
 {
-        return xwosdl_pm_suspend();
+        xwosdl_pm_suspend();
 }
 
 /**
  * @brief XWOS API：唤醒系统
- * @return 错误码
- * @retval XWOK: 成功
- * @retval -EALREADY: 系统正在运行
  * @note
  * + 上下文：中断
  * @details
  * 只可在唤醒中断中调用。
  */
 static __xwos_inline_api
-xwer_t xwos_pm_resume(void)
+void xwos_pm_resume(void)
 {
-        return xwosdl_pm_resume();
+        xwosdl_pm_resume();
 }
 
 /**

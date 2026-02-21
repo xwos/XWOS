@@ -15,41 +15,42 @@
 
 #include <xwos/mp/pm.h>
 
-typedef xwmp_pmdm_cb_f xwosdl_pm_cb_f;
+typedef xwmp_skd_pm_cb_f xwosdl_pm_cb_f;
 
 #define XWOSDL_PM_STAGE_SUSPENDED XWMP_PM_STAGE_SUSPENDED
 #define XWOSDL_PM_STAGE_SUSPENDING XWMP_PM_STAGE_SUSPENDING
 #define XWOSDL_PM_STAGE_RESUMING XWMP_PM_STAGE_RESUMING
+#define XWOSDL_PM_STAGE_ALLFRZ XWMP_PM_STAGE_ALLFRZ
 #define XWOSDL_PM_STAGE_FREEZING XWMP_PM_STAGE_FREEZING
 #define XWOSDL_PM_STAGE_THAWING XWMP_PM_STAGE_THAWING
 #define XWOSDL_PM_STAGE_RUNNING XWMP_PM_STAGE_RUNNING
 
 static __xwcc_inline
-void xwosdl_pm_set_cb(xwosdl_pm_cb_f resume_cb,
-                      xwosdl_pm_cb_f suspend_cb,
-                      xwosdl_pm_cb_f wakeup_cb,
-                      xwosdl_pm_cb_f sleep_cb,
+void xwosdl_pm_set_cb(xwosdl_pm_cb_f resume,
+                      xwosdl_pm_cb_f suspend,
+                      xwosdl_pm_cb_f wakeup,
+                      xwosdl_pm_cb_f sleep,
                       void * arg)
 {
-        return  xwmp_pmdm_set_cb(resume_cb, suspend_cb, wakeup_cb, sleep_cb, arg);
+        return  xwmp_pm_set_cb(resume, suspend, wakeup, sleep, arg);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_pm_suspend(void)
+void xwosdl_pm_suspend(void)
 {
-        return xwmp_pmdm_suspend();
+        xwmp_pm_suspend();
 }
 
 static __xwcc_inline
-xwer_t xwosdl_pm_resume(void)
+void xwosdl_pm_resume(void)
 {
-        return xwmp_pmdm_resume();
+        xwmp_pm_resume();
 }
 
 static __xwcc_inline
 xwsq_t xwosdl_pm_get_stage(void)
 {
-        return xwmp_pmdm_get_stage();
+        return xwmp_pm_get_stage();
 }
 
 #endif /* xwos/mp/osdl/pm.h */

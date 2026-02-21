@@ -28,14 +28,9 @@
  *   + ① xwmp_skd.cxlock
  *     + ② xwmp_skd.rq.rt.lock
  *       + ③ xwmp_thd.stlock
- * - 休眠时锁的顺序：同级的锁不可同时获得
- *   + ① xwmp_skd.pm.lock
- *     + ② xwmp_thd.stlock
- *     + ② xwmp_skd.thdlistlock
  * - 函数suffix意义：
  *   1. _lc: Local Context，是指只能在“本地”CPU的中执行的代码。
  *   2. _lic: Local ISR Context，是指只能在“本地”CPU的中断上下文中执行的代码。
- *   3. _pmlk: 是只持有锁xwmp_skd.pm.lock才可调用的函数。
  *   3. _tllk: 是只持有锁xwmp_skd.thdlistlock才可调用的函数。
  */
 
@@ -196,9 +191,7 @@ xwer_t xwmp_skd_init_lc(void)
         xwmp_skd_init_idled(xwskd);
         xwskd->pm.wklkcnt = (xwsq_t)XWMP_SKD_WKLKCNT_RUNNING;
         xwskd->pm.frz_thd_cnt = (xwsq_t)0;
-        xwmp_splk_init(&xwskd->pm.lock);
         xwlib_bclst_init_head(&xwskd->pm.frzlist);
-        xwskd->pm.xwpmdm = &xwmp_pmdm;
         rc = xwospl_skd_init(xwskd);
         if (rc < 0) {
                 goto err_skd_init;
@@ -1378,17 +1371,30 @@ xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd)
 static __xwmp_code
 void xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
 {
+        xwreg_t cpuirq;
         xwsq_t nv;
         xwer_t rc;
 
+        xwmp_cpuirq_save_lc(&cpuirq);
         rc = xwaop_teq_then_sub(xwsq_t, &xwskd->pm.wklkcnt,
                                 (xwsq_t)XWMP_SKD_WKLKCNT_ALLFRZ,
                                 (xwsq_t)1,
                                 &nv, NULL);
-        if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_SUSPENDED == nv)) {
-                if (NULL != xwskd->pm.xwpmdm) {
-                        xwmp_pmdm_report_xwskd_suspended(xwskd->pm.xwpmdm);
+        if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_SUSPENDING == nv)) {
+                if (NULL != xwskd->pm.cb.suspend) {
+                        xwskd->pm.cb.suspend(xwskd->pm.cb.arg);
                 }
+        }
+        xwmp_cpuirq_restore_lc(cpuirq);
+        xwaop_teq_then_sub(xwsq_t, &xwskd->pm.wklkcnt,
+                           (xwsq_t)XWMP_SKD_WKLKCNT_SUSPENDING,
+                           (xwsq_t)1,
+                           &nv, NULL);
+        while ((xwsq_t)XWMP_SKD_WKLKCNT_SUSPENDED == nv) {
+                if (NULL != xwskd->pm.cb.sleep) {
+                        xwskd->pm.cb.sleep(xwskd->pm.cb.arg);
+                }
+                nv = xwaop_load(xwsq_t, &xwskd->pm.wklkcnt, xwaop_mo_acquire);
         }
 }
 
@@ -1404,19 +1410,17 @@ void xwmp_skd_thaw_allfrz_lic(struct xwmp_skd * xwskd)
         struct xwmp_thd * n;
         xwreg_t cpuirq;
 
-        xwmp_splk_lock_cpuirqsv(&xwskd->pm.lock, &cpuirq);
-        xwmp_splk_lock(&xwskd->thdlistlock);
+        xwmp_splk_lock_cpuirqsv(&xwskd->thdlistlock, &cpuirq);
         // cppcheck-suppress [misra-c2012-12.3, misra-c2012-14.2]
         xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->thdlist,
                                         struct xwmp_thd, thdnode) {
                 xwmp_thd_grab(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_splk_unlock(&xwskd->thdlistlock);
-                xwmp_thd_thaw_lic_pmlk(c); // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_thd_thaw_lic(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_thd_put(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_splk_lock(&xwskd->thdlistlock);
         }
-        xwmp_splk_unlock(&xwskd->thdlistlock);
-        xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+        xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         XWOS_BUG_ON(xwskd->pm.frz_thd_cnt != (xwsq_t)0);
 }
@@ -1436,16 +1440,13 @@ xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd)
         xwreg_t cpuirq;
 
         xwmp_skd_reqfrz_intr_all_lic(xwskd);
-        xwmp_splk_lock_cpuirqsv(&xwskd->pm.lock, &cpuirq);
-        xwmp_splk_lock(&xwskd->thdlistlock);
+        xwmp_splk_lock_cpuirqsv(&xwskd->thdlistlock, &cpuirq);
         if (xwskd->thd_num == xwskd->pm.frz_thd_cnt) {
-                xwmp_splk_unlock(&xwskd->thdlistlock);
-                xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                 // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_skd_notify_allfrz_lic(xwskd);
         } else {
-                xwmp_splk_unlock(&xwskd->thdlistlock);
-                xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
         }
         return XWOK;
 }
@@ -1453,7 +1454,6 @@ xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd)
 /**
  * @brief XWMP API：申请暂停调度器
  * @param[in] cpuid: CPU的ID
- * @return 错误码
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
@@ -1462,16 +1462,15 @@ xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd)
  * + 调度器暂停时会通知所有线程进入冻结状态，以便执行低功耗的代码流程。
  */
 __xwmp_api
-xwer_t xwmp_skd_suspend(xwid_t cpuid)
+void xwmp_skd_suspend(xwid_t cpuid)
 {
         struct xwmp_skd * xwskd;
         xwer_t rc;
 
         rc = xwmp_skd_get_by_cpuid(cpuid, &xwskd);
         if (XWOK == rc) {
-                rc = xwmp_skd_dec_wklkcnt(xwskd);
+                xwmp_skd_dec_wklkcnt(xwskd);
         }
-        return rc;
 }
 
 /**
@@ -1485,6 +1484,7 @@ xwer_t xwmp_skd_suspend(xwid_t cpuid)
 __xwmp_code
 xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd)
 {
+        xwreg_t cpuirq;
         xwer_t rc;
         xwsq_t nv;
         xwsq_t ov;
@@ -1494,10 +1494,22 @@ xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd)
                                         (xwsq_t)XWMP_SKD_WKLKCNT_SUSPENDED,
                                         (xwsq_t)1,
                                         &nv, &ov);
-                if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_ALLFRZ == nv)) {
-                        xwmp_pmdm_report_xwskd_resuming(xwskd->pm.xwpmdm);
+                if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_RESUMING == nv)) {
+                        if (NULL != xwskd->pm.cb.wakeup) {
+                                xwskd->pm.cb.wakeup(xwskd->pm.cb.arg);
+                        }
                 }
-
+                xwmp_cpuirq_save_lc(&cpuirq);
+                rc = xwaop_teq_then_add(xwsq_t, &xwskd->pm.wklkcnt,
+                                        (xwsq_t)XWMP_SKD_WKLKCNT_RESUMING,
+                                        (xwsq_t)1,
+                                        &nv, &ov);
+                if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_ALLFRZ == nv)) {
+                        if (NULL != xwskd->pm.cb.resume) {
+                                xwskd->pm.cb.resume(xwskd->pm.cb.arg);
+                        }
+                }
+                xwmp_cpuirq_restore_lc(cpuirq);
                 rc = xwaop_teq_then_add(xwsq_t, &xwskd->pm.wklkcnt,
                                         (xwsq_t)XWMP_SKD_WKLKCNT_ALLFRZ,
                                         (xwsq_t)1,
@@ -1514,27 +1526,24 @@ xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd)
                                         &nv, &ov);
                 if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_UNLOCKED == nv)) {
                         xwmp_skd_thaw_allfrz_lic(xwskd);
-                        rc = XWOK;
                         break;
                 } else if (ov >= (xwsq_t)XWMP_SKD_WKLKCNT_UNLOCKED) {
-                        rc = -EALREADY;
                         break;
                 } else {}
         } while (true);
-        return rc;
+        return XWOK;
 }
 
 /**
  * @brief XWMP API：从低功耗状态恢复调度器
  * @param[in] cpuid: CPU的ID
- * @return 错误码
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  */
 __xwmp_api
-xwer_t xwmp_skd_resume(xwid_t cpuid)
+void xwmp_skd_resume(xwid_t cpuid)
 {
         struct xwmp_skd * xwskd;
         xwid_t localid;
@@ -1544,17 +1553,16 @@ xwer_t xwmp_skd_resume(xwid_t cpuid)
         if (localid == cpuid) {
                 xwskd = xwmp_skd_get_lc();
                 if (XWOK == xwmp_irq_get_id(NULL)) {
-                        rc = xwmp_skd_resume_lic(xwskd);
+                        xwmp_skd_resume_lic(xwskd);
                 } else {
-                        rc = xwospl_skd_resume(xwskd);
+                        xwospl_skd_resume(xwskd);
                 }
         } else {
                 rc = xwmp_skd_get_by_cpuid(cpuid, &xwskd);
                 if (XWOK == rc) {
-                        rc = xwospl_skd_resume(xwskd);
+                        xwospl_skd_resume(xwskd);
                 }
         }
-        return rc;
 }
 
 /**

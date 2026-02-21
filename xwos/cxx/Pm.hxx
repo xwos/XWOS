@@ -49,8 +49,8 @@ class Pm
     virtual void onWakeup() = 0;
     virtual void onSleep() = 0;
   public:
-    xwer_t suspend() { return xwos_pm_suspend(); }
-    xwer_t resume() { return xwos_pm_resume(); }
+    void suspend() { xwos_pm_suspend(); }
+    void resume() { xwos_pm_resume(); }
     enum PmStage stage() { return (enum PmStage)xwos_pm_get_stage(); }
 
   private:

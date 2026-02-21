@@ -146,7 +146,7 @@ void xwmp_thd_eq_plwq_locked(struct xwmp_thd * thd,
                              xwu16_t type);
 #endif
 xwer_t xwmp_thd_reqfrz_lic(struct xwmp_thd * thd);
-xwer_t xwmp_thd_thaw_lic_pmlk(struct xwmp_thd * thd);
+xwer_t xwmp_thd_thaw_lic(struct xwmp_thd * thd);
 
 xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc);
 void xwmp_cthd_return(xwer_t rc);

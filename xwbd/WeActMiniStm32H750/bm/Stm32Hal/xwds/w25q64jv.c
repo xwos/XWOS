@@ -123,12 +123,14 @@ err_w25q64jv_stop:
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t stm32xwds_w25q64jv_drv_resume(struct xwds_device * dev)
 {
-        return stm32xwds_w25q64jv_drv_stop(dev);
+        XWOS_UNUSED(dev);
+        return XWOK;
 }
 
 xwer_t stm32xwds_w25q64jv_drv_suspend(struct xwds_device * dev)
 {
-        return stm32xwds_w25q64jv_drv_start(dev);
+        XWOS_UNUSED(dev);
+        return XWOK;
 }
 #endif
 
