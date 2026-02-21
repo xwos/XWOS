@@ -120,7 +120,7 @@ xwer_t stm32xwds_st7735_drv_start(struct xwds_device * dev)
         if (rc < 0) {
                 goto err_st7735_start;
         }
-	HAL_TIMEx_PWMN_Start(STM32XWDS_ST7735_BRIGHTNESS_TIMER,
+        HAL_TIMEx_PWMN_Start(STM32XWDS_ST7735_BRIGHTNESS_TIMER,
                              STM32XWDS_ST7735_BRIGHTNESS_TIMER_CHANNEL);
         return XWOK;
 
@@ -133,7 +133,7 @@ xwer_t stm32xwds_st7735_drv_stop(struct xwds_device * dev)
 {
         xwer_t rc;
 
-	HAL_TIMEx_PWMN_Stop(STM32XWDS_ST7735_BRIGHTNESS_TIMER,
+        HAL_TIMEx_PWMN_Stop(STM32XWDS_ST7735_BRIGHTNESS_TIMER,
                             STM32XWDS_ST7735_BRIGHTNESS_TIMER_CHANNEL);
         rc = xwds_st7735_drv_stop(dev);
         if (rc < 0) {
@@ -155,12 +155,14 @@ err_st7735_stop:
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t stm32xwds_st7735_drv_resume(struct xwds_device * dev)
 {
-        return stm32xwds_st7735_drv_start(dev);
+        XWOS_UNUSED(dev);
+        return XWOK;
 }
 
 xwer_t stm32xwds_st7735_drv_suspend(struct xwds_device * dev)
 {
-        return stm32xwds_st7735_drv_stop(dev);
+        XWOS_UNUSED(dev);
+        return XWOK;
 }
 #endif
 
@@ -257,7 +259,7 @@ xwer_t stm32xwds_st7735_drv_set_brightness(struct xwds_st7735 * st7735,
 {
         XWOS_UNUSED(st7735);
 
-	__HAL_TIM_SET_COMPARE(STM32XWDS_ST7735_BRIGHTNESS_TIMER,
+        __HAL_TIM_SET_COMPARE(STM32XWDS_ST7735_BRIGHTNESS_TIMER,
                               STM32XWDS_ST7735_BRIGHTNESS_TIMER_CHANNEL,
                               brightness);
         return XWOK;

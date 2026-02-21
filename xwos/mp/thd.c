@@ -754,22 +754,19 @@ xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc)
         detached = !!((xwsq_t)XWMP_SKDOBJ_ST_DETACHED & thd->state);
         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
         xwmp_cond_broadcast(&thd->completion); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_splk_lock_cpuirq(&xwskd->pm.lock);
-        xwmp_splk_lock(&xwskd->thdlistlock);
+        xwmp_splk_lock_cpuirq(&xwskd->thdlistlock);
         xwlib_bclst_del_init(&thd->thdnode);
         xwskd->thd_num--;
         if (detached) {
                 xwlib_bclst_add_tail(&xwskd->thdelist, &thd->thdnode);
         }
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
-                xwmp_splk_unlock(&xwskd->thdlistlock);
-                xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                 xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_skd_notify_allfrz_lic(xwskd);
         } else {
-                xwmp_splk_unlock(&xwskd->thdlistlock);
-                xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                 xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         }
@@ -1652,17 +1649,15 @@ xwer_t xwmp_thd_reqfrz_lic(struct xwmp_thd * thd)
         xwer_t rc;
 
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
-        xwmp_splk_lock_cpuirqsv(&xwskd->pm.lock, &cpuirq);
-        xwmp_splk_lock(&thd->stlock);
+        xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
         if ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_FROZEN & thd->state)) {
-                xwmp_splk_unlock(&thd->stlock);
+                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
                 rc = -EALREADY;
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWMP_SKDOBJ_ST_FREEZABLE);
-                xwmp_splk_unlock(&thd->stlock);
+                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
                 rc = XWOK;
         }
-        xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
         return rc;
 }
 
@@ -1686,8 +1681,7 @@ xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd)
         XWOS_BUG_ON((xwsq_t)0 == ((xwsq_t)XWMP_SKDOBJ_ST_RUNNING & thd->state));
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         srccpu = xwskd->id;
-        xwmp_splk_lock_cpuirqsv(&xwskd->pm.lock, &cpuirq);
-        xwmp_splk_lock(&thd->stlock);
+        xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
         if ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_FREEZABLE & thd->state)) {
                 xwbop_c0m(xwsq_t, &thd->state, ((xwsq_t)XWMP_SKDOBJ_ST_RUNNING |
                                                 (xwsq_t)XWMP_SKDOBJ_ST_FREEZABLE));
@@ -1696,13 +1690,13 @@ xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd)
                         xwmp_splk_unlock(&thd->stlock);
                         xwmp_thd_outmigrate_frozen_lic(thd);
                         dstcpu = thd->migration.dst;
-                        xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                        xwmp_cpuirq_restore_lc(cpuirq);
                         if (srccpu == dstcpu) {
                                 xwmp_thd_immigrate_lic(thd);
                         } else {
                                 xwospl_thd_immigrate(thd, dstcpu);
                         }
-                        xwmp_splk_lock_cpuirqsv(&xwskd->pm.lock, &cpuirq);
+                        xwmp_cpuirq_disable_lc();
                 } else {
                         xwmp_splk_unlock(&thd->stlock);
                         xwskd->pm.frz_thd_cnt++;
@@ -1710,22 +1704,19 @@ xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd)
                 }
                 xwmp_splk_lock(&xwskd->thdlistlock);
                 if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
-                        xwmp_splk_unlock(&xwskd->thdlistlock);
-                        xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                        xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                         xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                         // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_skd_notify_allfrz_lic(xwskd);
                 } else {
-                        xwmp_splk_unlock(&xwskd->thdlistlock);
-                        xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                        xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                         xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                         // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_skd_req_swcx(xwskd);
                 }
                 rc = XWOK;
         } else {
-                xwmp_splk_unlock(&thd->stlock);
-                xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
                 rc = -ECANCELED;
         }
         return rc;
@@ -1759,10 +1750,9 @@ xwer_t xwmp_cthd_freeze(void)
  * @return 错误码
  * @note
  * - 此函数只能在线程所属的CPU的中断中执行。
- * - 此函数只能在持有锁xwskd->pm.lock时调用。
  */
 __xwmp_code
-xwer_t xwmp_thd_thaw_lic_pmlk(struct xwmp_thd * thd)
+xwer_t xwmp_thd_thaw_lic(struct xwmp_thd * thd)
 {
         struct xwmp_skd * xwskd;
         xwpr_t prio;
@@ -1857,8 +1847,7 @@ void xwmp_thd_immigrate_lic(struct xwmp_thd * thd)
         XWOS_BUG_ON((xwsq_t)0 == ((xwsq_t)XWMP_SKDOBJ_ST_FROZEN & thd->state));
         XWOS_BUG_ON((xwsq_t)0 == ((xwsq_t)XWMP_SKDOBJ_ST_MIGRATING & thd->state));
         new = xwmp_skd_get_lc();
-        xwmp_splk_lock_cpuirqsv(&new->pm.lock, &cpuirq);
-        xwmp_splk_lock(&new->thdlistlock);
+        xwmp_splk_lock_cpuirqsv(&new->thdlistlock, &cpuirq);
         thd->migration.dst = 0;
         xwlib_bclst_add_tail(&new->thdlist, &thd->thdnode);
         new->thd_num++;
@@ -1870,15 +1859,14 @@ void xwmp_thd_immigrate_lic(struct xwmp_thd * thd)
                 xwmp_splk_unlock(&thd->stlock);
                 xwlib_bclst_add_tail(&new->pm.frzlist, &thd->frznode);
                 new->pm.frz_thd_cnt++;
-                xwmp_splk_unlock_cpuirqrs(&new->pm.lock, cpuirq);
+                xwmp_cpuirq_restore_lc(cpuirq);
         } else {
                 xwmp_splk_lock(&thd->stlock);
                 prio = thd->dprio.r;
                 xwbop_c0m(xwsq_t, &thd->state, ((xwsq_t)XWMP_SKDOBJ_ST_FROZEN |
                                                 (xwsq_t)XWMP_SKDOBJ_ST_MIGRATING));
                 thd->dprio.r = XWMP_SKD_PRIORITY_INVALID;
-                xwmp_splk_unlock(&thd->stlock);
-                xwmp_splk_unlock_cpuirqrs(&new->pm.lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
                 rc = xwmp_thd_rq_add_tail(thd, prio);
                 XWOS_BUG_ON(rc < 0);
                 xwmp_skd_chkpmpt(new);
@@ -1889,9 +1877,9 @@ void xwmp_thd_immigrate_lic(struct xwmp_thd * thd)
  * @brief 将线程从当前CPU中迁出
  * @param[in] thd: 线程对象的指针
  * @note
- * - 此函数只能在线程所属的CPU的中断上下文中执行；
- * - 此函数被调用时需要获得当前CPU调度器的锁 `pm.lock` 并且关闭本地CPU的中断；
- * - 此函数假设线程对象已经被引用，执行过程中不会成为野指针；
+ * + 此函数只能在线程所属的CPU的中断上下文中执行；
+ * + 此函数被调用时需要关闭本地CPU的中断；
+ * + 此函数假设线程对象已经被引用，执行过程中不会成为野指针；
  */
 static __xwmp_code
 void xwmp_thd_outmigrate_frozen_lic(struct xwmp_thd * thd)
@@ -1931,16 +1919,13 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
 
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         srccpu = xwskd->id;
-        xwmp_splk_lock_cpuirqsv(&xwskd->pm.lock, &cpuirq);
-        xwmp_splk_lock(&thd->stlock);
+        xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
         if ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_STANDBY & thd->state)) {
-                xwmp_splk_unlock(&thd->stlock);
-                xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
                 xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 rc = -ESHUTDOWN;
         } else if ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_MIGRATING & thd->state)) {
-                xwmp_splk_unlock(&thd->stlock);
-                xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
                 xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 rc = -EINPROGRESS;
         } else {
@@ -1949,7 +1934,7 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
                         xwmp_splk_unlock(&thd->stlock);
                         thd->migration.dst = dstcpu;
                         xwmp_thd_outmigrate_frozen_lic(thd);
-                        xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                        xwmp_cpuirq_restore_lc(cpuirq);
                         xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                         if (srccpu == dstcpu) {
                                 xwmp_thd_immigrate_lic(thd);
@@ -1961,7 +1946,7 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
                                   (xwsq_t)XWMP_SKDOBJ_ST_FREEZABLE);
                         xwmp_splk_unlock(&thd->stlock);
                         thd->migration.dst = dstcpu;
-                        xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                        xwmp_cpuirq_restore_lc(cpuirq);
                         xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 }
                 rc = XWOK;

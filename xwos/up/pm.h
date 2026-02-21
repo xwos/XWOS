@@ -14,26 +14,12 @@
 #define __xwos_up_pm_h__
 
 #include <xwos/standard.h>
-
-/**
- * @brief 调度器唤醒锁状态枚举
- */
-enum xwup_skd_wakelock_cnt_em {
-        XWUP_SKD_WKLKCNT_SUSPENDED = 0U, /**< 调度器已暂停 */
-        XWUP_SKD_WKLKCNT_SUSPENDING = 1U, /**< 调度器正在暂停 */
-        XWUP_SKD_WKLKCNT_RESUMING = XWUP_SKD_WKLKCNT_SUSPENDING, /**< 调度器正在恢复 */
-        XWUP_SKD_WKLKCNT_ALLFRZ = 2U, /**< 调度器所有线程已冻结 */
-        XWUP_SKD_WKLKCNT_FREEZING = 3U, /**< 正在冻结线程 */
-        XWUP_SKD_WKLKCNT_THAWING = XWUP_SKD_WKLKCNT_FREEZING, /**< 正在解冻线程 */
-        XWUP_SKD_WKLKCNT_RUNNING = 4U, /**< 正常运行 */
-        XWUP_SKD_WKLKCNT_UNLOCKED = XWUP_SKD_WKLKCNT_RUNNING, /**< 唤醒锁：未加锁 */
-        XWUP_SKD_WKLKCNT_LOCKED = 5U, /**< 唤醒锁：已加锁 */
-};
+#include <xwos/up/skd.h>
 
 /**
  * @brief 电源管理阶段枚举
  */
-enum xwup_skd_pm_stage_em {
+enum xwup_pm_stage_em {
         XWUP_PM_STAGE_SUSPENDED = XWUP_SKD_WKLKCNT_SUSPENDED, /**< 已经暂停 */
         XWUP_PM_STAGE_SUSPENDING = XWUP_SKD_WKLKCNT_SUSPENDING, /**< 正在暂停 */
         XWUP_PM_STAGE_RESUMING = XWUP_SKD_WKLKCNT_RESUMING, /**< 正在恢复 */
@@ -46,14 +32,14 @@ enum xwup_skd_pm_stage_em {
 typedef void (* xwup_skd_pm_cb_f)(void *); /**< 电源管理回调函数 */
 
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
-void xwup_skd_set_pm_cb(xwup_skd_pm_cb_f resume_cb,
-                        xwup_skd_pm_cb_f suspend_cb,
-                        xwup_skd_pm_cb_f wakeup_cb,
-                        xwup_skd_pm_cb_f sleep_cb,
-                        void * arg);
+void xwup_pm_set_cb(xwup_skd_pm_cb_f resume,
+                    xwup_skd_pm_cb_f suspend,
+                    xwup_skd_pm_cb_f wakeup,
+                    xwup_skd_pm_cb_f sleep,
+                    void * arg);
 #endif
-xwer_t xwup_skd_suspend(void);
-xwer_t xwup_skd_resume(void);
-xwsq_t xwup_skd_get_pm_stage(void);
+void xwup_pm_suspend(void);
+void xwup_pm_resume(void);
+xwsq_t xwup_pm_get_stage(void);
 
 #endif /* xwos/up/pm.h */

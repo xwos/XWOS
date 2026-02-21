@@ -1213,30 +1213,25 @@ void xwup_skd_intr_all(void)
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
 /**
  * @brief XWUP PM API：设置电源管理回调函数
- * @param[in] resume_cb: 从暂停模式恢复的回调函数
- * @param[in] suspend_cb: 进入暂停模式的回调函数
- * @param[in] wakeup_cb: 唤醒的回调函数
- * @param[in] sleep_cb: 休眠的回调函数
- * @param[in] arg: 回调函数调用时的参数
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  */
 __xwup_api
-void xwup_skd_set_pm_cb(xwup_skd_pm_cb_f resume_cb,
-                        xwup_skd_pm_cb_f suspend_cb,
-                        xwup_skd_pm_cb_f wakeup_cb,
-                        xwup_skd_pm_cb_f sleep_cb,
-                        void * arg)
+void xwup_pm_set_cb(xwup_skd_pm_cb_f resume,
+                    xwup_skd_pm_cb_f suspend,
+                    xwup_skd_pm_cb_f wakeup,
+                    xwup_skd_pm_cb_f sleep,
+                    void * arg)
 {
         struct xwup_skd * xwskd;
 
         xwskd = &xwup_skd;
-        xwskd->pm.cb.resume = resume_cb;
-        xwskd->pm.cb.suspend = suspend_cb;
-        xwskd->pm.cb.wakeup = wakeup_cb;
-        xwskd->pm.cb.sleep = sleep_cb;
+        xwskd->pm.cb.resume = resume;
+        xwskd->pm.cb.suspend = suspend;
+        xwskd->pm.cb.wakeup = wakeup;
+        xwskd->pm.cb.sleep = sleep;
         xwskd->pm.cb.arg = arg;
 }
 
@@ -1429,17 +1424,16 @@ xwer_t xwup_skd_thaw_allfrz_lic(struct xwup_skd * xwskd)
 }
 
 /**
- * @brief XWUP API：申请暂停调度器
- * @return 错误码
+ * @brief XWUP API：申请进入低功耗
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  */
 __xwup_api
-xwer_t xwup_skd_suspend(void)
+void xwup_pm_suspend(void)
 {
-        return xwup_skd_dec_wklkcnt();
+        xwup_skd_dec_wklkcnt();
 }
 
 /**
@@ -1455,7 +1449,6 @@ __xwup_code
 xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
 {
         xwreg_t cpuirq;
-        xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
         do { //cppcheck-suppress [misra-c2012-15.4]
@@ -1487,44 +1480,40 @@ xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
                         //cppcheck-suppress [misra-c2012-17.7]
                         xwup_skd_thaw_allfrz_lic(xwskd);
                         xwospl_cpuirq_save_lc(&cpuirq);
-                        rc = XWOK;
                         break;
                 }
                 if (xwskd->pm.wklkcnt >= (xwsq_t)XWUP_SKD_WKLKCNT_UNLOCKED) {
-                        rc = -EALREADY;
                         break;
                 }
         } while (true);
         xwospl_cpuirq_restore_lc(cpuirq);
-        return rc;
+        return XWOK;
 }
 
 /**
- * @brief XWUP API：继续已经暂停的调度器
- * @return 错误码
- * @retval XWOK: 没有错误
+ * @brief XWUP API：从低功耗状态恢复运行状态
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  */
 __xwup_api
-xwer_t xwup_skd_resume(void)
+void xwup_pm_resume(void)
 {
         struct xwup_skd * xwskd;
         xwer_t rc;
 
         xwskd = &xwup_skd;
-        if (XWOK != xwup_irq_get_id(NULL)) {
-                rc = xwospl_skd_resume(xwskd);
+        rc = xwup_irq_get_id(NULL);
+        if (XWOK != rc) {
+                xwospl_skd_resume(xwskd);
         } else {
-                rc = xwup_skd_resume_lic(xwskd);
+                xwup_skd_resume_lic(xwskd);
         }
-        return rc;
 }
 
 /**
- * @brief XWUP API：获取调度器电源管理阶段
+ * @brief XWUP API：获取当前电源管理阶段
  * @return 状态值 @ref xwup_pm_stage_em
  * @note
  * - 同步/异步：同步
@@ -1532,7 +1521,7 @@ xwer_t xwup_skd_resume(void)
  * - 重入性：可重入
  */
 __xwup_api
-xwsq_t xwup_skd_get_pm_stage(void)
+xwsq_t xwup_pm_get_stage(void)
 {
         struct xwup_skd * xwskd;
 
@@ -1541,6 +1530,16 @@ xwsq_t xwup_skd_get_pm_stage(void)
 }
 
 #else
+__xwup_api
+void xwup_pm_suspend(void)
+{
+}
+
+__xwup_api
+void xwup_pm_resume(void)
+{
+}
+
 __xwup_code
 xwer_t xwup_skd_suspend_lic(struct xwup_skd * xwskd)
 {
@@ -1556,7 +1555,7 @@ xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
 }
 
 __xwup_api
-xwsq_t xwup_skd_get_pm_stage(void)
+xwsq_t xwup_pm_get_stage(void)
 {
         return (xwsq_t)XWUP_PM_STAGE_RUNNING;
 }

@@ -53,6 +53,7 @@
 #if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
 #  include <xwos/up/sync/cond.h>
 #endif
+#include <xwos/up/pm.h>
 
 /* #define XWOS_THDLOGF */ /**< 调试日志开关 */
 #ifdef XWOS_THDLOGF
@@ -1498,7 +1499,7 @@ __xwup_api
 bool xwup_cthd_shld_frz(void)
 {
 #if (1 == XWOSRULE_SKD_THD_FREEZE)
-        return !!(xwup_skd_get_pm_stage() < (xwsq_t)XWUP_PM_STAGE_RUNNING);
+        return !!(xwup_pm_get_stage() < (xwsq_t)XWUP_PM_STAGE_RUNNING);
 #else
         return false;
 #endif

@@ -36,7 +36,6 @@
 #  define XWMP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
 #endif
 
-struct xwmp_pmdm;
 struct xwmp_skd;
 struct xwmp_thd;
 
@@ -112,12 +111,28 @@ enum xwmp_skd_context_em {
  */
 enum xwmp_skd_wakelock_cnt_em {
         XWMP_SKD_WKLKCNT_SUSPENDED = 0U, /**< 调度器已暂停 */
-        XWMP_SKD_WKLKCNT_ALLFRZ = 1U, /**< 调度器所有线程已冻结 */
-        XWMP_SKD_WKLKCNT_FREEZING = 2U, /**< 调度器正在暂停 */
+        XWMP_SKD_WKLKCNT_SUSPENDING = 1U, /**< 调度器正在暂停 */
+        XWMP_SKD_WKLKCNT_RESUMING = XWMP_SKD_WKLKCNT_SUSPENDING, /**< 调度器正在恢复 */
+        XWMP_SKD_WKLKCNT_ALLFRZ = 2U, /**< 调度器所有线程已冻结 */
+        XWMP_SKD_WKLKCNT_FREEZING = 3U, /**< 调度器正在暂停 */
         XWMP_SKD_WKLKCNT_THAWING = XWMP_SKD_WKLKCNT_FREEZING, /**< 调度器正在恢复 */
-        XWMP_SKD_WKLKCNT_RUNNING = 3U, /**< 正常运行 */
+        XWMP_SKD_WKLKCNT_RUNNING = 4U, /**< 正常运行 */
         XWMP_SKD_WKLKCNT_UNLOCKED = XWMP_SKD_WKLKCNT_RUNNING, /**< 唤醒锁：未加锁 */
-        XWMP_SKD_WKLKCNT_LOCKED = 4U, /**< 唤醒锁：已加锁 */
+        XWMP_SKD_WKLKCNT_LOCKED = 5U, /**< 唤醒锁：已加锁 */
+};
+
+
+typedef void (* xwmp_skd_pm_cb_f)(void *); /**< 电源管理回调函数 */
+
+/**
+ * @brief 电源管理领域回调函数集合
+ */
+struct xwmp_skd_pm_callback {
+        xwmp_skd_pm_cb_f resume; /**< 电源管理领域从暂停模式恢复的回调函数 */
+        xwmp_skd_pm_cb_f suspend; /**< 电源管理领域进入暂停模式的回调函数 */
+        xwmp_skd_pm_cb_f wakeup; /**< 唤醒电源管理领域的回调函数 */
+        xwmp_skd_pm_cb_f sleep; /**< 电源管理领域休眠的回调函数 */
+        void * arg; /**< 各回调函数的参数 */
 };
 
 /**
@@ -127,8 +142,7 @@ struct xwmp_skd_pm {
         atomic_xwsq_t wklkcnt; /**< 唤醒锁，取值 @ref xwmp_skd_wakelock_cnt_em */
         xwsz_t frz_thd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
-        struct xwmp_splk lock; /**< 保护链表和计数器的锁 */
-        struct xwmp_pmdm * xwpmdm; /**< 归属的电源管理领域 */
+        struct xwmp_skd_pm_callback cb; /**< 电源管理回调函数集合 */
 };
 
 /**
@@ -273,8 +287,8 @@ struct xwmp_skd * xwmp_skd_enpmpt_lc(void)
         return xwmp_skd_enpmpt(xwskd);
 }
 
-xwer_t xwmp_skd_suspend(xwid_t cpuid);
-xwer_t xwmp_skd_resume(xwid_t cpuid);
+void xwmp_skd_suspend(xwid_t cpuid);
+void xwmp_skd_resume(xwid_t cpuid);
 xwsq_t xwmp_skd_get_pm_state(struct xwmp_skd * xwskd);
 void xwmp_skd_get_context_lc(xwsq_t * ctx, xwirq_t * irqn);
 bool xwmp_skd_prio_tst_valid(xwpr_t prio);

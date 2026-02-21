@@ -14,63 +14,31 @@
 #define __xwos_mp_pm_h__
 
 #include <xwos/standard.h>
-#include <xwos/lib/bclst.h>
-#include <xwos/mp/lock/spinlock.h>
+#include <xwos/mp/skd.h>
 
 struct xwmp_pmdm;
 
 /**
  * @brief 电源管理阶段枚举
  */
-enum xwmp_pm_stage_em {
-        XWMP_PM_STAGE_SUSPENDED = 0U, /**< 已经暂停 */
-        XWMP_PM_STAGE_SUSPENDING = 1U, /**< 正在暂停 */
-        XWMP_PM_STAGE_RESUMING = XWMP_PM_STAGE_SUSPENDING, /**< 正在恢复 */
-        XWMP_PM_STAGE_RESERVED = 2U,
-        XWMP_PM_STAGE_FREEZING = 3U, /**< 正在冻结线程 */
-        XWMP_PM_STAGE_THAWING = XWMP_PM_STAGE_FREEZING, /**< 正在解冻线程 */
-        XWMP_PM_STAGE_RUNNING = 4U, /**< 正常运行 */
+enum xwup_skd_pm_stage_em {
+        XWMP_PM_STAGE_SUSPENDED = XWMP_SKD_WKLKCNT_SUSPENDED, /**< 已经暂停 */
+        XWMP_PM_STAGE_SUSPENDING = XWMP_SKD_WKLKCNT_SUSPENDING, /**< 正在暂停 */
+        XWMP_PM_STAGE_RESUMING = XWMP_SKD_WKLKCNT_RESUMING, /**< 正在恢复 */
+        XWMP_PM_STAGE_ALLFRZ = XWMP_SKD_WKLKCNT_ALLFRZ, /**< 所有线程已冻结 */
+        XWMP_PM_STAGE_FREEZING = XWMP_SKD_WKLKCNT_FREEZING, /**< 正在冻结线程 */
+        XWMP_PM_STAGE_THAWING = XWMP_SKD_WKLKCNT_THAWING, /**< 正在解冻线程 */
+        XWMP_PM_STAGE_RUNNING = XWMP_SKD_WKLKCNT_RUNNING, /**< 正常运行 */
 };
 
-typedef void (* xwmp_pmdm_cb_f)(void *); /**< 电源管理回调函数 */
 
-/**
- * @brief 电源管理领域回调函数集合
- */
-struct xwmp_pmdm_callback {
-        xwmp_pmdm_cb_f resume; /**< 电源管理领域从暂停模式恢复的回调函数 */
-        xwmp_pmdm_cb_f suspend; /**< 电源管理领域进入暂停模式的回调函数 */
-        xwmp_pmdm_cb_f wakeup; /**< 唤醒电源管理领域的回调函数 */
-        xwmp_pmdm_cb_f sleep; /**< 电源管理领域休眠的回调函数 */
-        void * arg; /**< 各回调函数的参数 */
-};
-
-/**
- * @brief 电源管理领域
- */
-struct xwmp_pmdm {
-        /* 配置 */
-        xwsz_t xwskd_num; /**< 调度器数量 */
-        struct xwmp_pmdm_callback cb; /**< 回调函数集合 */
-
-        /* 私有成员 */
-        atomic_xwsq_t stage; /**< 电源管理阶段，取值@ref xwmp_pmdm_stage_em */
-        atomic_xwsz_t suspended_xwskd_cnt; /**< 已暂停的调度器的计数器 */
-        struct xwmp_splk rslock; /**< 防止cb.resume与cb.suspend被同时调用的锁 */
-};
-
-extern struct xwmp_pmdm xwmp_pmdm;
-
-void xwmp_pmdm_init(void);
-void xwmp_pmdm_set_cb(xwmp_pmdm_cb_f resume_cb,
-                      xwmp_pmdm_cb_f suspend_cb,
-                      xwmp_pmdm_cb_f wakeup_cb,
-                      xwmp_pmdm_cb_f sleep_cb,
-                      void * arg);
-xwer_t xwmp_pmdm_suspend(void);
-xwer_t xwmp_pmdm_resume(void);
-xwsq_t xwmp_pmdm_get_stage(void);
-void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm);
-void xwmp_pmdm_report_xwskd_resuming(struct xwmp_pmdm * pmdm);
+void xwmp_pm_set_cb(xwmp_skd_pm_cb_f resume,
+                    xwmp_skd_pm_cb_f suspend,
+                    xwmp_skd_pm_cb_f wakeup,
+                    xwmp_skd_pm_cb_f sleep,
+                    void * arg);
+void xwmp_pm_suspend(void);
+void xwmp_pm_resume(void);
+xwsq_t xwmp_pm_get_stage(void);
 
 #endif /* xwos/mp/pm.h */

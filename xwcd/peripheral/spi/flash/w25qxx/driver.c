@@ -61,13 +61,15 @@ xwer_t xwds_w25qxx_drv_stop(struct xwds_device * dev)
 __xwbsp_code
 xwer_t xwds_w25qxx_drv_resume(struct xwds_device * dev)
 {
-        return xwds_w25qxx_drv_start(dev);
+        XWOS_UNUSED(dev);
+        return XWOK;
 }
 
 __xwbsp_code
 xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev)
 {
-        return xwds_w25qxx_drv_stop(dev);
+        XWOS_UNUSED(dev);
+        return XWOK;
 }
 #endif
 
