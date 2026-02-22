@@ -144,26 +144,12 @@ SECTIONS {
         /* -------- Global Offset Table -------- */
 
         /* ++++++++ Data ++++++++ */
-        .cpu0.thread.stack (OVERLAY) : ALIGN(32) {
-                *(.cpu0.thread.stack*)
-                . = ALIGN(32);
-                cpu0_thread_stack_vma_end = .;
-        } > cpu0_thread_stack_mr
-        cpu0_thread_stack_vma_base = ADDR(.cpu0.thread.stack);
-
-        .cpu1.thread.stack (OVERLAY) : ALIGN(32) {
-                *(.cpu1.thread.stack*)
-                . = ALIGN(32);
-                cpu1_thread_stack_vma_end = .;
-        } > cpu1_thread_stack_mr
-        cpu1_thread_stack_vma_base = ADDR(.cpu1.thread.stack);
-
-        .cpu2.thread.stack (OVERLAY) : ALIGN(32) {
-                *(.cpu2.thread.stack*)
-                . = ALIGN(32);
-                cpu2_thread_stack_vma_end = .;
-        } > cpu2_thread_stack_mr
-        cpu2_thread_stack_vma_base = ADDR(.cpu2.thread.stack);
+        OVERLAY : {
+                .cpu0.thread.stack { *(.cpu0.thread.stack*) }
+                .cpu1.thread.stack { *(.cpu1.thread.stack*) }
+                .cpu2.thread.stack { *(.cpu2.thread.stack*) }
+                .cpu3.thread.stack { *(.cpu3.thread.stack*) }
+        } > thread_stack_mr
 
         .dtcm.data : ALIGN(32) {
                 *(.dtcm.data*)
