@@ -18,6 +18,32 @@ extern xwer_t soc_log_write(const char * s, xwsz_t * n);
 extern xwer_t board_log_write(const char * s, xwsz_t * n);
 
 /**
+ * @brief 输出字符串
+ * @param[in] str: 字符串
+ * @param[in] size: 字符串长度
+ * @note
+ * + 上下文：依赖 `soc_log_write()` 或 `board_log_write()` 实现
+ * @details
+ * 如果底层 `soc_log_write()` 或 `board_log_write()` 的实现会导致线程睡眠，
+ * 不可在除线程外的其他上下文使用。
+ */
+__xwlib_code
+xwer_t xwps(const char * str, xwsz_t size)
+{
+        xwer_t rc;
+#if defined(SOCCFG_LOG) && (1 == SOCCFG_LOG)
+        rc = soc_log_write(str, &size);
+#elif defined(BRDCFG_LOG) && (1 == BRDCFG_LOG)
+        rc = board_log_write(str, &size);
+#else
+        XWOS_UNUSED(str);
+        XWOS_UNUSED(str);
+        rc = -ENOSYS;
+#endif
+        return rc;
+}
+
+/**
  * @brief 格式化字符串并输出到日志，同 `printf()` 函数
  * @param[in] fmt: 格式的字符串
  * @param[in] ...: 需要转换位字符串的其他参数

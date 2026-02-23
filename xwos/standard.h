@@ -95,6 +95,12 @@
 #  endif
 #endif
 
+#if defined(XWOSCFG_LOGO) && (1 == XWOSCFG_LOGO)
+extern const char xwos_logo[]; /**< XWOS LOGO数组 */
+extern const xwsz_t xwos_logo_size; /**< XWOS LOGO数组大小，包括结尾的 '\0' */
+void xwos_show_logo(void);
+#endif
+
 /**
  * @} xwos_standard
  */

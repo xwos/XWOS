@@ -42,7 +42,6 @@ xwer_t xwsh_start(xwstk_t * stack, xwsz_t stack_size)
 
 void xwsh_init(void)
 {
-        xwsh_show_logo();
         xwsh_cherryrl_init();
 }
 

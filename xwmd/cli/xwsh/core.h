@@ -19,6 +19,5 @@
 
 xwer_t xwsh_run_cmdline(char * line);
 void xwsh_show_all_cmds(void);
-void xwsh_show_logo(void);
 
 #endif /* xwmd/cli/xwsh/core.h */

@@ -20,6 +20,10 @@ include xwos/lib/lib.mk
 ######## init ########
 XWOS_CSRCS += init.c
 
+ifeq ($(XWOSCFG_LOGO),y)
+  XWOS_CSRCS += logo.c
+endif
+
 ######## mm ########
 XWOS_CSRCS += mm/sma.c
 

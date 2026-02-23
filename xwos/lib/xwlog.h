@@ -22,6 +22,7 @@
  */
 
 int xwpf(const char * fmt, ...);
+xwer_t xwps(const char * str, xwsz_t size);
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 0)
 #  define XWLOGF_VERBOSE(tag, fmt, ...) xwpf("V|" tag " " fmt, ##__VA_ARGS__)
