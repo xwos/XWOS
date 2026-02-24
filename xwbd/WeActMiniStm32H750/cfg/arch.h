@@ -33,6 +33,9 @@
 /******** ******** fpu ******** ********/
 #define ARCHCFG_FPU                             1
 
+/******** ******** fpu ******** ********/
+#define ARCHCFG_MPU                             1
+
 /******** ******** architecture libs ******** ********/
 /******** libc.a ********/
 #define ARCHCFG_COMPILER_ERRNO                  1
