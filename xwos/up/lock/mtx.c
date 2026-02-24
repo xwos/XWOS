@@ -945,10 +945,9 @@ xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
 __xwup_api
 xwer_t xwup_mtx_get_status(struct xwup_mtx * mtx, xwsq_t * status)
 {
-        volatile struct xwup_mtxtree * ownertree;
+        struct xwup_mtxtree * ownertree;
 
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwmb_read(struct xwup_mtxtree *, ownertree, &mtx->ownertree);
+        ownertree = mtx->ownertree;
         if (NULL != ownertree) {
                 *status = (xwsq_t)XWOS_LKST_LOCKED;
         } else {

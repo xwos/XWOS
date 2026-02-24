@@ -24,36 +24,14 @@
 #include <xwos/ospl/soc/isa.h>
 
 /**
- * @brief: 强制从内存中访问指定类型的变量
- * @param[in] t: 类型，只能为基本类型
- * @param[out] v: 类型为t左值，读取的值放在这个左值中
+ * @brief: 强制以指定类型访问内存地址p
+ * @param[in] t: 类型
+ * @param[out] p: 地址
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
 // cppcheck-suppress [misra-c2012-20.7]
-#define xwmb_access(t, v)       (*((volatile t *)&(v)))
-
-/**
- * @brief: 读取地址中的指定类型的值
- * @param[in] t: 类型，只能为基本类型及其typedef后的类型
- * @param[out] v: 类型为t左值，读取的值放在这个左值中
- * @param[in] p: 类型为t *的指针，指向需要读取的地址
- * @note
- * + 类型t的位宽只能是8位、16位、32位、64位。
- */
-// cppcheck-suppress [misra-c2012-20.7]
-#define xwmb_read(t, v, p)      xwmb_access(t, v) = (*(volatile t * )(p))
-
-/**
- * @brief 存储指定类型的值到地址中
- * @param[in] t: 类型，只能为基本类型及其typedef后的类型
- * @param[in] p: 类型为t *的指针，指向需要存储的地址
- * @param[in] v: 待存储的类型为t右值
- * @note
- * + 类型t的位宽只能是8位、16位、32位、64位。
- */
-// cppcheck-suppress [misra-c2012-20.7]
-#define xwmb_write(t, p, v)     (*(volatile t * )(p)) = (v)
+#define xwmb_access(t, p)       (*((volatile t *)(p)))
 
 #if !defined(xwmb_compiler) || defined(__DOXYGEN__)
 /**
@@ -181,24 +159,24 @@
 
 #if !defined(xwmb_mp_load_acquire) || defined(__DOXYGEN__)
 /**
- * @brief: 读取地址中的指定类型的值，并保证此处的“读”操作一定发生在之后的“读写”操作之前
- * @param[in] t: 类型，只能为基本类型及其typedef后的类型
- * @param[out] v: 类型为t左值，读取的值放在这个左值中
- * @param[in] p: 类型为t *的指针，指向需要读取的地址
+ * @brief: 读取内存地址，并保证此处的“读”操作一定发生在之后的“读写”操作之前
+ * @param[in] t: 类型
+ * @param[out] v: 类型为t左值
+ * @param[in] p: 需要读取的地址，会被强制类型转换为 `t *`来读取
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
-#define xwmb_mp_load_acquire(t, v, p)           \
-        do {                                    \
-                xwmb_read(t, (v), (p));         \
-                xwmb_mp_acquire();              \
+#define xwmb_mp_load_acquire(t, v, p)                           \
+        do {                                                    \
+                xwmb_access(t, &(v)) = xwmb_access(t, p);       \
+                xwmb_mp_acquire();                              \
         } while (0)
 #endif
 
 #if !defined(xwmb_mp_store_release) || defined(__DOXYGEN__)
 /**
- * @brief 存储指定类型的值到地址中，并保证此处的“写”操作一定发生在之前的“读写”操作之后
- * @param[in] t: 类型，只能为基本类型及其typedef后的类型
+ * @brief 存储指定类型的值到内存地址中，并保证“写”操作一定发生在之前的“读写”操作之后
+ * @param[in] t: 类型
  * @param[in] p: 类型为t *的指针，指向需要存储的地址
  * @param[in] v: 待存储的类型为t右值
  * @note
@@ -207,7 +185,7 @@
 #define xwmb_mp_store_release(t, p, v)          \
         do {                                    \
                 xwmb_mp_release();              \
-                xwmb_write(t, (p), (v));        \
+                xwmb_access(t, (p)) = (v);      \
         } while (0)
 #endif
 

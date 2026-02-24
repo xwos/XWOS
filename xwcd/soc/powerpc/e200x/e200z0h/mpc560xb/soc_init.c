@@ -269,7 +269,7 @@ void soc_ram_init(void)
                 /* Read all backup SRAM once. If there is an ECC error, it will enter
                    in Data Storage Exception. */
                 for (i = 0; i < cnt; i++) {
-                        xwmb_read(xwu32_t, tmp, &src[i]);
+                        tmp = xwmb_access(xwu32_t, &src[i]);
                 }
                 asm volatile("wrteei 0");
         } else {

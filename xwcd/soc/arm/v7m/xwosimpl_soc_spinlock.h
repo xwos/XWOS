@@ -83,7 +83,7 @@ void soc_splk_lock(struct soc_splk * socsplk)
 
         while (tmp.v.tickets.next != tmp.v.tickets.curr) {
                 armv7m_wfe();
-                tmp.v.tickets.curr = xwmb_access(xwu16_t, socsplk->v.tickets.curr);
+                tmp.v.tickets.curr = xwmb_access(xwu16_t, &socsplk->v.tickets.curr);
         }
         xwmb_mp_mb();
 }

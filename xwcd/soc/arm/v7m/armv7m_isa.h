@@ -487,7 +487,7 @@ struct armv7m_scs_reg {
 
                         union {
                                 __xw_io xwu32_t u32;
-                        } rnr; /**< offset:0xd98 (r/w) mpu region rnrber register */
+                        } rnr; /**< offset:0xd98 (r/w) mpu region number register */
 
                         union {
                                 __xw_io xwu32_t u32;

@@ -48,7 +48,7 @@ xwsq_t xwmp_sqlk_rd_begin(struct xwmp_sqlk * sql)
         xwsq_t ret;
 
         do {
-                ret = xwmb_access(xwsq_t, sql->seq);
+                ret = xwmb_access(xwsq_t, &sql->seq);
 #if (XWMP_SQLK_GRANULARITY > 1)
                 ret &= ((~(xwsq_t)XWMP_SQLK_GRANULARITY) + (xwsq_t)1);
 #endif
@@ -73,7 +73,7 @@ xwsq_t xwmp_sqlk_get_seq(struct xwmp_sqlk * sql)
 {
         xwsq_t ret;
 
-        ret = xwmb_access(xwsq_t, sql->seq);
+        ret = xwmb_access(xwsq_t, &sql->seq);
         xwmb_mp_rmb();
 #if (XWMP_SQLK_GRANULARITY > 1)
         return ret & ((~(xwsq_t)XWMP_SQLK_GRANULARITY) + (xwsq_t)1);

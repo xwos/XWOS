@@ -85,7 +85,7 @@ void xwospl_syshwt_isr(void)
         __xwcc_unused xwu32_t csr;
 
         /* read to clear COUNTFLAG */
-        xwmb_read(xwu32_t, csr, &armv7m_scs.systick.csr.u32);
+        csr = xwmb_access(xwu32_t, &armv7m_scs.systick.csr.u32);
         xwskd = xwosplcb_skd_get_lc();
         xwosplcb_syshwt_task(&xwskd->tt.hwt);
 }
