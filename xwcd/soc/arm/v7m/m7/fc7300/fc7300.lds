@@ -177,7 +177,7 @@ SECTIONS {
 
         .xwos.data : ALIGN(32) {
                 *(.xwos.data)
-                . = ALIGN(32);
+                . = ALIGN(1024);
                 xwos_data_vma_end = .;
         } > data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);

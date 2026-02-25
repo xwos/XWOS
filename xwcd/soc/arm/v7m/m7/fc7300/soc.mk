@@ -31,6 +31,18 @@ SOC_CXXSRCS :=
 SOC_EOBJS :=
 
 SOC_CSRCS += soc_init.c
+ifeq ($(SOCCFG_CHIP_FC7300F4MDS),y)
+  SOC_CSRCS += fc7300f4mds_init.c
+endif
+ifeq ($(SOCCFG_CHIP_FC7300F4MDD),y)
+  SOC_CSRCS += fc7300f4mdd_init.c
+endif
+ifeq ($(SOCCFG_CHIP_FC7300F8MDT),y)
+  SOC_CSRCS += fc7300f8mdt_init.c
+endif
+ifeq ($(SOCCFG_CHIP_FC7300F8MDQ),y)
+  SOC_CSRCS += fc7300f8mdq_init.c
+endif
 SOC_CSRCS += xwosimpl_irq.c
 SOC_CSRCS += xwosimpl_skd.c
 SOC_CSRCS += xwosimpl_syshwt.c
