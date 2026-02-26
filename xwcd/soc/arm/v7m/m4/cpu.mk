@@ -30,9 +30,9 @@ CPU_CXXSRCS :=
 
 CPU_EOBJS :=
 
-CPU_AFLAGS_llvm := --target=armv7em-none-eabi
-CPU_CFLAGS_llvm := --target=armv7em-none-eabi
-CPU_CXXFLAGS_llvm := --target=armv7em-none-eabi
-CPU_LDFLAGS_llvm := --target=armv7em-none-eabi
+CPU_AFLAGS_llvm := --target=thumbv7m-none-eabihf
+CPU_CFLAGS_llvm := --target=thumbv7m-none-eabihf
+CPU_CXXFLAGS_llvm := --target=thumbv7m-none-eabihf
+CPU_LDFLAGS_llvm := --target=thumbv7m-none-eabihf
 
 RUST_TARGET := thumbv7em-none-eabihf
