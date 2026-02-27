@@ -23,8 +23,6 @@
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
 
 extern xwu8_t armv7m_isr_stack_top[];
-extern xwu8_t dtcm0_mr_origin[];
-extern xwu8_t dtcm0_mr_size[];
 
 /**
  * @brief SOC Boot Entry

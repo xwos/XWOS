@@ -145,11 +145,11 @@ SECTIONS {
 
         /* ++++++++ Data ++++++++ */
         OVERLAY : {
-                .cpu0.thread.stack { *(.cpu0.thread.stack*) }
-                .cpu1.thread.stack { *(.cpu1.thread.stack*) }
-                .cpu2.thread.stack { *(.cpu2.thread.stack*) }
-                .cpu3.thread.stack { *(.cpu3.thread.stack*) }
-        } > thread_stack_mr
+                .cpu0.data { *(.cpu0.data*) }
+                .cpu1.data { *(.cpu1.data*) }
+                .cpu2.data { *(.cpu2.data*) }
+                .cpu3.data { *(.cpu3.data*) }
+        } > percpu_data_mr
 
         .dtcm.data : ALIGN(32) {
                 *(.dtcm.data*)
