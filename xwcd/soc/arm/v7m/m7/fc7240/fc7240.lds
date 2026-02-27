@@ -144,13 +144,6 @@ SECTIONS {
         /* -------- Global Offset Table -------- */
 
         /* ++++++++ Data ++++++++ */
-        .cpu0.thread.stack : ALIGN(32) {
-                *(.cpu0.thread.stack*)
-                . = ALIGN(32);
-                cpu0_thread_stack_vma_end = .;
-        } > cpu0_thread_stack_mr
-        cpu0_thread_stack_vma_base = ADDR(.cpu0.thread.stack);
-
         .dtcm.data : ALIGN(32) {
                 *(.dtcm.data*)
                 *(.seperated_data*)
