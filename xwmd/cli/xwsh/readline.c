@@ -90,17 +90,25 @@ uint8_t xwsh_cherryrl_acb(chry_readline_t * rl, char * pre,
 
 uint16_t xwsh_cherryrl_sput(chry_readline_t * rl, const void * data, uint16_t size)
 {
-        int ret;
+        xwer_t rc;
+        size_t ret;
         const char * buf;
         (void)rl;
 
         buf = data;
         if (size > 0) {
                 ret = fwrite(buf, size, 1, stdout);
-                if (ret > 0) {
-                        fflush(stdout);
-                } else {
+                rc = -errno;
+                if (rc < 0) {
+                        if (xwos_cthd_shld_frz()) {
+                                xwos_cthd_freeze();
+                        }
+                        if (xwos_cthd_shld_stop()) {
+                                xwos_cthd_exit(-EEXIT);
+                        }
                         ret = 0;
+                } else {
+                        fflush(stdout);
                 }
         } else {
                 ret = 0;
@@ -110,14 +118,22 @@ uint16_t xwsh_cherryrl_sput(chry_readline_t * rl, const void * data, uint16_t si
 
 uint16_t xwsh_cherryrl_sget(chry_readline_t * rl, void * data, uint16_t size)
 {
-        int ret;
+        xwer_t rc;
+        size_t ret;
         char * buf;
         (void)rl;
 
         buf = data;
         ret = fread(buf, size, 1, stdin);
-        if (ret < 0) {
+        rc = -errno;
+        if (rc < 0) {
                 ret = 0;
+                if (xwos_cthd_shld_frz()) {
+                        xwos_cthd_freeze();
+                }
+                if (xwos_cthd_shld_stop()) {
+                        xwos_cthd_exit(-EEXIT);
+                }
         }
         return (uint16_t)ret;
 }

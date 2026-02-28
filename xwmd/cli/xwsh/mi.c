@@ -62,9 +62,6 @@ xwer_t xwsh_thd_mainfunc(void * arg)
         XWOS_UNUSED(arg);
         xwsh_init();
         while (!xwos_cthd_shld_stop()) {
-                if (xwos_cthd_shld_frz()) {
-                        xwos_cthd_freeze();
-                }
                 xwsh_loop(buf);
         }
         return XWOK;
