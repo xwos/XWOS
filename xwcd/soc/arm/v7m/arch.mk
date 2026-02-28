@@ -474,19 +474,6 @@ ifeq ($(ARCHCFG_LIB_XWAOP64),y)
   ARCH_CSRCS += xwosimpl_soc_xwaop/s64/xor.c
 endif
 
-ifeq ($(ARCHCFG_LIB_XWBMPAOP),y)
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/t1i.c
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/c0i.c
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/x1i.c
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/s1i.c
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/t0i_then_s1i.c
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/t1i_then_c0i.c
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/ffs_then_c0i.c
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/ffz_then_s1i.c
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/fls_then_c0i.c
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp/flz_then_s1i.c
-endif
-
 ifeq ($(ARCHCFG_LIB_XWBOP_FFS8),y)
   ARCH_CSRCS += xwosimpl_soc_xwbop/ffs8.c
 endif

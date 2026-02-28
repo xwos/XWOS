@@ -16,7 +16,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/lib/xwbop.h>
-#include <xwos/lib/xwaop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/mm/bma.h>
@@ -172,7 +171,7 @@ struct xwssc {
         struct {
                 atomic_xwu32_t cnt; /**< 发送计数器 */
                 struct xwssc_carrier car[XWSSC_MEMBLK_NUM]; /**< 包含待发送帧的发送器 */
-                xwbmpaop_define(carbmp, XWSSC_MEMBLK_NUM); /**< 发送器的索引位图 */
+                xwbmpop_define(carbmp, XWSSC_MEMBLK_NUM); /**< 发送器的索引位图 */
                 struct xwlib_bclst_head q[XWSSC_PRI_NUM]; /**< 每优先级发送队列 */
                 xwbmpop_define(qnebmp, XWSSC_PRI_NUM); /**< 发送队列非空的索引位图 */
                 struct xwos_splk qlock; /**< 保护发送队列的自旋锁 */
