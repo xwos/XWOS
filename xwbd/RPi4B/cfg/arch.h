@@ -69,7 +69,6 @@
 #define ARCHCFG_LIB_XWBMPOP_S1I                 0
 #define ARCHCFG_LIB_XWBMPOP_C0I                 0
 #define ARCHCFG_LIB_XWBMPOP_X1I                 0
-#define ARCHCFG_LIB_XWBMPOP_T1I                 0
 
 /******** xwaop ********/
 #define ARCHCFG_LIB_XWAOP8                      1
