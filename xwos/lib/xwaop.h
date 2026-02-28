@@ -75,7 +75,7 @@
  * + 内存序：acquire。
  */
 #define xwaop_read(type, a, ov) \
-        xwaop(type, read, (a), (ov))
+        xwaop(type, read, (a), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取—写
@@ -89,7 +89,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_write(type, a, v, ov) \
-        xwaop(type, write, (a), (v), (ov))
+        xwaop(type, write, (a), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“相等”－写
@@ -111,7 +111,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_teq_then_write(type, a, t, v, ov) \
-        xwaop(type, teq_then_write, (a), (t), (v), (ov))
+        xwaop(type, teq_then_write, (a), (t), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“不相等”－写
@@ -133,7 +133,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_tne_then_write(type, a, t, v, ov) \
-        xwaop(type, tne_then_write, (a), (t), (v), (ov))
+        xwaop(type, tne_then_write, (a), (t), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“大于”－写
@@ -155,7 +155,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_tgt_then_write(type, a, t, v, ov) \
-        xwaop(type, tgt_then_write, (a), (t), (v), (ov))
+        xwaop(type, tgt_then_write, (a), (t), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“大于等于”－写
@@ -177,7 +177,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_tge_then_write(type, a, t, v, ov) \
-        xwaop(type, tge_then_write, (a), (t), (v), (ov))
+        xwaop(type, tge_then_write, (a), (t), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“小于”－写
@@ -199,7 +199,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_tlt_then_write(type, a, t, v, ov) \
-        xwaop(type, tlt_then_write, (a), (t), (v), (ov))
+        xwaop(type, tlt_then_write, (a), (t), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“小于等于”－写
@@ -221,7 +221,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_tle_then_write(type, a, t, v, ov) \
-        xwaop(type, tle_then_write, (a), (t), (v), (ov))
+        xwaop(type, tle_then_write, (a), (t), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－写
@@ -244,7 +244,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_tgtlt_then_write(type, a, l, r, v, ov) \
-        xwaop(type, tgtlt_then_write, (a), (l), (r), (v), (ov))
+        xwaop(type, tgtlt_then_write, (a), (l), (r), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－写
@@ -267,7 +267,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_tgelt_then_write(type, a, l, r, v, ov) \
-        xwaop(type, tgelt_then_write, (a), (l), (r), (v), (ov))
+        xwaop(type, tgelt_then_write, (a), (l), (r), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－写
@@ -290,7 +290,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_tgtle_then_write(type, a, l, r, v, ov) \
-        xwaop(type, tgtle_then_write, (a), (l), (r), (v), (ov))
+        xwaop(type, tgtle_then_write, (a), (l), (r), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－写
@@ -313,7 +313,7 @@
  * + 结果：通过 `ov` 返回旧值。
  */
 #define xwaop_tgele_then_write(type, a, l, r, v, ov) \
-        xwaop(type, tgele_then_write, (a), (l), (r), (v), (ov))
+        xwaop(type, tgele_then_write, (a), (l), (r), (v), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－相加－回写
@@ -328,7 +328,7 @@
  * + 结果：通过 `nv` 返回相加后的新值，通过 `ov` 返回相加前的旧值。
  */
 #define xwaop_add(type, a, v, nv, ov) \
-        xwaop(type, add, (a), (v), (nv), (ov))
+        xwaop(type, add, (a), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“相等”－相加－回写
@@ -353,7 +353,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_teq_then_add(type, a, t, v, nv, ov) \
-        xwaop(type, teq_then_add, (a), (t), (v), (nv), (ov))
+        xwaop(type, teq_then_add, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“不相等”－相加－回写
@@ -378,7 +378,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tne_then_add(type, a, t, v, nv, ov) \
-        xwaop(type, tne_then_add, (a), (t), (v), (nv), (ov))
+        xwaop(type, tne_then_add, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“大于”－相加－回写
@@ -403,7 +403,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgt_then_add(type, a, t, v, nv, ov) \
-        xwaop(type, tgt_then_add, (a), (t), (v), (nv), (ov))
+        xwaop(type, tgt_then_add, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“大于等于”－相加－回写
@@ -428,7 +428,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tge_then_add(type, a, t, v, nv, ov) \
-        xwaop(type, tge_then_add, (a), (t), (v), (nv), (ov))
+        xwaop(type, tge_then_add, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“小于”－相加－回写
@@ -453,7 +453,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tlt_then_add(type, a, t, v, nv, ov) \
-        xwaop(type, tlt_then_add, (a), (t), (v), (nv), (ov))
+        xwaop(type, tlt_then_add, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“小于等于”－相加－回写
@@ -478,7 +478,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tle_then_add(type, a, t, v, nv, ov) \
-        xwaop(type, tle_then_add, (a), (t), (v), (nv), (ov))
+        xwaop(type, tle_then_add, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－相加－回写
@@ -504,7 +504,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgtlt_then_add(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgtlt_then_add, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgtlt_then_add, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－相加－回写
@@ -530,7 +530,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgelt_then_add(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgelt_then_add, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgelt_then_add, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－相加－回写
@@ -556,7 +556,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgtle_then_add(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgtle_then_add, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgtle_then_add, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－相加－回写
@@ -582,7 +582,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgele_then_add(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgele_then_add, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgele_then_add, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－相减－回写
@@ -596,7 +596,7 @@
  * + 内存序：acq_rel。
  */
 #define xwaop_sub(type, a, v, nv, ov) \
-        xwaop(type, sub, (a), (v), (nv), (ov))
+        xwaop(type, sub, (a), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“相等”－相减－回写
@@ -621,7 +621,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_teq_then_sub(type, a, t, v, nv, ov) \
-        xwaop(type, teq_then_sub, (a), (t), (v), (nv), (ov))
+        xwaop(type, teq_then_sub, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“不相等”－相减－回写
@@ -646,7 +646,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tne_then_sub(type, a, t, v, nv, ov) \
-        xwaop(type, tne_then_sub, (a), (t), (v), (nv), (ov))
+        xwaop(type, tne_then_sub, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“大于”－相减－回写
@@ -671,7 +671,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgt_then_sub(type, a, t, v, nv, ov) \
-        xwaop(type, tgt_then_sub, (a), (t), (v), (nv), (ov))
+        xwaop(type, tgt_then_sub, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“大于等于”－相减－回写
@@ -696,7 +696,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tge_then_sub(type, a, t, v, nv, ov) \
-        xwaop(type, tge_then_sub, (a), (t), (v), (nv), (ov))
+        xwaop(type, tge_then_sub, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“小于”－相减－回写
@@ -721,7 +721,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tlt_then_sub(type, a, t, v, nv, ov) \
-        xwaop(type, tlt_then_sub, (a), (t), (v), (nv), (ov))
+        xwaop(type, tlt_then_sub, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“小于等于”－相减－回写
@@ -746,7 +746,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tle_then_sub(type, a, t, v, nv, ov) \
-        xwaop(type, tle_then_sub, (a), (t), (v), (nv), (ov))
+        xwaop(type, tle_then_sub, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－相减－回写
@@ -772,7 +772,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgtlt_then_sub(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgtlt_then_sub, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgtlt_then_sub, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－相减－回写
@@ -798,7 +798,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgelt_then_sub(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgelt_then_sub, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgelt_then_sub, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－相减－回写
@@ -824,7 +824,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgtle_then_sub(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgtle_then_sub, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgtle_then_sub, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－相减－回写
@@ -850,7 +850,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgele_then_sub(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgele_then_sub, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgele_then_sub, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－反向减法－回写
@@ -864,7 +864,7 @@
  * + 内存序：acq_rel。
  */
 #define xwaop_rsb(type, a, v, nv, ov) \
-        xwaop(type, rsb, (a), (v), (nv), (ov))
+        xwaop(type, rsb, (a), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“相等”－反向减法－回写
@@ -889,7 +889,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_teq_then_rsb(type, a, t, v, nv, ov) \
-        xwaop(type, teq_then_rsb, (a), (t), (v), (nv), (ov))
+        xwaop(type, teq_then_rsb, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“不相等”－反向减法－回写
@@ -914,7 +914,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tne_then_rsb(type, a, t, v, nv, ov) \
-        xwaop(type, tne_then_rsb, (a), (t), (v), (nv), (ov))
+        xwaop(type, tne_then_rsb, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“大于”－反向减法－回写
@@ -939,7 +939,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgt_then_rsb(type, a, t, v, nv, ov) \
-        xwaop(type, tgt_then_rsb, (a), (t), (v), (nv), (ov))
+        xwaop(type, tgt_then_rsb, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“大于等于”－反向减法－回写
@@ -964,7 +964,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tge_then_rsb(type, a, t, v, nv, ov) \
-        xwaop(type, tge_then_rsb, (a), (t), (v), (nv), (ov))
+        xwaop(type, tge_then_rsb, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“小于”－反向减法－回写
@@ -989,7 +989,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tlt_then_rsb(type, a, t, v, nv, ov) \
-        xwaop(type, tlt_then_rsb, (a), (t), (v), (nv), (ov))
+        xwaop(type, tlt_then_rsb, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“小于等于”－反向减法－回写
@@ -1014,7 +1014,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tle_then_rsb(type, a, t, v, nv, ov) \
-        xwaop(type, tle_then_rsb, (a), (t), (v), (nv), (ov))
+        xwaop(type, tle_then_rsb, (a), (t), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－反向减法－回写
@@ -1040,7 +1040,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgtlt_then_rsb(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgtlt_then_rsb, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgtlt_then_rsb, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－反向减法－回写
@@ -1066,7 +1066,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgelt_then_rsb(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgelt_then_rsb, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgelt_then_rsb, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－反向减法－回写
@@ -1092,7 +1092,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgtle_then_rsb(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgtle_then_rsb, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgtle_then_rsb, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试“区间”－反向减法－回写
@@ -1118,7 +1118,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tgele_then_rsb(type, a, l, r, v, nv, ov) \
-        xwaop(type, tgele_then_rsb, (a), (l), (r), (v), (nv), (ov))
+        xwaop(type, tgele_then_rsb, (a), (l), (r), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－位与操作－回写
@@ -1132,7 +1132,7 @@
  * + 内存序：acq_rel。
  */
 #define xwaop_and(type, a, v, nv, ov) \
-        xwaop(type, and, (a), (v), (nv), (ov))
+        xwaop(type, and, (a), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：
@@ -1146,7 +1146,7 @@
  * + 内存序：acq_rel。
  */
 #define xwaop_or(type, a, v, nv, ov) \
-        xwaop(type, or, (a), (v), (nv), (ov))
+        xwaop(type, or, (a), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－位异或操作－回写
@@ -1160,7 +1160,7 @@
  * + 内存序：acq_rel。
  */
 #define xwaop_xor(type, a, v, nv, ov) \
-        xwaop(type, xor, (a), (v), (nv), (ov))
+        xwaop(type, xor, (a), (v), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－位置1操作－回写
@@ -1174,7 +1174,7 @@
  * + 内存序：acq_rel。
  */
 #define xwaop_s1m(type, a, m, nv, ov) \
-        xwaop(type, or, (a), (m), (nv), (ov))
+        xwaop(type, or, (a), (m), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－位清0操作－回写
@@ -1188,7 +1188,7 @@
  * + 内存序：acq_rel。
  */
 #define xwaop_c0m(type, a, m, nv, ov) \
-        xwaop(type, c0m, (a), (m), (nv), (ov))
+        xwaop(type, c0m, (a), (m), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－位翻转操作－回写
@@ -1202,7 +1202,7 @@
  * + 内存序：acq_rel。
  */
 #define xwaop_x1m(type, a, m, nv, ov) \
-        xwaop(type, xor, (a), (m), (nv), (ov))
+        xwaop(type, xor, (a), (m), (type *)(nv), (type *)(ov))
 
 
 /**
@@ -1227,7 +1227,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_t1ma_then_c0m(type, a, m, nv, ov) \
-        xwaop(type, t1ma_then_c0m, (a), (m), (nv), (ov))
+        xwaop(type, t1ma_then_c0m, (a), (m), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－位测试－位清零操作－回写
@@ -1251,7 +1251,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_t1mo_then_c0m(type, a, m, nv, ov) \
-        xwaop(type, t1mo_then_c0m, (a), (m), (nv), (ov))
+        xwaop(type, t1mo_then_c0m, (a), (m), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－位测试－位置1操作－回写
@@ -1275,7 +1275,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_t0ma_then_s1m(type, a, m, nv, ov) \
-        xwaop(type, t0ma_then_s1m, (a), (m), (nv), (ov))
+        xwaop(type, t0ma_then_s1m, (a), (m), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－位测试－位置1操作－回写
@@ -1299,7 +1299,7 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_t0mo_then_s1m(type, a, m, nv, ov) \
-        xwaop(type, t0mo_then_s1m, (a), (m), (nv), (ov))
+        xwaop(type, t0mo_then_s1m, (a), (m), (type *)(nv), (type *)(ov))
 
 /**
  * @brief 对原子变量进行原子操作：读取－测试－修改－回写
@@ -1326,7 +1326,8 @@
  *   + 测试失败时，通过 `nv` 与 `ov` 同时返回旧值。
  */
 #define xwaop_tst_then_op(type, a, tf, tfarg, of, ofarg, nv, ov) \
-        xwaop(type, tst_then_op, (a), (tf), (tfarg), (of), (ofarg), (nv), (ov))
+        xwaop(type, tst_then_op, (a), (tf), (tfarg), (of), (ofarg), \
+              (type *)(nv), (type *)(ov))
 
 /******** ******** load ******** ********/
 /**

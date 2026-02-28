@@ -88,7 +88,7 @@ void xwlua_xt_openlibs(lua_State * L)
         }
 }
 
-void * xwlua_alloc(void * ud, void * ptr, size_t osize, size_t nsize)
+void * xwlua_alloc(void * ud, void * ptr, xwsz_t osize, xwsz_t nsize)
 {
         void * mem;
 

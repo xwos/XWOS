@@ -31,7 +31,7 @@ typedef struct {
         xwsq_t tik;
 } xwosdl_thd_d;
 
-#define XWOSDL_THD_NILD ((xwosdl_thd_d){NULL, 0,})
+#define XWOSDL_THD_NILD ((xwosdl_thd_d){(struct xwosdl_thd *)NULL, 0,})
 
 static __xwcc_inline
 void xwosdl_thd_attr_init(struct xwosdl_thd_attr * attr)

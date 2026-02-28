@@ -14,6 +14,7 @@
 #define __xwmd_libc_newlib_fatfs_h__
 
 #include <stdio.h>
+#include <sys/stat.h>
 
 int newlibac_fatfs_open(struct _reent * r, const char * path, int flag, int mode);
 int newlibac_fatfs_close(struct _reent * r, int fd);

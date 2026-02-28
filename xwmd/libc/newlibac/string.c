@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwmd/libc/newlibac/linkage.h>
 #include <xwmd/libc/newlibac/check.h>
 

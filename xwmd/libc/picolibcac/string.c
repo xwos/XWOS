@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
 

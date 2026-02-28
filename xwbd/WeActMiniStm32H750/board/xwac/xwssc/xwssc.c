@@ -30,8 +30,8 @@
 
 struct xwssc xwssc3;
 XWSSC_DEF_MEMPOOL(xwssc3_mem);
-xwstk_t xwssc3_rxthd_stack[(4096U / sizeof(xwstk_t))];
-xwstk_t xwssc3_txthd_stack[(4096U / sizeof(xwstk_t))];
+__xwcc_alignl1cache xwstk_t xwssc3_rxthd_stack[(4096U / sizeof(xwstk_t))];
+__xwcc_alignl1cache xwstk_t xwssc3_txthd_stack[(4096U / sizeof(xwstk_t))];
 
 static
 void xwssc3_notify(struct xwssc * xwssc, xwsq_t event);

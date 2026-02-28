@@ -27,7 +27,7 @@ typedef struct {
         xwsq_t tik;
 } xwosdl_sem_d;
 
-#  define XWOSDL_SEM_NILD ((xwosdl_sem_d){NULL, 0,})
+#  define XWOSDL_SEM_NILD ((xwosdl_sem_d){(struct xwosdl_sem *)NULL, 0,})
 
 static __xwcc_inline
 xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
@@ -148,7 +148,8 @@ static __xwcc_inline
 xwer_t xwosdl_sem_wait(struct xwosdl_sem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwup_rtsem_wait(sem);
 }
@@ -157,7 +158,8 @@ static __xwcc_inline
 xwer_t xwosdl_sem_wait_to(struct xwosdl_sem * sem, xwtm_t to)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwup_rtsem_wait_to(sem, to);
 }
@@ -166,7 +168,8 @@ static __xwcc_inline
 xwer_t xwosdl_sem_wait_unintr(struct xwosdl_sem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwup_rtsem_wait_unintr(sem);
 }
@@ -311,7 +314,8 @@ static __xwcc_inline
 xwer_t xwosdl_sem_wait(struct xwosdl_sem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwup_plsem_wait(sem);
 }
@@ -320,7 +324,8 @@ static __xwcc_inline
 xwer_t xwosdl_sem_wait_to(struct xwosdl_sem * sem, xwtm_t to)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwup_plsem_wait_to(sem, to);
 }
@@ -329,7 +334,8 @@ static __xwcc_inline
 xwer_t xwosdl_sem_wait_unintr(struct xwosdl_sem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwup_plsem_wait_unintr(sem);
 }

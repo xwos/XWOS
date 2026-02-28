@@ -24,7 +24,7 @@ typedef struct {
         xwsq_t tik;
 } xwosdl_flg_d;
 
-#define XWOSDL_FLG_NILD ((xwosdl_flg_d){NULL, 0,})
+#define XWOSDL_FLG_NILD ((xwosdl_flg_d){(struct xwosdl_flg *)NULL, 0,})
 
 #define XWOSDL_FLG_TRIGGER_SET_ALL      XWUP_FLG_TRIGGER_SET_ALL
 #define XWOSDL_FLG_TRIGGER_SET_ANY      XWUP_FLG_TRIGGER_SET_ANY
@@ -199,7 +199,8 @@ xwer_t xwosdl_flg_wait(struct xwosdl_flg * flg,
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
-        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwup_flg_wait(flg, trigger, consumption, origin, msk);
 }
@@ -215,7 +216,8 @@ xwer_t xwosdl_flg_wait_to(struct xwosdl_flg * flg,
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
-        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwup_flg_wait_to(flg, trigger, consumption, origin, msk, to);
 }
@@ -244,7 +246,8 @@ xwer_t xwosdl_flg_wait_unintr(struct xwosdl_flg * flg,
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
-        XWOS_VALIDATE((XWOK != xwup_irq_get_id(NULL)), "not-thd-ctx", -EISRCTX);
+        XWOS_VALIDATE((XWOK != xwup_irq_get_id((xwirq_t *)NULL)),
+                      "not-thd-ctx", -EISRCTX);
 
         return xwup_flg_wait_unintr(flg, trigger, consumption, origin, msk);
 }

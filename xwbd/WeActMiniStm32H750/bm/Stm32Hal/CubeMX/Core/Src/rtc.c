@@ -23,6 +23,7 @@
 
 /* USER CODE BEGIN 0 */
 #include <time.h>
+#include <sys/time.h>
 
 /* USER CODE END 0 */
 

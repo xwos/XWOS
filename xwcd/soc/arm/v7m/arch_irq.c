@@ -78,7 +78,7 @@ extern void board_esr_hardfault(xwreg_t lr, xwreg_t sp);
 /**
  * @brief Hardfault ISR
  */
-__xwbsp_isr __xwcc_naked
+__xwbsp_isr
 void arch_isr_hardfault(void)
 {
 #if defined(BRDCFG_ESR_HARDFAULT) && (1 == BRDCFG_ESR_HARDFAULT)
@@ -107,7 +107,7 @@ extern void board_esr_mm(xwreg_t lr, xwreg_t sp);
 /**
  * @brief MM ISR
  */
-__xwbsp_isr __xwcc_naked
+__xwbsp_isr
 void arch_isr_mm(void)
 {
 #if defined(BRDCFG_ESR_MM) && (1 == BRDCFG_ESR_MM)
@@ -134,7 +134,7 @@ extern void board_esr_busfault(xwreg_t lr, xwreg_t sp);
 /**
  * @brief busfault ISR
  */
-__xwbsp_isr __xwcc_naked
+__xwbsp_isr
 void arch_isr_busfault(void)
 {
 #if defined(BRDCFG_ESR_BUSFAULT) && (1 == BRDCFG_ESR_BUSFAULT)
@@ -163,7 +163,7 @@ extern void board_esr_usagefault(xwreg_t lr, xwreg_t sp);
 /**
  * @brief usagefault ISR
  */
-__xwbsp_isr __xwcc_naked
+__xwbsp_isr
 void arch_isr_usagefault(void)
 {
 #if defined(BRDCFG_ESR_USAGEFAULT) && (1 == BRDCFG_ESR_USAGEFAULT)
@@ -192,7 +192,7 @@ extern void board_esr_dbgmon(xwreg_t lr, xwreg_t sp);
 /**
  * @brief debugmon ISR
  */
-__xwbsp_isr __xwcc_naked
+__xwbsp_isr
 void arch_isr_dbgmon(void)
 {
 #if defined(BRDCFG_ESR_DBGMON) && (1 == BRDCFG_ESR_DBGMON)
