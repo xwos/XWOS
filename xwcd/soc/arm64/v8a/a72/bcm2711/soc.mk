@@ -38,5 +38,3 @@ SOC_CSRCS += soc_cache.c
 SOC_CSRCS += xwosimpl_irq.c
 SOC_CSRCS += xwosimpl_skd.c
 SOC_CSRCS += xwosimpl_syshwt.c
-
-SYSROOT_llvm := aarch64
