@@ -218,7 +218,8 @@ struct xwmp_skd * xwmp_skd_rsth(struct xwmp_skd * xwskd, xwsq_t dis_th_cnt);
 bool xwmp_skd_tstth(struct xwmp_skd * xwskd);
 
 void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd);
-void xwmp_skd_chkpmpt_all(void);
+void xwmp_skd_chkpmpt_lc(struct xwmp_skd * xwskd);
+void xwmp_skd_chkpmpt_oc(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_inc_wklkcnt(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_dec_wklkcnt(struct xwmp_skd * xwskd);

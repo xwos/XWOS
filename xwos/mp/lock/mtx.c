@@ -586,7 +586,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
 {
         xwer_t rc;
         struct xwmp_skd * local;
-        struct xwmp_skd * xwskd;
+        struct xwmp_skd * other;
         struct xwmp_wqn * wqn;
         struct xwmp_thd * t;
         struct xwmp_thd * cthd;
@@ -655,13 +655,15 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                         xwmp_thd_chprio(cthd);
                         xwmp_skd_enpmpt(local); // cppcheck-suppress [misra-c2012-17.7]
                         /* 如果函数在 `xwmp_cond_wait_to()` 中被调用，
-                           当前线程已经不是 `XWMP_SKDOBJ_ST_RUNNING` 状态，
+                           当前线程已不是 `XWMP_SKDOBJ_ST_RUNNING` 状态，
                            `xwmp_skd_chkpmpt()` 不起作用。*/
-                        xwmp_skd_chkpmpt(local);
+                        xwmp_skd_chkpmpt_lc(local);
 
                         /* `t` 可能运行在不同CPU上，因此也需要检查此CPU的抢占 */
-                        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &t->xwskd);
-                        xwmp_skd_chkpmpt(xwskd);
+                        xwmb_mp_load_acquire(struct xwmp_skd *, other, &t->xwskd);
+                        if (local != other) {
+                                xwmp_skd_chkpmpt_oc(other);
+                        }
                 } else {
                         /* Case 2: 没有线程正在等待互斥锁 */
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
@@ -671,7 +673,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                         /* 如果函数在 `xwmp_cond_wait_to()` 中被调用，
                            当前线程已经不是 `XWMP_SKDOBJ_ST_RUNNING` 状态，
                            `xwmp_skd_chkpmpt()` 不起作用。*/
-                        xwmp_skd_chkpmpt(local);
+                        xwmp_skd_chkpmpt_lc(local);
                 }
         }
         return rc;
@@ -866,7 +868,7 @@ xwer_t xwmp_mtx_lock_or_block_to(struct xwmp_mtx * mtx,
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 xwmp_thd_chprio(thd);
                 xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-                xwmp_skd_chkpmpt(xwskd);
+                xwmp_skd_chkpmpt_lc(xwskd);
         }
         return rc;
 }
@@ -1034,7 +1036,7 @@ xwer_t xwmp_mtx_lock_or_block_unintr(struct xwmp_mtx * mtx,
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 xwmp_thd_chprio(thd);
                 xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-                xwmp_skd_chkpmpt(xwskd);
+                xwmp_skd_chkpmpt_lc(xwskd);
         }
         return rc;
 }
@@ -1114,7 +1116,7 @@ xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx)
                 xwmp_rtwq_unlock_cpuirq(&mtx->rtwq);
                 xwmp_thd_chprio(cthd);
                 xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-                xwmp_skd_chkpmpt(xwskd);
+                xwmp_skd_chkpmpt_lc(xwskd);
         }
 
 err_mtx_grab:

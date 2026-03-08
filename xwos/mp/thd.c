@@ -1198,8 +1198,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
                 xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
         } else if ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_BLOCKING & thd->state)) {
                 xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                /* 上锁必须按照锁的顺序，否则会出现死锁。
-                   一旦“解锁-重新上锁”以后就需要重新检查条件。 */
+                /* 上锁必须按顺序。**解锁-重新上锁** 后需重新检查条件。 */
                 xwmp_splk_lock_cpuirq(&thd->wqn.lock);
                 if ((xwsq_t)XWMP_WQTYPE_NULL == thd->wqn.type) {
                         thd->wqn.wq = NULL;
@@ -1272,7 +1271,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
                         xwmp_splk_unlock(&thd->stlock);
                         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                         xwmp_thd_wakeup(thd); // cppcheck-suppress [misra-c2012-17.7]
-                        xwmp_skd_chkpmpt(thd->xwskd);
+                        xwmp_skd_chkpmpt(xwskd);
                 } else {
                         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 }
@@ -1368,6 +1367,7 @@ xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt,
 __xwmp_code
 void xwmp_thd_wqn_callback(struct xwmp_wqn * wqn)
 {
+        struct xwmp_skd * xwskd;
         struct xwmp_thd * thd;
         xwreg_t cpuirq;
 
@@ -1378,7 +1378,8 @@ void xwmp_thd_wqn_callback(struct xwmp_wqn * wqn)
         thd->dprio.wq = XWMP_SKD_PRIORITY_INVALID;
         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
         xwmp_thd_wakeup(thd); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_chkpmpt(thd->xwskd);
+        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
+        xwmp_skd_chkpmpt(xwskd);
 }
 
 #if (1 == XWOSRULE_SKD_WQ_RT)
@@ -1833,8 +1834,8 @@ bool xwmp_cthd_frz_shld_stop(bool * frozen)
  * @brief 将线程迁移进目标CPU
  * @param[in] thd: 线程对象的指针
  * @note
- * - 此函数只能在目标CPU的中断上下文中执行；
- * - 此函数假设线程对象已经被引用，执行过程中不会成为野指针
+ * + 此函数只能在目标CPU的中断上下文中执行；
+ * + 此函数假设线程对象已经被引用，执行过程中不会成为野指针
  */
 __xwmp_code
 void xwmp_thd_immigrate_lic(struct xwmp_thd * thd)
@@ -1869,7 +1870,7 @@ void xwmp_thd_immigrate_lic(struct xwmp_thd * thd)
                 xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
                 rc = xwmp_thd_rq_add_tail(thd, prio);
                 XWOS_BUG_ON(rc < 0);
-                xwmp_skd_chkpmpt(new);
+                xwmp_skd_chkpmpt_lc(new);
         }
 }
 

@@ -221,6 +221,11 @@ xwid_t xwospl_skd_get_cpuid_lc(void)
         return hartid;
 }
 
+__xwbsp_code __xwcc_weak
+void xwospl_skd_chkpmpt_oc(__xwcc_unused struct xwospl_skd * xwskd)
+{
+}
+
 __xwbsp_code
 void soc_skd_req_swcx(struct xwospl_skd * xwskd)
 {

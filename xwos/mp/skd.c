@@ -878,7 +878,7 @@ bool xwmp_skd_tstpmpt(struct xwmp_skd * xwskd)
  * @retval true: 需要抢占
  * @retval false: 不需要抢占
  * @note
- * - 此函数被调用时需要获得锁xwskd->cxlock并且关闭本地CPU的中断。
+ * + 此函数被调用时需要获得锁xwskd->cxlock并且关闭本地CPU的中断。
  */
 static __xwmp_code
 bool xwmp_skd_chkpmpt_thd(struct xwmp_skd * xwskd, struct xwmp_thd * t)
@@ -909,11 +909,28 @@ bool xwmp_skd_chkpmpt_thd(struct xwmp_skd * xwskd, struct xwmp_thd * t)
 }
 
 /**
- * @brief 调度器检测抢占
+ * @brief 检测调度器的抢占
  * @param[in] xwskd: XWOS MP调度器的指针
  */
 __xwmp_code
 void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
+{
+        struct xwmp_skd * local;
+
+        local = xwmp_skd_get_lc();
+        if (local == xwskd) {
+                xwmp_skd_chkpmpt_lc(local);
+        } else {
+                xwmp_skd_chkpmpt_oc(xwskd);
+        }
+}
+
+/**
+ * @brief 检测本地调度器的抢占
+ * @param[in] xwskd: XWOS MP调度器的指针
+ */
+__xwmp_code
+void xwmp_skd_chkpmpt_lc(struct xwmp_skd * xwskd)
 {
         struct xwmp_thd * t;
         struct xwmp_skdobj_stack * cstk;
@@ -949,18 +966,13 @@ void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief 所有CPU的调度器检测抢占
+ * @brief 检测其他CPU调度器的抢占
+ * @param[in] xwskd: XWOS MP调度器的指针
  */
 __xwmp_code
-void xwmp_skd_chkpmpt_all(void)
+void xwmp_skd_chkpmpt_oc(struct xwmp_skd * xwskd)
 {
-        struct xwmp_skd * xwskd;
-        xwid_t cpuid;
-
-        for (cpuid = (xwid_t)0; cpuid < (xwid_t)CPUCFG_CPU_NUM; cpuid++) {
-                xwskd = &xwmp_skd[cpuid];
-                xwmp_skd_chkpmpt(xwskd);
-        }
+        xwospl_skd_chkpmpt_oc(xwskd);
 }
 
 /**

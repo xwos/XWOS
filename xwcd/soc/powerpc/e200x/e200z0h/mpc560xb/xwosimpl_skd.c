@@ -90,6 +90,11 @@ xwid_t xwospl_skd_get_cpuid_lc(void)
         return 0;
 }
 
+__xwbsp_code __xwcc_weak
+void xwospl_skd_chkpmpt_oc(__xwcc_unused struct xwospl_skd * xwskd)
+{
+}
+
 /**
  * @brief 初始化调度对象的栈
  * @param[in] stk: 栈信息结构体指针

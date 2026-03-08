@@ -315,7 +315,7 @@ void xwmp_tt_bh(struct xwmp_tt * xwtt)
                 xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
         }
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-        xwmp_skd_chkpmpt(xwskd);
+        xwmp_skd_chkpmpt_lc(xwskd);
 }
 
 /**
@@ -459,8 +459,9 @@ void xwmp_syshwt_task(struct xwmp_syshwt * hwt)
 #else
                 xwmp_tt_bh(xwtt);
 #endif
+        } else {
+                xwmp_skd_chkpmpt_lc(xwskd);
         }
-        xwmp_skd_chkpmpt(xwskd);
 #if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
         board_xwskd_syshwt_hook(xwskd);
 #endif

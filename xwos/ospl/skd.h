@@ -79,6 +79,12 @@ xwid_t xwospl_skd_get_cpuid_lc(void);
 xwer_t xwospl_skd_start(struct xwospl_skd * xwskd);
 
 /**
+ * @brief XWOS移植层：检测其他CPU调度器的抢占
+ * @param[in] xwskd: 调度器的指针
+ */
+void xwospl_skd_chkpmpt_oc(struct xwospl_skd * xwskd);
+
+/**
  * @brief XWOS移植层：暂停调度器，用于电源管理
  * @param[in] xwskd: 调度器的指针
  * @return 错误码

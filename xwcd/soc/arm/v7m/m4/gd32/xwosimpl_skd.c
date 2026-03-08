@@ -56,6 +56,11 @@ xwer_t xwospl_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
                 "       bx      lr\n");
 }
 
+__xwbsp_code __xwcc_weak
+void xwospl_skd_chkpmpt_oc(__xwcc_unused struct xwospl_skd * xwskd)
+{
+}
+
 __xwbsp_code __xwcc_naked
 xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
 {
