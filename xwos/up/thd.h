@@ -144,7 +144,7 @@ void xwup_thd_eq_plwq(struct xwup_thd * thd, struct xwup_plwq * xwplwq,
 #endif
 
 xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd);
-xwer_t xwup_thd_thaw_lic(struct xwup_thd * thd);
+xwer_t xwup_thd_thaw_lc(struct xwup_thd * thd);
 xwer_t xwup_thd_drop(struct xwup_thd * thd);
 
 /**

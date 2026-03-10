@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/ospl/skd.h>
 #include <xwos/mp/pm.h>
 
 /**
@@ -43,10 +44,20 @@ void xwmp_pm_set_cb(xwmp_skd_pm_cb_f resume,
 __xwmp_api
 void xwmp_pm_suspend(void)
 {
+        struct xwmp_skd * local;
+        struct xwmp_skd * xwskd;
         xwid_t cpuid;
 
+        local = xwmp_skd_get_lc();
         for (cpuid = (xwid_t)0; cpuid < (xwid_t)CPUCFG_CPU_NUM; cpuid++) {
-                xwmp_skd_suspend(cpuid);
+                xwskd = xwmp_skd_get_by_cpuid(cpuid);
+                if (local == xwskd) {
+                        // cppcheck-suppress [misra-c2012-17.7]
+                        xwmp_skd_dec_wklkcnt(xwskd);
+                } else if (NULL != xwskd) {
+                        xwospl_skd_suspend(xwskd);
+                } else {
+                }
         }
 }
 
@@ -58,10 +69,19 @@ void xwmp_pm_suspend(void)
 __xwmp_api
 void xwmp_pm_resume(void)
 {
+        struct xwmp_skd * local;
+        struct xwmp_skd * xwskd;
         xwid_t cpuid;
 
+        local = xwmp_skd_get_lc();
         for (cpuid = (xwid_t)0; cpuid < (xwid_t)CPUCFG_CPU_NUM; cpuid++) {
-                xwmp_skd_resume(cpuid);
+                xwskd = xwmp_skd_get_by_cpuid(cpuid);
+                if (local == xwskd) {
+                        xwmp_skd_resume_lc(xwskd);
+                } else if (NULL != xwskd) {
+                        xwospl_skd_resume(xwskd);
+                } else {
+                }
         }
 }
 

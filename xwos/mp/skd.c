@@ -9,29 +9,16 @@
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  * @details
- * - XWOS MP的调度器是一个每CPU变量，为了提高程序的效率，减少cache miss，
- *   通常只由CPU才可访问自己的调度器控制块结构体。其他CPU需要操作当前
- *   CPU的调度器时，需要挂起当前CPU的调度器服务中断，由当前CPU在ISR
- *   中进行操作。
- * - 调度器服务中断处理以下操作：
- *   + 调度器暂停：xwmp_skd_suspend_lic()
- *                   |--> xwmp_skd_notify_allfrz_lic()
- *   + 线程退出：xwmp_thd_exit_lic()
- *                 |--> xwmp_skd_notify_allfrz_lic()
- *   + 线程冻结：xwmp_thd_freeze_lic()
- *                 |--> xwmp_skd_notify_allfrz_lic()
- *   + 线程解冻：xwmp_thd_thaw_lic()
- *   + 线程迁出：xwmp_thd_outmigrate_lic()
- *   + 线程迁入：xwmp_thd_immigrate_lic()
- * - 调度器服务中断的中断优先级必须为系统最高优先级。
- * - 调度时锁的顺序：同级的锁不可同时获得
- *   + ① xwmp_skd.cxlock
- *     + ② xwmp_skd.rq.rt.lock
- *       + ③ xwmp_thd.stlock
- * - 函数suffix意义：
- *   1. _lc: Local Context，是指只能在“本地”CPU的中执行的代码。
- *   2. _lic: Local ISR Context，是指只能在“本地”CPU的中断上下文中执行的代码。
- *   3. _tllk: 是只持有锁xwmp_skd.thdlistlock才可调用的函数。
+ * + XWOS MP的调度器是一个每CPU变量，为了提高程序的效率，减少cache miss，
+ *   通常由CPU自己访问自己的调度器控制块结构体。
+ * + 调度器服务中断的中断优先级必须为系统最高优先级。
+ * + 调度时锁的顺序：同级的锁不可同时获得
+ *   + 1. xwmp_skd.cxlock
+ *     + 2. xwmp_skd.rq.rt.lock
+ *       + 3. xwmp_thd.stlock
+ * + 函数suffix意义：
+ *   + _lc: Local Context，是指只能在“本地”CPU的中执行的代码。
+ *   + _lic: Local ISR Context，是指只能在“本地”CPU的中断上下文中执行的代码。
  */
 
 #include <xwos/standard.h>
@@ -140,19 +127,22 @@ static __xwmp_code
 void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd);
 
 static __xwmp_code
-void xwmp_skd_reqfrz_intr_all_lic(struct xwmp_skd * xwskd);
+void xwmp_skd_reqfrz_intr_all_lc(struct xwmp_skd * xwskd);
 
 static __xwmp_code
-void xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd);
+void xwmp_skd_notify_allfrz_idlec(struct xwmp_skd * xwskd);
 
 static __xwmp_code
-void xwmp_skd_thaw_allfrz_lic(struct xwmp_skd * xwskd);
+void xwmp_skd_thaw_allfrz_lc(struct xwmp_skd * xwskd);
+
+static __xwmp_code
+xwer_t xwmp_skd_suspend_lc(struct xwmp_skd * xwskd);
 
 /**
- * @brief XWMP INIT API：初始化本地CPU的调度器
+ * @brief XWMP INIT API：初始化当前CPU的调度器
  * @return 错误码
  * @note
- * - 重入性：本函数只可在系统初始化时调用一次
+ * + 重入性：本函数只可在系统初始化时调用一次
  */
 __xwmp_init_code
 xwer_t xwmp_skd_init_lc(void)
@@ -221,11 +211,11 @@ err_tt_init:
 }
 
 /**
- * @brief XWMP INIT API：启动本地CPU的调度器
+ * @brief XWMP INIT API：启动当前CPU的调度器
  * @return 错误码
  * @note
- * - 重入性：只可调用一次
- * - 此函数不会返回
+ * + 重入性：只可调用一次
+ * + 此函数不会返回
  */
 __xwmp_init_code
 xwer_t xwmp_skd_start_lc(void)
@@ -253,12 +243,12 @@ xwer_t xwmp_skd_start_lc(void)
 }
 
 /**
- * @brief XWMP API：启动本地CPU调度器的系统定时器
+ * @brief XWMP API：启动当前CPU调度器的系统定时器
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
  */
 __xwmp_api
 xwer_t xwmp_skd_start_syshwt_lc(void)
@@ -270,12 +260,12 @@ xwer_t xwmp_skd_start_syshwt_lc(void)
 }
 
 /**
- * @brief XWMP API：关闭本地CPU调度器的系统定时器
+ * @brief XWMP API：关闭当前CPU调度器的系统定时器
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
  */
 __xwmp_api
 xwer_t xwmp_skd_stop_syshwt_lc(void)
@@ -293,8 +283,8 @@ xwid_t xwmp_skd_get_cpuid_lc(void)
 }
 
 /**
- * @brief 得到本地CPU调度器的指针
- * @return 本地CPU调度器的指针
+ * @brief 获取当前CPU调度器的指针
+ * @return 当前CPU调度器的指针
  */
 __xwmp_code
 struct xwmp_skd * xwmp_skd_get_lc(void)
@@ -315,21 +305,19 @@ struct xwmp_skd * xwmp_skd_get_lc(void)
 /**
  * @brief 得到指定ID的CPU调度器的指针
  * @param[in] cpuid: CPU ID
- * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于返回指定ID的CPU调度器的指针
- * @return 错误码
+ * @return 指定ID的CPU调度器的指针
  */
 __xwmp_code
-xwer_t xwmp_skd_get_by_cpuid(xwid_t cpuid, struct xwmp_skd ** ptrbuf)
+struct xwmp_skd * xwmp_skd_get_by_cpuid(xwid_t cpuid)
 {
-        xwer_t rc;
+        struct xwmp_skd * xwskd;
 
         if (cpuid < (xwid_t)XWMP_CPU_NUM) {
-                *ptrbuf = &xwmp_skd[cpuid];
-                rc = XWOK;
+                xwskd = &xwmp_skd[cpuid];
         } else {
-                rc = -ENODEV;
+                xwskd = NULL;
         }
-        return rc;
+        return xwskd;
 }
 
 /**
@@ -347,8 +335,8 @@ struct xwmp_thd * xwmp_skd_get_cthd(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief 获得本地CPU的调度器中正在运行的线程对象的指针
- * @return 本地CPU的调度器中正在运行的线程对象的指针
+ * @brief 获取当前CPU的调度器中正在运行的线程对象的指针
+ * @return 当前CPU的调度器中正在运行的线程对象的指针
  */
 __xwmp_code
 struct xwmp_thd * xwmp_skd_get_cthd_lc(void)
@@ -373,7 +361,7 @@ struct xwmp_thd * xwmp_skd_get_cthd_lc(void)
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 线程对象指针或NULL（代表空闲任务）
  * @note
- * - 此函数只能在锁xwskd->cxlock中调用。
+ * + 此函数只能在锁 `xwskd->cxlock` 中调用。
  */
 static __xwmp_code
 struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd)
@@ -441,7 +429,7 @@ xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd)
 #if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
                 xwmp_skd_del_thd_lc(xwskd);
 #endif
-                xwmp_skd_notify_allfrz_lc(xwskd);
+                xwmp_skd_notify_allfrz_idlec(xwskd);
 #if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
                 board_xwskd_idle_hook(xwskd);
 #endif
@@ -878,7 +866,7 @@ bool xwmp_skd_tstpmpt(struct xwmp_skd * xwskd)
  * @retval true: 需要抢占
  * @retval false: 不需要抢占
  * @note
- * + 此函数被调用时需要获得锁xwskd->cxlock并且关闭本地CPU的中断。
+ * + 此函数被调用时需要获得锁 `xwskd->cxlock` 并且关闭当前CPU的中断。
  */
 static __xwmp_code
 bool xwmp_skd_chkpmpt_thd(struct xwmp_skd * xwskd, struct xwmp_thd * t)
@@ -984,7 +972,7 @@ void xwmp_skd_chkpmpt_oc(struct xwmp_skd * xwskd)
  * @retval OK: 需要切换上下文
  * @retval <0: 不需要切换上下文
  * @note
- * - 此函数被调用时需要获得锁xwskd->cxlock并且关闭本地CPU的中断。
+ * + 此函数被调用时需要获得锁 `xwskd->cxlock` 并且关闭当前CPU的中断。
  */
 static __xwmp_code
 xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
@@ -1028,7 +1016,7 @@ xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误吗 @ref xwmp_skd_req_swcx()
  * @note
- * - 此函数被调用时需要获得锁xwskd->cxlock并且关闭本地CPU的中断。
+ * + 此函数被调用时需要获得锁 `xwskd->cxlock` 并且关闭当前CPU的中断。
  */
 static __xwmp_code
 xwer_t xwmp_skd_swcx(struct xwmp_skd * xwskd)
@@ -1155,7 +1143,7 @@ xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
  * @brief 结束上下文的切换
  * @param[in] xwskd: XWOS MP调度器的指针
  * @note
- * - 此函数需要在BSP切换线程上下文的中断函数的最后一步调用。
+ * + 此函数需要在BSP切换线程上下文的中断函数的最后一步调用。
  */
 static __xwmp_code
 void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
@@ -1239,7 +1227,7 @@ xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
  * @brief 结束上下文的切换
  * @param[in] xwskd: XWOS MP调度器的指针
  * @note
- * - 此函数需要在BSP切换线程上下文的中断函数的最后一步调用。
+ * + 此函数需要在BSP切换线程上下文的中断函数的最后一步调用。
  */
 static __xwmp_code
 void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
@@ -1298,7 +1286,7 @@ xwer_t xwmp_skd_dec_wklkcnt(struct xwmp_skd * xwskd)
                                 (xwsq_t)1,
                                 &nv, NULL);
         if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_FREEZING == nv)) {
-                rc = xwospl_skd_suspend(xwskd);
+                rc = xwmp_skd_suspend_lc(xwskd);
         }
         return rc;
 }
@@ -1326,11 +1314,11 @@ xwer_t xwmp_skd_wakelock_unlock(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief 中断本地CPU中所有线程的阻塞或睡眠状态，并准备冻结
+ * @brief 中断当前CPU中所有线程的阻塞或睡眠状态，并准备冻结
  * @param[in] xwskd: XWOS MP调度器的指针
  */
 static __xwmp_code
-void xwmp_skd_reqfrz_intr_all_lic(struct xwmp_skd * xwskd)
+void xwmp_skd_reqfrz_intr_all_lc(struct xwmp_skd * xwskd)
 {
         struct xwmp_thd * c;
         struct xwmp_thd * n;
@@ -1342,7 +1330,7 @@ void xwmp_skd_reqfrz_intr_all_lic(struct xwmp_skd * xwskd)
                                         struct xwmp_thd, thdnode) {
                 xwmp_thd_grab(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
-                xwmp_thd_reqfrz_lic(c); // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_thd_reqfrz_lc(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_thd_intr(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_thd_put(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_splk_lock_cpuirqsv(&xwskd->thdlistlock, &cpuirq);
@@ -1351,12 +1339,12 @@ void xwmp_skd_reqfrz_intr_all_lic(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief 通知所有线程已经冻结（中断上下文中执行的部分）
+ * @brief 通知所有线程已经冻结（上半部分）
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  */
 __xwmp_code
-xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd)
+xwer_t xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
 {
         xwer_t rc;
         xwsq_t nv;
@@ -1377,11 +1365,11 @@ xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief 通知所有线程已经冻结（空闲任务中执行的部分）
+ * @brief 通知所有线程已经冻结（下半部分：空闲任务中执行）
  * @param[in] xwskd: XWOS MP调度器的指针
  */
 static __xwmp_code
-void xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
+void xwmp_skd_notify_allfrz_idlec(struct xwmp_skd * xwskd)
 {
         xwreg_t cpuirq;
         xwsq_t nv;
@@ -1411,12 +1399,12 @@ void xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief 解冻本地CPU中的所有线程
+ * @brief 解冻当前CPU中的所有线程
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  */
 static __xwmp_code
-void xwmp_skd_thaw_allfrz_lic(struct xwmp_skd * xwskd)
+void xwmp_skd_thaw_allfrz_lc(struct xwmp_skd * xwskd)
 {
         struct xwmp_thd * c;
         struct xwmp_thd * n;
@@ -1428,7 +1416,7 @@ void xwmp_skd_thaw_allfrz_lic(struct xwmp_skd * xwskd)
                                         struct xwmp_thd, thdnode) {
                 xwmp_thd_grab(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_splk_unlock(&xwskd->thdlistlock);
-                xwmp_thd_thaw_lic(c); // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_thd_thaw_lc(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_thd_put(c); // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_splk_lock(&xwskd->thdlistlock);
         }
@@ -1438,25 +1426,23 @@ void xwmp_skd_thaw_allfrz_lic(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief 暂停本地CPU的调度器
+ * @brief 暂停当前CPU的调度器
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  * @note
- * - 此函数只能在CPU自身的调度器服务中断中执行，当电源管理的代码运行于
- *   其他CPU上时，可通过 @ref xwmp_skd_suspend() 向对应CPU申请
- *   调度器服务中断并执行此函数。
+ * + 此函数只能由调度器 `xwskd` 对应的CPU执行。
  */
-__xwmp_code
-xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd)
+static __xwmp_code
+xwer_t xwmp_skd_suspend_lc(struct xwmp_skd * xwskd)
 {
         xwreg_t cpuirq;
 
-        xwmp_skd_reqfrz_intr_all_lic(xwskd);
+        xwmp_skd_reqfrz_intr_all_lc(xwskd);
         xwmp_splk_lock_cpuirqsv(&xwskd->thdlistlock, &cpuirq);
         if (xwskd->thd_num == xwskd->pm.frz_thd_cnt) {
                 xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                 // cppcheck-suppress [misra-c2012-17.7]
-                xwmp_skd_notify_allfrz_lic(xwskd);
+                xwmp_skd_notify_allfrz_lc(xwskd);
         } else {
                 xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
         }
@@ -1464,37 +1450,14 @@ xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief XWMP API：申请暂停调度器
- * @param[in] cpuid: CPU的ID
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- * @note
- * + 调度器暂停时会通知所有线程进入冻结状态，以便执行低功耗的代码流程。
- */
-__xwmp_api
-void xwmp_skd_suspend(xwid_t cpuid)
-{
-        struct xwmp_skd * xwskd;
-        xwer_t rc;
-
-        rc = xwmp_skd_get_by_cpuid(cpuid, &xwskd);
-        if (XWOK == rc) {
-                xwmp_skd_dec_wklkcnt(xwskd);
-        }
-}
-
-/**
- * @brief 继续本地CPU调度器
+ * @brief 继续当前CPU调度器
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  * @details
- * 此函数只能在CPU自身的调度器服务中断中执行，因此当电源管理的代码运行在其他CPU上时，
- * 可通过 @ref xwmp_skd_resume() 向其他CPU申请执行此函数。
+ * + 此函数只能由调度器 `xwskd` 对应的CPU执行。
  */
 __xwmp_code
-xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd)
+xwer_t xwmp_skd_resume_lc(struct xwmp_skd * xwskd)
 {
         xwreg_t cpuirq;
         xwer_t rc;
@@ -1537,7 +1500,7 @@ xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd)
                                         (xwsq_t)1,
                                         &nv, &ov);
                 if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_UNLOCKED == nv)) {
-                        xwmp_skd_thaw_allfrz_lic(xwskd);
+                        xwmp_skd_thaw_allfrz_lc(xwskd);
                         break;
                 } else if (ov >= (xwsq_t)XWMP_SKD_WKLKCNT_UNLOCKED) {
                         break;
@@ -1547,44 +1510,13 @@ xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief XWMP API：从低功耗状态恢复调度器
- * @param[in] cpuid: CPU的ID
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwmp_api
-void xwmp_skd_resume(xwid_t cpuid)
-{
-        struct xwmp_skd * xwskd;
-        xwid_t localid;
-        xwer_t rc;
-
-        localid = xwmp_skd_get_cpuid_lc();
-        if (localid == cpuid) {
-                xwskd = xwmp_skd_get_lc();
-                if (XWOK == xwmp_irq_get_id(NULL)) {
-                        xwmp_skd_resume_lic(xwskd);
-                } else {
-                        xwospl_skd_resume(xwskd);
-                }
-        } else {
-                rc = xwmp_skd_get_by_cpuid(cpuid, &xwskd);
-                if (XWOK == rc) {
-                        xwospl_skd_resume(xwskd);
-                }
-        }
-}
-
-/**
  * @brief XWMP API：获取调度器电源管理状态
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 状态值 @ref xwmp_skd_wakelock_cnt_em
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
  */
 __xwmp_api
 xwsq_t xwmp_skd_get_pm_state(struct xwmp_skd * xwskd)

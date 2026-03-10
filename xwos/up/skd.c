@@ -9,7 +9,7 @@
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  * @note
- * - 函数suffix意义：
+ * + 函数suffix意义：
  *   1. _lc: Local Context，是指只能在“本地”CPU的中执行的代码；
  *   2. _lic: Local ISR Context，是指只能在“本地”CPU的中断上下文中执行的代码。
  */
@@ -109,17 +109,20 @@ void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd);
 
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
 static __xwup_code
-void xwup_skd_notify_allfrz_lc(struct xwup_skd * xwskd);
+void xwup_skd_notify_allfrz_idlec(struct xwup_skd * xwskd);
 
 static __xwup_code
-xwer_t xwup_skd_thaw_allfrz_lic(struct xwup_skd * xwskd);
+xwer_t xwup_skd_thaw_allfrz_lc(struct xwup_skd * xwskd);
+
+static __xwup_code
+xwer_t xwup_skd_suspend_lc(struct xwup_skd * xwskd);
 #endif
 
 /**
  * @brief XWUP INIT API：初始化本地CPU的调度器
  * @return 错误码
  * @note
- * - 重入性：本函数只可在系统初始化时调用一次
+ * + 重入性：本函数只可在系统初始化时调用一次
  */
 __xwup_init_code
 xwer_t xwup_skd_init_lc(void)
@@ -190,8 +193,8 @@ err_tt_init:
  * @brief XWUP INIT API：启动本地CPU的调度器
  * @return 错误码
  * @note
- * - 重入性：只可调用一次
- * - 此函数不会返回
+ * + 重入性：只可调用一次
+ * + 此函数不会返回
  */
 __xwup_init_code
 xwer_t xwup_skd_start_lc(void)
@@ -220,9 +223,9 @@ xwer_t xwup_skd_start_lc(void)
  * @brief XWUP API：启动本地CPU调度器的系统定时器
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
  */
 __xwup_api
 xwer_t xwup_skd_start_syshwt_lc(void)
@@ -239,9 +242,9 @@ xwer_t xwup_skd_start_syshwt_lc(void)
  * @brief XWUP API：关闭本地CPU调度器的系统定时器
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
  */
 __xwup_api
 xwer_t xwup_skd_stop_syshwt_lc(void)
@@ -282,7 +285,7 @@ struct xwup_thd * xwup_skd_get_cthd_lc(void)
  * @retval pointer: 被选择的线程对象的指针
  * @retval NULL: 空闲任务
  * @note
- * - 此函数只能在临界区中调用。
+ * + 此函数只能在临界区中调用。
  */
 static __xwup_code
 struct xwup_thd * xwup_skd_rtrq_choose(void)
@@ -340,7 +343,7 @@ xwer_t xwup_skd_idled(struct xwup_skd * xwskd)
                 xwup_skd_del_thd_lc(xwskd);
 #endif
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
-                xwup_skd_notify_allfrz_lc(xwskd);
+                xwup_skd_notify_allfrz_idlec(xwskd);
 #endif
 #if (defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK))
                 board_xwskd_idle_hook(xwskd);
@@ -548,9 +551,9 @@ void xwup_skd_init_bhd(void)
  * @brief XWUP API：关闭本地CPU调度器的中断底半部
  * @return XWOS UP调度器的指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
  */
 __xwup_api
 struct xwup_skd * xwup_skd_dsbh_lc(void)
@@ -568,9 +571,9 @@ struct xwup_skd * xwup_skd_dsbh_lc(void)
  * @brief XWUP API：开启本地CPU调度器的中断底半部
  * @return XWOS UP调度器的指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
  */
 __xwup_api
 struct xwup_skd * xwup_skd_enbh_lc(void)
@@ -843,7 +846,7 @@ bool xwup_skd_tstpmpt_lc(void)
  * @retval true: 需要抢占
  * @retval false: 不需要抢占
  * @note
- * - 此函数被调用时需要关闭本地CPU的中断。
+ * + 此函数被调用时需要关闭本地CPU的中断。
  */
 static __xwup_code
 bool xwup_skd_chkpmpt_thd(struct xwup_thd * t)
@@ -917,7 +920,7 @@ void xwup_skd_chkpmpt(void)
  * @retval XWOK: 需要切换上下文
  * @retval <0: 不需要切换上下文
  * @note
- * - 此函数被调用时需要关闭本地CPU的中断。
+ * + 此函数被调用时需要关闭本地CPU的中断。
  */
 static __xwup_code
 xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd)
@@ -1078,7 +1081,7 @@ xwer_t xwup_skd_req_swcx(void)
  * @brief 结束上下文的切换
  * @param[in] xwskd: XWOS UP调度器的指针
  * @note
- * - 此函数需要在BSP切换上下文的中断的最后调用。
+ * + 此函数需要在BSP切换上下文的中断的最后调用。
  */
 static __xwup_code
 void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd)
@@ -1165,7 +1168,7 @@ xwer_t xwup_skd_req_swcx(void)
  * @brief 结束上下文的切换
  * @param[in] xwskd: XWOS UP调度器的指针
  * @note
- * - 此函数需在BSP切换上下文的中断的最后调用。
+ * + 此函数需在BSP切换上下文的中断的最后调用。
  */
 static __xwup_code
 void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd)
@@ -1214,9 +1217,9 @@ void xwup_skd_intr_all(void)
 /**
  * @brief XWUP PM API：设置电源管理回调函数
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
  */
 __xwup_api
 void xwup_pm_set_cb(xwup_skd_pm_cb_f resume,
@@ -1287,7 +1290,7 @@ xwer_t xwup_skd_dec_wklkcnt(void)
         }
         xwospl_cpuirq_restore_lc(cpuirq);
         if (lpm) {
-                rc = xwospl_skd_suspend(xwskd);
+                rc = xwup_skd_suspend_lc(xwskd);
         }
         return rc;
 }
@@ -1313,35 +1316,11 @@ xwer_t xwup_skd_wakelock_unlock(void)
 }
 
 /**
- * @brief 暂停调度器（中断中执行）
- * @param[in] xwskd: XWOS UP调度器的指针
- * @return 错误码
- * @note
- * - 此函数只能在CPU自身的调度器服务中断中执行，可通过 @ref xwospl_skd_suspend()
- *   触发并执行此函数。
- */
-__xwup_code
-xwer_t xwup_skd_suspend_lic(struct xwup_skd * xwskd)
-{
-        xwreg_t cpuirq;
-
-        xwup_skd_intr_all();
-        xwospl_cpuirq_save_lc(&cpuirq);
-        if (xwskd->thd_num == xwskd->pm.frz_thd_cnt) {
-                xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_skd_notify_allfrz_lic(); //cppcheck-suppress [misra-c2012-17.7]
-        } else {
-                xwospl_cpuirq_restore_lc(cpuirq);
-        }
-        return XWOK;
-}
-
-/**
  * @brief 通知所有线程已经冻结（中断上下文中执行的部分）
  * @return 错误码
  */
 __xwup_code
-xwer_t xwup_skd_notify_allfrz_lic(void)
+xwer_t xwup_skd_notify_allfrz_lc(void)
 {
         struct xwup_skd * xwskd;
         xwreg_t cpuirq;
@@ -1368,7 +1347,7 @@ xwer_t xwup_skd_notify_allfrz_lic(void)
  * @param[in] xwskd: XWOS UP调度器的指针
  */
 static __xwup_code
-void xwup_skd_notify_allfrz_lc(struct xwup_skd * xwskd)
+void xwup_skd_notify_allfrz_idlec(struct xwup_skd * xwskd)
 {
         xwreg_t cpuirq;
 
@@ -1399,7 +1378,7 @@ void xwup_skd_notify_allfrz_lc(struct xwup_skd * xwskd)
  * @return 错误码
  */
 static __xwup_code
-xwer_t xwup_skd_thaw_allfrz_lic(struct xwup_skd * xwskd)
+xwer_t xwup_skd_thaw_allfrz_lc(struct xwup_skd * xwskd)
 {
         struct xwup_thd * c;
         struct xwup_thd * n;
@@ -1410,7 +1389,7 @@ xwer_t xwup_skd_thaw_allfrz_lic(struct xwup_skd * xwskd)
         xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->pm.frzlist,
                                         struct xwup_thd, frznode) {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_thd_thaw_lic(c); //cppcheck-suppress [misra-c2012-17.7]
+                xwup_thd_thaw_lc(c); //cppcheck-suppress [misra-c2012-17.7]
                 xwospl_cpuirq_disable_lc();
         }
         if ((xwsq_t)0 == xwskd->pm.frz_thd_cnt) {
@@ -1424,11 +1403,32 @@ xwer_t xwup_skd_thaw_allfrz_lic(struct xwup_skd * xwskd)
 }
 
 /**
+ * @brief 暂停调度器
+ * @param[in] xwskd: XWOS UP调度器的指针
+ * @return 错误码
+ */
+static __xwup_code
+xwer_t xwup_skd_suspend_lc(struct xwup_skd * xwskd)
+{
+        xwreg_t cpuirq;
+
+        xwup_skd_intr_all();
+        xwospl_cpuirq_save_lc(&cpuirq);
+        if (xwskd->thd_num == xwskd->pm.frz_thd_cnt) {
+                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_skd_notify_allfrz_lc(); //cppcheck-suppress [misra-c2012-17.7]
+        } else {
+                xwospl_cpuirq_restore_lc(cpuirq);
+        }
+        return XWOK;
+}
+
+/**
  * @brief XWUP API：申请进入低功耗
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
  */
 __xwup_api
 void xwup_pm_suspend(void)
@@ -1437,16 +1437,12 @@ void xwup_pm_suspend(void)
 }
 
 /**
- * @brief 继续已经暂停的调度器（在中断中执行）
+ * @brief 继续当前CPU调度器
  * @param[in] xwskd: XWOS UP调度器的指针
  * @return 错误码
- * @note
- * - 此函数只可由 @ref xwup_skd_resume() 调用。
- *   在MP架构中，SOC层 `xwospl_skd_resume()` 会触发CPU自身的调度器服务中断来运行此
- *   函数，UP架构中复用了同一份BSP的适配代码。因此，此函数仅仅是为了保证编译顺利。
  */
 __xwup_code
-xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
+xwer_t xwup_skd_resume_lc(struct xwup_skd * xwskd)
 {
         xwreg_t cpuirq;
 
@@ -1478,7 +1474,7 @@ xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
                         xwskd->pm.wklkcnt++;
                         xwospl_cpuirq_restore_lc(cpuirq);
                         //cppcheck-suppress [misra-c2012-17.7]
-                        xwup_skd_thaw_allfrz_lic(xwskd);
+                        xwup_skd_thaw_allfrz_lc(xwskd);
                         xwospl_cpuirq_save_lc(&cpuirq);
                         break;
                 }
@@ -1493,32 +1489,26 @@ xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
 /**
  * @brief XWUP API：从低功耗状态恢复运行状态
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
  */
 __xwup_api
 void xwup_pm_resume(void)
 {
         struct xwup_skd * xwskd;
-        xwer_t rc;
 
         xwskd = &xwup_skd;
-        rc = xwup_irq_get_id(NULL);
-        if (XWOK != rc) {
-                xwospl_skd_resume(xwskd);
-        } else {
-                xwup_skd_resume_lic(xwskd);
-        }
+        xwup_skd_resume_lc(xwskd);
 }
 
 /**
  * @brief XWUP API：获取当前电源管理阶段
  * @return 状态值 @ref xwup_pm_stage_em
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
  */
 __xwup_api
 xwsq_t xwup_pm_get_stage(void)
@@ -1530,28 +1520,28 @@ xwsq_t xwup_pm_get_stage(void)
 }
 
 #else
+__xwup_code
+xwer_t xwup_skd_suspend_lc(struct xwup_skd * xwskd)
+{
+        XWOS_UNUSED(xwskd);
+        return -ENOSYS;
+}
+
 __xwup_api
 void xwup_pm_suspend(void)
 {
 }
 
+__xwup_code
+xwer_t xwup_skd_resume_lc(struct xwup_skd * xwskd)
+{
+        XWOS_UNUSED(xwskd);
+        return -ENOSYS;
+}
+
 __xwup_api
 void xwup_pm_resume(void)
 {
-}
-
-__xwup_code
-xwer_t xwup_skd_suspend_lic(struct xwup_skd * xwskd)
-{
-        XWOS_UNUSED(xwskd);
-        return -ENOSYS;
-}
-
-__xwup_code
-xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
-{
-        XWOS_UNUSED(xwskd);
-        return -ENOSYS;
 }
 
 __xwup_api

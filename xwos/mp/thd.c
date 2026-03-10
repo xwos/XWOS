@@ -563,9 +563,9 @@ err_xwobj_activate:
  * @retval -EINVAL: 无效的参数
  * @retval -EEXIST: 线程已经被加载
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入，除非线程主函数已经退出，线程回到‘STANDBY’状态
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入，除非线程主函数已经退出，线程回到 `STANDBY` 状态
  */
 static __xwmp_code
 void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg)
@@ -764,7 +764,7 @@ xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc)
                 xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                 xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 // cppcheck-suppress [misra-c2012-17.7]
-                xwmp_skd_notify_allfrz_lic(xwskd);
+                xwmp_skd_notify_allfrz_lc(xwskd);
         } else {
                 xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                 xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
@@ -934,9 +934,8 @@ xwer_t xwmp_thd_detach(struct xwmp_thd * thd)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESTALE: 状态已经被其他CPU改变
- * @note
- * - 此函数将线程(thd)的优先级改成(dprio)，并返回接下来需要修改的互斥锁(*pmtx)
- *   的优先级。
+ * @details
+ * + 此函数修改线程的优先级，并返回接下来需要修改优先级的互斥锁。
  */
 __xwmp_code
 xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
@@ -1342,7 +1341,7 @@ void xwmp_thd_ttn_callback(struct xwmp_ttn * ttn)
  * @param[in] cpuirq: 本地CPU的中断标志
  * @return 错误码
  * @note
- * - 此函数只能在取得写锁xwtt->lock以及关闭本地CPU的中断时才可调用。
+ * + 此函数只能在取得写锁 `xwtt->lock` 以及关闭本地CPU的中断时才可调用。
  */
 __xwmp_code
 xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt,
@@ -1639,11 +1638,11 @@ err_dis:
  * @retval XWOK: 没有错误
  * @retval -EALREADY: 线程已经被冻结
  * @note
- * - 此函数只可在线程所属的CPU的中断上下文中被调用；
- * - 此函数假设线程对象已经被引用，执行过程中不会成为野指针。
+ * + 此函数只可由线程所属的CPU运行；
+ * + 此函数假设线程对象已经被引用，执行过程中不会成为野指针。
  */
 __xwmp_code
-xwer_t xwmp_thd_reqfrz_lic(struct xwmp_thd * thd)
+xwer_t xwmp_thd_reqfrz_lc(struct xwmp_thd * thd)
 {
         struct xwmp_skd * xwskd;
         xwreg_t cpuirq;
@@ -1667,8 +1666,8 @@ xwer_t xwmp_thd_reqfrz_lic(struct xwmp_thd * thd)
  * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在线程所属的CPU的调度器服务中断中执行；
- * - 此中断只可从函数@ref xwmp_cthd_freeze()中进入。
+ * + 此函数只能在线程所属的CPU的调度器服务中断中执行；
+ * + 此中断只可从函数 @ref xwmp_cthd_freeze() 中进入。
  */
 __xwmp_code
 xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd)
@@ -1708,7 +1707,7 @@ xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd)
                         xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                         xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                         // cppcheck-suppress [misra-c2012-17.7]
-                        xwmp_skd_notify_allfrz_lic(xwskd);
+                        xwmp_skd_notify_allfrz_lc(xwskd);
                 } else {
                         xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
                         xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
@@ -1751,10 +1750,10 @@ xwer_t xwmp_cthd_freeze(void)
  * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在线程所属的CPU的中断中执行。
+ * + 此函数只能在线程所属的CPU的中断中执行。
  */
 __xwmp_code
-xwer_t xwmp_thd_thaw_lic(struct xwmp_thd * thd)
+xwer_t xwmp_thd_thaw_lc(struct xwmp_thd * thd)
 {
         struct xwmp_skd * xwskd;
         xwpr_t prio;
@@ -1908,8 +1907,8 @@ void xwmp_thd_outmigrate_frozen_lic(struct xwmp_thd * thd)
  * @retval -EINPROGRESS: 线程处于迁移的过程中
  * @retval -EALREADY: 线程已经被冻结
  * @note
- * - 此函数只可在线程所属的CPU的中断上下文中被调用；
- * - 此函数假设线程对象已被引用，执行过程中不会成为野指针。
+ * + 此函数只可在线程所属的CPU的中断上下文中被调用；
+ * + 此函数假设线程对象已被引用，执行过程中不会成为野指针。
  */
 static __xwmp_code
 xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
@@ -1962,8 +1961,8 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
  * @param[in] dstcpu: 目标CPU的ID
  * @return 错误码
  * @note
- * - 此函数只能在线程所属的CPU中执行。
- * - 此函数假设线程对象已经被引用，执行过程中不会成为野指针。
+ * + 此函数只能在线程所属的CPU中执行。
+ * + 此函数假设线程对象已经被引用，执行过程中不会成为野指针。
  */
 __xwmp_code
 xwer_t xwmp_thd_outmigrate_lic(struct xwmp_thd * thd, xwid_t dstcpu)

@@ -49,13 +49,13 @@ struct xwospl_skd * xwosplcb_skd_post_swcx_lic(struct xwospl_skd * xwskd)
 __xwos_code
 xwer_t xwosplcb_skd_suspend_lic(struct xwospl_skd * xwskd)
 {
-        return xwmp_skd_suspend_lic(xwskd);
+        return xwmp_skd_dec_wklkcnt(xwskd);
 }
 
 __xwos_code
 xwer_t xwosplcb_skd_resume_lic(struct xwospl_skd * xwskd)
 {
-        return xwmp_skd_resume_lic(xwskd);
+        return xwmp_skd_resume_lc(xwskd);
 }
 
 __xwos_code
@@ -124,13 +124,13 @@ struct xwospl_skd * xwosplcb_skd_post_swcx_lic(struct xwospl_skd * xwskd)
 __xwos_code
 xwer_t xwosplcb_skd_suspend_lic(struct xwospl_skd * xwskd)
 {
-        return xwup_skd_suspend_lic(xwskd);
+        return xwup_skd_dec_wklkcnt();
 }
 
 __xwos_code
 xwer_t xwosplcb_skd_resume_lic(struct xwospl_skd * xwskd)
 {
-        return xwup_skd_resume_lic(xwskd);
+        return xwup_skd_resume_lc(xwskd);
 }
 
 __xwos_code

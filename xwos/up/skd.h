@@ -203,13 +203,11 @@ xwer_t xwup_skd_dec_wklkcnt(void);
 xwer_t xwup_skd_wakelock_lock(void);
 xwer_t xwup_skd_wakelock_unlock(void);
 void xwup_skd_intr_all(void);
-xwer_t xwup_skd_notify_allfrz_lic(void);
+xwer_t xwup_skd_notify_allfrz_lc(void);
 
 struct xwup_skd * xwup_skd_post_start_lic(struct xwup_skd * xwskd);
 struct xwup_skd * xwup_skd_pre_swcx_lic(struct xwup_skd * xwskd);
 struct xwup_skd * xwup_skd_post_swcx_lic(struct xwup_skd * xwskd);
-xwer_t xwup_skd_suspend_lic(struct xwup_skd * xwskd);
-xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd);
 
 xwer_t xwup_skd_init_lc(void);
 xwer_t xwup_skd_start_lc(void);
@@ -234,6 +232,9 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void);
 struct xwup_skd * xwup_skd_svpmpt_lc(xwsq_t * dis_pmpt_cnt);
 struct xwup_skd * xwup_skd_rspmpt_lc(xwsq_t dis_pmpt_cnt);
 bool xwup_skd_tstpmpt_lc(void);
+
+xwer_t xwup_skd_resume_lc(struct xwup_skd * xwskd);
+
 void xwup_skd_get_context_lc(xwsq_t * ctx, xwirq_t * irqn);
 bool xwup_skd_prio_tst_valid(xwpr_t prio);
 

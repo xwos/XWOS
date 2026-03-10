@@ -194,7 +194,7 @@ struct __xwcc_alignl1cache xwmp_skd {
 extern struct xwmp_skd xwmp_skd[CPUCFG_CPU_NUM];
 
 struct xwmp_skd * xwmp_skd_get_lc(void);
-xwer_t xwmp_skd_get_by_cpuid(xwid_t cpuid, struct xwmp_skd ** ptrbuf);
+struct xwmp_skd * xwmp_skd_get_by_cpuid(xwid_t cpuid);
 struct xwmp_thd * xwmp_skd_get_cthd(struct xwmp_skd * xwskd);
 struct xwmp_thd * xwmp_skd_get_cthd_lc(void);
 struct xwmp_skd * xwmp_skd_dspmpt_lc(struct xwmp_skd * xwskd);
@@ -225,13 +225,11 @@ xwer_t xwmp_skd_inc_wklkcnt(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_dec_wklkcnt(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_wakelock_lock(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_wakelock_unlock(struct xwmp_skd * xwskd);
-xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd);
+xwer_t xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd);
 
 struct xwmp_skd * xwmp_skd_post_start_lic(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_pre_swcx_lic(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd);
-xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd);
-xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd);
 
 xwer_t xwmp_skd_init_lc(void);
 xwer_t xwmp_skd_start_lc(void);
@@ -239,9 +237,9 @@ xwer_t xwmp_skd_start_syshwt_lc(void);
 xwer_t xwmp_skd_stop_syshwt_lc(void);
 xwid_t xwmp_skd_get_cpuid_lc(void);
 
-void xwmp_skd_suspend(xwid_t cpuid);
-void xwmp_skd_resume(xwid_t cpuid);
+xwer_t xwmp_skd_resume_lc(struct xwmp_skd * xwskd);
 xwsq_t xwmp_skd_get_pm_state(struct xwmp_skd * xwskd);
+
 void xwmp_skd_get_context_lc(xwsq_t * ctx, xwirq_t * irqn);
 bool xwmp_skd_prio_tst_valid(xwpr_t prio);
 

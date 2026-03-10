@@ -179,7 +179,7 @@ xwer_t xwup_thd_cache_init(struct xwmm_mempool * mp, xwsq_t page_order)
  * @param[in] zone_size: 内存区域的大小
  * @return 错误码
  * @note
- * - 重入性：只可在系统初始化时使用一次
+ * + 重入性：只可在系统初始化时使用一次
  */
 __xwup_init_code
 xwer_t xwup_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
@@ -722,7 +722,7 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
-                xwup_skd_notify_allfrz_lic(); // cppcheck-suppress [misra-c2012-17.7]
+                xwup_skd_notify_allfrz_lc(); // cppcheck-suppress [misra-c2012-17.7]
         } else {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
@@ -897,8 +897,8 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESTALE: 状态已经被其他CPU改变
- * @note
- * - 此函数将线程(thd)的优先级改成(dprio)，并返回接下来需要修改优先级的互斥锁的指针。
+ * @details
+ * + 此函数修改线程的优先级，并返回接下来需要修改优先级的互斥锁。
  */
 __xwup_code
 void xwup_thd_chprio_once(struct xwup_thd * thd, xwpr_t dprio,
@@ -1145,7 +1145,7 @@ void xwup_thd_ttn_callback(struct xwup_ttn * ttn)
  * @param[in] cpuirq: 本地CPU的中断标志
  * @return 错误码
  * @note
- * - 此函数只能在取得写锁xwtt->lock以及关闭本地CPU的中断时才可调用。
+ * + 此函数只能在取得写锁 `xwtt->lock` 以及关闭本地CPU的中断时才可调用。
  */
 __xwup_code
 xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt,
@@ -1435,7 +1435,7 @@ xwer_t xwup_cthd_freeze(void)
  * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在中断上下文中调用并且这个中断只能由 @ref xwup_cthd_freeze() 触发。
+ * + 此函数只能在中断上下文中调用并且这个中断只能由 @ref xwup_cthd_freeze() 触发。
  */
 __xwup_code
 xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
@@ -1454,8 +1454,7 @@ xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
         xwup_skd_enpmpt_lc(); //cppcheck-suppress [misra-c2012-17.7]
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                // cppcheck-suppress [misra-c2012-17.7]
-                xwup_skd_notify_allfrz_lic();
+                xwup_skd_notify_allfrz_lc(); // cppcheck-suppress [misra-c2012-17.7]
         } else {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
@@ -1473,7 +1472,7 @@ xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
  * @return 错误码
  */
 __xwup_code
-xwer_t xwup_thd_thaw_lic(struct xwup_thd * thd)
+xwer_t xwup_thd_thaw_lc(struct xwup_thd * thd)
 {
 #if (1 == XWOSRULE_SKD_THD_FREEZE)
         struct xwup_skd * xwskd;
