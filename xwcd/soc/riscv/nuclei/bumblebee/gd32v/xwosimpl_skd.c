@@ -330,7 +330,7 @@ xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd)
 }
 
 __xwbsp_code
-void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc)
+void xwospl_thd_exit(struct xwospl_thd * thd, xwer_t rc)
 {
         rc = (xwer_t)xwsc((xwsc_f)xwosplcb_thd_exit_lic, 2, thd, rc);
         while (true) {
@@ -338,7 +338,7 @@ void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc)
 }
 
 __xwbsp_code
-xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd)
+xwer_t xwospl_thd_freeze(struct xwospl_thd * thd)
 {
         xwer_t rc;
 

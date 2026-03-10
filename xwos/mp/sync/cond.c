@@ -809,25 +809,25 @@ xwer_t xwmp_cond_block_to(struct xwmp_cond * cond,
         }
 
         /* 调度 */
-        xwmp_skd_svpmpt(xwskd, &pmpt); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rspmpt(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_svpmpt_lc(xwskd, &pmpt); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rspmpt_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        xwmp_skd_svbh(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsbh(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_svbh_lc(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsbh_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #endif
 
-        xwmp_skd_svth(xwskd, &th); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsth(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_svth_lc(xwskd, &th); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsth_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_wakelock_unlock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_wakelock_lock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsth(xwskd, th); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsth_lc(xwskd, th); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        xwmp_skd_rsbh(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsbh_lc(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwmp_skd_rspmpt(xwskd, pmpt); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rspmpt_lc(xwskd, pmpt); // cppcheck-suppress [misra-c2012-17.7]
 
         /* 判断唤醒原因 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
@@ -1058,21 +1058,21 @@ xwer_t xwmp_cond_block_unintr(struct xwmp_cond * cond,
         }
 
         /* 调度 */
-        xwmp_skd_svpmpt(xwskd, &pmpt); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rspmpt(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_svpmpt_lc(xwskd, &pmpt); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rspmpt_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        xwmp_skd_svbh(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsbh(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_svbh_lc(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsbh_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwmp_skd_svth(xwskd, &th); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsth(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_svth_lc(xwskd, &th); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsth_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsth(xwskd, th); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsth_lc(xwskd, th); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        xwmp_skd_rsbh(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsbh_lc(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwmp_skd_rspmpt(xwskd, pmpt); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rspmpt_lc(xwskd, pmpt); // cppcheck-suppress [misra-c2012-17.7]
 
         /* 判断唤醒原因 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);

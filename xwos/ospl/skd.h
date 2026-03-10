@@ -110,17 +110,17 @@ void xwospl_skd_req_swcx(struct xwospl_skd * xwskd);
 void xwospl_skd_isr_swcx(void);
 
 /**
- * @brief XWOS移植层：当前CPU上的线程退出
+ * @brief XWOS移植层：线程退出
  * @param[in] thd: 线程对象的指针
  * @param[in] rc: 线程退出抛出的返回值
  */
-void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc);
+void xwospl_thd_exit(struct xwospl_thd * thd, xwer_t rc);
 
 /**
  * @brief XWOS移植层：冻结当前CPU中正在运行的线程
  * @param[in] thd: 线程对象的指针
  */
-xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd);
+xwer_t xwospl_thd_freeze(struct xwospl_thd * thd);
 
 #if defined(XWCFG_CORE__mp)
 /**

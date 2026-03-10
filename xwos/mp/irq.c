@@ -86,13 +86,19 @@ void xwmp_cpuirq_disable_lc(void)
 __xwmp_api
 void xwmp_cpuirq_resume_lc(void)
 {
-        xwmp_skd_enth_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        struct xwmp_skd * xwskd;
+
+        xwskd = xwmp_skd_get_lc();
+        xwmp_skd_enth_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwmp_api
 void xwmp_cpuirq_suspend_lc(void)
 {
-        xwmp_skd_dsth_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        struct xwmp_skd * xwskd;
+
+        xwskd = xwmp_skd_get_lc();
+        xwmp_skd_dsth_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwmp_api

@@ -84,7 +84,7 @@ void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
 }
 
 __xwbsp_code
-void xwospl_thd_exit_lc(__xwcc_unused struct xwospl_thd * thd, __xwcc_unused xwer_t rc)
+void xwospl_thd_exit(__xwcc_unused struct xwospl_thd * thd, __xwcc_unused xwer_t rc)
 {
         __asm__ volatile(
         "       dsb     sy\n"
@@ -97,7 +97,7 @@ void xwospl_thd_exit_lc(__xwcc_unused struct xwospl_thd * thd, __xwcc_unused xwe
 }
 
 __xwbsp_code __xwcc_noreturn
-xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
+xwer_t xwospl_thd_freeze(__xwcc_unused struct xwospl_thd * thd)
 {
         __asm__ volatile(
         "       dsb     sy\n"
@@ -108,7 +108,7 @@ xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
         :
         : "x0", "memory"
         );
-        /* 使用 `noreturn` 模拟 `naked` 属性，下列代码只为编译不报错，并不会执行到。*/
+        /* 使用 `noreturn` 模拟 `naked` 属性，下面代码只为编译不报错，并不执行。*/
         while (true) {
         }
 }

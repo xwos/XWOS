@@ -789,7 +789,7 @@ void xwmp_cthd_return(xwer_t rc)
 
         cthd = xwmp_skd_get_cthd_lc();
         xwos_thdlogf(INFO, cthd, "return:%d\r\n", rc);
-        xwospl_thd_exit_lc(cthd, rc);
+        xwospl_thd_exit(cthd, rc);
 #else
         XWOS_UNUSED(rc);
         while (true) {
@@ -805,7 +805,7 @@ void xwmp_cthd_exit(xwer_t rc)
 
         cthd = xwmp_skd_get_cthd_lc();
         xwos_thdlogf(INFO, cthd, "exit:%d\r\n", rc);
-        xwospl_thd_exit_lc(cthd, rc);
+        xwospl_thd_exit(cthd, rc);
 #else
         XWOS_UNUSED(rc);
         while (true) {
@@ -1706,12 +1706,12 @@ xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd)
                 xwmp_splk_lock(&xwskd->thdlistlock);
                 if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
                         xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
-                        xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+                        xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                         // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_skd_notify_allfrz_lic(xwskd);
                 } else {
                         xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
-                        xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+                        xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                         // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_skd_req_swcx(xwskd);
                 }
@@ -1731,15 +1731,16 @@ xwer_t xwmp_cthd_freeze(void)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwskd = xwmp_skd_dspmpt_lc();
+        xwskd = xwmp_skd_get_lc();
+        xwmp_skd_dspmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         cthd = xwmp_skd_get_cthd(xwskd);
         xwmp_splk_lock_cpuirqsv(&cthd->stlock, &cpuirq);
         if ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_FREEZABLE & cthd->state)) {
                 xwmp_splk_unlock_cpuirqrs(&cthd->stlock, cpuirq);
-                rc = xwospl_thd_freeze_lc(cthd);
+                rc = xwospl_thd_freeze(cthd);
         } else {
                 xwmp_splk_unlock_cpuirqrs(&cthd->stlock, cpuirq);
-                xwmp_skd_enpmpt(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                 rc = -EPERM;
         }
         return rc;

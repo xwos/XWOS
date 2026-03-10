@@ -752,7 +752,7 @@ void xwup_cthd_return(xwer_t rc)
 
         cthd = xwup_skd_get_cthd_lc();
         xwos_thdlogf(INFO, cthd, "return:%d\r\n", rc);
-        xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
+        xwospl_thd_exit((struct xwospl_thd *)cthd, rc);
 #else
         XWOS_UNUSED(rc);
         while (true) {
@@ -768,7 +768,7 @@ void xwup_cthd_exit(xwer_t rc)
 
         cthd = xwup_skd_get_cthd_lc();
         xwos_thdlogf(INFO, cthd, "exit:%d\r\n", rc);
-        xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
+        xwospl_thd_exit((struct xwospl_thd *)cthd, rc);
 #else
         XWOS_UNUSED(rc);
         while (true) {
@@ -1423,7 +1423,7 @@ xwer_t xwup_cthd_freeze(void)
 
         xwup_skd_dspmpt_lc(); //cppcheck-suppress [misra-c2012-17.7]
         cthd = xwup_skd_get_cthd_lc();
-        rc = xwospl_thd_freeze_lc(cthd);
+        rc = xwospl_thd_freeze(cthd);
         return rc;
 #else
         return -ENOSYS;

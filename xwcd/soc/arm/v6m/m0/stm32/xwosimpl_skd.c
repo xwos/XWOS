@@ -62,7 +62,7 @@ void xwospl_skd_chkpmpt_oc(__xwcc_unused struct xwospl_skd * xwskd)
 }
 
 __xwbsp_code __xwcc_naked
-xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
+xwer_t xwospl_thd_freeze(__xwcc_unused struct xwospl_thd * thd)
 {
         __asm__ volatile(
                 ".syntax        unified");
@@ -72,8 +72,8 @@ xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
 }
 
 __xwbsp_code __xwcc_naked
-void xwospl_thd_exit_lc(__xwcc_unused struct xwospl_thd * thd,
-                        __xwcc_unused xwer_t rc)
+void xwospl_thd_exit(__xwcc_unused struct xwospl_thd * thd,
+                     __xwcc_unused xwer_t rc)
 {
         __asm__ volatile(
                 ".syntax        unified");

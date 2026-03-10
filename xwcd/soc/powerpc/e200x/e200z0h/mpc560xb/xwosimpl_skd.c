@@ -52,11 +52,6 @@ __xwbsp_data struct e200x_context soc_context = {
         .irqn = SOC_IRQN_NIL,
 };
 
-/**
- * @brief 初始化调度调度器
- * @param[in] xwskd: 调度器的指针
- * @return 错误码
- */
 __xwbsp_init_code
 xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
 {
@@ -81,9 +76,6 @@ xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
         return XWOK;
 }
 
-/**
- * @brief 获取当前CPU的ID
- */
 __xwbsp_code
 xwid_t xwospl_skd_get_cpuid_lc(void)
 {
@@ -95,10 +87,6 @@ void xwospl_skd_chkpmpt_oc(__xwcc_unused struct xwospl_skd * xwskd)
 {
 }
 
-/**
- * @brief 初始化调度对象的栈
- * @param[in] stk: 栈信息结构体指针
- */
 __xwbsp_code
 void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
                            void (* exit)(xwer_t))
@@ -216,10 +204,6 @@ void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
         *(stk->sp) = (xwstk_t)_SDA2_BASE_; /* r2 */
 }
 
-/**
- * @brief 触发切换上下文的软中断
- * @param[in] xwskd: XWOS调度器的指针
- */
 __xwbsp_code
 void soc_skd_req_swcx(struct xwospl_skd * xwskd)
 {
@@ -229,10 +213,6 @@ void soc_skd_req_swcx(struct xwospl_skd * xwskd)
         eppc_isb();
 }
 
-/**
- * @brief 切换线程上下文时检查线程的栈溢出
- * @return XWOS调度器的指针
- */
 __xwbsp_code
 struct xwospl_skd * soc_skd_chk_swcx(void)
 {
@@ -257,10 +237,6 @@ struct xwospl_skd * soc_skd_chk_swcx(void)
 #endif
 }
 
-/**
- * @brief 异常时检查当前线程的栈溢出
- * @return XWOS调度器的指针
- */
 __xwbsp_code
 struct xwospl_skd * soc_skd_chk_stk(void)
 {
@@ -287,10 +263,6 @@ struct xwospl_skd * soc_skd_chk_stk(void)
         return xwskd;
 }
 
-/**
- * @brief 报告栈溢出
- * @param[in] stk: 溢出的栈
- */
 static __xwbsp_code
 void soc_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk)
 {
@@ -298,11 +270,6 @@ void soc_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk)
         SDL_BUG();
 }
 
-/**
- * @brief 暂停调度器
- * @param[in] xwskd: 调度器的指针
- * @return 错误码
- */
 __xwbsp_code
 xwer_t xwospl_skd_suspend(struct xwospl_skd * xwskd)
 {
@@ -313,11 +280,6 @@ xwer_t xwospl_skd_suspend(struct xwospl_skd * xwskd)
         return rc;
 }
 
-/**
- * @brief 继续调度器
- * @param[in] xwskd: 调度器的指针
- * @return 错误码
- */
 __xwbsp_code
 xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd)
 {
@@ -328,13 +290,8 @@ xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd)
         return rc;
 }
 
-/**
- * @brief 本地CPU上的线程退出
- * @param[in] thd: 线程控制块对象的指针
- * @param[in] rc: 线程退出抛出的返回值
- */
 __xwbsp_code
-void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc)
+void xwospl_thd_exit(struct xwospl_thd * thd, xwer_t rc)
 {
         soc_skd_swi((xwer_t(*)(void *, void *))xwosplcb_thd_exit_lic,
                     (void *)thd, (void *)rc);
@@ -342,12 +299,8 @@ void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc)
         }
 }
 
-/**
- * @brief 冻结本地CPU中正在运行的线程
- * @param[in] thd: 线程控制块对象的指针
- */
 __xwbsp_code
-xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd)
+xwer_t xwospl_thd_freeze(struct xwospl_thd * thd)
 {
         xwer_t rc;
 
@@ -357,12 +310,6 @@ xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd)
 }
 
 #if (1 == XWOSRULE_THD_MIGRATION)
-/**
- * @brief 将线程迁出其他CPU，并准备迁入其他CPU
- * @param[in] thd: 线程控制块对象的指针
- * @param[in] cpuid: 目的地CPU的ID
- * @return 错误码
- */
 __xwbsp_code
 xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid)
 {
@@ -373,11 +320,6 @@ xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid)
         return rc;
 }
 
-/**
- * @brief 迁移线程至目标CPU
- * @param[in] thd: 线程控制块对象的指针
- * @param[in] cpuid: 目的地CPU的ID
- */
 __xwbsp_code
 void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid)
 {

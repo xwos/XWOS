@@ -8,7 +8,7 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
- * @note
+ * @details
  * - XWOS MP的调度器是一个每CPU变量，为了提高程序的效率，减少cache miss，
  *   通常只由CPU才可访问自己的调度器控制块结构体。其他CPU需要操作当前
  *   CPU的调度器时，需要挂起当前CPU的调度器服务中断，由当前CPU在ISR
@@ -237,7 +237,7 @@ xwer_t xwmp_skd_start_lc(void)
         id = xwmp_skd_get_cpuid_lc();
         xwskd = &xwmp_skd[id];
         if ((xwsq_t)XWMP_SKD_STATE_INIT == xwskd->state) {
-                xwmp_skd_dspmpt(xwskd);
+                xwmp_skd_dspmpt_lc(xwskd);
                 rc = xwmp_syshwt_start(&xwskd->tt.hwt);
                 if (XWOK == rc) {
                         rc = xwospl_skd_start(xwskd);
@@ -494,7 +494,7 @@ void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_dsth(struct xwmp_skd * xwskd)
+struct xwmp_skd * xwmp_skd_dsth_lc(struct xwmp_skd * xwskd)
 {
         xwospl_cpuirq_disable_lc();
         xwaop_add(xwsq_t, &xwskd->dis_th_cnt, 1, NULL, NULL);
@@ -507,7 +507,7 @@ struct xwmp_skd * xwmp_skd_dsth(struct xwmp_skd * xwskd)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_enth(struct xwmp_skd * xwskd)
+struct xwmp_skd * xwmp_skd_enth_lc(struct xwmp_skd * xwskd)
 {
         xwsq_t nv;
 
@@ -525,7 +525,7 @@ struct xwmp_skd * xwmp_skd_enth(struct xwmp_skd * xwskd)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_svth(struct xwmp_skd * xwskd, xwsq_t * dis_th_cnt)
+struct xwmp_skd * xwmp_skd_svth_lc(struct xwmp_skd * xwskd, xwsq_t * dis_th_cnt)
 {
         xwospl_cpuirq_disable_lc();
         xwaop_add(xwsq_t, &xwskd->dis_th_cnt, 1, NULL, dis_th_cnt);
@@ -539,7 +539,7 @@ struct xwmp_skd * xwmp_skd_svth(struct xwmp_skd * xwskd, xwsq_t * dis_th_cnt)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_rsth(struct xwmp_skd * xwskd, xwsq_t dis_th_cnt)
+struct xwmp_skd * xwmp_skd_rsth_lc(struct xwmp_skd * xwskd, xwsq_t dis_th_cnt)
 {
         xwaop_write(xwsq_t, &xwskd->dis_th_cnt, dis_th_cnt, NULL);
         if ((xwsq_t)0 == dis_th_cnt) {
@@ -640,7 +640,7 @@ void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_dsbh(struct xwmp_skd * xwskd)
+struct xwmp_skd * xwmp_skd_dsbh_lc(struct xwmp_skd * xwskd)
 {
         xwaop_add(xwsq_t, &xwskd->dis_bh_cnt, 1, NULL, NULL);
         return xwskd;
@@ -652,7 +652,7 @@ struct xwmp_skd * xwmp_skd_dsbh(struct xwmp_skd * xwskd)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd)
+struct xwmp_skd * xwmp_skd_enbh_lc(struct xwmp_skd * xwskd)
 {
         xwsq_t nv;
 
@@ -673,7 +673,7 @@ struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_svbh(struct xwmp_skd * xwskd, xwsq_t * dis_bh_cnt)
+struct xwmp_skd * xwmp_skd_svbh_lc(struct xwmp_skd * xwskd, xwsq_t * dis_bh_cnt)
 {
         xwaop_add(xwsq_t, &xwskd->dis_bh_cnt, 1, NULL, dis_bh_cnt);
         return xwskd;
@@ -686,7 +686,7 @@ struct xwmp_skd * xwmp_skd_svbh(struct xwmp_skd * xwskd, xwsq_t * dis_bh_cnt)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_rsbh(struct xwmp_skd * xwskd, xwsq_t dis_bh_cnt)
+struct xwmp_skd * xwmp_skd_rsbh_lc(struct xwmp_skd * xwskd, xwsq_t dis_bh_cnt)
 {
         xwaop_write(xwsq_t, &xwskd->dis_bh_cnt, dis_bh_cnt, NULL);
         if ((xwsq_t)0 == dis_bh_cnt) {
@@ -797,7 +797,7 @@ bool xwmp_skd_tst_in_bh(struct xwmp_skd * xwskd)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_dspmpt(struct xwmp_skd * xwskd)
+struct xwmp_skd * xwmp_skd_dspmpt_lc(struct xwmp_skd * xwskd)
 {
         xwaop_add(xwsq_t, &xwskd->dis_pmpt_cnt, 1, NULL, NULL);
         return xwskd;
@@ -809,7 +809,7 @@ struct xwmp_skd * xwmp_skd_dspmpt(struct xwmp_skd * xwskd)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_enpmpt(struct xwmp_skd * xwskd)
+struct xwmp_skd * xwmp_skd_enpmpt_lc(struct xwmp_skd * xwskd)
 {
         xwsq_t nv;
 
@@ -830,7 +830,7 @@ struct xwmp_skd * xwmp_skd_enpmpt(struct xwmp_skd * xwskd)
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_svpmpt(struct xwmp_skd * xwskd, xwsq_t * dis_pmpt_cnt)
+struct xwmp_skd * xwmp_skd_svpmpt_lc(struct xwmp_skd * xwskd, xwsq_t * dis_pmpt_cnt)
 {
         xwaop_add(xwsq_t, &xwskd->dis_pmpt_cnt, 1, NULL, dis_pmpt_cnt);
         return xwskd;
@@ -843,7 +843,7 @@ struct xwmp_skd * xwmp_skd_svpmpt(struct xwmp_skd * xwskd, xwsq_t * dis_pmpt_cnt
  * @return XWOS MP调度器的指针
  */
 __xwmp_code
-struct xwmp_skd * xwmp_skd_rspmpt(struct xwmp_skd * xwskd, xwsq_t dis_pmpt_cnt)
+struct xwmp_skd * xwmp_skd_rspmpt_lc(struct xwmp_skd * xwskd, xwsq_t dis_pmpt_cnt)
 {
         xwaop_write(xwsq_t, &xwskd->dis_pmpt_cnt, dis_pmpt_cnt, NULL);
         if ((xwsq_t)0 == dis_pmpt_cnt) {
@@ -1081,7 +1081,7 @@ __xwmp_code
 struct xwmp_skd * xwmp_skd_post_start_lic(struct xwmp_skd * xwskd)
 {
         xwskd->state = (xwsq_t)XWMP_SKD_STATE_RUNNING;
-        xwmp_skd_enpmpt(xwskd);
+        xwmp_skd_enpmpt_lc(xwskd);
         return xwskd;
 }
 
