@@ -35,11 +35,6 @@ ifeq ($(ARCHCFG_LIB_XWAOP32),y)
   ARCH_CSRCS += xwosimpl_soc_xwaop/u32.c
 endif
 
-ifeq ($(ARCHCFG_LIB_XWBMPAOP),y)
-  ARCH_CSRCS += xwosimpl_soc_xwaop/bmp.c
-  ARCH_ASRCS += xwosimpl_soc_xwaop/asm_bmp.S
-endif
-
 ARCH_CSRCS += xwosimpl_soc_xwbop/xwbop.c
 ARCH_ASRCS += xwosimpl_soc_xwbop/asm_xwbop.S
 

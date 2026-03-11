@@ -40,7 +40,6 @@ ARCH_CSRCS += xwosimpl_soc_xwaop/s32.c
 ARCH_CSRCS += xwosimpl_soc_xwaop/u32.c
 ARCH_CSRCS += xwosimpl_soc_xwaop/s64.c
 ARCH_CSRCS += xwosimpl_soc_xwaop/u64.c
-ARCH_CSRCS += xwosimpl_soc_xwaop/bmp.c
 ARCH_CSRCS += xwosimpl_soc_xwbop.c
 ARCH_CSRCS += xwosimpl_soc_lfq.c
 ARCH_CSRCS += xwosimpl_tls.c

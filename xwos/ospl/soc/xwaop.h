@@ -2246,16 +2246,4 @@ xwer_t xwaop__xws64_t__tst_then_op(atomic_xws64_t * a,
                                    xwaop_op_f op, void * op_args,
                                    xws64_t * nv, xws64_t * ov);
 
-/******** ******** ******** ******** bitmap ******** ******** ******** ********/
-bool xwbmpaop_t1i(atomic_xwbmp_t * bmp, xwsq_t idx);
-void xwbmpaop_s1i(atomic_xwbmp_t * bmp, xwsq_t idx);
-void xwbmpaop_c0i(atomic_xwbmp_t * bmp, xwsq_t idx);
-void xwbmpaop_x1i(atomic_xwbmp_t * bmp, xwsq_t idx);
-xwer_t xwbmpaop_t0i_then_s1i(atomic_xwbmp_t * bmp, xwsq_t idx);
-xwer_t xwbmpaop_t1i_then_c0i(atomic_xwbmp_t * bmp, xwsq_t idx);
-xwssq_t xwbmpaop_fls_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num);
-xwssq_t xwbmpaop_flz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num);
-xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num);
-xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num);
-
 #endif /* xwos/ospl/soc/xwaop.h */
