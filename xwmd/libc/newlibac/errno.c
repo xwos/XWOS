@@ -11,7 +11,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/thd.h>
+#include <xwos/osal/skd.h>
 #include <xwmd/libc/newlibac/linkage.h>
 #include <xwmd/libc/newlibac/check.h>
 #include <errno.h>
@@ -24,6 +24,5 @@ int * __errno(void);
 
 int * __errno(void)
 {
-        xwos_thd_d thdd = xwos_cthd_self();
-        return &thdd.thd->osthd.libc.error_number;
+        return xwos_skd_get_errno_lc();
 }

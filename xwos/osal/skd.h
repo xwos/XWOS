@@ -37,6 +37,11 @@
  * XWOS将上下文分为五种，定义可以参考 @ref xwos_skd_context ，
  * 当前代码的上下文可以通过 `xwos_skd_get_context_lc()` 获取。
  *
+ * ## libc的 `errno`
+ *
+ * 为了兼容libc，XWOS将libc的 `errno` 实现为每线程独立的私有变量，
+ * 可以通过 `xwos_skd_get_errno_lc()` 获取 `errno` 的地址。
+ *
  * ## CPU ID
  *
  * + `xwos_skd_get_cpuid_lc()` ：获取CPU ID。
@@ -209,6 +214,22 @@ static __xwos_inline_api
 void xwos_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
 {
         xwosdl_skd_get_context_lc(ctxbuf, irqnbuf);
+}
+
+/**
+ * @brief XWOS API：获取当前上下文的 `errno` 的地址
+ * @return `errno` 的指针
+ * @details
+ * + `errno` 是libc中定义的错误码，XWOS将其定义为每线程独立的私有变量：
+ *   + 当上下文为线程时，返回当前线程的 `errno`
+ *   + 当上下文为其他时，返回调度器的 `errno`
+ * @note
+ * + 上下文：任意
+ */
+static __xwcc_inline
+int * xwos_skd_get_errno_lc(void)
+{
+        return xwosdl_skd_get_errno_lc();
 }
 
 /**

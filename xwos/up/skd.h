@@ -186,6 +186,9 @@ struct xwup_skd {
         struct xwlib_bclst_head thdlist; /**< 本调度器中所有线程的链表头 */
         xwsz_t thd_num; /**< 本调度器中的线程数量 */
         struct xwlib_bclst_head thdelist; /**< 本调度器中所有待删除的线程的链表头 */
+        struct {
+                int error_number; /**< 错误码 */
+        } libc;
 };
 
 
@@ -237,5 +240,7 @@ xwer_t xwup_skd_resume_lc(struct xwup_skd * xwskd);
 
 void xwup_skd_get_context_lc(xwsq_t * ctx, xwirq_t * irqn);
 bool xwup_skd_prio_tst_valid(xwpr_t prio);
+
+int * xwup_skd_get_errno_lc(void);
 
 #endif /* xwos/up/skd.h */

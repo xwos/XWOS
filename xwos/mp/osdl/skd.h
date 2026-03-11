@@ -55,6 +55,12 @@ void xwosdl_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
 }
 
 static __xwcc_inline
+int * xwosdl_skd_get_errno_lc(void)
+{
+        return xwmp_skd_get_errno_lc();
+}
+
+static __xwcc_inline
 xwtm_t xwosdl_skd_get_time_lc(void)
 {
         struct xwmp_skd * xwskd;

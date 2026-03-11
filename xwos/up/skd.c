@@ -1593,3 +1593,22 @@ bool xwup_skd_prio_tst_valid(xwpr_t prio)
 {
         return (prio <= XWUP_SKD_PRIORITY_INVALID);
 }
+
+__xwup_api
+int * xwup_skd_get_errno_lc(void)
+{
+        struct xwup_skd * xwskd;
+        xwsq_t ctx;
+        struct xwup_thd * thd;
+        int * errnum;
+
+        xwskd = &xwup_skd;
+        xwup_skd_get_context_lc(&ctx, NULL);
+        if ((xwsq_t)XWUP_SKD_CONTEXT_THD == ctx) {
+                thd = xwup_skd_get_cthd_lc();
+                errnum = &thd->libc.error_number;
+        } else {
+                errnum = &xwskd->libc.error_number;
+        }
+        return errnum;
+}

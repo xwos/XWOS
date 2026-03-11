@@ -1569,3 +1569,22 @@ bool xwmp_skd_prio_tst_valid(xwpr_t prio)
 {
         return (prio <= XWMP_SKD_PRIORITY_INVALID);
 }
+
+__xwmp_api
+int * xwmp_skd_get_errno_lc(void)
+{
+        struct xwmp_skd * xwskd;
+        xwsq_t ctx;
+        struct xwmp_thd * thd;
+        int * errnum;
+
+        xwskd = xwmp_skd_get_lc();
+        xwmp_skd_get_context_lc(&ctx, NULL);
+        if ((xwsq_t)XWMP_SKD_CONTEXT_THD == ctx) {
+                thd = xwmp_skd_get_cthd(xwskd);
+                errnum = &thd->libc.error_number;
+        } else {
+                errnum = &xwskd->libc.error_number;
+        }
+        return errnum;
+}

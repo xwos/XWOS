@@ -189,6 +189,9 @@ struct __xwcc_alignl1cache xwmp_skd {
         xwsz_t thd_num; /**< 本调度器中的线程数量 */
         struct xwmp_splk thdlistlock; /**< 保护thdlist的锁 */
         struct xwlib_bclst_head thdelist; /**< 本调度器中所有待删除的线程的链表头 */
+        struct {
+                int error_number; /**< 错误码 */
+        } libc;
 };
 
 extern struct xwmp_skd xwmp_skd[CPUCFG_CPU_NUM];
@@ -242,5 +245,7 @@ xwsq_t xwmp_skd_get_pm_state(struct xwmp_skd * xwskd);
 
 void xwmp_skd_get_context_lc(xwsq_t * ctx, xwirq_t * irqn);
 bool xwmp_skd_prio_tst_valid(xwpr_t prio);
+
+int * xwmp_skd_get_errno_lc(void);
 
 #endif /* xwos/mp/skd.h */
