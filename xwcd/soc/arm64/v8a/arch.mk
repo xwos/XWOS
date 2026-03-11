@@ -32,16 +32,26 @@ ARCH_EOBJS :=
 
 ARCH_ASRCS += arch_exception.S
 
-ARCH_CSRCS += xwosimpl_soc_xwaop/s8.c
-ARCH_CSRCS += xwosimpl_soc_xwaop/u8.c
-ARCH_CSRCS += xwosimpl_soc_xwaop/s16.c
-ARCH_CSRCS += xwosimpl_soc_xwaop/u16.c
-ARCH_CSRCS += xwosimpl_soc_xwaop/s32.c
-ARCH_CSRCS += xwosimpl_soc_xwaop/u32.c
-ARCH_CSRCS += xwosimpl_soc_xwaop/s64.c
-ARCH_CSRCS += xwosimpl_soc_xwaop/u64.c
+ifeq ($(ARCHCFG_LIB_XWAOP8),y)
+  ARCH_CSRCS += xwosimpl_soc_xwaop/s8.c
+  ARCH_CSRCS += xwosimpl_soc_xwaop/u8.c
+endif
+ifeq ($(ARCHCFG_LIB_XWAOP16),y)
+  ARCH_CSRCS += xwosimpl_soc_xwaop/s16.c
+  ARCH_CSRCS += xwosimpl_soc_xwaop/u16.c
+endif
+ifeq ($(ARCHCFG_LIB_XWAOP32),y)
+  ARCH_CSRCS += xwosimpl_soc_xwaop/s32.c
+  ARCH_CSRCS += xwosimpl_soc_xwaop/u32.c
+endif
+ifeq ($(ARCHCFG_LIB_XWAOP64),y)
+  ARCH_CSRCS += xwosimpl_soc_xwaop/s64.c
+  ARCH_CSRCS += xwosimpl_soc_xwaop/u64.c
+endif
+ifeq ($(ARCHCFG_LIB_LFQ),y)
+  ARCH_CSRCS += xwosimpl_soc_lfq.c
+endif
 ARCH_CSRCS += xwosimpl_soc_xwbop.c
-ARCH_CSRCS += xwosimpl_soc_lfq.c
 ARCH_CSRCS += xwosimpl_tls.c
 ARCH_CSRCS += arch_init.c
 ARCH_CSRCS += arch_isa.c

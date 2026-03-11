@@ -474,6 +474,10 @@ ifeq ($(ARCHCFG_LIB_XWAOP64),y)
   ARCH_CSRCS += xwosimpl_soc_xwaop/s64/xor.c
 endif
 
+ifeq ($(ARCHCFG_LIB_LFQ),y)
+  ARCH_CSRCS += xwosimpl_soc_lfq.c
+endif
+
 ifeq ($(ARCHCFG_LIB_XWBOP_FFS8),y)
   ARCH_CSRCS += xwosimpl_soc_xwbop/ffs8.c
 endif
@@ -549,7 +553,7 @@ ifeq ($(XWLIBCFG_SETJMP),y)
 endif
 
 ARCH_CSRCS += arch_init.c
-ARCH_CSRCS += arch_firmware.c arch_irq.c xwosimpl_soc_lfq.c
+ARCH_CSRCS += arch_firmware.c arch_irq.c
 ARCH_CSRCS += arch_skd.c arch_systick.c
 ARCH_CSRCS += xwosimpl_tls.c
 

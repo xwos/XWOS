@@ -37,4 +37,13 @@
 #define SOCCFG_CRC32                            1
 #define SOCCFG_CRC8                             1
 
+/******** xwaop ********/
+#define SOCCFG_LIB_XWAOP8                       0
+#define SOCCFG_LIB_XWAOP16                      0
+#define SOCCFG_LIB_XWAOP32                      0
+#define SOCCFG_LIB_XWAOP64                      0
+
+/******** lfq ********/
+#define SOCCFG_LIB_LFQ                          0
+
 #endif /* cfg/soc.h */

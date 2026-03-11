@@ -31,4 +31,13 @@
 #define SOCCFG_BUG                              1
 #define SOCCFG_DBGLOGBUF_SIZE                   (512U)
 
+/******** xwaop ********/
+#define SOCCFG_LIB_XWAOP8                       0
+#define SOCCFG_LIB_XWAOP16                      0
+#define SOCCFG_LIB_XWAOP32                      0
+#define SOCCFG_LIB_XWAOP64                      0
+
+/******** lfq ********/
+#define SOCCFG_LIB_LFQ                          0
+
 #endif /* cfg/soc.h */
