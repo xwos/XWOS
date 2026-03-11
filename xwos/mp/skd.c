@@ -1535,15 +1535,19 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
         xwer_t rc;
         xwsq_t ctx;
 
+        xwskd = xwmp_skd_get_lc();
         rc = xwmp_irq_get_id(&irqn);
-        if (XWOK == rc) {
-                ctx = (xwsq_t)XWMP_SKD_CONTEXT_ISR;
-                if (NULL != irqnbuf) {
-                        *irqnbuf = irqn;
-                }
+        if (NULL != irqnbuf) {
+                *irqnbuf = irqn;
+        }
+        if (xwskd->state <= (xwsq_t)XWMP_SKD_STATE_INIT) {
+                ctx = (xwsq_t)XWMP_SKD_CONTEXT_BOOT;
+        } else if ((xwsq_t)XWMP_SKD_STATE_PWRMNT == xwskd->state) {
+                ctx = (xwsq_t)XWMP_SKD_CONTEXT_PWRMNT;
         } else {
-                xwskd = xwmp_skd_get_lc();
-                if ((xwsq_t)XWMP_SKD_STATE_RUNNING == xwskd->state) {
+                if (XWOK == rc) {
+                        ctx = (xwsq_t)XWMP_SKD_CONTEXT_ISR;
+                } else {
                         if (XWMP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
                                 ctx = (xwsq_t)XWMP_SKD_CONTEXT_IDLE;
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
@@ -1553,10 +1557,6 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                         } else {
                                 ctx = (xwsq_t)XWMP_SKD_CONTEXT_THD;
                         }
-                } else if ((xwsq_t)XWMP_SKD_STATE_PWRMNT == xwskd->state) {
-                        ctx = (xwsq_t)XWMP_SKD_CONTEXT_PWRMNT;
-                } else {
-                        ctx = (xwsq_t)XWMP_SKD_CONTEXT_BOOT;
                 }
         }
         if (NULL != ctxbuf) {
