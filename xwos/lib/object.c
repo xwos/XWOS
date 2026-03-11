@@ -14,6 +14,7 @@
 #include <xwos/lib/object.h>
 #include <xwos/osal/irq.h>
 #include <xwos/osal/skd.h>
+#include <xwos/osal/lock/spinlock.h>
 
 static __xwlib_code
 xwsq_t xwos_objtik_get(void);
@@ -26,6 +27,9 @@ void xwos_object_release_refaop_op(void * nv, const void * ov, void * arg);
 
 #define XWOS_OBJTIK_CHUNK        ((xwsq_t)1 << 20U) /* 1M */
 #define XWOS_OBJTIK_CHUNK_MSK    (XWOS_OBJTIK_CHUNK - 1U)
+
+static __xwlib_data
+struct xwos_splk xwos_objtik_lock = XWOS_SPLK_INITIALIZER;
 
 /**
  * @brief 对象标签分配器，每次分配 `XWOS_OBJTIK_CHUNK` 个ID给CPU
@@ -59,7 +63,7 @@ void xwos_objtik_init(void)
  * @details
  * 为了避免频繁地访问多CPU共享原子变量 `xwos_objtik_dispatcher` ，每次获取标签
  * 都是从当前CPU的私有变量 `xwos_objtik[cpu]` 中分配的，只有当 `xwos_objtik[cpu]` 的
- * 分配额达到最大额度 `XWOS_OBJTIK_CHUNK` 时，才会在临界区访问 `xwos_objtik_dispatcher`
+ * 分配额达到最大值 `XWOS_OBJTIK_CHUNK` 时，才会在临界区访问 `xwos_objtik_dispatcher`
  * 预先分配数量为 `XWOS_OBJTIK_CHUNK` 的标签。
  */
 static __xwlib_code
@@ -82,17 +86,17 @@ xwsq_t xwos_objtik_get(void)
                         xwreg_t cpuirq;
                         xwsq_t chunk;
 
-                        xwos_cpuirq_save_lc(&cpuirq);
+                        xwos_splk_lock_cpuirqsv(&xwos_objtik_lock, &cpuirq);
                         curr = xwaop_load(xwsq_t, objtik, xwaop_mo_relaxed);
                         if (curr == max) {
                                 ov = curr;
                                 xwaop_add(xwsq_t, &xwos_objtik_dispatcher,
                                           XWOS_OBJTIK_CHUNK, NULL, &chunk);
                                 xwaop_store(xwsq_t, objtik, xwaop_mo_relaxed, chunk);
-                                xwos_cpuirq_restore_lc(cpuirq);
+                                xwos_splk_unlock_cpuirqrs(&xwos_objtik_lock, cpuirq);
                                 break;
                         } else {
-                                xwos_cpuirq_restore_lc(cpuirq);
+                                xwos_splk_unlock_cpuirqrs(&xwos_objtik_lock, cpuirq);
                         }
                 }
         } while (curr > max);
