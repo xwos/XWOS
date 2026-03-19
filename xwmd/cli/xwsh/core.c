@@ -84,9 +84,7 @@ err_name:
 
 xwer_t xwsh_set_ext_cmd_table(const struct xwsh_cmd cmd[], xwsz_t num)
 {
-        xwer_t rc = XWOK;
-        xwsz_t i;
-        xwsz_t j;
+        xwer_t rc;
 
         /* 参数检查 */
         if ((NULL == cmd) && (0 != num)) {
@@ -94,31 +92,11 @@ xwer_t xwsh_set_ext_cmd_table(const struct xwsh_cmd cmd[], xwsz_t num)
                 goto err_param;
         }
 
-        /* 重名检查 */
-        for (i = 0; i < num; i++) {
-                /* 检查与内置命令重名 */
-                for (j = 0; j < xwsh_cmd_table_size; j++) {
-                        if (!strcmp(cmd[i].name, xwsh_cmd_table[j].name)) {
-                                rc = -EEXIST;
-                                goto err_duplicate;
-                        }
-                }
-
-                /* 检查外部命令之间重名 */
-                for (j = 0; j < i; j++) {
-                        if (!strcmp(cmd[i].name, cmd[j].name)) {
-                                rc = -EEXIST;
-                                goto err_duplicate;
-                        }
-                }
-        }
-
         /* 设置外部命令表 */
         xwsh_ext_cmd_table = cmd;
         xwsh_ext_cmd_table_size = num;
         return XWOK;
 
-err_duplicate:
 err_param:
         return rc;
 }
