@@ -6,7 +6,8 @@
   "author": "Roy Sun",
   "main": "index.js",
   "scripts": {
-    "husky": "cd .. && husky install .js/commitlint/husky"
+    "husky": "cd .. && husky install .js/commitlint/husky",
+    "postinstall": "npm run husky"
   },
   "dependencies": {
     "@commitlint/cli": "^18",
