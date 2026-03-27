@@ -42,9 +42,9 @@ void armv8a_init(void)
         xwu64_t cntvoff;
 
         armv8a_sysreg_read(&el, CurrentEL);
-        el >>= 2;
+        el >>= 2UL;
         switch (el) {
-        case 3:
+        case 3UL:
                 armv8a_sysreg_read(&scr, scr_el3);
                 scr &= ~(ARMV8A_SCR_TWE /* Disable TWE */
                          | ARMV8A_SCR_TWI /* Disable TWI */
@@ -81,10 +81,10 @@ void armv8a_init(void)
                 soc_show_sysreg(spsr_el3);
 
                 [[fallthrough]];
-        case 2:
+        case 2UL:
                 armv8a_sysreg_read(&hcr, hcr_el2);
                 hcr |= (ARMV8A_HCR_RW /* Keep AArch64 when droping EL */
-                        | ARMV8A_HCR_FMO /* Enable IRQ in EL2 */
+                        | ARMV8A_HCR_FMO /* Enable FIQ in EL2 */
                         | ARMV8A_HCR_IMO /* Enable IRQ in EL2 */);
                 armv8a_sysreg_write(hcr_el2, hcr);
                 soc_show_sysreg(hcr_el2);
@@ -112,8 +112,7 @@ void armv8a_init(void)
                 armv8a_sysreg_write(cntvoff_el2, cntvoff);
 
                 [[fallthrough]];
-        case 1:
-        default:
+        case 1UL:
                 armv8a_sysreg_read(&sctlr, sctlr_el1);
                 sctlr &= ~ARMV8A_SCTLR_EE; /* EE: little-endian */
                 sctlr |= (ARMV8A_SCTLR_SA /* Stack Alignment Check */
@@ -131,5 +130,8 @@ void armv8a_init(void)
                          );
                 armv8a_sysreg_write(cpacr_el1, cpacr);
                 soc_show_sysreg(cpacr_el1);
+                break;
+        default:
+                break;
         }
 }

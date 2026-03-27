@@ -253,7 +253,7 @@ void armv8a_trap_serror_el3(struct armv8a_reg_frame * regs, xwu64_t routine)
 }
 
 __xwbsp_code
-void armv8a_dump(struct armv8a_reg_frame  * frame)
+void armv8a_dump(struct armv8a_reg_frame * frame)
 {
         soc_logf("[Dump Registers 0x%016lX]\r\n", (xwu64_t)frame);
         soc_logf("        X0:  0x%016lX, X1:  0x%016lX, X2:  0x%016lX, X3:  0x%016lX,\r\n",
@@ -283,7 +283,7 @@ union armv8a_backtrace_chain {
 };
 
 __xwbsp_code
-void armv8a_backtrace_frame(struct armv8a_reg_frame  * frame, const char * name)
+void armv8a_backtrace_frame(struct armv8a_reg_frame * frame, const char * name)
 {
         union armv8a_backtrace_chain fp;
         xwu64_t lr;

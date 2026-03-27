@@ -109,19 +109,21 @@ void armv8a_init_vector(void)
         xwu64_t el;
 
         armv8a_sysreg_read(&el, CurrentEL);
-        el >>= 2;
+        el >>= 2UL;
         switch (el) {
-        case 3:
+        case 3UL:
                 armv8a_sysreg_write(vbar_el3, (xwu64_t)armv8a_exception_vector_el3);
                 soc_show_sysreg(vbar_el3);
                 [[fallthrough]];
-        case 2:
+        case 2UL:
                 armv8a_sysreg_write(vbar_el2, (xwu64_t)armv8a_exception_vector_el2);
                 soc_show_sysreg(vbar_el2);
                 [[fallthrough]];
-        case 1:
-        default:
+        case 1UL:
                 armv8a_sysreg_write(vbar_el1, (xwu64_t)armv8a_exception_vector_el1);
                 soc_show_sysreg(vbar_el1);
+                break;
+        default:
+                break;
         }
 }
