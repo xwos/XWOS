@@ -18,6 +18,7 @@
  * > limitations under the License.
  */
 
+#include <xwcd/soc/arm64/v8a/arch_regs.h>
 #include <xwcd/soc/arm64/v8a/arch_gic3.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/ospl/skd.h>
@@ -842,4 +843,25 @@ xwer_t armv8a_gic_irq_set_isr(xwirq_t irqn, xwisr_f isr)
                 rc = -ERANGE;
         }
         return rc;
+}
+
+#define ARMV8A_MPIDR_TO_SGI_AFFINITY(mpidr, level) \
+	(ARMV8A_MPIDR_AFFINITY_LEVEL(mpidr, level) << \
+         ARMV8A_ICC_SGI1R_AFFINITY_## level ##_SHIFT)
+#define ARMV8A_MPIDR_RS(mpidr) (((mpidr) & 0xF0UL) >> 4UL)
+#define ARMV8A_MPIDR_TO_SGI_RS(mpidr) \
+        (ARMV8A_MPIDR_RS(mpidr) << ARMV8A_ICC_SGI1R_RS_SHIFT)
+
+__xwbsp_code
+void armv8a_gic_send_sgi(xwu64_t mpidr, xwu16_t tlist, xwirq_t irq)
+{
+        xwu64_t val;
+
+        val = (ARMV8A_MPIDR_TO_SGI_AFFINITY(mpidr, 3) |
+               ARMV8A_MPIDR_TO_SGI_AFFINITY(mpidr, 2) |
+               irq << ARMV8A_ICC_SGI1R_SGI_ID_SHIFT   |
+               ARMV8A_MPIDR_TO_SGI_AFFINITY(mpidr, 1) |
+               ARMV8A_MPIDR_TO_SGI_RS(mpidr)          |
+               tlist << ARMV8A_ICC_SGI1R_TARGET_LIST_SHIFT);
+        armv8a_sysreg_write(icc_sgi1r_el1, val);
 }

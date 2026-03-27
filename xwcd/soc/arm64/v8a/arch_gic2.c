@@ -641,3 +641,12 @@ xwer_t armv8a_gic_irq_set_isr(xwirq_t irqn, xwisr_f isr)
         }
         return rc;
 }
+
+__xwbsp_code
+void armv8a_gic_send_sgi(xwid_t cpuid, xwirq_t irq)
+{
+	if (cpuid < ARMV8A_GIC_CPUIF_NUM) {
+                cpuid <<= 1U;
+                armv8a_gic2.d.sgir = ((cpuid << 16U) | irq);
+        }
+}

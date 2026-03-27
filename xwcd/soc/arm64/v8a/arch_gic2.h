@@ -34,6 +34,8 @@
 #define ARMV8A_PPI_NUM          16U
 #define ARMV8A_SPI_OFFSET       (ARMV8A_SGI_NUM + ARMV8A_PPI_NUM)
 
+#define ARMV8A_GIC_CPUIF_NUM    8U
+
 enum armv8a_irq_trigger_type_em {
         ARMV8A_IRQ_TRIGGER_TYPE_LEVEL = 0x0U,
         ARMV8A_IRQ_TRIGGER_TYPE_EDGE = 0x2U,
@@ -176,5 +178,7 @@ xwer_t armv8a_gic_irq_get_state(xwirq_t irqn,
                                 bool * enable, bool * pending, bool * active);
 void armv8a_gic_irq_dump(xwirq_t irqn);
 xwer_t armv8a_gic_irq_set_isr(xwirq_t irqn, xwisr_f isr);
+
+void armv8a_gic_send_sgi(xwid_t cpuid, xwirq_t irq);
 
 #endif /* xwcd/soc/arm64/v8a/arch_gic2.h */

@@ -97,4 +97,15 @@
 #define ARMV8A_CPACR_EL1_FPEN   ((1U << 21U) | (1U << 20U))
 #define ARMV8A_CPACR_EL1_ZEN    ((1U << 17U) | (1U << 16U))
 
+#define ARMV8A_MPIDR_UP_BITMASK         (0x1UL << 30UL)
+#define ARMV8A_MPIDR_MT_BITMASK         (0x1UL << 24UL)
+#define ARMV8A_MPIDR_HWID_BITMASK	(0xFF00FFFFFFUL)
+#define ARMV8A_MPIDR_LEVEL_BITS_SHIFT   (3UL)
+#define ARMV8A_MPIDR_LEVEL_BITS         (1UL << ARMV8A_MPIDR_LEVEL_BITS_SHIFT)
+#define ARMV8A_MPIDR_LEVEL_MASK         ((1UL << ARMV8A_MPIDR_LEVEL_BITS) - 1UL)
+#define ARMV8A_MPIDR_LEVEL_SHIFT(level) \
+        (((1UL << level) >> 1UL) << ARMV8A_MPIDR_LEVEL_BITS_SHIFT)
+#define ARMV8A_MPIDR_AFFINITY_LEVEL(mpidr, level) \
+	((mpidr >> ARMV8A_MPIDR_LEVEL_SHIFT(level)) & ARMV8A_MPIDR_LEVEL_MASK)
+
 #endif /* xwcd/soc/arm64/v8a/arch_regs.h */

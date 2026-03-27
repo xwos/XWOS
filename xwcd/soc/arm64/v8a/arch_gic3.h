@@ -249,6 +249,21 @@ struct armv8a_gic3_r_sgi_regs {
 
 #define ARMV8A_GIC3_R_SGI(cpuid) (SOC_GIC3_REGBASE + SOC_GIC3_R_SGI_OFFSET(cpuid))
 
+/******** ICC_SGI1R ********/
+#define ARMV8A_ICC_SGI1R_TARGET_LIST_SHIFT      0ULL
+#define ARMV8A_ICC_SGI1R_TARGET_LIST_MASK       (0xffff << ICC_SGI1R_TARGET_LIST_SHIFT)
+#define ARMV8A_ICC_SGI1R_AFFINITY_1_SHIFT       16ULL
+#define ARMV8A_ICC_SGI1R_AFFINITY_1_MASK        (0xFF << ICC_SGI1R_AFFINITY_1_SHIFT)
+#define ARMV8A_ICC_SGI1R_SGI_ID_SHIFT           24ULL
+#define ARMV8A_ICC_SGI1R_SGI_ID_MASK            (0xfULL << ICC_SGI1R_SGI_ID_SHIFT)
+#define ARMV8A_ICC_SGI1R_AFFINITY_2_SHIFT       32ULL
+#define ARMV8A_ICC_SGI1R_AFFINITY_2_MASK        (0xffULL << ICC_SGI1R_AFFINITY_2_SHIFT)
+#define ARMV8A_ICC_SGI1R_IRQ_ROUTING_MODE_BIT   40ULL
+#define ARMV8A_ICC_SGI1R_RS_SHIFT               44ULL
+#define ARMV8A_ICC_SGI1R_RS_MASK                (0xFULL << ICC_SGI1R_RS_SHIFT)
+#define ARMV8A_ICC_SGI1R_AFFINITY_3_SHIFT	48ULL
+#define ARMV8A_ICC_SGI1R_AFFINITY_3_MASK	(0xffULL << ICC_SGI1R_AFFINITY_3_SHIFT)
+
 void armv8a_gic3_init_runtime(void);
 void armv8a_gic3_init_distributor(void);
 void armv8a_gic3_enable_distributor(void);
@@ -273,9 +288,9 @@ xwer_t armv8a_gic_irq_get_trigger_type(xwirq_t irqn, xwu32_t * type);
 xwer_t armv8a_gic_irq_set_affinity_lc(xwirq_t irqn);
 xwer_t armv8a_gic_irq_get_state(xwirq_t irqn,
                                 bool * enable, bool * pending, bool * active);
-
 void armv8a_gic_irq_dump(xwirq_t irqn);
-
 xwer_t armv8a_gic_irq_set_isr(xwirq_t irqn, xwisr_f isr);
+
+void armv8a_gic_send_sgi(xwu64_t mpidr, xwu16_t tlist, xwirq_t irq);
 
 #endif /* xwcd/soc/arm64/v8a/arch_gic3.h */

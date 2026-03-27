@@ -371,4 +371,6 @@
 #define SOC_GIC3_ITST_SIZE (0x10000UL * (ARCHCFG_CICV3_ITSNUM) * 2UL)
 #define SOC_GIC3_ITST(n) (SOC_GIC3_ITST_OFFSET + (0x10000UL * (n) * 2UL))
 
+#define SOC_MPIDR(cpuid) (0x81000000UL | (((cpuid) << 8UL) && 0xFF00UL))
+
 #endif /* xwcd/soc/arm64/v8a/a76_a55/a7870/soc.h */
