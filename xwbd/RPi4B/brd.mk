@@ -36,7 +36,6 @@ BRD_LDFLAGS_gcc := -Wl,--no-warn-rwx-segment
 BRD_EOBJS :=
 
 BRD_CSRCS := board/init.c
-BRD_CSRCS += board/main.c
 BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwos)
 ifeq ($(XWCFG_LIBC),newlib)
   BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/newlib)
