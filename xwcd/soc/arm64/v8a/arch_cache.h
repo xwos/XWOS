@@ -23,10 +23,77 @@
 
 #include <xwos/standard.h>
 
+/**
+ * @brief 开启ICache
+ */
+void armv8a_icache_enable(void);
+
+/**
+ * @brief 关闭ICache
+ */
+void armv8a_icache_disable(void);
+
+/**
+ * @brief 完全无效ICache
+ */
 void armv8a_invalidate_icache_all(void);
+
+/**
+ * @brief 开启DCache
+ */
+void armv8a_dcache_enable(void);
+
+/**
+ * @brief 关闭DCache
+ */
+void armv8a_dcache_disable(void);
+
+/**
+ * @brief 完全冲洗DCache
+ */
 void armv8a_flush_dcache_all(void);
+
+/**
+ * @brief 冲洗DCache
+ * @param[in] origin: 清理的起始地址
+ * @param[in] size: 清理的大小
+ */
 void armv8a_flush_dcache(xwptr_t origin, xwsz_t size);
-void armv8a_clean_dcache(xwptr_t origin, xwsz_t size);
+
+/**
+ * @brief 清理DCache到一致点
+ * @param[in] origin: 清理的起始地址
+ * @param[in] size: 清理的大小
+ * @details
+ * + **一致点** 是指所有CPU、DMA、GPU等总线的主设备都能看到的点。在ARM64架构文档中被称为Outer Shareable。
+ */
+void armv8a_clean_dcache_poc(xwptr_t origin, xwsz_t size);
+
+/**
+ * @brief 清理DCache到统一点
+ * @param[in] origin: 清理的起始地址
+ * @param[in] size: 清理的大小
+ * @details
+ * + **统一点** 是指所有CPU都能看到的点。在ARM64架构文档中被称为Inner Shareable。
+ */
+void armv8a_clean_dcache_pou(xwptr_t origin, xwsz_t size);
+
+#if defined(ARCHCFG_FEAT_DPB) && (1 == ARCHCFG_FEAT_DPB)
+/**
+ * @brief 清理DCache到持久化点
+ * @param[in] origin: 清理的起始地址
+ * @param[in] size: 清理的大小
+ * @details
+ * + **持久化点** 是指数据断电后依然存在的点。
+ */
+void armv8a_clean_dcache_pop(xwptr_t origin, xwsz_t size);
+#endif
+
+/**
+ * @brief 无效DCache
+ * @param[in] origin: 清理的起始地址
+ * @param[in] size: 清理的大小
+ */
 void armv8a_invalidate_dcache(xwptr_t origin, xwsz_t size);
 
 #endif /* xwcd/soc/arm64/v8a/arch_cache.h */

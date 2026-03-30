@@ -34,7 +34,6 @@ SOC_CSRCS += soc_init.c
 SOC_CSRCS += soc_console.c
 SOC_CSRCS += soc_debug.c
 SOC_CSRCS += soc_mmu.c
-SOC_CSRCS += soc_cache.c
 SOC_CSRCS += xwosimpl_irq.c
 SOC_CSRCS += xwosimpl_skd.c
 SOC_CSRCS += xwosimpl_syshwt.c

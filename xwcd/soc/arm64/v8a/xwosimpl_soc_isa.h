@@ -32,7 +32,7 @@ extern void soc_panic(const char * fmt, ...);
 #define soc_bug() soc_panic("%s:%s():%d\n\r", __FILE__, __FUNCTION__, __LINE__)
 
 /******** ******** barrier ******** ********/
-#define armv8a_isb()            __asm__ volatile("isb" : : : "memory")
+#define armv8a_isb()            __asm__ volatile("isb sy" : : : "memory")
 #define armv8a_dsb(opt)         __asm__ volatile("dsb " #opt : : : "memory")
 #define armv8a_dmb(opt)         __asm__ volatile("dmb " #opt : : : "memory")
 

@@ -26,10 +26,12 @@
 #include <xwcd/soc/arm64/v8a/arch_exception.h>
 #include <xwcd/soc/arm64/v8a/arch_gic2.h>
 #include <xwcd/soc/arm64/v8a/arch_timer.h>
+#include <xwcd/soc/arm64/v8a/arch_mmu.h>
+#include <xwcd/soc/arm64/v8a/arch_cache.h>
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_gpio.h>
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_uart.h>
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_console.h>
-#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_cache.h>
+#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_mmu.h>
 
 /* #define SOC_DBGF */
 #include "soc_debug.h"
@@ -85,15 +87,9 @@ void soc_init_sysreg(void)
         xwu64_t l2ctlr;
 
         armv8a_sysreg_read(&el, CurrentEL);
-        el >>= 2;
+        el >>= 2UL;
         switch (el) {
-        case 3:
-                actlr = 0x73; /* (BIT(0) | BIT(1) | BIT(4) | BIT(5) | BIT(6)) */
-                armv8a_sysreg_write(actlr_el3, actlr);
-                soc_show_sysreg(actlr_el3);
-
-                [[fallthrough]];
-        case 2:
+        case 2UL:
                 actlr = 0x73; /* (BIT(0) | BIT(1) | BIT(4) | BIT(5) | BIT(6)) */
                 armv8a_sysreg_write(actlr_el2, actlr);
                 soc_show_sysreg(actlr_el2);
@@ -102,17 +98,17 @@ void soc_init_sysreg(void)
                 soc_armlocal.local_prescaler = 0x80000000;
 
                 [[fallthrough]];
-        case 1:
-        default:
+        case 1UL:
                 cpuectlr = (1U << 6U); /* Set SMPEN */
                 armv8a_sysreg_write(S3_1_C15_C2_1, cpuectlr);
 
                 armv8a_sysreg_read(&l2ctlr, S3_1_C11_C0_2);
                 l2ctlr |= 0x22U;
                 armv8a_sysreg_write(S3_1_C11_C0_2, l2ctlr);
+                break;
+        default:
+                break;
         }
-
-
 }
 
 /**
@@ -124,21 +120,29 @@ void soc_init(void)
         xwid_t cpuid;
         xwu64_t el;
 
+        armv8a_sysreg_read(&el, CurrentEL);
+        el >>= 2U;
         cpuid = xwospl_skd_get_cpuid_lc();
+        if (3 == el) {
+                armv8a_switch_el3_to_el2_aarch64();
+                soc_infof("BCM2711", "Drop CPU%d to EL%d\n\r", cpuid, el - 1);
+        }
         if (0 == cpuid) {
                 soc_console_init();
         }
         armv8a_init_vector();
-        armv8a_init();
-        soc_init_sysreg();
-        armv8a_timer_init();
 
         if (CPUCFG_MAIN_CPU == cpuid) {
                 soc_clear_bss();
+                soc_mmu_init();
+                armv8a_flush_dcache_all();
+                armv8a_dcache_enable();
+                /* armv8a_icache_enable(); */
         }
 
-        /* soc_icache_enable(); */
-        soc_dcache_enable();
+        armv8a_init();
+        soc_init_sysreg();
+        armv8a_timer_init();
 
         if (CPUCFG_MAIN_CPU == cpuid) {
                 armv8a_gic2_init_runtime();
@@ -146,15 +150,9 @@ void soc_init(void)
         }
         armv8a_gic2_init_cpuif();
 
-        armv8a_sysreg_read(&el, CurrentEL);
-        el >>= 2;
         soc_infof("BCM2711",
-                  "******** XWOS Start on CPU%dEL%d ********\n\r",
+                  "******** Start XWOS on CPU%d@EL%d ********\n\r",
                   cpuid, el);
-        if (3 == el) {
-                armv8a_switch_el3_to_el2_aarch64();
-                soc_infof("BCM2711", "Drop CPU%d to EL%d\n\r", cpuid, el - 1);
-        }
 }
 
 __xwcc_section(".armv8a.percpu.stack") __xwcc_aligned(0x800)
