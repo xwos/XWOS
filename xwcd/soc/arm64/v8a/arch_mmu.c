@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#include <xwcd/soc/arm64/v8a/arch_mmu.h>
 #include <xwcd/soc/arm64/v8a/arch_isa.h>
+#include <xwcd/soc/arm64/v8a/arch_mmu.h>
 
 __xwbsp_code
 void armv8a_invalidate_tlb_all(void)
@@ -29,21 +29,14 @@ void armv8a_invalidate_tlb_all(void)
         armv8a_sysreg_read(&el, CurrentEL);
         el >>= 2UL;
         switch (el) {
-        case 3:
-                __asm__ volatile(
-                "       tlbi    alle3\n"
-                "       dsb     sy\n"
-                "       isb\n"
-                : : :);
-                break;
-        case 2:
+        case 2UL:
                 __asm__ volatile(
                 "       tlbi    alle2\n"
                 "       dsb     sy\n"
                 "       isb\n"
                 : : :);
                 break;
-        case 1:
+        case 1UL:
                 __asm__ volatile(
                 "       tlbi    vmalle1\n"
                 "       dsb     sy\n"

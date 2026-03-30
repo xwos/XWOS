@@ -18,16 +18,116 @@
  * > limitations under the License.
  */
 
-#include <xwcd/soc/arm64/v8a/arch_cache.h>
+#include <xwcd/soc/arm64/v8a/arch_regs.h>
 #include <xwcd/soc/arm64/v8a/arch_isa.h>
+#include <xwcd/soc/arm64/v8a/arch_cache.h>
+
+__xwbsp_code
+void armv8a_icache_enable(void)
+{
+        xwu64_t el;
+        xwu64_t sctlr;
+
+        armv8a_sysreg_read(&el, CurrentEL);
+        el >>= 2UL;
+        armv8a_invalidate_icache_all();
+        switch (el) {
+        case 2UL:
+                armv8a_sysreg_read(&sctlr, sctlr_el2);
+                sctlr |= ARMV8A_SCTLR_I;
+                armv8a_sysreg_write(sctlr_el2, sctlr);
+                break;
+        case 1UL:
+                armv8a_sysreg_read(&sctlr, sctlr_el1);
+                sctlr |= ARMV8A_SCTLR_I;
+                armv8a_sysreg_write(sctlr_el1, sctlr);
+                break;
+        default:
+                break;
+        }
+}
+
+__xwbsp_code
+void armv8a_icache_disable(void)
+{
+        xwu64_t el;
+        xwu64_t sctlr;
+
+        armv8a_sysreg_read(&el, CurrentEL);
+        el >>= 2UL;
+        switch (el) {
+        case 2UL:
+                armv8a_sysreg_read(&sctlr, sctlr_el2);
+                sctlr &= ~(ARMV8A_SCTLR_I);
+                armv8a_sysreg_write(sctlr_el2, sctlr);
+                break;
+        case 1UL:
+                armv8a_sysreg_read(&sctlr, sctlr_el1);
+                sctlr &= ~(ARMV8A_SCTLR_I);
+                armv8a_sysreg_write(sctlr_el1, sctlr);
+                break;
+        default:
+                break;
+        }
+}
 
 __xwbsp_code
 void armv8a_invalidate_icache_all(void)
 {
         __asm__ volatile(
         "       ic      ialluis\n"
-        "       isb\n"
         : : :);
+        armv8a_isb();
+}
+
+void armv8a_dcache_enable(void)
+{
+        xwu64_t el;
+        xwu64_t sctlr;
+
+        armv8a_sysreg_read(&el, CurrentEL);
+        el >>= 2UL;
+        switch (el) {
+        case 2UL:
+                armv8a_sysreg_read(&sctlr, sctlr_el2);
+                sctlr |= ARMV8A_SCTLR_C;
+                armv8a_sysreg_write(sctlr_el2, sctlr);
+                break;
+        case 1UL:
+                armv8a_sysreg_read(&sctlr, sctlr_el1);
+                sctlr |= ARMV8A_SCTLR_C;
+                armv8a_sysreg_write(sctlr_el1, sctlr);
+                break;
+        default:
+                break;
+        }
+}
+
+void armv8a_dcache_disable(void)
+{
+        xwu64_t el;
+        xwu64_t sctlr;
+
+        armv8a_sysreg_read(&el, CurrentEL);
+        el >>= 2UL;
+        switch (el) {
+        case 2UL:
+                armv8a_sysreg_read(&sctlr, sctlr_el2);
+                if (0 != (sctlr & ARMV8A_SCTLR_C)) {
+                        sctlr &= ~(ARMV8A_SCTLR_C | ARMV8A_SCTLR_M);
+                        armv8a_sysreg_write(sctlr_el2, sctlr);
+                }
+                break;
+        case 1UL:
+                armv8a_sysreg_read(&sctlr, sctlr_el1);
+                if (0 != (sctlr & ARMV8A_SCTLR_C)) {
+                        sctlr &= ~(ARMV8A_SCTLR_C | ARMV8A_SCTLR_M);
+                        armv8a_sysreg_write(sctlr_el1, sctlr);
+                }
+                break;
+        default:
+                break;
+        }
 }
 
 __xwbsp_code
@@ -77,6 +177,8 @@ void armv8a_flush_dcache_all(void)
                         }
                 }
         }
+        armv8a_dsb(sy);
+        armv8a_isb();
 }
 
 __xwbsp_code
@@ -126,6 +228,8 @@ void armv8a_invalidate_dcache_all(void)
                         }
                 }
         }
+        armv8a_dsb(sy);
+        armv8a_isb();
 }
 
 __xwbsp_code
@@ -150,10 +254,11 @@ void armv8a_flush_dcache(xwptr_t origin, xwsz_t size)
                 );
                 addr += line_size;
         }
+        armv8a_dsb(sy);
 }
 
 __xwbsp_code
-void armv8a_clean_dcache(xwptr_t origin, xwsz_t size)
+void armv8a_clean_dcache_poc(xwptr_t origin, xwsz_t size)
 {
         xwu64_t ctr;
         xwu64_t line_size;
@@ -174,7 +279,60 @@ void armv8a_clean_dcache(xwptr_t origin, xwsz_t size)
                 );
                 addr += line_size;
         }
+        armv8a_dsb(sy);
 }
+
+__xwbsp_code
+void armv8a_clean_dcache_pou(xwptr_t origin, xwsz_t size)
+{
+        xwu64_t ctr;
+        xwu64_t line_size;
+        xwu64_t line_mask;
+        xwu64_t addr;
+        xwu64_t end = origin + size;
+
+        armv8a_sysreg_read(&ctr, ctr_el0);
+        line_size = 4UL << ((ctr >> 16UL) & 0xFUL);
+        line_mask = line_size - 1UL;
+        addr = origin & (~line_mask); /* aligned */
+        while (addr < end) {
+                __asm__ volatile(
+                        "       dc      cvau, %[__addr]\n"
+                :
+                : [__addr] "r" (addr)
+                :
+                );
+                addr += line_size;
+        }
+        armv8a_dsb(ish);
+}
+
+#if defined(ARCHCFG_FEAT_DPB) && (1 == ARCHCFG_FEAT_DPB)
+__xwbsp_code
+void armv8a_clean_dcache_pop(xwptr_t origin, xwsz_t size)
+{
+        xwu64_t ctr;
+        xwu64_t line_size;
+        xwu64_t line_mask;
+        xwu64_t addr;
+        xwu64_t end = origin + size;
+
+        armv8a_sysreg_read(&ctr, ctr_el0);
+        line_size = 4UL << ((ctr >> 16UL) & 0xFUL);
+        line_mask = line_size - 1UL;
+        addr = origin & (~line_mask); /* aligned */
+        while (addr < end) {
+                __asm__ volatile(
+                        "       dc      cvap, %[__addr]\n"
+                :
+                : [__addr] "r" (addr)
+                :
+                );
+                addr += line_size;
+        }
+        armv8a_dsb(ish);
+}
+#endif
 
 __xwbsp_code
 void armv8a_invalidate_dcache(xwptr_t origin, xwsz_t size)
@@ -198,4 +356,5 @@ void armv8a_invalidate_dcache(xwptr_t origin, xwsz_t size)
                 );
                 addr += line_size;
         }
+        armv8a_dsb(sy);
 }
