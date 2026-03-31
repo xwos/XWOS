@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm_v8a_a76_a55_a7870_soc_debug_h__
-#define __xwcd_soc_arm_v8a_a76_a55_a7870_soc_debug_h__
+#ifndef __xwcd_soc_arm_v8a_a76a55_a7870_soc_debug_h__
+#define __xwcd_soc_arm_v8a_a76a55_a7870_soc_debug_h__
 
 #include <xwos/standard.h>
 #include <xwcd/soc/arm64/v8a/arch_isa.h>
@@ -62,4 +62,4 @@ void soc_panic(const char * fmt, ...);
                 soc_dbgf("%s", "%s:%ld|0x%lX\r\n", __FUNCTION__, #reg, reg, reg); \
         })
 
-#endif /* xwcd/soc/arm64/v8a/a76_a55/a7870/soc_debug.h */
+#endif /* xwcd/soc/arm64/v8a/a76a55/a7870/soc_debug.h */

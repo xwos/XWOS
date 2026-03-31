@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm_v8a_a76_a55_a7870_soc_uart_h__
-#define __xwcd_soc_arm_v8a_a76_a55_a7870_soc_uart_h__
+#ifndef __xwcd_soc_arm_v8a_a76a55_a7870_soc_uart_h__
+#define __xwcd_soc_arm_v8a_a76a55_a7870_soc_uart_h__
 
 #include <xwos/standard.h>
-#include <xwcd/soc/arm64/v8a/a76_a55/a7870/soc.h>
+#include <xwcd/soc/arm64/v8a/a76a55/a7870/soc.h>
 
 struct soc_ap_uart_regs {
         xwu32_t txd; /**< 0x00 */
@@ -212,4 +212,4 @@ typedef union {
 #define soc_ap_uart2 (*((volatile struct soc_ap_uart_regs *)SOC_AP_UART2_PHYS))
 #define soc_ap_uart3 (*((volatile struct soc_ap_uart_regs *)SOC_AP_UART3_PHYS))
 
-#endif /* xwcd/soc/arm64/v8a/a76_a55/a7870/soc_uart.h */
+#endif /* xwcd/soc/arm64/v8a/a76a55/a7870/soc_uart.h */
