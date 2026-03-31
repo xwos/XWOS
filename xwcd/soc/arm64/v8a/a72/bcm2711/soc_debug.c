@@ -18,10 +18,11 @@
  * > limitations under the License.
  */
 
-#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_debug.h>
+#include <xwos/standard.h>
 #include <xwos/ospl/skd.h>
-#include <stdio.h> // cppcheck-suppress [misra-c2012-21.6]
+#include <xwos/lib/xwspf.h>
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_console.h>
+#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_debug.h>
 
 /**
  * @brief 格式化字符串并输出日志到SOC的终端
@@ -41,7 +42,7 @@ void soc_logf(const char * fmt, ...)
         int i;
 
         va_start(args, fmt);
-        i = vsnprintf(buf, sizeof(buf), fmt, args);
+        i = xwvsnpf(buf, sizeof(buf), fmt, args);
         va_end(args);
         if (i > 0) {
                soc_console_puts(buf);
@@ -56,7 +57,7 @@ void soc_panic(const char * fmt, ...)
         xwid_t cpuid;
 
         va_start(args, fmt);
-        vsnprintf(msg, sizeof(msg), fmt, args);
+        xwvsnpf(msg, sizeof(msg), fmt, args);
         va_end(args);
         cpuid = xwospl_skd_get_cpuid_lc();
         soc_logf("[panic CPU%d @0x%016lX] %s",
