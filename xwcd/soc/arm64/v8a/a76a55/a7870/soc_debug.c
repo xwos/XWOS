@@ -21,8 +21,8 @@
 #include <xwos/standard.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/lib/xwspf.h>
-#include <xwcd/soc/arm64/v8a/a76_a55/a7870/soc_console.h>
-#include <xwcd/soc/arm64/v8a/a76_a55/a7870/soc_debug.h>
+#include <xwcd/soc/arm64/v8a/a76a55/a7870/soc_console.h>
+#include <xwcd/soc/arm64/v8a/a76a55/a7870/soc_debug.h>
 
 /**
  * @brief 格式化字符串并输出日志到SOC的终端

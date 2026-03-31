@@ -26,9 +26,9 @@
 #include <xwcd/soc/arm64/v8a/arch_exception.h>
 #include <xwcd/soc/arm64/v8a/arch_gic3.h>
 #include <xwcd/soc/arm64/v8a/arch_timer.h>
-#include <xwcd/soc/arm64/v8a/a76_a55/a7870/soc_init.h>
+#include <xwcd/soc/arm64/v8a/a76a55/a7870/soc_init.h>
 
-/* #define SOC_DBGF */
+#define SOC_DBGF
 #include "soc_debug.h"
 
 extern xwu8_t xwos_data_lma_base[];
@@ -76,25 +76,18 @@ void soc_clear_bss(void)
 __xwbsp_code
 void soc_init_sysreg(void)
 {
-        xwu64_t actlr;
         xwu64_t el;
 
         armv8a_sysreg_read(&el, CurrentEL);
-        el >>= 2;
+        el >>= 2UL;
         switch (el) {
-        case 3:
-                actlr = (xwu64_t)0x1CB3;
-                armv8a_sysreg_write(actlr_el3, actlr);
-                soc_show_sysreg(actlr_el3);
-
-                [[fallthrough]];
-        case 2:
-                actlr = (xwu64_t)0x1CB3;
-                armv8a_sysreg_write(actlr_el2, actlr);
+        case 2UL:
                 soc_show_sysreg(actlr_el2);
+                soc_show_sysreg(S3_0_C15_C1_4); /* cpuectlr_el1 */
 
                 [[fallthrough]];
-        case 1:
+        case 3UL:
+        case 1UL:
         default:
                 break;
         }
@@ -111,35 +104,36 @@ void soc_init(void)
 
         cpuid = xwospl_skd_get_cpuid_lc();
         armv8a_sysreg_read(&el, CurrentEL);
-        el >>= 2;
+        el >>= 2UL;
+        if (3UL == el) {
+                armv8a_switch_el3_to_el2_aarch64();
+                el--;
+                soc_infof("A7870", "Drop CPU%d to EL%d\n\r", cpuid, el);
+        }
         soc_infof("A7870",
-                  "******** XWOS Start on CPU%dEL%d ********\n\r",
+                  "******** XWOS Start on CPU%d@EL%d ********\n\r",
                   cpuid, el);
 
         armv8a_init_vector();
-        armv8a_init();
-        soc_init_sysreg();
-        armv8a_timer_init();
-
-
         if (CPUCFG_MAIN_CPU == cpuid) {
+                soc_show_sysreg(tcr_el2);
+                soc_show_sysreg(ttbr0_el2);
+                soc_show_sysreg(mair_el2);
                 soc_clear_bss();
         }
+        armv8a_init();
+        soc_init_sysreg();
 
+        armv8a_timer_init();
         if (CPUCFG_MAIN_CPU == cpuid) {
                 armv8a_gic3_init_runtime();
-                if (3 == el) {
+                if (3UL == el) {
                         armv8a_gic3_init_distributor();
                 } else {
                         armv8a_gic3_enable_distributor();
                 }
         }
         armv8a_gic3_init_cpuif();
-
-        if (3 == el) {
-                armv8a_switch_el3_to_el2_aarch64();
-                soc_infof("A7870", "Drop CPU%d to EL%d\n\r", cpuid, el - 1);
-        }
 }
 
 extern xwu8_t soc_percpu_stack[CPUCFG_CPU_NUM][CPUCFG_CPU_STACK_SIZE];

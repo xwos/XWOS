@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC描述层：终端
+ * @brief SOC描述层：A7870 chipram evn
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,28 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm_v8a_a76_a55_a7870_soc_console_h__
-#define __xwcd_soc_arm_v8a_a76_a55_a7870_soc_console_h__
+#ifndef __xwcd_soc_arm_v8a_a76a55_a7870_chipram_h__
+#define __xwcd_soc_arm_v8a_a76a55_a7870_chipram_h__
 
 #include <xwos/standard.h>
 
-void soc_console_puts(const char * s);
-xwsz_t soc_console_gets(char * buf, xwsz_t bufsz);
-void soc_console_tx(const xwu8_t * d, xwsz_t size);
-xwsz_t soc_console_rx(char * buf, xwsz_t bufsz);
+struct chipram_env {
+        xwu32_t magic; //0x43454e56
+        xwu32_t mode;
+        xwu64_t dram_size;
+        xwu64_t vol_para_addr;
+        xwu32_t keep_charge;
+        xwu32_t channel_sel;
+        xwu32_t cs_number;
+        xwu64_t cs0_size;
+        xwu64_t cs1_size;
+        xwu32_t tspl_s;
+        xwu32_t tspl_e;
+        xwu32_t spl_adjust_flag;
+        xwu32_t reserved;
+};
 
-#endif /* xwcd/soc/arm64/v8a/a76_a55/a7870/soc_console.h */
+#define SOC_CHIPRAM_ENV_ADDR 0x82000000UL
+#define soc_chipram_env (*((volatile struct chipram_env *)SOC_CHIPRAM_ENV_ADDR))
+
+#endif /* xwcd/soc/arm64/v8a/a76a55/a7870/chipram.h */

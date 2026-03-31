@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm_v8a_a76_a55_a7870_soc_h__
-#define __xwcd_soc_arm_v8a_a76_a55_a7870_soc_h__
+#ifndef __xwcd_soc_arm_v8a_a76a55_a7870_soc_h__
+#define __xwcd_soc_arm_v8a_a76a55_a7870_soc_h__
 
 #include <xwos/standard.h>
 
@@ -338,39 +338,31 @@
 #define SOC_DBG_PHYCP_DBG_APB_PHYS               0x78300000UL
 #define SOC_DBG_APCPU_DBG_APB_PHYS               0x7a000000UL
 #define SOC_PUB_TO_DDRC_AXI0_PHYS                0x80000000UL
+#define SOC_DDR_ORIGIN                           SOC_PUB_TO_DDRC_AXI0_PHYS
 #define SOC_PCIE_PCIE_AXIS_PHYS                  0x880000000UL
-#define SOC_SHM_BASEADDR                         0x0UL
 
 #define SOC_GIC3_REGBASE SOC_APCPU_GIC600_PHYS
-
 #define SOC_GIC3_D_OFFSET 0x00000UL
 #define SOC_GIC3_D_SIZE 0x10000UL
-
 #define SOC_GIC3_A_OFFSET 0x10000UL
 #define SOC_GIC3_A_SIZE 0x10000UL
-
 #define SOC_GIC3_T_OFFSET 0x20000UL
 #define SOC_GIC3_T_SIZE 0x10000UL
-
 #define SOC_GIC3_P_OFFSET 0x30000UL
 #define SOC_GIC3_P_SIZE 0x10000UL
-
 #define SOC_GIC3_ITS_OFFSET 0x40000UL
 #define SOC_GIC3_ITS_SIZE ((ARCHCFG_CICV3_ITSNUM) * 0x20000UL)
 #define SOC_GIC3_ITS(n) (SOC_GIC3_ITS_OFFSET + ((n) * 0x20000UL))
-
 #define SOC_GIC3_R_OFFSET (0x40000UL + SOC_GIC3_ITS_SIZE)
 #define SOC_GIC3_R_SIZE ((ARCHCFG_CICV3_RDNUM) * 0x20000UL)
 #define SOC_GIC3_R_LPI_OFFSET(n) (SOC_GIC3_R_OFFSET + ((n) * 0x20000UL))
 #define SOC_GIC3_R_SGI_OFFSET(n) (SOC_GIC3_R_OFFSET + 0x10000 + ((n) * 0x20000UL))
-
 #define SOC_GIC3_DA_OFFSET (SOC_GIC3_R_OFFSET + SOC_GIC3_R_SIZE)
 #define SOC_GIC3_DA_SIZE 0x10000UL
-
 #define SOC_GIC3_ITST_OFFSET 0x50000UL
 #define SOC_GIC3_ITST_SIZE (0x10000UL * (ARCHCFG_CICV3_ITSNUM) * 2UL)
 #define SOC_GIC3_ITST(n) (SOC_GIC3_ITST_OFFSET + (0x10000UL * (n) * 2UL))
 
 #define SOC_MPIDR(cpuid) (0x81000000UL | (((cpuid) << 8UL) && 0xFF00UL))
 
-#endif /* xwcd/soc/arm64/v8a/a76_a55/a7870/soc.h */
+#endif /* xwcd/soc/arm64/v8a/a76a55/a7870/soc.h */

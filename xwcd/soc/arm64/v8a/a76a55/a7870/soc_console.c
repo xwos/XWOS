@@ -19,8 +19,8 @@
  */
 
 #include <xwos/standard.h>
-#include <xwcd/soc/arm64/v8a/a76_a55/a7870/soc.h>
-#include <xwcd/soc/arm64/v8a/a76_a55/a7870/soc_uart.h>
+#include <xwcd/soc/arm64/v8a/a76a55/a7870/soc.h>
+#include <xwcd/soc/arm64/v8a/a76a55/a7870/soc_uart.h>
 
 #define soc_console soc_ap_uart1
 

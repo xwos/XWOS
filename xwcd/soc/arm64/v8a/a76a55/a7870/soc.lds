@@ -155,7 +155,7 @@ SECTIONS {
         .tdata : ALIGN(32) {
                 *(.tdata .tdata.* .gnu.linkonce.td.*)
                 tdata_vma_end = .;
-	} > runtime_mr
+        } > runtime_mr
         tdata_vma_base = ADDR(.tdata);
         tdata_lma_base = LOADADDR(.tdata);
 

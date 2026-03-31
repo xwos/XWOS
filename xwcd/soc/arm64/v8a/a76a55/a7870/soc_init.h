@@ -18,12 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm64_v8a_a76_a55_a7870_soc_init_h__
-#define __xwcd_soc_arm64_v8a_a76_a55_a7870_soc_init_h__
+#ifndef __xwcd_soc_arm64_v8a_a76a55_a7870_soc_init_h__
+#define __xwcd_soc_arm64_v8a_a76a55_a7870_soc_init_h__
 
 #include <xwos/standard.h>
 
 void soc_init(void);
 void soc_relocate_data(void);
 
-#endif /* xwcd/soc/arm64/v8a/a76_a55/a7870/soc_init.h */
+#endif /* xwcd/soc/arm64/v8a/a76a55/a7870/soc_init.h */
