@@ -81,6 +81,7 @@ ifeq ($(XWLIBCFG_MAP),y)
   XWOS_CSRCS += lib/map.c
 endif
 
+XWOS_CSRCS += lib/xwspf.c
 ifeq ($(XWLIBCFG_LOG),y)
   XWOS_CSRCS += lib/xwlog.c
 endif
