@@ -101,8 +101,7 @@ void * memcpy(void * restrict dst, const void * restrict src, size_t count)
                 if ((0 == (s.val & (sizeof(xwu64_t) - 1U))) &&
                     (0 == (d.val & (sizeof(xwu64_t) - 1U)))) {
                         goto dword_copy;
-                } else
-                if ((0 == (s.val & (sizeof(xwu32_t) - 1U))) &&
+                } else if ((0 == (s.val & (sizeof(xwu32_t) - 1U))) &&
                            (0 == (d.val & (sizeof(xwu32_t) - 1U)))) {
                         goto word_copy;
                 } else {

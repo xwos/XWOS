@@ -73,22 +73,22 @@ void soc_splk_lock(struct soc_splk * splk)
 
         armv8a_prefetch_before_aop(splk->v.raw);
         do {
-                lkval.v.raw = armv8a_load_acquire_exclusively_32b((atomic_xwu32_t *)&splk->v.raw);
+                lkval.v.raw = armv8a_load_acquire_exclusively_32b(
+                        (atomic_xwu32_t *)&splk->v.raw);
                 queue_number = lkval.v.q.n;
                 lkval.v.q.n++;
-                rc = armv8a_store_exclusively_32b((atomic_xwu32_t *)&splk->v.raw, lkval.v.raw);
+                rc = armv8a_store_exclusively_32b(
+                        (atomic_xwu32_t *)&splk->v.raw, lkval.v.raw);
         } while (rc);
         if (queue_number != lkval.v.q.c) {
                 /* ARM指令手册中建议在 `WFE` 等待循环之前插入一条 `SEVL` 指令。
                    防止丢失其他CPU的解锁事件。 */
-                __asm__ volatile(
-                "       sevl\n" : : : "memory"
-                );
+                __asm__ volatile("sevl" : : : "memory");
                 do {
-                        __asm__ volatile(
-                        "       wfe\n" : : : "memory"
+                        __asm__ volatile("wfe" : : : "memory"
                         );
-                        lkval.v.q.c = armv8a_load_acquire_exclusively_16b((atomic_xwu16_t *)&splk->v.q.c);
+                        lkval.v.q.c = armv8a_load_acquire_exclusively_16b(
+                                (atomic_xwu16_t *)&splk->v.q.c);
                 } while (queue_number != lkval.v.q.c);
         }
 }
@@ -101,13 +101,15 @@ xwer_t soc_splk_trylock(struct soc_splk * splk)
 
         armv8a_prefetch_before_aop(splk->v.raw);
         do {
-                lkval.v.raw = armv8a_load_acquire_exclusively_32b((atomic_xwu32_t *)&splk->v.raw);
+                lkval.v.raw = armv8a_load_acquire_exclusively_32b(
+                        (atomic_xwu32_t *)&splk->v.raw);
                 if (lkval.v.q.n != lkval.v.q.c) {
                         rc = -EAGAIN;
                         break;
                 }
                 lkval.v.q.n++;
-                rc = armv8a_store_exclusively_32b((atomic_xwu32_t *)&splk->v.raw, lkval.v.raw);
+                rc = armv8a_store_exclusively_32b(
+                        (atomic_xwu32_t *)&splk->v.raw, lkval.v.raw);
         } while (rc);
         return rc;
 }
@@ -120,9 +122,7 @@ void soc_splk_unlock(struct soc_splk * splk)
         n = splk->v.q.c + 1;
         /* 根据ARM架构继续参考手册中的描述，"global monitor"检测到"PE"的
            "Exclusive Access"状态变为可访问时，会向"PE"发送一个"Event"，使得
-           正在执行 `WFE` 指令的"PE"唤醒。参考：
-           + 《ARMv8-A Architecture RM.pdf》 B2.10.6
-           + 《ARMv8-A Architecture RM.pdf》 D1.17 */
+           正在执行 `WFE` 指令的"PE"唤醒。*/
         armv8a_store_release_16b((atomic_xwu16_t *)&splk->v.q.c, n);
 }
 #endif

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwisc::Xwcq
+ * @brief xwmd::isc::Xwcq
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,8 +10,8 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwmd_isc_xwcq_cxx_XwcqProxy_hxx__
-#define __xwmd_isc_xwcq_cxx_XwcqProxy_hxx__
+#ifndef __xwmd_isc_xwcq_cxx_Xwcq_hxx__
+#define __xwmd_isc_xwcq_cxx_Xwcq_hxx__
 
 extern "C" {
 #include "xwmd/isc/xwcq/mi.h"
