@@ -48,6 +48,8 @@
  * 用户可以在编译期预先定义线程对象的结构体、线程栈，
  * 然后运行时通过 `xwos_thd_init()` 对线程进行初始化。
  *
+ * 定义静态线程栈时需要使用 `__xwos_thd_stack` 修饰，以到达内存对齐的要求。
+ *
  * ## 动态创建线程
  *
  * 用户可以在程序运行时通过 `xwos_thd_create()` 动态创建线程。
@@ -192,6 +194,11 @@ struct xwos_thd_stack_info {
         xwstk_t * guard_base; /**< 栈内存警戒线的基地址 */
         xwsz_t guard_size; /**< 栈内存警戒线，单位：字节 */
 };
+
+/**
+ * @brief XWOS API：定义栈内存时的修饰符
+ */
+#define __xwos_thd_stack __xwcc_alignl1cache
 
 /**
  * @brief XWOS API：栈内存的默认大小
