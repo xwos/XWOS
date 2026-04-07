@@ -51,6 +51,11 @@
 #define XWMDCFG_isc_xwcq                                        1
 #define XWMDCFG_isc_xwcq_CXX                                    1
 
+/******** ******** Inter-OS Communication ******** ********/
+#define XWMDCFG_isc_xwioc                                       1
+#define XWMDCFG_isc_xwioc_CXX                                   1
+#define XWMDCFG_isc_xwioc_PORT_NUM                              (16U)
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      AUTOSAR classical Platform     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
