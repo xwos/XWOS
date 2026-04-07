@@ -171,7 +171,7 @@ char * xwvsnpf_format_number(char * buf, char * end,
 
         locase = (char)(spec.flags & XWVSNPF_F_SMALL);
         if (spec.flags & XWVSNPF_F_LEFT) {
-                spec.flags &= ~XWVSNPF_F_ZEROPAD;
+                spec.flags &= (xwu8_t)(~XWVSNPF_F_ZEROPAD);
         }
         sign = 0;
         if (spec.flags & XWVSNPF_F_SIGN) {
@@ -298,20 +298,22 @@ void xwvsnpf_format_move_right(char * buf, char * end, xwssz_t len, xwssz_t spac
         xwssz_t size;
 
         if (buf >= end) {
-                return;
+                goto end;
         }
-        size = (xwptr_t)end - (xwptr_t)buf;
+        size = (xwssz_t)((xwptr_t)end - (xwptr_t)buf);
         if (size <= spaces) {
-                memset(buf, ' ', size);
-                return;
+                memset(buf, ' ', (xwsz_t)size);
+                goto end;
         }
         if (len > 0) {
                 if (len > size - spaces) {
                         len = size - spaces;
                 }
-                memmove(buf + spaces, buf, len);
+                memmove(buf + spaces, buf, (xwsz_t)len);
         }
-        memset(buf, ' ', spaces);
+        memset(buf, ' ', (xwsz_t)spaces);
+
+end:
 }
 
 static inline
