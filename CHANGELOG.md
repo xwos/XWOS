@@ -5,7 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0] - beta
+## [4.0.0] - 2026-04-10
+
+### Added
+
+- 增加对AutosarCp-OS兼容层。
+- 增加C++API。
+- 增加对ARM64支持。
+- 增加SOC
+  - armv7m
+    - fc7300
+    - fc7240
+  - arm64
+    - bcm2711
+    - a7870
+- 增加CmBacktrace
+- 增加CherryReadline
+- 增加命令行终端xwsh
+- 增加xwioc
+
+### Changed
+
+- 升级 `xwem/vm/lua` 至5.4.8。
+- 升级 `xwem/fs/fatfs` 至0.16。
+
+
+## [3.0.0] - 2024-08-05
 
 ### Added
 
