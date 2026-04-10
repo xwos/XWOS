@@ -12,7 +12,7 @@ module.exports = {
             2,
             'always',
             ["feat", "fix", "workaround", "perf", "refactor", "style", "revert", "docs", "test", "ci",
-             "chore", "milestone", "release", "revision", "alpha", "beta", "rc"
+             "chore", "ai", "milestone", "release", "revision", "alpha", "beta", "rc"
             ]
         ]
     }
