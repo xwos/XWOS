@@ -110,7 +110,9 @@ clang-format -i <文件>
 | `xwptr_t` | 指针类型 |
 | `xwer_t` | 错误码类型 |
 | `xwsz_t` | 大小类型 |
-| `xwst_t` | 状态类型 |
+| `xwsq_t` | 顺序类型 |
+| `xwtm_t` | 时间类型 |
+| `xwid_t` | ID 类型 |
 
 ### 错误处理
 

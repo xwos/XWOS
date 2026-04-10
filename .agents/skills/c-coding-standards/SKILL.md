@@ -147,7 +147,7 @@ xwu32_t xwlib_crc32_calc(const xwu8_t * data, xwsz_t size, xwu32_t crc);
 | `xwptr_t` | 指针类型 |
 | `xwer_t` | 错误码类型 |
 | `xwsz_t` | 大小类型 |
-| `xwst_t` | 状态类型 |
+| `xwsq_t` | 顺序类型 |
 | `xwtm_t` | 时间类型 |
 | `xwid_t` | ID 类型 |
 
@@ -503,4 +503,4 @@ err_mempool_objcache_init:
 
 ---
 
-*最后更新：2026-02-24*
+*最后更新：2026-04-11*
