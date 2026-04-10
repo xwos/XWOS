@@ -70,13 +70,25 @@ class Spinlock
 
 ## 命名约定
 
-### 类名
+### class/enum/struct/union
 - 使用帕斯卡命名法（PascalCase）
-- 示例：`Bmp`、`Sem`、`Spinlock`、`Pm`
+- 示例：`class Bmp`、`class RdexLkGrd`、`enum PmStage`、 `struct CanLPdu`、 `union CanLPduPack`
 
-### 成员变量
+### 类成员变量
 - 以 `m` 前缀开头，使用帕斯卡命名法
 - 示例：`mBmp`、`mSpinlock`、`mStatus`、`mCpuirq`
+
+### 类成员常量
+- 以 `mk` 前缀开头，使用帕斯卡命名法
+- 示例：`mkPinLevel`
+
+### 类静态变量
+- 以 `s` 前缀开头，使用帕斯卡命名法
+- 示例：`sPowerPort`
+
+### 类静态常量
+- 以 `sk` 前缀开头，使用帕斯卡命名法
+- 示例：`skPowerPort`
 
 ### 局部变量
 - 小写字母，单词间用下划线分隔
@@ -90,22 +102,30 @@ class Spinlock
 - 使用帕斯卡命名法
 - 示例：`SpinlockUnlocked`、`SpinlockLocked`、`PmStageSuspended`
 
+### struct/union成员
+- 驼峰名法
+- 名字比较短可以全小写
+- 示例：`canId`、`dlc`、`sdu`、 `rawData`
+
 ### 函数
 
-#### 成员函数
-- 使用帕斯卡命名法
+#### 类成员函数
+- 驼峰命名法
+- 首单词通常为动词
 - 示例：`post()`、`wait()`、`freeze()`、`getXwosObj()`
 
-#### 静态函数
+#### 类静态函数
 - 以 `s` 前缀开头，使用帕斯卡命名法
-- 示例：`sThdMainFunction`
+- 首单词通常为动词
+- 示例：`sFillPack()`
 
 #### 构造函数
 - 支持指针和引用重载
+- 当构造函数只有一个参数时，需要增加修饰词 `explicit`
 - 示例：
   ```cpp
-  explicit Bit(Bmp & bmp, xwsq_t index);
-  explicit Bit(Bmp * bmp, xwsq_t index);
+  explicit XwiocProxy(XwiocProxy * other);
+  explicit XwiocProxy(XwiocProxy & other);
   ```
 
 #### 析构函数
@@ -166,7 +186,9 @@ clang-format -i <文件>
 | `xwptr_t` | 指针类型 |
 | `xwer_t` | 错误码类型 |
 | `xwsz_t` | 大小类型 |
-| `xwst_t` | 状态类型 |
+| `xwsq_t` | 顺序类型 |
+| `xwtm_t` | 时间类型 |
+| `xwid_t` | ID 类型 |
 
 ## 错误处理
 
@@ -411,4 +433,4 @@ err_process:
 
 ---
 
-*最后更新：2026-02-23*
+*最后更新：2026-04-11*
