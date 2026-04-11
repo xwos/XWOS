@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwisc::XwsscPortProxy
+ * @brief xwisc::XwsscProxy
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -29,7 +29,7 @@ namespace xwisc {
 /**
  * @brief XWSSC端口代理
  */
-class XwsscPortProxy
+class XwsscProxy
 {
   private:
     struct xwssc * mProxy;
@@ -38,10 +38,9 @@ class XwsscPortProxy
     xwu8_t mDefaultQos; /**< 默认Qos */
 
   public:
-    XwsscPortProxy(struct xwssc * xwssc, xwu8_t port,
-                   xwu8_t default_priority, xwu8_t default_qos);
-    XwsscPortProxy() = delete;
-    ~XwsscPortProxy() {}
+    XwsscProxy(struct xwssc * xwssc, xwu8_t port, xwu8_t default_priority, xwu8_t default_qos);
+    XwsscProxy() = delete;
+    ~XwsscProxy() {}
 
     /**
      * @brief 发送数据，并同步等待发送结果
@@ -281,4 +280,4 @@ class XwsscPortProxy
 
 } // namespace xwisc
 
-#endif /* xwmd/isc/xwssc/cxx/XwsscPortProxy.hxx */
+#endif /* xwmd/isc/xwssc/cxx/XwsscProxy.hxx */

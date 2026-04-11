@@ -19,7 +19,7 @@ XWMO_CFLAGS :=
 XWMO_INCDIRS :=
 
 ifeq ($(XWMDCFG_isc_xwssc_CXX),y)
-  XWMO_CXXSRCS := cxx/XwsscPortProxy.cxx
+  XWMO_CXXSRCS := cxx/XwsscProxy.cxx
   XWMO_CXXFLAGS :=
 endif
 
