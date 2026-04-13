@@ -78,6 +78,9 @@
 #define XWIOC_PROTOCOL_HEAD_SOF_SIZE    (4UL)
 #define XWIOC_BLOCK_SIZE                (8UL)
 #define XWIOC_SHADOW_SIZE               (4096UL)
+#define XWIOC_SOCKET_TX_POS             (1UL)
+#define XWIOC_SOCKET_RX_POS             (2UL)
+#define XWIOC_SOCKET_CONNECTED          ((XWIOC_SOCKET_TX_POS) | (XWIOC_SOCKET_RX_POS))
 
 #if (XWMDCFG_isc_xwioc_PORT_NUM >= 64UL)
 #  error "XWMDCFG_isc_xwioc_PORT_NUM must be less than 64!"
@@ -132,6 +135,7 @@ struct xwioc_cq {
                         xwu64_t tail; /**< 当前有效数据的结束位置 */
                         xwu64_t m; /**< 内存地址偏移 */
                 } cq; /**< 循环队列 */
+                xwu64_t connection; /**< 通道连接标志 */
         } port[XWMDCFG_isc_xwioc_PORT_NUM];
 };
 
@@ -209,6 +213,56 @@ void xwioc_set_txcq_extra_memory(struct xwioc * xwioc, xwu64_t port,
  */
 void xwioc_set_rxcq_extra_memory(struct xwioc * xwioc, xwu64_t port,
                                  void * origin, xwu64_t size);
+
+/**
+ * @brief 连接端口
+ * @param[in] xwioc: 对象指针
+ * @param[in] port: 端口
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 端口超出范围
+ * @note
+ * + 上下文：任意
+ */
+xwer_t xwioc_connect(struct xwioc * xwioc, xwu64_t port);
+
+/**
+ * @brief 断开端口
+ * @param[in] xwioc: 对象指针
+ * @param[in] port: 端口
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 端口超出范围
+ * @note
+ * + 上下文：任意
+ */
+xwer_t xwioc_disconnect(struct xwioc * xwioc, xwu64_t port);
+
+/**
+ * @brief 测试发送队列的连接状态
+ * @param[in] xwioc: 对象指针
+ * @param[in] port: 端口
+ * @return 布尔值
+ * @retval true: 已连接
+ * @retval false: 连接断开
+ * @note
+ * + 上下文：任意
+ */
+bool xwioc_tst_txcq_connected(struct xwioc * xwioc, xwu64_t port);
+
+/**
+ * @brief 测试接收队列的连接状态
+ * @param[in] xwioc: 对象指针
+ * @param[in] port: 端口
+ * @return 布尔值
+ * @retval true: 已连接
+ * @retval false: 连接断开
+ * @note
+ * + 上下文：任意
+ */
+bool xwioc_tst_rxcq_connected(struct xwioc * xwioc, xwu64_t port);
 
 /**
  * @brief 发送数据

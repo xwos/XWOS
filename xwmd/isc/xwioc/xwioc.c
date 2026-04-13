@@ -82,6 +82,7 @@ xwer_t xwioc_init(struct xwioc * xwioc, xwu64_t shm_origin,
                 xwioc->txcq->port[i].cq.pos = 0UL;
                 xwioc->txcq->port[i].cq.tail = 0UL;
                 xwioc->txcq->port[i].cq.m = cqm_size * j;
+                xwioc->txcq->port[i].connection = 0UL;
         }
 
         xwos_splk_init(&xwioc->rxcq->splk);
@@ -97,6 +98,7 @@ xwer_t xwioc_init(struct xwioc * xwioc, xwu64_t shm_origin,
                 xwioc->rxcq->port[i].cq.pos = 0UL;
                 xwioc->rxcq->port[i].cq.tail = 0UL;
                 xwioc->rxcq->port[i].cq.m = cqm_size * j;
+                xwioc->rxcq->port[i].connection = 0UL;
         }
 
         return XWOK;
@@ -133,6 +135,130 @@ void xwioc_set_rxcq_extra_memory(struct xwioc * xwioc, xwu64_t port,
                         xwioc->rxcq->port[port].extra_memory.size = size;
                 } else {}
         }
+}
+
+xwer_t xwioc_connect(struct xwioc * xwioc, xwu64_t port)
+{
+        xwreg_t cpuirq;
+        xwer_t rc;
+
+        if (NULL == xwioc) {
+                rc = -EFAULT;
+                goto err_fault;
+        }
+        if (NULL == xwioc->txcq) {
+                rc = -EFAULT;
+                goto err_fault;
+        }
+        if (NULL == xwioc->rxcq) {
+                rc = -EFAULT;
+                goto err_fault;
+        }
+        if (port >= XWMDCFG_isc_xwioc_PORT_NUM) {
+                rc = -ECHRNG;
+                goto err_outofrange;
+        }
+        xwos_splk_lock_cpuirqsv(&xwioc->txcq->splk, &cpuirq);
+        xwioc->txcq->port[port].connection |= XWIOC_SOCKET_TX_POS;
+        xwos_splk_unlock_cpuirqrs(&xwioc->txcq->splk, cpuirq);
+
+        xwos_splk_lock_cpuirqsv(&xwioc->rxcq->splk, &cpuirq);
+        xwioc->rxcq->port[port].connection |= XWIOC_SOCKET_RX_POS;
+        xwos_splk_unlock_cpuirqrs(&xwioc->rxcq->splk, cpuirq);
+
+        return XWOK;
+
+err_outofrange:
+err_fault:
+        return rc;
+}
+
+xwer_t xwioc_disconnect(struct xwioc * xwioc, xwu64_t port)
+{
+        xwreg_t cpuirq;
+        xwer_t rc;
+
+        if (NULL == xwioc) {
+                rc = -EFAULT;
+                goto err_fault;
+        }
+        if (NULL == xwioc->txcq) {
+                rc = -EFAULT;
+                goto err_fault;
+        }
+        if (NULL == xwioc->rxcq) {
+                rc = -EFAULT;
+                goto err_fault;
+        }
+        if (port >= XWMDCFG_isc_xwioc_PORT_NUM) {
+                rc = -ECHRNG;
+                goto err_outofrange;
+        }
+        xwos_splk_lock_cpuirqsv(&xwioc->txcq->splk, &cpuirq);
+        xwioc->txcq->port[port].connection &= ~XWIOC_SOCKET_TX_POS;
+        xwos_splk_unlock_cpuirqrs(&xwioc->txcq->splk, cpuirq);
+
+        xwos_splk_lock_cpuirqsv(&xwioc->rxcq->splk, &cpuirq);
+        xwioc->rxcq->port[port].connection &= ~XWIOC_SOCKET_RX_POS;
+        xwos_splk_unlock_cpuirqrs(&xwioc->rxcq->splk, cpuirq);
+
+        return XWOK;
+
+err_outofrange:
+err_fault:
+        return rc;
+}
+
+bool xwioc_tst_txcq_connected(struct xwioc * xwioc, xwu64_t port)
+{
+        xwreg_t cpuirq;
+        bool rc;
+
+        if (NULL == xwioc) {
+                rc = false;
+                goto err_fault;
+        }
+        if (NULL == xwioc->txcq) {
+                rc = false;
+                goto err_fault;
+        }
+        if (port >= XWMDCFG_isc_xwioc_PORT_NUM) {
+                rc = false;
+                goto err_outofrange;
+        }
+        xwos_splk_lock_cpuirqsv(&xwioc->txcq->splk, &cpuirq);
+        rc = !!(XWIOC_SOCKET_CONNECTED == xwioc->txcq->port[port].connection);
+        xwos_splk_unlock_cpuirqrs(&xwioc->txcq->splk, cpuirq);
+
+err_outofrange:
+err_fault:
+        return rc;
+}
+
+bool xwioc_tst_rxcq_connected(struct xwioc * xwioc, xwu64_t port)
+{
+        xwreg_t cpuirq;
+        bool rc;
+
+        if (NULL == xwioc) {
+                rc = false;
+                goto err_fault;
+        }
+        if (NULL == xwioc->rxcq) {
+                rc = false;
+                goto err_fault;
+        }
+        if (port >= XWMDCFG_isc_xwioc_PORT_NUM) {
+                rc = false;
+                goto err_outofrange;
+        }
+        xwos_splk_lock_cpuirqsv(&xwioc->rxcq->splk, &cpuirq);
+        rc = !!(XWIOC_SOCKET_CONNECTED == xwioc->rxcq->port[port].connection);
+        xwos_splk_unlock_cpuirqrs(&xwioc->rxcq->splk, cpuirq);
+
+err_outofrange:
+err_fault:
+        return rc;
 }
 
 xwer_t xwioc_write(struct xwioc * xwioc, xwu64_t port,
@@ -176,6 +302,11 @@ xwer_t xwioc_write(struct xwioc * xwioc, xwu64_t port,
         wr_size = *dlc + sizeof(struct xwioc_cq_protocol_head);
         wr_block = ((wr_size + XWIOC_BLOCK_SIZE - 1UL) / XWIOC_BLOCK_SIZE);
         xwos_splk_lock_cpuirqsv(&xwioc->txcq->splk, &cpuirq);
+        if (XWIOC_SOCKET_CONNECTED != xwioc->txcq->port[port].connection) {
+                xwos_splk_unlock_cpuirqrs(&xwioc->txcq->splk, cpuirq);
+                rc = -ENOTCONN;
+                goto err_notconn;
+        }
         num = xwioc->txcq->port[port].cq.num;
         pos = xwioc->txcq->port[port].cq.pos;
         tail = xwioc->txcq->port[port].cq.tail;
@@ -220,9 +351,10 @@ xwer_t xwioc_write(struct xwioc * xwioc, xwu64_t port,
         return XWOK;
 
 err_nospc:
+err_notconn:
 err_msgsize:
-err_fault:
 err_outofrange:
+err_fault:
         return rc;
 }
 
@@ -321,8 +453,8 @@ err_size:
 err_proto:
 err_nodata:
 err_sem_wait:
-err_fault:
 err_outofrange:
+err_fault:
         return rc;
 }
 
