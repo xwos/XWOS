@@ -70,6 +70,61 @@ class XwiocProxy
     }
 
     /**
+     * @brief 连接端口
+     * @param[in] port: 端口
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ECHRNG: 端口超出范围
+     * @note
+     * + 上下文：任意
+     */
+    xwer_t connect(xwu64_t port) {
+        return xwioc_connect(mXwioc, port);
+    }
+
+    /**
+     * @brief 断开端口
+     * @param[in] port: 端口
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EFAULT: 空指针
+     * @retval -ECHRNG: 端口超出范围
+     * @note
+     * + 上下文：任意
+     */
+    xwer_t disconnect(xwu64_t port) {
+        return xwioc_disconnect(mXwioc, port);
+    }
+
+    /**
+     * @brief 测试发送队列的连接状态
+     * @param[in] xwioc: 对象指针
+     * @param[in] port: 端口
+     * @return 布尔值
+     * @retval true: 已连接
+     * @retval false: 连接断开
+     * @note
+     * + 上下文：任意
+     */
+    bool tstTxcqConnected(xwu64_t port) {
+        return xwioc_tst_txcq_connected(mXwioc, port);
+    }
+
+    /**
+     * @brief 测试接收队列的连接状态
+     * @param[in] port: 端口
+     * @return 布尔值
+     * @retval true: 已连接
+     * @retval false: 连接断开
+     * @note
+     * + 上下文：任意
+     */
+    bool tstRxcqConnected(xwu64_t port) {
+        return xwioc_tst_rxcq_connected(mXwioc, port);
+    }
+
+    /**
      * @brief 发送数据
      * @param[in] port: 端口
      * @param[in] sdu: 数据
