@@ -33,11 +33,12 @@ class XwiocProxy
 {
   private:
     struct xwioc * mXwioc;
+    xwu64_t mPort;
 
   public:
-    explicit XwiocProxy(struct xwioc * xwioc) : mXwioc(xwioc) {}
-    explicit XwiocProxy(XwiocProxy * other) : mXwioc(other->mXwioc) {}
-    explicit XwiocProxy(XwiocProxy & other) : mXwioc(other.mXwioc) {}
+    XwiocProxy(struct xwioc * xwioc, xwu64_t port) : mXwioc(xwioc), mPort(port) {}
+    explicit XwiocProxy(XwiocProxy * other) : mXwioc(other->mXwioc), mPort(other->mPort) {}
+    explicit XwiocProxy(XwiocProxy & other) : mXwioc(other.mXwioc), mPort(other.mPort) {}
     ~XwiocProxy() {}
 
     /**
@@ -47,31 +48,28 @@ class XwiocProxy
 
     /**
      * @brief 设置发送队列的额外内存
-     * @param[in] port: 端口
      * @param[in] origin: 额外内存地址
      * @param[in] size: 额外内存地址的大小
      * @note
      * + 上下文：任意
      */
-    void setTxcqExtraMemory(xwu64_t port, void * origin, xwu64_t size) {
-        xwioc_set_txcq_extra_memory(mXwioc, port, origin, size);
+    void setTxcqExtraMemory(void * origin, xwu64_t size) {
+        xwioc_set_txcq_extra_memory(mXwioc, mPort, origin, size);
     }
 
     /**
      * @brief 设置接收队列的额外内存
-     * @param[in] port: 端口
      * @param[in] origin: 额外内存地址
      * @param[in] size: 额外内存地址的大小
      * @note
      * + 上下文：任意
      */
-    void setRxcqExtraMemory(xwu64_t port, void * origin, xwu64_t size) {
-        xwioc_set_rxcq_extra_memory(mXwioc, port, origin, size);
+    void setRxcqExtraMemory(void * origin, xwu64_t size) {
+        xwioc_set_rxcq_extra_memory(mXwioc, mPort, origin, size);
     }
 
     /**
      * @brief 连接端口
-     * @param[in] port: 端口
      * @return 错误码
      * @retval XWOK: 没有错误
      * @retval -EFAULT: 空指针
@@ -79,13 +77,12 @@ class XwiocProxy
      * @note
      * + 上下文：任意
      */
-    xwer_t connect(xwu64_t port) {
-        return xwioc_connect(mXwioc, port);
+    xwer_t connect() {
+        return xwioc_connect(mXwioc, mPort);
     }
 
     /**
      * @brief 断开端口
-     * @param[in] port: 端口
      * @return 错误码
      * @retval XWOK: 没有错误
      * @retval -EFAULT: 空指针
@@ -93,40 +90,36 @@ class XwiocProxy
      * @note
      * + 上下文：任意
      */
-    xwer_t disconnect(xwu64_t port) {
-        return xwioc_disconnect(mXwioc, port);
+    xwer_t disconnect() {
+        return xwioc_disconnect(mXwioc, mPort);
     }
 
     /**
      * @brief 测试发送队列的连接状态
-     * @param[in] xwioc: 对象指针
-     * @param[in] port: 端口
      * @return 布尔值
      * @retval true: 已连接
      * @retval false: 连接断开
      * @note
      * + 上下文：任意
      */
-    bool tstTxcqConnected(xwu64_t port) {
-        return xwioc_tst_txcq_connected(mXwioc, port);
+    bool tstTxcqConnected() {
+        return xwioc_tst_txcq_connected(mXwioc, mPort);
     }
 
     /**
      * @brief 测试接收队列的连接状态
-     * @param[in] port: 端口
      * @return 布尔值
      * @retval true: 已连接
      * @retval false: 连接断开
      * @note
      * + 上下文：任意
      */
-    bool tstRxcqConnected(xwu64_t port) {
-        return xwioc_tst_rxcq_connected(mXwioc, port);
+    bool tstRxcqConnected() {
+        return xwioc_tst_rxcq_connected(mXwioc, mPort);
     }
 
     /**
      * @brief 发送数据
-     * @param[in] port: 端口
      * @param[in] sdu: 数据
      * @param[in,out] dlc: 指向缓冲区的指针，此缓冲区：
      * + (I) 作为输入时，表示待发送的数据大小
@@ -140,8 +133,8 @@ class XwiocProxy
      * @note
      * + 上下文：任意
      */
-    xwer_t write(xwu64_t port, const xwu8_t sdu[], xwsz_t * dlc) {
-        return xwioc_write(mXwioc, port, sdu, dlc);
+    xwer_t write(const xwu8_t sdu[], xwsz_t * dlc) {
+        return xwioc_write(mXwioc, mPort, sdu, dlc);
     }
 
     /**
@@ -155,7 +148,6 @@ class XwiocProxy
 
     /**
      * @brief 接收数据
-     * @param[in] port: 端口
      * @param[in] sdu: 数据
      * @param[in,out] dlc: 指向缓冲区的指针，此缓冲区：
      * + (I) 作为输入时，表示缓冲区的大小
@@ -179,13 +171,12 @@ class XwiocProxy
      *     可以使用 `xwtm_ft(delta)` 表示；
      *   + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
      */
-    xwer_t read(xwu64_t port, xwu8_t sdu[], xwsz_t * dlc, xwtm_t to) {
-        return xwioc_read(mXwioc, port, sdu, dlc, to);
+    xwer_t read(xwu8_t sdu[], xwsz_t * dlc, xwtm_t to) {
+        return xwioc_read(mXwioc, mPort, sdu, dlc, to);
     }
 
     /**
      * @brief 接收数据
-     * @param[in] port: 端口
      * @param[in] sdu: 数据
      * @param[in,out] dlc: 指向缓冲区的指针，此缓冲区：
      * + (I) 作为输入时，表示缓冲区的大小
@@ -203,8 +194,8 @@ class XwiocProxy
      * @details
      * + 如果等待被中断，此CAPI将返回 `-EINTR` 。
      */
-    xwer_t read(xwu64_t port, xwu8_t sdu[], xwsz_t * dlc) {
-        return xwioc_read(mXwioc, port, sdu, dlc, XWTM_MAX);
+    xwer_t read(xwu8_t sdu[], xwsz_t * dlc) {
+        return xwioc_read(mXwioc, mPort, sdu, dlc, XWTM_MAX);
     }
 };
 
