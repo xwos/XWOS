@@ -407,22 +407,24 @@ xwer_t xwioc_read(struct xwioc * xwioc, xwu64_t port,
                 rc = -ECHRNG;
                 goto err_outofrange;
         }
-        rc = xwos_sem_wait_to(&xwioc->rxsem[port], to);
-        if (rc < 0) {
-                goto err_sem_wait;
-        }
 
         m = (xwioc_block_t *)(xwioc->shm_origin + xwioc->block_mr_offset +
                               xwioc->rxcq->port[port].cq.m);
-        xwos_splk_lock_cpuirqsv(&xwioc->rxcq->splk, &cpuirq);
-        num = xwioc->rxcq->port[port].cq.num;
-        pos = xwioc->rxcq->port[port].cq.pos;
-        tail = xwioc->rxcq->port[port].cq.tail;
-        if (pos == tail) {
-                rc = -ENODATA;
-                xwos_splk_unlock_cpuirqrs(&xwioc->rxcq->splk, cpuirq);
-                goto err_nodata;
-        }
+        do {
+                xwos_splk_lock_cpuirqsv(&xwioc->rxcq->splk, &cpuirq);
+                num = xwioc->rxcq->port[port].cq.num;
+                pos = xwioc->rxcq->port[port].cq.pos;
+                tail = xwioc->rxcq->port[port].cq.tail;
+                if (pos == tail) {
+                        xwos_splk_unlock_cpuirqrs(&xwioc->rxcq->splk, cpuirq);
+                        rc = xwos_sem_wait_to(&xwioc->rxsem[port], to);
+                        if (rc < 0) {
+                                goto err_sem_wait;
+                        }
+                } else {
+                        rc = 1;
+                }
+        } while (XWOK == rc);
         msg = (struct xwioc_cq_protocol *)&m[pos];
         if (XWIOC_PROTOCOL_HEAD_SOF != msg->head.sof) {
                 rc = -EPROTO;
@@ -451,7 +453,6 @@ xwer_t xwioc_read(struct xwioc * xwioc, xwu64_t port,
 
 err_size:
 err_proto:
-err_nodata:
 err_sem_wait:
 err_outofrange:
 err_fault:
