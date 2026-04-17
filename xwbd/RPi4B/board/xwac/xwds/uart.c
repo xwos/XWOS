@@ -407,6 +407,8 @@ void rpi4bxwds_uart5_pin_fini(void)
         soc_gpio.gpio_pup_pdn_cntrl_reg0.bit.pin13 = SOC_GPIO_PUPDC_NO;
 }
 
+__xwcc_alignl1cache xwu8_t rpi4bxwds_uart5_rxq[8192U] = {0};
+
 const struct rpi4bxwds_uartc_cfg rpi4bxwds_uart5_soc_cfg = {
         .regbase = SOC_UART5_REGBASE,
         .irqn = 57 + SOC_GIC2_IRQn_OFFSET_VC,
@@ -438,4 +440,8 @@ struct xwds_uartc rpi4bxwds_uart5 = {
                 .data = (void *)&rpi4bxwds_uart5_drvdata,
         },
         .cfg = &rpi4bxwds_uart5_cfg,
+        .rxq = {
+                .q = rpi4bxwds_uart5_rxq,
+                .qsize = sizeof(rpi4bxwds_uart5_rxq),
+        },
 };

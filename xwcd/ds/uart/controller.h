@@ -109,8 +109,6 @@
  * @{
  */
 
-#define XWDS_UART_RXQ_SIZE XWCDCFG_ds_UART_RXQ_SIZE
-
 /**
  * @brief UART字长枚举
  */
@@ -221,7 +219,8 @@ struct xwds_uartc {
                 xwsq_t pos; /**< 当前有效数据的起始位置 */
                 xwsz_t tail; /**< 当前有效数据的结束位置 + 1 */
                 xwsq_t idx; /**< 从UART硬件接收数据的位置，如果使用DMA，不使用此成员 */
-                xwu8_t mem[XWDS_UART_RXQ_SIZE] __xwcc_alignl1cache; /**< 缓冲区 */
+                xwu8_t * q; /**< 缓冲区 */
+                xwsz_t qsize; /**< 缓冲区大小 */
         } rxq; /**< 循环接收队列 */
 };
 

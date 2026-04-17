@@ -38,7 +38,7 @@ xwer_t stm32xwds_usart_drv_start(struct xwds_device * dev)
         drvdata->uartc = uartc;
 
         MX_USART_UART_Init(dev->id);
-        rc = MX_USART_RXDMA_Start(dev->id, uartc->rxq.mem, sizeof(uartc->rxq.mem));
+        rc = MX_USART_RXDMA_Start(dev->id, uartc->rxq.q, uartc->rxq.qsize);
         if (rc < 0) {
                 goto err_rxdma_start;
         }
@@ -212,12 +212,12 @@ void stm32xwds_usart_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
 void stm32xwds_usart_cb_rxdma_restart(struct xwds_uartc * uartc)
 {
         xwds_uartc_drvcb_rxq_flush(uartc);
-        MX_USART_RXDMA_Start(uartc->dev.id, uartc->rxq.mem, sizeof(uartc->rxq.mem));
+        MX_USART_RXDMA_Start(uartc->dev.id, uartc->rxq.q, uartc->rxq.qsize);
 }
 
 void stm32xwds_usart_cb_rxdma_halfcplt(struct xwds_uartc * uartc)
 {
-        xwds_uartc_drvcb_rxq_pub(uartc, (sizeof(uartc->rxq.mem) >> (xwsq_t)1));
+        xwds_uartc_drvcb_rxq_pub(uartc, (uartc->rxq.qsize >> (xwsq_t)1));
 }
 
 void stm32xwds_usart_cb_rxdma_cplt(struct xwds_uartc * uartc)
@@ -229,8 +229,8 @@ void stm32xwds_usart_cb_rxdma_timer(struct xwds_uartc * uartc)
 {
         xwsq_t tail;
 
-        tail = sizeof(uartc->rxq.mem) - MX_USART_RXDMA_GetCounter(uartc->dev.id);
-        if (sizeof(uartc->rxq.mem) == tail) {
+        tail = uartc->rxq.qsize - MX_USART_RXDMA_GetCounter(uartc->dev.id);
+        if (uartc->rxq.qsize == tail) {
                 xwds_uartc_drvcb_rxq_pub(uartc, 0);
         } else {
                 xwds_uartc_drvcb_rxq_pub(uartc, tail);
@@ -257,6 +257,8 @@ const struct xwds_uartc_driver stm32xwds_usart_drv = {
 };
 
 /******** USART1 ********/
+__xwcc_alignl1cache xwu8_t stm32xwds_usart1_rxq[256U] = {0};
+
 struct xwds_uartc stm32xwds_usart1 = {
         /* attributes */
         .dev = {
@@ -267,9 +269,15 @@ struct xwds_uartc stm32xwds_usart1 = {
                 .data = (void *)&huart1_drvdata,
         },
         .cfg = NULL,
+        .rxq = {
+                .q = stm32xwds_usart1_rxq,
+                .qsize = sizeof(stm32xwds_usart1_rxq),
+        },
 };
 
 /******** USART3 ********/
+__xwcc_alignl1cache xwu8_t stm32xwds_usart3_rxq[4096U] = {0};
+
 struct xwds_uartc stm32xwds_usart3 = {
         /* attributes */
         .dev = {
@@ -280,4 +288,8 @@ struct xwds_uartc stm32xwds_usart3 = {
                 .data = (void *)&huart3_drvdata,
         },
         .cfg = NULL,
+        .rxq = {
+                .q = stm32xwds_usart3_rxq,
+                .qsize = sizeof(stm32xwds_usart3_rxq),
+        },
 };

@@ -170,7 +170,7 @@ xwer_t xwds_uartc_vop_start(struct xwds_uartc * uartc)
 {
         xwer_t rc;
 
-        memset(uartc->rxq.mem, 0, sizeof(uartc->rxq.mem));
+        memset(uartc->rxq.q, 0, uartc->rxq.qsize);
         uartc->rxq.pos = 0;
         uartc->rxq.tail = 0;
         uartc->rxq.idx = 0;
@@ -216,7 +216,7 @@ xwer_t xwds_uartc_vop_resume(struct xwds_uartc * uartc)
 {
         xwer_t rc;
 
-        memset(uartc->rxq.mem, 0, sizeof(uartc->rxq.mem));
+        memset(uartc->rxq.q, 0, uartc->rxq.qsize);
         uartc->rxq.pos = 0;
         uartc->rxq.tail = 0;
         rc = xwds_device_vop_resume(&uartc->dev);
@@ -254,17 +254,17 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                 if (uartc->rxq.tail >= uartc->rxq.pos) {
                         available = uartc->rxq.tail - uartc->rxq.pos;
                 } else {
-                        available = sizeof(uartc->rxq.mem) - uartc->rxq.pos;
+                        available = uartc->rxq.qsize - uartc->rxq.pos;
                         available += uartc->rxq.tail;
                 }
                 real = available > rest_buffer_size ? rest_buffer_size : available;
-                if ((real + uartc->rxq.pos) >= sizeof(uartc->rxq.mem)) {
-                        cp = sizeof(uartc->rxq.mem) - uartc->rxq.pos;
-                        memcpy(&buf[pos], &uartc->rxq.mem[uartc->rxq.pos], cp);
-                        memcpy(&buf[cp + pos], &uartc->rxq.mem[0], real - cp);
+                if ((real + uartc->rxq.pos) >= uartc->rxq.qsize) {
+                        cp = uartc->rxq.qsize - uartc->rxq.pos;
+                        memcpy(&buf[pos], &uartc->rxq.q[uartc->rxq.pos], cp);
+                        memcpy(&buf[cp + pos], &uartc->rxq.q[0], real - cp);
                         uartc->rxq.pos = real - cp;
                 } else {
-                        memcpy(&buf[pos], &uartc->rxq.mem[uartc->rxq.pos], real);
+                        memcpy(&buf[pos], &uartc->rxq.q[uartc->rxq.pos], real);
                         uartc->rxq.pos += real;
                 }
                 xwos_splk_unlock_cpuirqrs(&uartc->rxq.lock, cpuirq);
@@ -313,17 +313,17 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc,
                 if (uartc->rxq.tail >= uartc->rxq.pos) {
                         available = uartc->rxq.tail - uartc->rxq.pos;
                 } else {
-                        available = sizeof(uartc->rxq.mem) - uartc->rxq.pos;
+                        available = uartc->rxq.qsize - uartc->rxq.pos;
                         available += uartc->rxq.tail;
                 }
                 real = available > rest_buffer_size ? rest_buffer_size : available;
-                if ((real + uartc->rxq.pos) >= sizeof(uartc->rxq.mem)) {
-                        cp = sizeof(uartc->rxq.mem) - uartc->rxq.pos;
-                        memcpy(&buf[pos], &uartc->rxq.mem[uartc->rxq.pos], cp);
-                        memcpy(&buf[cp + pos], &uartc->rxq.mem[0], real - cp);
+                if ((real + uartc->rxq.pos) >= uartc->rxq.qsize) {
+                        cp = uartc->rxq.qsize - uartc->rxq.pos;
+                        memcpy(&buf[pos], &uartc->rxq.q[uartc->rxq.pos], cp);
+                        memcpy(&buf[cp + pos], &uartc->rxq.q[0], real - cp);
                         uartc->rxq.pos = real - cp;
                 } else {
-                        memcpy(&buf[pos], &uartc->rxq.mem[uartc->rxq.pos], real);
+                        memcpy(&buf[pos], &uartc->rxq.q[uartc->rxq.pos], real);
                         uartc->rxq.pos += real;
                 }
                 xwos_splk_unlock_cpuirqrs(&uartc->rxq.lock, cpuirq);
@@ -542,9 +542,9 @@ xwsq_t xwds_uartc_drvcb_rxq_fill(struct xwds_uartc * uartc,
                                  xwu8_t bytes[], xwsz_t size)
 {
         for (xwsz_t i = 0; i < size; i++) {
-                uartc->rxq.mem[uartc->rxq.idx] = bytes[i];
+                uartc->rxq.q[uartc->rxq.idx] = bytes[i];
                 uartc->rxq.idx++;
-                if (sizeof(uartc->rxq.mem) == uartc->rxq.idx) {
+                if (uartc->rxq.qsize == uartc->rxq.idx) {
                         uartc->rxq.idx = 0;
                 }
         }
@@ -557,7 +557,7 @@ void xwds_uartc_drvcb_rxq_pub(struct xwds_uartc * uartc, xwsq_t pub)
         xwsz_t pubsz;
         xwreg_t cpuirq;
 
-        if (sizeof(uartc->rxq.mem) == pub) {
+        if (uartc->rxq.qsize == pub) {
                 pub = 0;
         }
         xwos_splk_lock_cpuirqsv(&uartc->rxq.lock, &cpuirq);
@@ -569,23 +569,23 @@ void xwds_uartc_drvcb_rxq_pub(struct xwds_uartc * uartc, xwsq_t pub)
                 } else if (uartc->rxq.pos <= pub) {
                         /* Overflow! Discard the oldest data. */
                         uartc->rxq.pos = pub + 1;
-                        if (sizeof(uartc->rxq.mem) == uartc->rxq.pos) {
+                        if (uartc->rxq.qsize == uartc->rxq.pos) {
                                 uartc->rxq.pos = 0;
                         }
                 } else {
                 }
                 uartc->rxq.tail = pub;
         } else {
-                pubsz = sizeof(uartc->rxq.mem) - uartc->rxq.tail + pub;
+                pubsz = uartc->rxq.qsize - uartc->rxq.tail + pub;
                 if (uartc->rxq.pos <= pub) {
                         /* Overflow! Discard the oldest data. */
                         uartc->rxq.pos = pub + 1;
-                        /* `uartc->rxq.pos < sizeof(uartc->rxq.mem)` is always true. */
+                        /* `uartc->rxq.pos < uartc->rxq.qsize` is always true. */
                 } else if (uartc->rxq.pos <= uartc->rxq.tail) {
                 } else {
                         /* Overflow! Discard the oldest data. */
                         uartc->rxq.pos = pub + 1;
-                        /* `uartc->rxq.pos < sizeof(uartc->rxq.mem)` is always true. */
+                        /* `uartc->rxq.pos < uartc->rxq.qsize` is always true. */
                 }
                 uartc->rxq.tail = pub;
         }
