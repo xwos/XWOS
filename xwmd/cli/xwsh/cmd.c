@@ -16,6 +16,7 @@
 #include <xwos/osal/thd.h>
 #include "xwmd/cli/xwsh/mi.h"
 #include "xwmd/cli/xwsh/core.h"
+#include "xwmd/cli/xwsh/datalib.h"
 
 xwer_t xwsh_cmd_help(xwsz_t argc, char ** argv)
 {
@@ -39,8 +40,6 @@ xwer_t xwsh_cmd_rd(xwsz_t argc, char ** argv)
         xwptr_t addr;
         xwsz_t size;
         xwu8_t * p;
-        xwsz_t i;
-        xwsz_t j;
         xwer_t rc;
 
         size = 1U;
@@ -67,31 +66,7 @@ xwer_t xwsh_cmd_rd(xwsz_t argc, char ** argv)
 
         printf("origin address: %p\r\n", (void *)addr);
         p = (xwu8_t *)addr;
-        for (i = 0; i < size; i += 16U) {
-                printf("%08x: ", i);
-                for (j = 0; j < 16U && (i + j) < size; j++) {
-                        printf("%02x ", p[i + j]);
-                        if (j == 7U) {
-                                printf(" ");
-                        }
-                }
-                while (j < 16U) {
-                        printf("   ");
-                        if (j == 7U) {
-                                printf(" ");
-                        }
-                        j++;
-                }
-                printf(" |");
-                for (j = 0; j < 16U && (i + j) < size; j++) {
-                        if (p[i + j] >= 32U && p[i + j] <= 126U) {
-                                printf("%c", p[i + j]);
-                        } else {
-                                printf(".");
-                        }
-                }
-                printf("|\r\n");
-        }
+        xwsh_data_dump(p, size);
         return XWOK;
 
 err_invalid:
