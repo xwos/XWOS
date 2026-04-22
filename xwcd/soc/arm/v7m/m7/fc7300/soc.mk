@@ -19,10 +19,10 @@
 #
 
 SOC_INCDIRS :=
-SOC_AFLAGS := -mfpu=fpv5-d16
-SOC_CFLAGS := -mfpu=fpv5-d16
-SOC_CXXFLAGS := -mfpu=fpv5-d16
-SOC_LDFLAGS := -mfpu=fpv5-d16
+SOC_AFLAGS := -mfpu=fpv5-sp-d16
+SOC_CFLAGS := -mfpu=fpv5-sp-d16
+SOC_CXXFLAGS := -mfpu=fpv5-sp-d16
+SOC_LDFLAGS := -mfpu=fpv5-sp-d16
 
 SOC_ASRCS :=
 SOC_CSRCS :=
