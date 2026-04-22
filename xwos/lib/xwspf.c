@@ -14,6 +14,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <stddef.h>
+#include <math.h>
+#include <float.h>
 #include <xwos/lib/div64.h>
 
 #define XWVSNPF_F_ZEROPAD          0x01    /**< pad with zero */
@@ -44,6 +46,8 @@ enum xwvsnpf_format_type_em {
         XWVSNPF_FT_INT,
         XWVSNPF_FT_XWSZ_T,
         XWVSNPF_FT_PTRDIFF,
+        XWVSNPF_FT_FLOAT,
+        XWVSNPF_FT_FLOAT_SCI,
 };
 
 struct xwvsnpf_format_spec {
@@ -188,7 +192,7 @@ char * xwvsnpf_format_number(char * buf, char * end,
                 } else {}
         }
         if (need_pfx) {
-                if (16 == spec.base) {
+                if (16 == spec.base || 2 == spec.base) {
                         spec.field_width -= 2;
                 } else if (!is_zero) {
                         spec.field_width--;
@@ -205,12 +209,14 @@ char * xwvsnpf_format_number(char * buf, char * end,
                    tmp[i++] = (xwvsnpf_digits[xwdiv64(&num, base)] | locase);
                    } while (num != 0);
                 */
-        } else if (spec.base != 10) { /* 8 or 16 */
+        } else if (spec.base != 10) { /* 2, 8 or 16 */
                 int mask = spec.base - 1;
                 int shift = 3;
 
                 if (spec.base == 16) {
                         shift = 4;
+                } else if (spec.base == 2) {
+                        shift = 1;
                 }
                 do {
                         tmp[i++] = (xwvsnpf_digits[((char)num) & mask] |
@@ -242,9 +248,9 @@ char * xwvsnpf_format_number(char * buf, char * end,
                 }
                 buf++;
         }
-        /* "0x" / "0" prefix */
+        /* "0x" / "0b" / "0" prefix */
         if (need_pfx) {
-                if (spec.base == 16 || !is_zero) {
+                if (spec.base == 16 || spec.base == 2 || !is_zero) {
                         if (buf < end) {
                                 *buf = '0';
                         }
@@ -253,6 +259,11 @@ char * xwvsnpf_format_number(char * buf, char * end,
                 if (spec.base == 16) {
                         if (buf < end) {
                                 *buf = ('X' | locase);
+                        }
+                        buf++;
+                } else if (spec.base == 2) {
+                        if (buf < end) {
+                                *buf = ('B' | locase);
                         }
                         buf++;
                 }
@@ -398,6 +409,168 @@ char * xwvsnpf_format_pointer(const char * fmt, char * buf, char * end, void * p
 }
 
 static inline
+char * xwvsnpf_put_float_decimal(char * buf, char * end, unsigned long long num, int digits)
+{
+        char tmp[30];
+        int i = 0;
+        int j;
+
+        if (num == 0) {
+                tmp[i++] = '0';
+        } else {
+                while (num > 0 && i < 29) {
+                        tmp[i++] = (char)('0' + (num % 10));
+                        num = num / 10;
+                }
+        }
+
+        while (i < digits && i < 29) {
+                tmp[i++] = '0';
+        }
+
+        for (j = i - 1; j >= 0; j--) {
+                if (buf < end) {
+                        *buf = tmp[j];
+                }
+                buf++;
+        }
+        return buf;
+}
+
+static inline
+char * xwvsnpf_format_float(char * buf, char * end, double num,
+                            struct xwvsnpf_format_spec spec)
+{
+        char tmp[100];
+        char *p = tmp;
+        char sign = 0;
+        int precision = (spec.precision == -1) ? 6 : spec.precision;
+        int is_sci = (spec.type == XWVSNPF_FT_FLOAT_SCI);
+        int exp = 0;
+        unsigned long long int_part = 0;
+        unsigned long long frac_part = 0;
+        double abs_num;
+        int i, len;
+        int need_sign = 0;
+        char exp_char = (spec.flags & XWVSNPF_F_SMALL) ? 'e' : 'E';
+
+        if (isnan(num)) {
+                if (buf < end) *buf++ = 'n';
+                if (buf < end) *buf++ = 'a';
+                if (buf < end) *buf++ = 'n';
+                return buf;
+        }
+
+        if (isinf(num)) {
+                if (num < 0) {
+                        if (buf < end) *buf++ = '-';
+                }
+                if (buf < end) *buf++ = 'i';
+                if (buf < end) *buf++ = 'n';
+                if (buf < end) *buf++ = 'f';
+                return buf;
+        }
+
+        if (num < 0) {
+                sign = '-';
+                abs_num = -num;
+        } else {
+                if (spec.flags & XWVSNPF_F_PLUS) {
+                        sign = '+';
+                } else if (spec.flags & XWVSNPF_F_SPACE) {
+                        sign = ' ';
+                }
+                abs_num = num;
+        }
+
+        if (sign) {
+                need_sign = 1;
+        }
+
+        if (is_sci) {
+                if (abs_num == 0.0) {
+                        exp = 0;
+                } else if (abs_num >= 1.0) {
+                        while (abs_num >= 10.0) {
+                                abs_num /= 10.0;
+                                exp++;
+                        }
+                } else {
+                        while (abs_num < 1.0) {
+                                abs_num *= 10.0;
+                                exp--;
+                        }
+                }
+        }
+
+        int_part = (unsigned long long)abs_num;
+        double frac = abs_num - (double)int_part;
+        double mult = 1.0;
+        for (i = 0; i < precision; i++) {
+                mult *= 10.0;
+        }
+        frac_part = (unsigned long long)(frac * mult + 0.5);
+
+        if (frac_part >= (unsigned long long)mult) {
+                frac_part -= (unsigned long long)mult;
+                int_part++;
+        }
+
+        p = xwvsnpf_put_float_decimal(p, tmp + 99, int_part, 1);
+
+        if (precision > 0 || (spec.flags & XWVSNPF_F_SPECIAL)) {
+                *p++ = '.';
+                p = xwvsnpf_put_float_decimal(p, tmp + 99, frac_part, precision);
+        }
+
+        if (is_sci) {
+                *p++ = exp_char;
+                if (exp >= 0) {
+                        *p++ = '+';
+                } else {
+                        *p++ = '-';
+                        exp = -exp;
+                }
+                if (exp < 10) {
+                        *p++ = '0';
+                }
+                p = xwvsnpf_put_float_decimal(p, tmp + 99, (unsigned long long)exp, 1);
+        }
+
+        len = (int)(p - tmp);
+        int total_width = (spec.field_width != -1) ? spec.field_width : 0;
+        int pad_len = (total_width > len + need_sign) ? (total_width - len - need_sign) : 0;
+
+        if (!(spec.flags & XWVSNPF_F_LEFT) && pad_len > 0) {
+                char pad_char = (spec.flags & XWVSNPF_F_ZEROPAD) ? '0' : ' ';
+                if (pad_char == '0' && sign) {
+                        if (buf < end) *buf++ = sign;
+                        sign = 0;
+                        need_sign = 0;
+                }
+                for (i = 0; i < pad_len; i++) {
+                        if (buf < end) *buf++ = pad_char;
+                }
+        }
+
+        if (sign) {
+                if (buf < end) *buf++ = sign;
+        }
+
+        for (i = 0; i < len; i++) {
+                if (buf < end) *buf++ = tmp[i];
+        }
+
+        if ((spec.flags & XWVSNPF_F_LEFT) && pad_len > 0) {
+                for (i = 0; i < pad_len; i++) {
+                        if (buf < end) *buf++ = ' ';
+                }
+        }
+
+        return buf;
+}
+
+static inline
 int xwvsnpf_format_decode(const char * fmt,
                           struct xwvsnpf_format_spec * spec)
 {
@@ -539,6 +712,15 @@ qualifier:
                 spec->base = 8;
                 break;
 
+        case 'b':
+                spec->flags |= XWVSNPF_F_SMALL;
+                spec->base = 2;
+                break;
+
+        case 'B':
+                spec->base = 2;
+                break;
+
         case 'x':
                 spec->flags |= XWVSNPF_F_SMALL;
                 spec->base = 16;
@@ -547,6 +729,22 @@ qualifier:
         case 'X':
                 spec->base = 16;
                 break;
+
+        case 'f':
+                spec->type = XWVSNPF_FT_FLOAT;
+                fmt++;
+                return fmt - start;
+
+        case 'e':
+                spec->flags |= XWVSNPF_F_SMALL;
+                spec->type = XWVSNPF_FT_FLOAT_SCI;
+                fmt++;
+                return fmt - start;
+
+        case 'E':
+                spec->type = XWVSNPF_FT_FLOAT_SCI;
+                fmt++;
+                return fmt - start;
 
         case 'd':
         case 'i':
@@ -691,6 +889,11 @@ int xwvsnpf(char * buf, xwsz_t size, const char * fmt, va_list args)
                                 *str = '%';
                         }
                         ++str;
+                        break;
+
+                case XWVSNPF_FT_FLOAT:
+                case XWVSNPF_FT_FLOAT_SCI:
+                        str = xwvsnpf_format_float(str, end, va_arg(args, double), spec);
                         break;
 
                 default:
