@@ -82,9 +82,9 @@ extern xwu8_t dtcm_data_vma_end[];
 extern xwu8_t dtcm_bss_vma_base[];
 extern xwu8_t dtcm_bss_vma_end[];
 
-extern xwu8_t lpmr_data_lma_base[];
-extern xwu8_t lpmr_data_vma_base[];
-extern xwu8_t lpmr_data_vma_end[];
+extern xwu8_t lpm_data_lma_base[];
+extern xwu8_t lpm_data_vma_base[];
+extern xwu8_t lpm_data_vma_end[];
 
 extern xwu8_t xwos_data_lma_base[];
 extern xwu8_t xwos_data_vma_base[];
@@ -123,7 +123,7 @@ extern xwu8_t shareable_bss_vma_end[];
  * @brief 重定向低功耗保持数据到内存
  */
 __xwbsp_init_code
-void soc_relocate_lpmr_data(void)
+void soc_relocate_lpm_data(void)
 {
         xwid_t cpuid;
         xwsz_t cnt;
@@ -133,11 +133,11 @@ void soc_relocate_lpmr_data(void)
 
         cpuid = xwospl_skd_get_cpuid_lc();
         if (0U == cpuid) {
-                src = lpmr_data_lma_base;
-                dst = lpmr_data_vma_base;
+                src = lpm_data_lma_base;
+                dst = lpm_data_vma_base;
                 if (dst != src) {
-                        cnt = ((xwsz_t)lpmr_data_vma_end -
-                               (xwsz_t)lpmr_data_vma_base);
+                        cnt = ((xwsz_t)lpm_data_vma_end -
+                               (xwsz_t)lpm_data_vma_base);
                         for (i = 0; i < cnt; i++) {
                                 dst[i] = src[i];
                         }

@@ -160,13 +160,13 @@ SECTIONS {
         } > dtcm_data_mr
         dtcm_bss_vma_base = ADDR(.dtcm.bss);
 
-        .lpmr.data : ALIGN(32) {
-                *(.lpmr.data)
+        .lpm.data : ALIGN(32) {
+                *(.lpm.data)
                 . = ALIGN(32);
-                lpmr_data_vma_end = .;
-        } > lpmr_mr AT> code_mr
-        lpmr_data_vma_base = ADDR(.lpmr.data);
-        lpmr_data_lma_base = LOADADDR(.lpmr.data);
+                lpm_data_vma_end = .;
+        } > lpm_mr AT> code_mr
+        lpm_data_vma_base = ADDR(.lpm.data);
+        lpm_data_lma_base = LOADADDR(.lpm.data);
 
         .xwos.data : ALIGN(32) {
                 *(.xwos.data)
