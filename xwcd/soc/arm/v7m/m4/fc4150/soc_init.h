@@ -25,6 +25,7 @@
 
 void soc_isr_reset(void);
 void soc_relocate_ivt(void);
+void soc_relocate_lpm_data(void);
 void soc_relocate_data(void);
 void soc_disable_wdg(void);
 

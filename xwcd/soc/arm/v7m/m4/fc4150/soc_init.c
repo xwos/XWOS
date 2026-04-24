@@ -74,6 +74,10 @@ extern xwu8_t ramcode_lma_base[];
 extern xwu8_t ramcode_vma_base[];
 extern xwu8_t ramcode_vma_end[];
 
+extern xwu8_t lpm_data_lma_base[];
+extern xwu8_t lpm_data_vma_base[];
+extern xwu8_t lpm_data_vma_end[];
+
 extern xwu8_t data_lma_base[];
 extern xwu8_t data_vma_base[];
 extern xwu8_t data_vma_end[];
@@ -87,6 +91,32 @@ extern xwu8_t tdata_vma_end[];
 
 extern xwu8_t tbss_vma_base[];
 extern xwu8_t tbss_vma_end[];
+
+/**
+ * @brief 重定向低功耗保持数据到内存
+ */
+__xwbsp_init_code
+void soc_relocate_lpm_data(void)
+{
+        xwid_t cpuid;
+        xwsz_t cnt;
+        xwsz_t i;
+        xwu8_t * src;
+        xwu8_t * dst;
+
+        cpuid = xwospl_skd_get_cpuid_lc();
+        if (0U == cpuid) {
+                src = lpm_data_lma_base;
+                dst = lpm_data_vma_base;
+                if (dst != src) {
+                        cnt = ((xwsz_t)lpm_data_vma_end -
+                               (xwsz_t)lpm_data_vma_base);
+                        for (i = 0; i < cnt; i++) {
+                                dst[i] = src[i];
+                        }
+                }
+        }
+}
 
 /**
  * @brief 重定向数据区到内存

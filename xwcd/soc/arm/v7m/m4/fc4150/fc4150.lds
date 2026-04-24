@@ -50,9 +50,9 @@ SECTIONS {
                 KEEP (*(.fini))
                 *(.text* .gnu.linkonce.t.*)
                 *(.rodata* .gnu.linkonce.r.*)
-                *(.mcal_text*)
-                *(.mcal_rodata*)
-                *(.mcal_const_cfg*)
+                *(.*mcal_text*)
+                *(.*mcal_rodata*)
+                *(.*mcal_const_cfg*)
 
                 *(.gnu.warning)
                 *(.glue_7) /* glue arm to thumb code */
@@ -63,7 +63,7 @@ SECTIONS {
 
         .ramcode : ALIGN(8) {
                 *(.ramcode*)
-                *(.mcal_ramcode)
+                *(.*mcal_ramcode)
                 *(.bsp_ramcode)
                 ramcode_vma_end = .;
         } > ramcode_mr AT> code_mr
@@ -144,12 +144,20 @@ SECTIONS {
         /* -------- Global Offset Table -------- */
 
         /* ++++++++ Data ++++++++ */
+        .lpm.data : ALIGN(32) {
+                *(.lpm.data)
+                . = ALIGN(32);
+                lpm_data_vma_end = .;
+        } > lpm_mr AT> code_mr
+        lpm_data_vma_base = ADDR(.lpm.data);
+        lpm_data_lma_base = LOADADDR(.lpm.data);
+
         .data : ALIGN(32) {
                 *(.xwos.data)
                 *(.data* .gnu.linkonce.d.*)
-                *(.mcal_data*)
-                *(.mcal_nocacheable_data*)
-                *(.mcal_shareable_data*)
+                *(.*mcal_data*)
+                *(.*mcal_nocacheable_data*)
+                *(.*mcal_shareable_data*)
                 . = ALIGN(32);
                 data_vma_end = .;
         } > data_mr AT> code_mr
@@ -159,9 +167,9 @@ SECTIONS {
         .bss (NOLOAD) : ALIGN(4) {
                 *(.dynbss)
                 *(.bss* .gnu.linkonce.b.*)
-                *(.mcal_bss*)
-                *(.mcal_nocacheable_bss*)
-                *(.mcal_shareable_bss*)
+                *(.*mcal_bss*)
+                *(.*mcal_nocacheable_bss*)
+                *(.*mcal_shareable_bss*)
                 *(COMMON)
                 . = ALIGN(32);
                 bss_vma_end = .;
@@ -172,7 +180,7 @@ SECTIONS {
                 *(.tdata* .gnu.linkonce.td.*)
                 . = ALIGN(32);
                 tdata_vma_end = .;
-	} > data_mr AT> code_mr
+        } > data_mr AT> code_mr
         tdata_vma_base = ADDR(.tdata);
         tdata_lma_base = LOADADDR(.tdata);
 
