@@ -7,7 +7,6 @@ use core::cell::UnsafeCell;
 use core::ops::*;
 
 use crate::types::*;
-use crate::bit;
 
 extern "C" {
     fn xwds_i2cm_xfer(i2cm: *mut XwdsI2cm,

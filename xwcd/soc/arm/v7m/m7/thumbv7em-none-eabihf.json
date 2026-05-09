@@ -7,9 +7,9 @@
   "emit-debug-gdb-scripts": false,
   "features": "+vfp4d16sp",
   "frame-pointer": "always",
-  "is-builtin": false,
   "linker": "rust-lld",
   "linker-flavor": "gnu-lld",
+  "llvm-floatabi": "hard",
   "llvm-target": "thumbv7em-none-eabihf",
   "max-atomic-width": 32,
   "metadata": {
@@ -20,7 +20,7 @@
   },
   "panic-strategy": "abort",
   "relocation-model": "static",
-  "target-pointer-width": "32",
+  "target-pointer-width": 32,
   "os": "xwos",
   "env": "newlib",
   "target-family": [

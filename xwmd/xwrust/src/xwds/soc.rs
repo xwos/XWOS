@@ -9,7 +9,6 @@ use core::ops::*;
 use core::mem;
 
 use crate::types::*;
-use crate::bit;
 
 
 extern "C" {

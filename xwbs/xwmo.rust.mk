@@ -55,7 +55,8 @@ $(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR):
 	@[ ! -d $@ ] && mkdir -p $@ || true
 
 $(XWMO_RUSTLIB):
-	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) build --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
+	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) build -Zjson-target-spec --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
+#	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) fix --lib -p xwrust --allow-dirty -Zjson-target-spec --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
 
 doc:
 	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) doc --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
