@@ -145,18 +145,51 @@ SECTIONS {
 
         /* ++++++++ Data ++++++++ */
         OVERLAY : {
-                .cpu0.data { *(.cpu0.data*) }
-                .cpu1.data { *(.cpu1.data*) }
-                .cpu2.data { *(.cpu2.data*) }
-                .cpu3.data { *(.cpu3.data*) }
-        } > percpu_data_mr
+                .cpu0.data {
+                        *(.cpu0.data*)
+                        cpu0_data_vma_end = .;
+                }
+                .cpu1.data {
+                        *(.cpu1.data*)
+                        cpu1_data_vma_end = .;
+                }
+                .cpu2.data {
+                        *(.cpu2.data*)
+                        cpu2_data_vma_end = .;
+                }
+                .cpu3.data {
+                        *(.cpu3.data*)
+                        cpu3_data_vma_end = .;
+                }
+        } > dtcm_private_data_mr AT> code_mr
+        cpu0_data_vma_base = ADDR(.cpu0.data);
+        cpu0_data_lma_base = LOADADDR(.cpu0.data);
+        cpu1_data_vma_base = ADDR(.cpu1.data);
+        cpu1_data_lma_base = LOADADDR(.cpu1.data);
+        cpu2_data_vma_base = ADDR(.cpu2.data);
+        cpu2_data_lma_base = LOADADDR(.cpu2.data);
+        cpu3_data_vma_base = ADDR(.cpu3.data);
+        cpu3_data_lma_base = LOADADDR(.cpu3.data);
+
+        .cpu0.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+                *(.cpu0.thd.stack*)
+        }
+        .cpu1.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+                *(.cpu1.thd.stack*)
+        }
+        .cpu2.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+                *(.cpu2.thd.stack*)
+        }
+        .cpu3.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+                *(.cpu3.thd.stack*)
+        }
 
         .dtcm.data : ALIGN(32) {
                 *(.dtcm.data*)
                 *(.seperated_data*)
                 . = ALIGN(32);
                 dtcm_data_vma_end = .;
-        } > dtcm_data_mr AT> code_mr
+        } > dtcm_common_data_mr AT> code_mr
         dtcm_data_vma_base = ADDR(.dtcm.data);
         dtcm_data_lma_base = LOADADDR(.dtcm.data);
 
@@ -164,7 +197,7 @@ SECTIONS {
                 *(.seperated_bss*)
                 . = ALIGN(32);
                 dtcm_bss_vma_end = .;
-        } > dtcm_data_mr
+        } > dtcm_common_data_mr
         dtcm_bss_vma_base = ADDR(.dtcm.bss);
 
         .lpm.data : ALIGN(32) {

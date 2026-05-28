@@ -123,6 +123,22 @@ extern xwu8_t itcm_code_lma_base[];
 extern xwu8_t itcm_code_vma_base[];
 extern xwu8_t itcm_code_vma_end[];
 
+extern xwu8_t cpu0_data_lma_base[];
+extern xwu8_t cpu0_data_vma_base[];
+extern xwu8_t cpu0_data_vma_end[];
+
+extern xwu8_t cpu1_data_lma_base[];
+extern xwu8_t cpu1_data_vma_base[];
+extern xwu8_t cpu1_data_vma_end[];
+
+extern xwu8_t cpu2_data_lma_base[];
+extern xwu8_t cpu2_data_vma_base[];
+extern xwu8_t cpu2_data_vma_end[];
+
+extern xwu8_t cpu3_data_lma_base[];
+extern xwu8_t cpu3_data_vma_base[];
+extern xwu8_t cpu3_data_vma_end[];
+
 extern xwu8_t dtcm_data_lma_base[];
 extern xwu8_t dtcm_data_vma_base[];
 extern xwu8_t dtcm_data_vma_end[];
@@ -231,7 +247,16 @@ void soc_relocate_data(void)
         }
 
         cpuid = xwospl_skd_get_cpuid_lc();
-        if (0U == cpuid) {
+        switch (cpuid) {
+        case 0U:
+                src = cpu0_data_lma_base;
+                dst = cpu0_data_vma_base;
+                if (dst != src) {
+                        cnt = (xwsz_t)cpu0_data_vma_end - (xwsz_t)cpu0_data_vma_base;
+                        for (i = 0; i < cnt; i++) {
+                                dst[i] = src[i];
+                        }
+                }
                 src = xwos_data_lma_base;
                 dst = xwos_data_vma_base;
                 if (dst != src) {
@@ -240,7 +265,6 @@ void soc_relocate_data(void)
                                 dst[i] = src[i];
                         }
                 }
-
                 src = data_lma_base;
                 dst = data_vma_base;
                 if (dst != src) {
@@ -251,14 +275,12 @@ void soc_relocate_data(void)
                                 src++;
                         }
                 }
-
                 dst = bss_vma_base;
                 cnt = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
                 for (i = 0; i < cnt; i++) {
                         *dst = 0;
                         dst++;
                 }
-
                 src = tdata_lma_base;
                 dst = tdata_vma_base;
                 if (dst != src) {
@@ -269,14 +291,12 @@ void soc_relocate_data(void)
                                 src++;
                         }
                 }
-
                 dst = tbss_vma_base;
                 cnt = (xwsz_t)tbss_vma_end - (xwsz_t)tbss_vma_base;
                 for (i = 0; i < cnt; i++) {
                         *dst = 0;
                         dst++;
                 }
-
                 src = noncacheable_data_lma_base;
                 dst = noncacheable_data_vma_base;
                 if (dst != src) {
@@ -286,7 +306,6 @@ void soc_relocate_data(void)
                                 dst[i] = src[i];
                         }
                 }
-
                 dst = noncacheable_bss_vma_base;
                 cnt = ((xwsz_t)noncacheable_bss_vma_end -
                        (xwsz_t)noncacheable_bss_vma_base);
@@ -294,7 +313,6 @@ void soc_relocate_data(void)
                         *dst = 0;
                         dst++;
                 }
-
                 src = shareable_data_lma_base;
                 dst = shareable_data_vma_base;
                 if (dst != src) {
@@ -304,13 +322,51 @@ void soc_relocate_data(void)
                                 dst[i] = src[i];
                         }
                 }
-
                 dst = shareable_bss_vma_base;
                 cnt = (xwsz_t)shareable_bss_vma_end - (xwsz_t)shareable_bss_vma_base;
                 for (i = 0; i < cnt; i++) {
                         *dst = 0;
                         dst++;
                 }
+                break;
+#if CPUCFG_CPU_NUM >= 2
+        case 1U:
+                src = cpu1_data_lma_base;
+                dst = cpu1_data_vma_base;
+                if (dst != src) {
+                        cnt = (xwsz_t)cpu1_data_vma_end - (xwsz_t)cpu1_data_vma_base;
+                        for (i = 0; i < cnt; i++) {
+                                dst[i] = src[i];
+                        }
+                }
+                break;
+#endif
+#if CPUCFG_CPU_NUM >= 3
+        case 2U:
+                src = cpu2_data_lma_base;
+                dst = cpu2_data_vma_base;
+                if (dst != src) {
+                        cnt = (xwsz_t)cpu2_data_vma_end - (xwsz_t)cpu2_data_vma_base;
+                        for (i = 0; i < cnt; i++) {
+                                dst[i] = src[i];
+                        }
+                }
+                break;
+#endif
+#if CPUCFG_CPU_NUM >= 4
+        case 3U:
+                src = cpu3_data_lma_base;
+                dst = cpu3_data_vma_base;
+                if (dst != src) {
+                        cnt = (xwsz_t)cpu3_data_vma_end - (xwsz_t)cpu3_data_vma_base;
+                        for (i = 0; i < cnt; i++) {
+                                dst[i] = src[i];
+                        }
+                }
+                break;
+#endif
+        default:
+                break;
         }
 }
 
