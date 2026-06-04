@@ -124,7 +124,7 @@ class Bmp
     {
         xwbmpop_c0all(mData, TNum);
     }
-    Bmp(xwu8_t x[], xwsz_t sz)
+    Bmp(const xwu8_t x[], xwsz_t sz)
     {
         xwbmpop_c0all(mData, TNum);
         if (sz < sizeof(mData)) {
