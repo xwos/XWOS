@@ -33,6 +33,7 @@ DThd::DThd(const char * name, xwsz_t stack_size, xwsz_t stack_guard_size,
 
 DThd::~DThd()
 {
+    xwos_thd_detach(mThdDesc);
 }
 
 xwer_t DThd::thdMainFunction()

@@ -54,7 +54,7 @@ class DThd
          xwsz_t stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
          xwpr_t priority = XWOS_SKD_PRIORITY_RT_MIN, bool detached = false,
          bool privileged = true);
-    ~DThd(); /**< 动态线程析构函数 */
+    virtual ~DThd(); /**< 动态线程析构函数 */
     xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态线程构造的结果 */
 
     /**

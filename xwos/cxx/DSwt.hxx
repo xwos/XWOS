@@ -46,7 +46,7 @@ class DSwt
      * @param[in] flag: 软件定时器的标志，默认值：定时器为单次触发的
      */
     DSwt(xwsq_t flag = XWOS_SWT_FLAG_NULL);
-    ~DSwt(); /**< 动态软件定时器析构函数 */
+    virtual ~DSwt(); /**< 动态软件定时器析构函数 */
     xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态软件定时器构造的结果 */
     /**
      * @brief 启动软件定时器
