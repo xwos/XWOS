@@ -146,6 +146,7 @@ SECTIONS {
         /* ++++++++ Data ++++++++ */
         .dtcm.data : ALIGN(32) {
                 *(.dtcm.data*)
+                *(.percpu.data*)
                 *(.seperated_data*)
                 . = ALIGN(32);
                 dtcm_data_vma_end = .;

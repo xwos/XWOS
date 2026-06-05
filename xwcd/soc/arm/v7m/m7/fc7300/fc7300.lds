@@ -144,6 +144,19 @@ SECTIONS {
         /* -------- Global Offset Table -------- */
 
         /* ++++++++ Data ++++++++ */
+        .cpu0.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+                *(.cpu0.thd.stack*)
+        } > dtcm_thd_stack_mr
+        .cpu1.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+                *(.cpu1.thd.stack*)
+        } > dtcm_thd_stack_mr
+        .cpu2.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+                *(.cpu2.thd.stack*)
+        } > dtcm_thd_stack_mr
+        .cpu3.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+                *(.cpu3.thd.stack*)
+        } > dtcm_thd_stack_mr
+
         OVERLAY : {
                 .cpu0.data {
                         *(.cpu0.data*)
@@ -171,21 +184,9 @@ SECTIONS {
         cpu3_data_vma_base = ADDR(.cpu3.data);
         cpu3_data_lma_base = LOADADDR(.cpu3.data);
 
-        .cpu0.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
-                *(.cpu0.thd.stack*)
-        }
-        .cpu1.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
-                *(.cpu1.thd.stack*)
-        }
-        .cpu2.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
-                *(.cpu2.thd.stack*)
-        }
-        .cpu3.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
-                *(.cpu3.thd.stack*)
-        }
-
         .dtcm.data : ALIGN(32) {
                 *(.dtcm.data*)
+                *(.percpu.data*)
                 *(.seperated_data*)
                 . = ALIGN(32);
                 dtcm_data_vma_end = .;
