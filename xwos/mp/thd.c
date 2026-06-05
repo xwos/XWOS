@@ -1493,7 +1493,7 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         }
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
-        rc = xwmp_skd_wakelock_lock(xwskd);
+        rc = xwmp_skd_wakelock_lock_lc(xwskd);
         if (rc < 0) {
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，返回-EINTR。*/
@@ -1510,7 +1510,7 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
                            (xwsq_t)XWMP_SKDOBJ_ST_EXITING) & cthd->state)) {
                 xwmp_splk_unlock(&cthd->stlock);
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                xwmp_skd_wakelock_unlock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                 rc = -EINTR;
                 goto err_intr;
         }
@@ -1522,7 +1522,7 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         // cppcheck-suppress [misra-c2012-17.7]
         xwmp_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
         xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-        xwmp_skd_wakelock_unlock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 
@@ -1581,7 +1581,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         to = xwtm_add_safely(*from, dur);
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
-        rc = xwmp_skd_wakelock_lock(xwskd);
+        rc = xwmp_skd_wakelock_lock_lc(xwskd);
         if (rc < 0) {
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，返回-EINTR。*/
@@ -1598,7 +1598,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
                            (xwsq_t)XWMP_SKDOBJ_ST_EXITING) & cthd->state)) {
                 xwmp_splk_unlock(&cthd->stlock);
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                xwmp_skd_wakelock_unlock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+                xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                 rc = -EINTR;
                 goto err_intr;
         }
@@ -1610,7 +1610,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         // cppcheck-suppress [misra-c2012-17.7]
         xwmp_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
         xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-        xwmp_skd_wakelock_unlock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 

@@ -735,9 +735,9 @@ xwer_t xwmp_plsem_block_to(struct xwmp_sem * sem,
 
         /* 调度 */
         xwospl_cpuirq_enable_lc();
-        xwmp_skd_wakelock_unlock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_wakelock_lock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_wakelock_lock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
@@ -842,7 +842,7 @@ xwer_t xwmp_plsem_acquire_or_block_to(struct xwmp_sem * sem, struct xwmp_skd * x
 
         xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
         if (sem->count <= (xwssq_t)0) {
-                rc = xwmp_skd_wakelock_lock(xwskd);
+                rc = xwmp_skd_wakelock_lock_lc(xwskd);
                 if (rc < 0) {
                         /* 当前调度器正准备休眠，线程需被冻结，返回 `-EINTR` 。*/
                         xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
@@ -850,7 +850,7 @@ xwer_t xwmp_plsem_acquire_or_block_to(struct xwmp_sem * sem, struct xwmp_skd * x
                 } else {
                         rc = xwmp_plsem_block_to(sem, xwskd, thd, to, cpuirq);
                         // cppcheck-suppress [misra-c2012-17.7]
-                        xwmp_skd_wakelock_unlock(xwskd);
+                        xwmp_skd_wakelock_unlock_lc(xwskd);
                 }
         } else {
                 sem->count--;
@@ -1309,9 +1309,9 @@ xwer_t xwmp_rtsem_block_to(struct xwmp_sem * sem,
 
         /* 调度 */
         xwospl_cpuirq_enable_lc();
-        xwmp_skd_wakelock_unlock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_wakelock_lock(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_wakelock_lock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
@@ -1416,7 +1416,7 @@ xwer_t xwmp_rtsem_acquire_or_block_to(struct xwmp_sem * sem, struct xwmp_skd * x
 
         xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
         if (sem->count <= (xwssq_t)0) {
-                rc = xwmp_skd_wakelock_lock(xwskd);
+                rc = xwmp_skd_wakelock_lock_lc(xwskd);
                 if (rc < 0) {
                         /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                         xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
@@ -1424,7 +1424,7 @@ xwer_t xwmp_rtsem_acquire_or_block_to(struct xwmp_sem * sem, struct xwmp_skd * x
                 } else {
                         rc = xwmp_rtsem_block_to(sem, xwskd, thd, to, cpuirq);
                         // cppcheck-suppress [misra-c2012-17.7]
-                        xwmp_skd_wakelock_unlock(xwskd);
+                        xwmp_skd_wakelock_unlock_lc(xwskd);
                 }
         } else {
                 sem->count--;

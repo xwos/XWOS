@@ -53,7 +53,7 @@ void xwmp_pm_suspend(void)
                 xwskd = xwmp_skd_get_by_cpuid(cpuid);
                 if (local == xwskd) {
                         // cppcheck-suppress [misra-c2012-17.7]
-                        xwmp_skd_dec_wklkcnt(xwskd);
+                        xwmp_skd_dec_wklkcnt_lc(xwskd);
                 } else if (NULL != xwskd) {
                         xwospl_skd_suspend(xwskd);
                 } else {

@@ -1257,7 +1257,7 @@ void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
  * @retval <0: 当前调度器正在进入低功耗模式
  */
 __xwmp_code
-xwer_t xwmp_skd_inc_wklkcnt(struct xwmp_skd * xwskd)
+xwer_t xwmp_skd_inc_wklkcnt_lc(struct xwmp_skd * xwskd)
 {
         xwer_t rc;
 
@@ -1276,11 +1276,13 @@ xwer_t xwmp_skd_inc_wklkcnt(struct xwmp_skd * xwskd)
  * @retval <0: 当前调度器正在进入低功耗
  */
 __xwmp_code
-xwer_t xwmp_skd_dec_wklkcnt(struct xwmp_skd * xwskd)
+xwer_t xwmp_skd_dec_wklkcnt_lc(struct xwmp_skd * xwskd)
 {
         xwer_t rc;
         xwsq_t nv;
+        xwreg_t cpuirq;
 
+        xwmp_cpuirq_save_lc(&cpuirq);
         rc = xwaop_tge_then_sub(xwsq_t, &xwskd->pm.wklkcnt,
                                 (xwsq_t)XWMP_SKD_WKLKCNT_UNLOCKED,
                                 (xwsq_t)1,
@@ -1288,6 +1290,7 @@ xwer_t xwmp_skd_dec_wklkcnt(struct xwmp_skd * xwskd)
         if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_FREEZING == nv)) {
                 rc = xwmp_skd_suspend_lc(xwskd);
         }
+        xwmp_cpuirq_restore_lc(cpuirq);
         return rc;
 }
 
@@ -1295,22 +1298,26 @@ xwer_t xwmp_skd_dec_wklkcnt(struct xwmp_skd * xwskd)
  * @brief 禁止调度器进入暂停模式
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
+ * @note
+ * + 此函数只能在CPU“本地”执行
  */
 __xwmp_code
-xwer_t xwmp_skd_wakelock_lock(struct xwmp_skd * xwskd)
+xwer_t xwmp_skd_wakelock_lock_lc(struct xwmp_skd * xwskd)
 {
-        return xwmp_skd_inc_wklkcnt(xwskd);
+        return xwmp_skd_inc_wklkcnt_lc(xwskd);
 }
 
 /**
  * @brief 允许调度器进入暂停模式
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
+ * @note
+ * + 此函数只能在CPU“本地”执行
  */
 __xwmp_code
-xwer_t xwmp_skd_wakelock_unlock(struct xwmp_skd * xwskd)
+xwer_t xwmp_skd_wakelock_unlock_lc(struct xwmp_skd * xwskd)
 {
-        return xwmp_skd_dec_wklkcnt(xwskd);
+        return xwmp_skd_dec_wklkcnt_lc(xwskd);
 }
 
 /**
@@ -1348,7 +1355,9 @@ xwer_t xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
 {
         xwer_t rc;
         xwsq_t nv;
+        xwreg_t cpuirq;
 
+        xwmp_cpuirq_save_lc(&cpuirq);
         rc = xwaop_teq_then_sub(xwsq_t, &xwskd->pm.wklkcnt,
                                 (xwsq_t)XWMP_SKD_WKLKCNT_FREEZING,
                                 (xwsq_t)1,
@@ -1361,6 +1370,7 @@ xwer_t xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
                 rc = -EINTR;
         }
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_cpuirq_restore_lc(cpuirq);
         return rc;
 }
 
@@ -1371,9 +1381,9 @@ xwer_t xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
 static __xwmp_code
 void xwmp_skd_notify_allfrz_idlec(struct xwmp_skd * xwskd)
 {
-        xwreg_t cpuirq;
-        xwsq_t nv;
         xwer_t rc;
+        xwsq_t nv;
+        xwreg_t cpuirq;
 
         xwmp_cpuirq_save_lc(&cpuirq);
         rc = xwaop_teq_then_sub(xwsq_t, &xwskd->pm.wklkcnt,
