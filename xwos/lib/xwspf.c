@@ -896,6 +896,7 @@ qualifier:
         case 'd':
         case 'i':
                 spec->flags |= XWVSNPF_F_SIGN;
+                break;
         case 'u':
                 break;
 

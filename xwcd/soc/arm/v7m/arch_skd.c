@@ -38,7 +38,7 @@
 #define ARCH_NVFR_SIZE                                  0x40U
 
 static __xwbsp_code
-void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
+void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk, xwreg_t sp);
 
 /**
  * @brief 初始化切换上下文中断
@@ -368,11 +368,11 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
         armv7m_get_psp(&psp);
 #  if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         if ((psp - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) < ((xwptr_t)stkbtn + grdsz)) {
-                arch_skd_report_stk_overflow(pstk);
+                arch_skd_report_stk_overflow(pstk, psp);
         }
 #  else
         if ((psp - ARCH_NVGR_SIZE) < (((xwptr_t)stkbtn) + grdsz)) {
-                arch_skd_report_stk_overflow(pstk);
+                arch_skd_report_stk_overflow(pstk, psp);
         }
 #  endif
 #else
@@ -406,28 +406,38 @@ struct xwospl_skd * arch_skd_chk_stk(void)
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         if ((stk.value - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
             ((xwptr_t)stkbtn + grdsz)) {
-                arch_skd_report_stk_overflow(cstk);
+                arch_skd_report_stk_overflow(cstk, stk.value);
         }
 #else
         if ((stk.value - ARCH_NVGR_SIZE) < ((xwptr_t)stkbtn + grdsz)) {
-                arch_skd_report_stk_overflow(cstk);
+                arch_skd_report_stk_overflow(cstk, stk.value);
         }
 #endif
         for (i = 0; i < (grdsz / sizeof(xwstk_t)); i++) {
                 if (0xFFFFFFFFU != stkbtn[i]) {
-                        arch_skd_report_stk_overflow(cstk);
+                        arch_skd_report_stk_overflow(cstk, stk.value);
                 }
         }
         return xwskd;
 }
+
+#if defined(BRDCFG_ESR_STACK_OVERFLOW) && (1 == BRDCFG_ESR_STACK_OVERFLOW)
+extern void board_esr_stk_overflow(struct xwospl_skdobj_stack * stk, xwreg_t sp);
+#endif
 
 /**
  * @brief 报告栈溢出
  * @param[in] stk: 溢出的栈
  */
 static __xwbsp_code
-void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk)
+void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk, xwreg_t sp)
 {
         XWOS_UNUSED(stk);
+        XWOS_UNUSED(sp);
+
+#if defined(BRDCFG_ESR_STACK_OVERFLOW) && (1 == BRDCFG_ESR_STACK_OVERFLOW)
+        board_esr_stk_overflow(stk, sp);
+#else
         XWOS_BUG();
+#endif
 }
