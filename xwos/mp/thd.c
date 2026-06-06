@@ -130,9 +130,6 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
                          xwobj_gc_f gcfunc);
 
 static __xwmp_code
-void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg);
-
-static __xwmp_code
 void xwmp_thd_ttn_callback(struct xwmp_ttn * ttn);
 
 static __xwmp_code
@@ -567,7 +564,7 @@ err_xwobj_activate:
  * + 上下文：中断、中断底半部、线程
  * + 重入性：不可重入，除非线程主函数已经退出，线程回到 `STANDBY` 状态
  */
-static __xwmp_code
+__xwmp_code
 void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg)
 {
         struct xwmp_skd * xwskd;

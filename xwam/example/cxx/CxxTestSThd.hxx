@@ -24,7 +24,8 @@
 #include <xwos/standard.hxx>
 #include <xwos/cxx/SThd.hxx>
 
-class CxxTestSThd : public xwos::SThd
+class CxxTestSThd
+    : public xwos::SThd<0>
 {
   public:
     CxxTestSThd();

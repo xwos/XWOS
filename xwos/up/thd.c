@@ -140,9 +140,6 @@ void xwup_thd_ttn_callback(struct xwup_ttn * ttn);
 static __xwup_code
 void xwup_thd_wqn_callback(struct xwup_wqn * wqn);
 
-static __xwup_code
-void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg);
-
 #if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
 /**
  * @brief XWUP INIT CODE：初始化 `struct xwup_thd` 的对象缓存
@@ -532,7 +529,6 @@ err_obj_activate:
  * @param[in] thdfunc: 线程主函数
  * @param[in] arg: 线程主函数的参数
  */
-static __xwup_code
 void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg)
 {
         struct xwup_skd * xwskd;

@@ -54,6 +54,10 @@
  *
  * 用户可以在程序运行时通过 `xwos_thd_create()` 动态创建线程。
  *
+ * ## 加载线程
+ *
+ * 若初始化/创建线程时未指定线程函数，就需要通过 `xwos_thd_launch()` 来加载线程，
+ * 线程会在调用 `xwos_thd_launch()` 的CPU上运行。
  *
  * ## 中断线程的阻塞态和睡眠态
  *
@@ -266,9 +270,10 @@ void xwos_thd_attr_init(struct xwos_thd_attr * attr)
  * @note
  * + 上下文：任意
  * @details
- * 此CAPI用于不使用动态内存的方式创建线程。所有需要的内存（线程对象结构体，栈内存数组）
+ * 此CAPI用于不使用动态内存的方式创建线程。所需内存（线程对象结构体，栈内存数组）
  * 都需要在编译期定义，并且用户需要保证它们的生命周期在线程运行期间始终有效，
  * 通常定义为全局变量。
+ *
  *
  * 这种方式创建线程，可在编译期计算出准确的内存使用量，
  * 避免使用动态内存时返回 `-ENOMEM` 错误，
@@ -280,10 +285,12 @@ void xwos_thd_attr_init(struct xwos_thd_attr * attr)
  *
  *
  * 栈内存的首地址与大小，必须要满足CPU的ABI规则，例如ARM，就需要8字节对齐，
- * 且大小是8的倍数。因此在定义栈数组时需要使用 `__xwcc_aligned(8)` 来修饰。
+ * 且大小是8的倍数。如果CPU存在DCache，最好让线程栈对齐到缓存线，可获取最高性能。
+ * 因此需要使用 `__xwos_thd_stack` 修饰线程对象结构体和栈内存数组。
  *
- * 如果CPU存在DCache，最好让数据对齐到缓存线，可获取最高性能，
- * 此时需要使用 `__xwcc_alignl1cache` 修饰线程对象结构体和栈内存数组。
+ *
+ * 参数 `thdfunc` 可以为 `NULL` ，此时只创建线程对象，不开始运行。
+ * 直到CPU调用 `xwos_thd_launch()` 后，线程才开始在此CPU上运行。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_init(struct xwos_thd * thd, xwos_thd_d * thdd,
@@ -344,14 +351,18 @@ xwer_t xwos_thd_put(xwos_thd_d thdd)
  * @note
  * + 上下文：任意
  * @details
- * + 参数 `attr` 类似于 `pthread_attr_t` ，可为 `NULL` ，表示采用默认属性创建线程。
- * + 若通过 `attr->stack` 指定内存作为栈，栈内存的首地址与大小，必须要满足CPU的ABI规则，
- *   例如ARM，就需要8字节对齐，且大小是8的倍数。
- *   因此在定义栈数组时需要使用 `__xwcc_aligned(8)` 来修饰。
- *   如果CPU存在DCache，最好让线程栈对齐到缓存线，可获取最高性能，
- *   此时需要使用 `__xwcc_alignl1cache` 修饰栈内存数组。
- * + 如果栈内存也动态申请，地址对齐问题由操作系统内核处理。
+ * 参数 `attr` 类似于 `pthread_attr_t` ，可为 `NULL` ，表示采用默认属性创建线程。
  *
+ *
+ * 若通过 `attr->stack` 指定内存作为栈，栈内存的首地址与大小，必须要满足CPU的ABI规则，
+ * 例如ARM，就需要8字节对齐，且大小是8的倍数。
+ * 如果CPU存在DCache，最好让线程栈对齐到缓存线，可获取最高性能。
+ * 因此需要使用 `__xwos_thd_stack` 修饰线程对象结构体和栈内存数组。
+ * 如果栈内存也动态申请，地址对齐问题由操作系统内核处理。
+ *
+ *
+ * 参数 `thdfunc` 可以为 `NULL` ，此时只创建线程对象，不开始运行。
+ * 直到CPU调用 `xwos_thd_launch()` 后，线程才开始在此CPU上运行。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_create(xwos_thd_d * thdd,
@@ -395,6 +406,28 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
 {
         return xwosdl_thd_release(&thdd.thd->osthd, thdd.tik);
 }
+
+/**
+ * @brief XWOS API：加载线程
+ * @param[in] thdd: 线程对象描述符
+ * @param[in] thdfunc: 线程函数的指针
+ * @param[in] arg: 线程函数的参数
+ * @return 错误码
+ * @note
+ * + 上下文：任意
+ * @details
+ * 线程会在调用此CAPI的CPU上，以 `thdfunc` 作为线程函数，`arg` 作为线程函数参数，
+ * 开始运行。
+ *
+ */
+static __xwos_inline_api
+xwer_t xwos_thd_launch(xwos_thd_d thdd, xwos_thd_f thdfunc, void * arg)
+{
+        return xwosdl_thd_launch(&thdd.thd->osthd, thdd.tik,
+                                 // cppcheck-suppress [misra-c2012-11.1]
+                                 (xwosdl_thd_f)thdfunc, arg);
+}
+
 
 /**
  * @brief XWOS API：获取线程的属性

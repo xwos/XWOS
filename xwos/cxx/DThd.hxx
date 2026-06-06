@@ -14,6 +14,7 @@
 #define __xwos_cxx_DThd_hxx__
 
 #include <xwos/osal/thd.hxx>
+#include <xwos/cxx/Cpu.hxx>
 
 namespace xwos {
 
@@ -33,7 +34,9 @@ namespace xwos {
 
 /**
  * @brief 动态线程
+ * @param[in] TCpu: 目标CPU
  */
+template<xwid_t TCpu = 0>
 class DThd
 {
   private:
@@ -53,10 +56,51 @@ class DThd
     DThd(const char * name, xwsz_t stack_size,
          xwsz_t stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
          xwpr_t priority = XWOS_SKD_PRIORITY_RT_MIN, bool detached = false,
-         bool privileged = true);
-    virtual ~DThd(); /**< 动态线程析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态线程构造的结果 */
+         bool privileged = true)
+        : mThdDesc{ nullptr, 0 }
+    {
+        struct xwos_thd_attr attr({
+            .name = name,
+            .stack = (xwstk_t *)NULL,
+            .stack_size = stack_size,
+            .stack_guard_size = stack_guard_size,
+            .priority = priority,
+            .detached = detached,
+            .privileged = privileged,
+            });
+        mCtorRc = xwos_thd_create(&mThdDesc, &attr, nullptr, nullptr);
+    }
+    /**
+     * @brief 动态线程析构函数
+     */
+    virtual ~DThd() { xwos_thd_detach(mThdDesc); }
+    /**
+     * @brief 加载线程
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EHOSTUNREACH: CPU不匹配
+     * @note
+     * + 上下文：任意
+     * @details
+     * 线程会在调用此C++API的CPU上开始运行。
+     */
+    void launch()
+    {
+        xwer_t rc;
 
+        if (TCpu == Cpu::getLocalCpuId()) {
+            rc = xwos_thd_launch(mThdDesc, (xwos_thd_f)sThdMainFunction, this);
+        } else {
+            rc = -EHOSTUNREACH;
+        }
+        return rc;
+    }
+    /**
+     * @brief 获取动态线程构造的结果
+     * @note
+     * 动态对象的创建可能会因为内存不足构造失败。
+     */
+    xwer_t getDThdCtorRc() { return mCtorRc; }
     /**
      * @brief 获取当前线程的栈信息
      * @param[out] stack: 用于返回线程栈信息的缓冲区
@@ -105,7 +149,7 @@ class DThd
     /**
      * @brief 线程主函数，用户需要重新实现此函数
      */
-    virtual xwer_t thdMainFunction();
+    virtual xwer_t thdMainFunction() { return XWOK; }
 
     /* 只能在当前线程函数中调用的API */
     /**
@@ -173,7 +217,7 @@ class DThd
     }
 
   private:
-    static xwer_t sThdMainFunction(DThd * thd);
+    static xwer_t sThdMainFunction(DThd * thd) { return thd->thdMainFunction(); }
 };
 
 /**

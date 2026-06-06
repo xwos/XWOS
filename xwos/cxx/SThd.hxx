@@ -14,6 +14,7 @@
 #define __xwos_cxx_SThd_hxx__
 
 #include <xwos/osal/thd.hxx>
+#include <xwos/cxx/Cpu.hxx>
 
 namespace xwos {
 
@@ -33,13 +34,14 @@ namespace xwos {
 
 /**
  * @brief 静态线程
+ * @param[in] TCpu: 目标CPU
  */
+template<xwid_t TCpu = 0>
 class SThd
 {
   private:
     xwos_thd_d mThdDesc; /**< 线程描述符 */
     struct xwos_thd mThd; /**< 线程结构体 */
-    xwer_t mCtorRc; /**< 线程构造的结果 */
 
   public:
     /**
@@ -55,10 +57,48 @@ class SThd
     SThd(const char * name, xwstk_t * stack, xwsz_t stack_size,
          xwsz_t stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
          xwpr_t priority = XWOS_SKD_PRIORITY_RT_MIN, bool detached = false,
-         bool privileged = true);
-    ~SThd(); /**< 静态线程析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取静态线程构造的结果 */
+         bool privileged = true)
+        : mThdDesc{ nullptr, 0 }
+    {
+        struct xwos_thd_attr attr({
+            .name = name,
+            .stack = stack,
+            .stack_size = stack_size,
+            .stack_guard_size = stack_guard_size,
+            .priority = priority,
+            .detached = detached,
+            .privileged = privileged,
+            });
+        xwos_thd_init(&mThd, &mThdDesc, &attr, nullptr, nullptr);
+    }
+    /**
+     * @brief 静态线程析构函数
+     * @note
+     * 静态线程是编译器创建，不支持删除，因此不会调用析构函数。
+     * 基类析构函数不能为 `virtual` ，否则编译器编译子类时，会链接 `operator delete` 。
+     */
+    ~SThd() { xwos_thd_detach(mThdDesc); }
+    /**
+     * @brief 加载线程
+     * @return 错误码
+     * @retval XWOK: 没有错误
+     * @retval -EHOSTUNREACH: CPU不匹配
+     * @note
+     * + 上下文：任意
+     * @details
+     * 线程会在调用此C++API的CPU上开始运行。
+     */
+    xwer_t launch()
+    {
+        xwer_t rc;
 
+        if (TCpu == Cpu::getLocalCpuId()) {
+            rc = xwos_thd_launch(mThdDesc, (xwos_thd_f)sThdMainFunction, this);
+        } else {
+            rc = -EHOSTUNREACH;
+        }
+        return rc;
+    }
     /**
      * @brief 获取当前线程的栈信息
      * @param[out] stack: 用于返回线程栈信息的缓冲区
@@ -107,7 +147,7 @@ class SThd
     /**
      * @brief 线程主函数，用户需要重新实现此函数
      */
-    virtual xwer_t thdMainFunction();
+    virtual xwer_t thdMainFunction() { return XWOK; }
 
     /* 只能在当前线程函数中调用的API */
     /**
@@ -175,7 +215,7 @@ class SThd
     }
 
   private:
-    static xwer_t sThdMainFunction(SThd * thd);
+    static xwer_t sThdMainFunction(SThd * thd) { return thd->thdMainFunction(); }
     static void * operator new(xwsz_t sz) = delete;
     void operator delete(void * obj) = delete;
 };
