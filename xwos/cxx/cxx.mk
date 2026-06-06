@@ -10,18 +10,6 @@
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
 ######## ######## ######## ######## rule ######## ######## ######## ########
-ifeq ($(XWOSCFG_SKD_SWT_MEMPOOL),y)
-  XWOSCXXRULE_DSWT := y
-else ifeq ($(XWOSCFG_SKD_SWT_MEMSLICE),y)
-  XWOSCXXRULE_DSWT := y
-else ifeq ($(XWOSCFG_SKD_SWT_SMA),y)
-  XWOSCXXRULE_DSWT := y
-else ifeq ($(XWOSCFG_SKD_SWT_STDC_MM),y)
-  XWOSCXXRULE_DSWT := y
-else
-  XWOSCXXRULE_DSWT := n
-endif
-
 ifeq ($(XWOSCFG_LOCK_MTX_MEMPOOL),y)
   XWOSCXXRULE_DMTX := y
 else ifeq ($(XWOSCFG_LOCK_MTX_MEMSLICE),y)
@@ -37,12 +25,6 @@ endif
 ######## ######## ######## ######## Thread ######## ######## ######## ########
 
 ######## ######## ######## ######## SoftwareTimer ######## ######## ######## ########
-ifeq ($(XWOSCFG_SKD_SWT_CXX), y)
-  XWOS_CXXSRCS += cxx/SSwt.cxx
-  ifeq ($(XWOSCXXRULE_DSWT),y)
-    XWOS_CXXSRCS += cxx/DSwt.cxx
-  endif
-endif
 
 ######## ######## ######## ######## Lock ######## ######## ######## ########
 ifeq ($(XWOSCFG_LOCK_MTX_CXX), y)
