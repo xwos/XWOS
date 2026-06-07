@@ -15,6 +15,10 @@
 
 #include <xwos/standard.h>
 
+#if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#  include <xwos/osal/skd.h>
+#endif
+
 /**
  * @defgroup xwos_lib_xwlog 日志
  * @ingroup xwos_lib
@@ -25,72 +29,135 @@ int xwpf(const char * fmt, ...);
 xwer_t xwps(const char * str, xwsz_t size);
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 0)
-#  define XWLOGF_VERBOSE(tag, fmt, ...) xwpf("V|" tag " " fmt, ##__VA_ARGS__)
-#  define XWLOGF_V(tag, fmt, ...) xwpf("V|" tag " " fmt, ##__VA_ARGS__)
+#  if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#    define XWLOGF_VERBOSE(tag, fmt, ...) xwpf("C%d|V|" tag " " fmt, \
+                                               xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#    define XWLOGF_V(tag, fmt, ...) xwpf("C%d|V|" tag " " fmt, \
+                                         xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#  else
+#    define XWLOGF_VERBOSE(tag, fmt, ...) xwpf("V|" tag " " fmt, ##__VA_ARGS__)
+#    define XWLOGF_V(tag, fmt, ...) xwpf("V|" tag " " fmt, ##__VA_ARGS__)
+#  endif
 #else
 #  define XWLOGF_VERBOSE(tag, fmt, ...)
 #  define XWLOGF_V(tag, fmt, ...)
 #endif
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 1)
-#  define XWLOGF_DEBUG(tag, fmt, ...) xwpf("D|" tag " " fmt, ##__VA_ARGS__)
-#  define XWLOGF_D(tag, fmt, ...) xwpf("D|" tag " " fmt, ##__VA_ARGS__)
+#  if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#    define XWLOGF_DEBUG(tag, fmt, ...) xwpf("C%d|D|" tag " " fmt, \
+                                             xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#    define XWLOGF_D(tag, fmt, ...) xwpf("C%d|D|" tag " " fmt, \
+                                         xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#  else
+#    define XWLOGF_DEBUG(tag, fmt, ...) xwpf("D|" tag " " fmt, ##__VA_ARGS__)
+#    define XWLOGF_D(tag, fmt, ...) xwpf("D|" tag " " fmt, ##__VA_ARGS__)
+#  endif
 #else
 #  define XWLOGF_DEBUG(tag, fmt, ...)
 #  define XWLOGF_D(tag, fmt, ...)
 #endif
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 2)
-#  define XWLOGF_INFO(tag, fmt, ...) xwpf("I|" tag " " fmt, ##__VA_ARGS__)
-#  define XWLOGF_I(tag, fmt, ...) xwpf("I|" tag " " fmt, ##__VA_ARGS__)
+#  if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#    define XWLOGF_INFO(tag, fmt, ...) xwpf("C%d|I|" tag " " fmt, \
+                                            xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#    define XWLOGF_I(tag, fmt, ...) xwpf("C%d|I|" tag " " fmt, \
+                                         xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#  else
+#    define XWLOGF_INFO(tag, fmt, ...) xwpf("I|" tag " " fmt, ##__VA_ARGS__)
+#    define XWLOGF_I(tag, fmt, ...) xwpf("I|" tag " " fmt, ##__VA_ARGS__)
+#  endif
 #else
 #  define XWLOGF_INFO(tag, fmt, ...)
 #  define XWLOGF_I(tag, fmt, ...)
 #endif
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 3)
-#  define XWLOGF_NOTICE(tag, fmt, ...) xwpf("N|" tag " " fmt, ##__VA_ARGS__)
-#  define XWLOGF_N(tag, fmt, ...) xwpf("N|" tag " " fmt, ##__VA_ARGS__)
+#  if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#    define XWLOGF_NOTICE(tag, fmt, ...) xwpf("C%d|N|" tag " " fmt, \
+                                              xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#    define XWLOGF_N(tag, fmt, ...) xwpf("C%d|N|" tag " " fmt, \
+                                         xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#  else
+#    define XWLOGF_NOTICE(tag, fmt, ...) xwpf("N|" tag " " fmt, ##__VA_ARGS__)
+#    define XWLOGF_N(tag, fmt, ...) xwpf("N|" tag " " fmt, ##__VA_ARGS__)
+#  endif
 #else
 #  define XWLOGF_NOTICE(tag, fmt, ...)
 #  define XWLOGF_N(tag, fmt, ...)
 #endif
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 4)
-#  define XWLOGF_WARNING(tag, fmt, ...) xwpf("W|" tag " " fmt, ##__VA_ARGS__)
-#  define XWLOGF_W(tag, fmt, ...) xwpf("W|" tag " " fmt, ##__VA_ARGS__)
+#  if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#    define XWLOGF_WARNING(tag, fmt, ...) xwpf("C%d|W|" tag " " fmt, \
+                                               xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#    define XWLOGF_W(tag, fmt, ...) xwpf("C%d|W|" tag " " fmt, \
+                                         xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#  else
+#    define XWLOGF_WARNING(tag, fmt, ...) xwpf("W|" tag " " fmt, ##__VA_ARGS__)
+#    define XWLOGF_W(tag, fmt, ...) xwpf("W|" tag " " fmt, ##__VA_ARGS__)
+#  endif
 #else
 #  define XWLOGF_WARNING(tag, fmt, ...)
 #  define XWLOGF_W(tag, fmt, ...)
 #endif
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 5)
-#  define XWLOGF_ERR(tag, fmt, ...) xwpf("E|" tag " " fmt, ##__VA_ARGS__)
-#  define XWLOGF_E(tag, fmt, ...) xwpf("E|" tag " " fmt, ##__VA_ARGS__)
+#  if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#    define XWLOGF_ERR(tag, fmt, ...) xwpf("C%d|E|" tag " " fmt, \
+                                           xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#    define XWLOGF_E(tag, fmt, ...) xwpf("C%d|E|" tag " " fmt, \
+                                         xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#  else
+#    define XWLOGF_ERR(tag, fmt, ...) xwpf("E|" tag " " fmt, ##__VA_ARGS__)
+#    define XWLOGF_E(tag, fmt, ...) xwpf("E|" tag " " fmt, ##__VA_ARGS__)
+#  endif
 #else
 #  define XWLOGF_ERR(tag, fmt, ...)
 #  define XWLOGF_E(tag, fmt, ...)
 #endif
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 6)
-#  define XWLOGF_CRIT(tag, fmt, ...) xwpf("C|" tag " " fmt, ##__VA_ARGS__)
-#  define XWLOGF_C(tag, fmt, ...) xwpf("C|" tag " " fmt, ##__VA_ARGS__)
+#  if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#    define XWLOGF_CRIT(tag, fmt, ...) xwpf("C%d|C|" tag " " fmt, \
+                                            xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#    define XWLOGF_C(tag, fmt, ...) xwpf("C%d|C|" tag " " fmt, \
+                                         xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#  else
+#    define XWLOGF_CRIT(tag, fmt, ...) xwpf("C|" tag " " fmt, ##__VA_ARGS__)
+#    define XWLOGF_C(tag, fmt, ...) xwpf("C|" tag " " fmt, ##__VA_ARGS__)
+#  endif
 #else
 #  define XWLOGF_CRIT(tag, fmt, ...)
 #  define XWLOGF_C(tag, fmt, ...)
 #endif
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 7)
-#  define XWLOGF_ALERT(tag, fmt, ...) xwpf("A|" tag " " fmt, ##__VA_ARGS__)
-#  define XWLOGF_A(tag, fmt, ...) xwpf("A|" tag " " fmt, ##__VA_ARGS__)
+#  if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#    define XWLOGF_ALERT(tag, fmt, ...) xwpf("C%d|A|" tag " " fmt, \
+                                             xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#    define XWLOGF_A(tag, fmt, ...) xwpf("C%d|A|" tag " " fmt, \
+                                         xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#  else
+#    define XWLOGF_ALERT(tag, fmt, ...) xwpf("A|" tag " " fmt, ##__VA_ARGS__)
+#    define XWLOGF_A(tag, fmt, ...) xwpf("A|" tag " " fmt, ##__VA_ARGS__)
+#  endif
 #else
 #  define XWLOGF_ALERT(tag, fmt, ...)
 #  define XWLOGF_A(tag, fmt, ...)
 #endif
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG) && (XWLIBCFG_XWLOG_LEVEL <= 8)
-#  define XWLOGF_EMERG(tag, fmt, ...) xwpf("G|" tag " " fmt, ##__VA_ARGS__)
-#  define XWLOGF_G(tag, fmt, ...) xwpf("G|" tag " " fmt, ##__VA_ARGS__)
+#  if defined(CPUCFG_CPU_NUM) && (CPUCFG_CPU_NUM > 1)
+#    define XWLOGF_EMERG(tag, fmt, ...) xwpf("C%d|G|" tag " " fmt, \
+                                             xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#    define XWLOGF_G(tag, fmt, ...) xwpf("C%d|G|" tag " " fmt, \
+                                         xwos_skd_get_cpuid_lc(), ##__VA_ARGS__)
+#  else
+#    define XWLOGF_EMERG(tag, fmt, ...) xwpf("G|" tag " " fmt, ##__VA_ARGS__)
+#    define XWLOGF_G(tag, fmt, ...) xwpf("G|" tag " " fmt, ##__VA_ARGS__)
+#  endif
 #else
 #  define XWLOGF_EMERG(tag, fmt, ...)
 #  define XWLOGF_G(tag, fmt, ...)
