@@ -157,11 +157,11 @@ xwer_t xwup_skd_init_lc(void)
         xwskd->pm.wklkcnt = (xwsq_t)XWUP_SKD_WKLKCNT_UNLOCKED;
         xwskd->pm.frz_thd_cnt = (xwsq_t)0;
         xwlib_bclst_init_head(&xwskd->pm.frzlist);
-        xwskd->pm.cb.resume = NULL;
-        xwskd->pm.cb.suspend = NULL;
-        xwskd->pm.cb.wakeup = NULL;
-        xwskd->pm.cb.sleep = NULL;
-        xwskd->pm.cb.arg = NULL;
+        xwskd->pm.op.resume_periph = NULL;
+        xwskd->pm.op.suspend_periph = NULL;
+        xwskd->pm.op.wakeup_cpu = NULL;
+        xwskd->pm.op.sleep_cpu = NULL;
+        xwskd->pm.op.arg = NULL;
 #endif
         rc = xwospl_skd_init(xwskd);
         if (rc < 0) {
@@ -1210,27 +1210,29 @@ void xwup_skd_intr_all(void)
 
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
 /**
- * @brief XWUP PM API：设置电源管理回调函数
+ * @brief XWUP PM API：设置电源管理操作函数
  * @note
  * + 同步/异步：同步
  * + 上下文：中断、中断底半部、线程
  * + 重入性：不可重入
  */
 __xwup_api
-void xwup_pm_set_cb(xwup_skd_pm_cb_f resume,
-                    xwup_skd_pm_cb_f suspend,
-                    xwup_skd_pm_cb_f wakeup,
-                    xwup_skd_pm_cb_f sleep,
+void xwup_pm_set_op(xwid_t cpuid,
+                    xwup_skd_pm_op_f resume_periph,
+                    xwup_skd_pm_op_f suspend_periph,
+                    xwup_skd_pm_op_f wakeup_cpu,
+                    xwup_skd_pm_op_f sleep_cpu,
                     void * arg)
 {
         struct xwup_skd * xwskd;
 
+        XWOS_UNUSED(cpuid);
         xwskd = &xwup_skd;
-        xwskd->pm.cb.resume = resume;
-        xwskd->pm.cb.suspend = suspend;
-        xwskd->pm.cb.wakeup = wakeup;
-        xwskd->pm.cb.sleep = sleep;
-        xwskd->pm.cb.arg = arg;
+        xwskd->pm.op.resume_periph = resume_periph;
+        xwskd->pm.op.suspend_periph = suspend_periph;
+        xwskd->pm.op.wakeup_cpu = wakeup_cpu;
+        xwskd->pm.op.sleep_cpu = sleep_cpu;
+        xwskd->pm.op.arg = arg;
 }
 
 /**
@@ -1350,15 +1352,15 @@ void xwup_skd_notify_allfrz_idlec(struct xwup_skd * xwskd)
                 xwospl_cpuirq_save_lc(&cpuirq);
                 if ((xwsq_t)XWUP_SKD_WKLKCNT_ALLFRZ == xwskd->pm.wklkcnt) {
                         xwskd->pm.wklkcnt--;
-                        if (NULL != xwskd->pm.cb.suspend) {
-                                xwskd->pm.cb.suspend(xwskd->pm.cb.arg);
+                        if (NULL != xwskd->pm.op.suspend_periph) {
+                                xwskd->pm.op.suspend_periph(xwskd->pm.op.arg);
                         }
                         xwskd->pm.wklkcnt--;
                         xwospl_cpuirq_restore_lc(cpuirq);
                         while ((xwsq_t)XWUP_SKD_WKLKCNT_SUSPENDED ==
                                xwskd->pm.wklkcnt) {
-                                if (NULL != xwskd->pm.cb.sleep) {
-                                        xwskd->pm.cb.sleep(xwskd->pm.cb.arg);
+                                if (NULL != xwskd->pm.op.sleep_cpu) {
+                                        xwskd->pm.op.sleep_cpu(xwskd->pm.op.arg);
                                 }
                         }
                 } else {
@@ -1440,15 +1442,15 @@ xwer_t xwup_skd_resume_lc(struct xwup_skd * xwskd)
                 if ((xwsq_t)XWUP_SKD_WKLKCNT_SUSPENDED == xwskd->pm.wklkcnt) {
                         xwskd->pm.wklkcnt++;
                         xwospl_cpuirq_restore_lc(cpuirq);
-                        if (NULL != xwskd->pm.cb.wakeup) {
-                                xwskd->pm.cb.wakeup(xwskd->pm.cb.arg);
+                        if (NULL != xwskd->pm.op.wakeup_cpu) {
+                                xwskd->pm.op.wakeup_cpu(xwskd->pm.op.arg);
                         }
                         xwospl_cpuirq_save_lc(&cpuirq);
                 }
                 if ((xwsq_t)XWUP_SKD_WKLKCNT_RESUMING == xwskd->pm.wklkcnt) {
                         xwskd->pm.wklkcnt++;
-                        if (NULL != xwskd->pm.cb.resume) {
-                                xwskd->pm.cb.resume(xwskd->pm.cb.arg);
+                        if (NULL != xwskd->pm.op.resume_periph) {
+                                xwskd->pm.op.resume_periph(xwskd->pm.op.arg);
                         }
                 }
                 if ((xwsq_t)XWUP_SKD_WKLKCNT_ALLFRZ == xwskd->pm.wklkcnt) {

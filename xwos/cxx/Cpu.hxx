@@ -38,81 +38,159 @@ class Cpu
     ~Cpu() {}
 
   public:
+    /**
+     * @brief 启动当前CPU的调度器
+     */
     static xwer_t startLocalSchedule()
     {
         return xwos_skd_start_lc();
-    } /**< 启动当前CPU的调度器 */
+    }
+
+    /**
+     * @brief 暂停本地CPU调度器
+     */
     static xwer_t pauseLocalScheduler()
     {
         return xwosdl_skd_pause_lc();
-    } /**< 暂停本地CPU调度器 */
+    }
+
+    /**
+     * @brief 继续运行本地CPU调度器
+     */
     static xwer_t continueLocalScheduler()
     {
         return xwos_skd_continue_lc();
-    } /**< 继续运行本地CPU调度器 */
+    }
+
+    /**
+     * @brief 获取当前CPU的ID
+     */
     static xwid_t getLocalCpuId()
     {
         return xwos_skd_get_cpuid_lc();
-    } /**< 获取当前CPU的ID */
+    }
+
+    /**
+     * @brief 获取当前代码的上下文
+     */
     static void getContext(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
     {
         xwos_skd_get_context_lc(ctxbuf, irqnbuf);
-    } /**< 获取当前代码的上下文 */
+    }
+
+    /**
+     * @brief 关闭本地CPU调度器的抢占
+     */
     static void disableLocalPreemption()
     {
         xwos_skd_dspmpt_lc();
-    } /**< 关闭本地CPU调度器的抢占 */
+    }
+
+    /**
+     * @brief 开启本地CPU调度器的抢占
+     */
     static void enableLocalPreemption()
     {
         xwos_skd_enpmpt_lc();
-    } /**< 开启本地CPU调度器的抢占 */
-    static void disableLocalBh() { xwos_skd_dsbh_lc(); } /**< 关闭本地CPU的中断底半部 */
-    static void enableLocalBh() { xwos_skd_enbh_lc(); } /**< 开启本地CPU的中断底半部 */
+    }
+
+    /**
+     * @brief 关闭本地CPU的中断底半部
+     */
+    static void disableLocalBh() { xwos_skd_dsbh_lc(); } /**<  */
+
+    /**
+     * @brief 开启本地CPU的中断底半部
+     */
+    static void enableLocalBh() { xwos_skd_enbh_lc(); }
+
+    /**
+     * @brief 关闭本地CPU的中断开关（不可嵌套使用）
+     */
     static void disableLocalIrq()
     {
         xwos_cpuirq_disable_lc();
-    } /**< 关闭本地CPU的中断开关（不可嵌套使用） */
+    }
+
+    /**
+     * @brief 开启本地CPU的中断开关（不可嵌套使用）
+     */
     static void enableLocalIrq()
     {
         xwos_cpuirq_enable_lc();
-    } /**< 开启本地CPU的中断开关（不可嵌套使用） */
+    }
+
+    /**
+     * @brief 暂停本地CPU的中断（可嵌套使用）
+     */
     static void suspendLocalIrq()
     {
         xwos_cpuirq_suspend_lc();
-    } /**< 暂停本地CPU的中断（可嵌套使用） */
+    }
+
+    /**
+     * @brief 恢复本地CPU的中断（可嵌套使用）
+     */
     static void resumeLocalIrq()
     {
         xwos_cpuirq_resume_lc();
-    } /**< 恢复本地CPU的中断（可嵌套使用） */
+    }
+
+    /**
+     * @brief 保存本地CPU的中断开关然后关闭（可嵌套使用）
+     */
     static void saveLocalIrq(xwreg_t * cpuirq)
     {
         xwos_cpuirq_save_lc(cpuirq);
-    } /**< 保存本地CPU的中断开关然后关闭（可嵌套使用） */
+    }
+
+    /**
+     * @brief 恢复本地CPU的中断（可嵌套使用）
+     */
     static void restoreLocalIrq(xwreg_t cpuirq)
     {
         xwos_cpuirq_restore_lc(cpuirq);
-    } /**< 恢复本地CPU的中断（可嵌套使用） */
+    }
+
+    /**
+     * @brief 测试本地CPU的中断开关状态
+     */
     static bool testLocalIrq()
     {
         return xwos_cpuirq_test_lc();
-    } /**< 测试本地CPU的中断开关状态 */
+    }
 
+    /**
+     * @brief 关闭某个外设中断
+     */
     static void disableIrq(xwirq_t irqn)
     {
         xwos_irq_disable(irqn);
-    } /**< 关闭某个外设中断 */
+    }
+
+    /**
+     * @brief 开启某个外设中断
+     */
     static void enableIrq(xwirq_t irqn)
     {
         xwos_irq_enable(irqn);
-    } /**< 开启某个外设中断 */
+    }
+
+    /**
+     * @brief 保存某个外设中断的开关，然后将其关闭
+     */
     static void saveIrq(xwirq_t irqn, xwreg_t * flag)
     {
         xwos_irq_save(irqn, flag);
-    } /**< 保存某个外设中断的开关，然后将其关闭 */
+    }
+
+    /**
+     * @brief 恢复某个外设中断的开关
+     */
     static void restoreIrq(xwirq_t irqn, xwreg_t flag)
     {
         xwos_irq_restore(irqn, flag);
-    } /**< 恢复某个外设中断的开关 */
+    }
 };
 
 /**

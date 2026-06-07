@@ -16,8 +16,6 @@
 #include <xwos/standard.h>
 #include <xwos/mp/skd.h>
 
-struct xwmp_pmdm;
-
 /**
  * @brief 电源管理阶段枚举
  */
@@ -32,10 +30,11 @@ enum xwup_skd_pm_stage_em {
 };
 
 
-void xwmp_pm_set_cb(xwmp_skd_pm_cb_f resume,
-                    xwmp_skd_pm_cb_f suspend,
-                    xwmp_skd_pm_cb_f wakeup,
-                    xwmp_skd_pm_cb_f sleep,
+void xwmp_pm_set_op(xwid_t cpuid,
+                    xwmp_skd_pm_op_f resume_periph,
+                    xwmp_skd_pm_op_f suspend_periph,
+                    xwmp_skd_pm_op_f wakeup_cpu,
+                    xwmp_skd_pm_op_f sleep_cpu,
                     void * arg);
 void xwmp_pm_suspend(void);
 void xwmp_pm_resume(void);

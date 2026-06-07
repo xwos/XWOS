@@ -22,13 +22,27 @@ namespace xwos {
  * @ingroup xwos_cxx
  *
  *
- * ## 头文件
+ * ## 电源管理操作函数
  *
- * @ref xwos/cxx/Pm.hxx
+ * `class Pm` 是抽象的类模板，用户必须为其提供实现，并定义4个基本操作函数：
+ *
+ * + `resumePeriph` ：恢复外设
+ * + `suspendPeriph` ：暂停外设
+ * + `wakeupCpu` ：唤醒CPU
+ * + `sleepCpu` ：休眠CPU
+ *
+ * ## 模板参数
+ *
+ * `template<xwid_t TCpu> class Pm` 的模板参数 `TCpu` 表示电源管理类用于哪一个CPU。
  *
  * @{
  */
 
+/**
+ * @brief 电源管理类
+ * @param[in] TCpu: 目标CPU
+ */
+template<xwid_t TCpu = 0UL>
 class Pm
 {
   public:
@@ -42,22 +56,48 @@ class Pm
     };
 
   protected:
-    Pm();
-    ~Pm();
-    virtual void onResume() = 0;
-    virtual void onSuspend() = 0;
-    virtual void onWakeup() = 0;
-    virtual void onSleep() = 0;
-  public:
+    Pm() { xwos_pm_set_op(TCpu, sResumePeriph, sSuspendPeriph, sWakeupCpu, sSleepCpu, this); }
+    virtual ~Pm() {}
+    virtual void resumePeriph() = 0;
+    virtual void suspendPeriph() = 0;
+    virtual void wakeupCpu() = 0;
+    virtual void sleepCpu() = 0;
+    /**
+     * @brief 进入低功耗模式
+     * @note
+     * 此C++API只能由 `class Pm` 的实现类调用，只会使得运行代码的CPU进入低功耗模式，不影响其他CPU。
+     */
     void suspend() { xwos_pm_suspend(); }
+  public:
+    /**
+     * @brief 从低功耗模式恢复
+     * @note
+     * 此C++API只能由唤醒中断调用，只会使得运行代码的CPU从低功耗模式恢复，不影响其他CPU。
+     */
     void resume() { xwos_pm_resume(); }
     enum PmStage stage() { return (enum PmStage)xwos_pm_get_stage(); }
 
   private:
-    static void sOnResume(void * obj);
-    static void sOnSuspend(void * obj);
-    static void sOnWakeup(void * obj);
-    static void sOnSleep(void * obj);
+    static void sResumePeriph(void * obj)
+    {
+        Pm * mgr = reinterpret_cast<Pm *>(obj);
+        mgr->resumePeriph();
+    }
+    static void sSuspendPeriph(void * obj)
+    {
+        Pm * mgr = reinterpret_cast<Pm *>(obj);
+        mgr->suspendPeriph();
+    }
+    static void sWakeupCpu(void * obj)
+    {
+        Pm * mgr = reinterpret_cast<Pm *>(obj);
+        mgr->wakeupCpu();
+    }
+    static void sSleepCpu(void * obj)
+    {
+        Pm * mgr = reinterpret_cast<Pm *>(obj);
+        mgr->sleepCpu();
+    }
 };
 
 /**

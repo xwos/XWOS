@@ -122,17 +122,17 @@ enum xwmp_skd_wakelock_cnt_em {
 };
 
 
-typedef void (* xwmp_skd_pm_cb_f)(void *); /**< 电源管理回调函数 */
+typedef void (* xwmp_skd_pm_op_f)(void *); /**< 电源管理回调函数 */
 
 /**
- * @brief 电源管理领域回调函数集合
+ * @brief 电源管理操作集合
  */
-struct xwmp_skd_pm_callback {
-        xwmp_skd_pm_cb_f resume; /**< 电源管理领域从暂停模式恢复的回调函数 */
-        xwmp_skd_pm_cb_f suspend; /**< 电源管理领域进入暂停模式的回调函数 */
-        xwmp_skd_pm_cb_f wakeup; /**< 唤醒电源管理领域的回调函数 */
-        xwmp_skd_pm_cb_f sleep; /**< 电源管理领域休眠的回调函数 */
-        void * arg; /**< 各回调函数的参数 */
+struct xwmp_skd_pm_operation {
+        xwmp_skd_pm_op_f resume_periph; /**< 恢复外设 */
+        xwmp_skd_pm_op_f suspend_periph; /**< 暂停外设 */
+        xwmp_skd_pm_op_f wakeup_cpu; /**< 唤醒 */
+        xwmp_skd_pm_op_f sleep_cpu; /**< 休眠 */
+        void * arg; /**< 各函数的参数 */
 };
 
 /**
@@ -142,7 +142,7 @@ struct xwmp_skd_pm {
         atomic_xwsq_t wklkcnt; /**< 唤醒锁，取值 @ref xwmp_skd_wakelock_cnt_em */
         xwsz_t frz_thd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
-        struct xwmp_skd_pm_callback cb; /**< 电源管理回调函数集合 */
+        struct xwmp_skd_pm_operation op; /**< 电源管理操作集合函数集合 */
 };
 
 /**

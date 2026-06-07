@@ -15,7 +15,7 @@
 
 #include <xwos/up/pm.h>
 
-typedef xwup_skd_pm_cb_f xwosdl_pm_cb_f;
+typedef xwup_skd_pm_op_f xwosdl_pm_op_f;
 
 #define XWOSDL_PM_STAGE_SUSPENDED XWUP_PM_STAGE_SUSPENDED
 #define XWOSDL_PM_STAGE_SUSPENDING XWUP_PM_STAGE_SUSPENDING
@@ -26,13 +26,19 @@ typedef xwup_skd_pm_cb_f xwosdl_pm_cb_f;
 #define XWOSDL_PM_STAGE_RUNNING XWUP_PM_STAGE_RUNNING
 
 static __xwcc_inline
-void xwosdl_pm_set_cb(xwosdl_pm_cb_f resume,
-                      xwosdl_pm_cb_f suspend,
-                      xwosdl_pm_cb_f wakeup,
-                      xwosdl_pm_cb_f sleep,
+void xwosdl_pm_set_op(xwid_t cpuid,
+                      xwosdl_pm_op_f resume_periph,
+                      xwosdl_pm_op_f suspend_periph,
+                      xwosdl_pm_op_f wakeup_cpu,
+                      xwosdl_pm_op_f sleep_cpu,
                       void * arg)
 {
-        return  xwup_pm_set_cb(resume, suspend, wakeup, sleep, arg);
+        return  xwup_pm_set_op(cpuid,
+                               resume_periph,
+                               suspend_periph,
+                               wakeup_cpu,
+                               sleep_cpu,
+                               arg);
 }
 
 static __xwcc_inline

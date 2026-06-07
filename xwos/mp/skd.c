@@ -1391,8 +1391,8 @@ void xwmp_skd_notify_allfrz_idlec(struct xwmp_skd * xwskd)
                                 (xwsq_t)1,
                                 &nv, NULL);
         if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_SUSPENDING == nv)) {
-                if (NULL != xwskd->pm.cb.suspend) {
-                        xwskd->pm.cb.suspend(xwskd->pm.cb.arg);
+                if (NULL != xwskd->pm.op.suspend_periph) {
+                        xwskd->pm.op.suspend_periph(xwskd->pm.op.arg);
                 }
         }
         xwmp_cpuirq_restore_lc(cpuirq);
@@ -1401,8 +1401,8 @@ void xwmp_skd_notify_allfrz_idlec(struct xwmp_skd * xwskd)
                            (xwsq_t)1,
                            &nv, NULL);
         while ((xwsq_t)XWMP_SKD_WKLKCNT_SUSPENDED == nv) {
-                if (NULL != xwskd->pm.cb.sleep) {
-                        xwskd->pm.cb.sleep(xwskd->pm.cb.arg);
+                if (NULL != xwskd->pm.op.sleep_cpu) {
+                        xwskd->pm.op.sleep_cpu(xwskd->pm.op.arg);
                 }
                 nv = xwaop_load(xwsq_t, &xwskd->pm.wklkcnt, xwaop_mo_acquire);
         }
@@ -1480,8 +1480,8 @@ xwer_t xwmp_skd_resume_lc(struct xwmp_skd * xwskd)
                                         (xwsq_t)1,
                                         &nv, &ov);
                 if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_RESUMING == nv)) {
-                        if (NULL != xwskd->pm.cb.wakeup) {
-                                xwskd->pm.cb.wakeup(xwskd->pm.cb.arg);
+                        if (NULL != xwskd->pm.op.wakeup_cpu) {
+                                xwskd->pm.op.wakeup_cpu(xwskd->pm.op.arg);
                         }
                 }
                 xwmp_cpuirq_save_lc(&cpuirq);
@@ -1490,8 +1490,8 @@ xwer_t xwmp_skd_resume_lc(struct xwmp_skd * xwskd)
                                         (xwsq_t)1,
                                         &nv, &ov);
                 if ((XWOK == rc) && ((xwsq_t)XWMP_SKD_WKLKCNT_ALLFRZ == nv)) {
-                        if (NULL != xwskd->pm.cb.resume) {
-                                xwskd->pm.cb.resume(xwskd->pm.cb.arg);
+                        if (NULL != xwskd->pm.op.resume_periph) {
+                                xwskd->pm.op.resume_periph(xwskd->pm.op.arg);
                         }
                 }
                 xwmp_cpuirq_restore_lc(cpuirq);

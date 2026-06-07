@@ -23,6 +23,6 @@
 
 #include "board/std.h"
 
-void xwosac_pmcb_init(void);
+void xwosac_pm_init(void);
 
 #endif /* board/xwac/xwos/pm.h */

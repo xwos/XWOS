@@ -102,7 +102,7 @@ void xwos_postinit(void)
 {
         cm_backtrace_init("XWOS", "V1.1", XWOS_VERSION);
         stm32hal_init();
-        xwosac_pmcb_init();
+        xwosac_pm_init();
         xwlibac_crc_init();
         board_mm_init();
 }

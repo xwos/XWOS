@@ -23,7 +23,7 @@
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include <bm/Stm32Hal/mi.h>
 
-void xwosac_pmcb_resume(void * arg)
+void xwosac_pmop_resume_periph(void * arg)
 {
         xwsq_t ctx;
         xwirq_t irq;
@@ -33,7 +33,7 @@ void xwosac_pmcb_resume(void * arg)
         stm32hal_resume();
 }
 
-void xwosac_pmcb_suspend(void * arg)
+void xwosac_pmop_suspend_periph(void * arg)
 {
         xwsq_t ctx;
         xwirq_t irq;
@@ -43,24 +43,24 @@ void xwosac_pmcb_suspend(void * arg)
         stm32hal_suspend();
 }
 
-void xwosac_pmcb_wakeup(void * arg)
+void xwosac_pmop_wakeup_cpu(void * arg)
 {
         XWOS_UNUSED(arg);
         stm32hal_wakeup();
 }
 
-void xwosac_pmcb_sleep(void * arg)
+void xwosac_pmop_sleep_cpu(void * arg)
 {
         XWOS_UNUSED(arg);
         stm32hal_sleep();
         armv7m_wfi(); /* 通过 WFI 指令进入STOP模式 */
 }
 
-void xwosac_pmcb_init(void)
+void xwosac_pm_init(void)
 {
-        xwos_pm_set_cb(xwosac_pmcb_resume,
-                       xwosac_pmcb_suspend,
-                       xwosac_pmcb_wakeup,
-                       xwosac_pmcb_sleep,
+        xwos_pm_set_op(xwosac_pmop_resume_periph,
+                       xwosac_pmop_suspend_periph,
+                       xwosac_pmop_wakeup_cpu,
+                       xwosac_pmop_sleep_cpu,
                        NULL);
 }

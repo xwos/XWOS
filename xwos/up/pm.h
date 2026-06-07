@@ -29,13 +29,14 @@ enum xwup_pm_stage_em {
         XWUP_PM_STAGE_RUNNING = XWUP_SKD_WKLKCNT_RUNNING, /**< 正常运行 */
 };
 
-typedef void (* xwup_skd_pm_cb_f)(void *); /**< 电源管理回调函数 */
+typedef void (* xwup_skd_pm_op_f)(void *); /**< 电源管理操作函数 */
 
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
-void xwup_pm_set_cb(xwup_skd_pm_cb_f resume,
-                    xwup_skd_pm_cb_f suspend,
-                    xwup_skd_pm_cb_f wakeup,
-                    xwup_skd_pm_cb_f sleep,
+void xwup_pm_set_op(xwid_t cpuid,
+                    xwup_skd_pm_op_f resume_periph,
+                    xwup_skd_pm_op_f suspend_periph,
+                    xwup_skd_pm_op_f wakeup_cpu,
+                    xwup_skd_pm_op_f sleep_cpu,
                     void * arg);
 #endif
 void xwup_pm_suspend(void);

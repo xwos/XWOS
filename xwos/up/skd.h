@@ -105,7 +105,7 @@ enum xwup_skd_context_em {
 };
 
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
-typedef void (* xwup_skd_pm_cb_f)(void *); /**< 电源管理回调函数 */
+typedef void (* xwup_skd_pm_op_f)(void *); /**< 电源管理操作函数 */
 
 /**
  * @brief 调度器唤醒锁状态枚举
@@ -123,14 +123,14 @@ enum xwup_skd_wakelock_cnt_em {
 };
 
 /**
- * @brief 电源管理回调函数集合
+ * @brief 电源管理操作函数集合
  */
-struct xwup_skd_pm_callback {
-        xwup_skd_pm_cb_f resume; /**< 恢复 */
-        xwup_skd_pm_cb_f suspend; /**< 暂停 */
-        xwup_skd_pm_cb_f wakeup; /**< 唤醒 */
-        xwup_skd_pm_cb_f sleep; /**< 休眠*/
-        void * arg; /**< 各回调函数的参数 */
+struct xwup_skd_pm_operation {
+        xwup_skd_pm_op_f resume_periph; /**< 恢复外设 */
+        xwup_skd_pm_op_f suspend_periph; /**< 暂停外设 */
+        xwup_skd_pm_op_f wakeup_cpu; /**< 唤醒 */
+        xwup_skd_pm_op_f sleep_cpu; /**< 休眠*/
+        void * arg; /**< 各操作函数的参数 */
 };
 
 /**
@@ -140,7 +140,7 @@ struct xwup_skd_pm {
         __xw_io xwsq_t wklkcnt; /**< 唤醒锁，取值 @ref xwup_skd_wakelock_cnt_em */
         xwsz_t frz_thd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
-        struct xwup_skd_pm_callback cb; /**< 电源管理回调函数集合 */
+        struct xwup_skd_pm_operation op; /**< 电源管理操作函数集合 */
 };
 #endif
 

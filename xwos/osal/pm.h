@@ -21,15 +21,12 @@
  * @ingroup xwos
  * 技术参考手册： [电源管理](../Docs/TechRefManual/Pm)
  *
- * ## 电源管理回调
+ * ## 电源管理操作函数
  *
- * 用户可以通过 `xwos_pm_set_cb()` 设置电源管理回调函数。
- * 这个CAPI只影响当前运行代码的CPU，如果是多核系统，需要在每个CPU上都调用一次这个CAPI。
- *
- * + `resume` ：从暂停模式恢复的回调函数
- * + `suspend` ：进入暂停模式的回调函数
- * + `wakeup` ：从休眠中唤醒的回调函数
- * + `sleep` ：CPU进入休眠的回调函数
+ * 用户可以通过 `xwos_pm_set_op()` 设置电源管理操作函数。
+ * + 如果是多核系统，需要通过参数 `cpuid` 为每个CPU的都设置操作函数。
+ *   此CAPI通常在系统初始化阶段调用，CPU0可以为所有CPU设置操作函数。
+ * + 如果是单核系统，参数 `cpuid` 无意义，可取任意值，但建议设置为 `0` 。
  *
  *
  * ## 系统休眠与唤醒
@@ -40,17 +37,13 @@
  * 休眠与唤醒是一个比较复杂的过程，可以通过 `xwos_pm_get_stage()` 获取电源管理
  * 目前所处的 @ref xwos_pm_stage 。
  *
- *
- * ## C++
- *
- * C++头文件： @ref xwos/osal/pm.hxx
  * @{
  */
 
 /**
- * @brief 电源管理回调函数指针类型
+ * @brief 电源管理操作函数指针类型
  */
-typedef xwosdl_pm_cb_f xwos_pm_cb_f;
+typedef xwosdl_pm_op_f xwos_pm_op_f;
 
 /**
  * @defgroup xwos_pm_stage 电源管理阶段
@@ -70,23 +63,29 @@ typedef xwosdl_pm_cb_f xwos_pm_cb_f;
  */
 
 /**
- * @brief XWOS API：设置电源管理的回调函数
- * @param[in] resume: 从暂停模式恢复的回调函数
- * @param[in] suspend: 进入暂停模式的回调函数
- * @param[in] wakeup: 唤醒时回调函数
- * @param[in] sleep: 休眠时的回调函数
- * @param[in] arg: 电源管理系统调用回调函数时传递的参数
+ * @brief XWOS API：设置电源管理的操作函数
+ * @param[in] resume_periph: 恢复外设
+ * @param[in] suspend_periph: 暂停外设
+ * @param[in] wakeup_cpu: 唤醒CPU
+ * @param[in] sleep_cpu: 休眠CPU
+ * @param[in] arg: 调用各操作函数时传递的参数
  * @note
  * + 上下文：任意
  */
 static __xwos_inline_api
-void xwos_pm_set_cb(xwos_pm_cb_f resume,
-                    xwos_pm_cb_f suspend,
-                    xwos_pm_cb_f wakeup,
-                    xwos_pm_cb_f sleep,
+void xwos_pm_set_op(xwid_t cpuid,
+                    xwos_pm_op_f resume_periph,
+                    xwos_pm_op_f suspend_periph,
+                    xwos_pm_op_f wakeup_cpu,
+                    xwos_pm_op_f sleep_cpu,
                     void * arg)
 {
-        return xwosdl_pm_set_cb(resume, suspend, wakeup, sleep, arg);
+        return xwosdl_pm_set_op(cpuid,
+                                resume_periph,
+                                suspend_periph,
+                                wakeup_cpu,
+                                sleep_cpu,
+                                arg);
 }
 
 /**

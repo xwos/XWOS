@@ -10,10 +10,10 @@ use core::cmp::{PartialOrd, Ordering};
 use crate::types::*;
 
 extern "C" {
-    fn xwrustffi_pm_set_cb(resume: PmCallback,
-                           suspend: PmCallback,
-                           wakeup: PmCallback,
-                           sleep: PmCallback,
+    fn xwrustffi_pm_set_op(resume_periph: PmOperation,
+                           suspend_periph: PmOperation,
+                           wakeup_cpu: PmOperation,
+                           sleep_cpu: PmOperation,
                            arg: *mut c_void);
     fn xwrustffi_pm_suspend();
     fn xwrustffi_pm_resume();
@@ -21,20 +21,24 @@ extern "C" {
 }
 
 /// 电源管理回调函数类型
-pub type PmCallback = extern "C" fn(*mut c_void);
+pub type PmOperation = extern "C" fn(*mut c_void);
 
 /// 设置电源管理的回调函数
 ///
 /// # 参数说明
 ///
-/// + resume: 从暂停模式恢复的回调函数
-/// + suspend: 进入暂停模式的回调函数
-/// + wakeup: 唤醒时回调函数
-/// + sleep: 休眠时的回调函数
-pub fn set_cb(resume: PmCallback, suspend: PmCallback,
-              wakeup: PmCallback, sleep: PmCallback) {
+/// + resume_periph: 恢复外设
+/// + suspend_periph: 暂停外设
+/// + wakeup_cpu: 唤醒
+/// + sleep_cpu: 休眠
+pub fn set_op(resume_periph: PmOperation, suspend_periph: PmOperation,
+              wakeup_cpu: PmOperation, sleep_cpu: PmOperation) {
     unsafe {
-        xwrustffi_pm_set_cb(resume, suspend, wakeup, sleep, ptr::null_mut());
+        xwrustffi_pm_set_op(resume_periph,
+                            suspend_periph,
+                            wakeup_cpu,
+                            sleep_cpu,
+                            ptr::null_mut());
     }
 }
 

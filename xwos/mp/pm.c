@@ -15,25 +15,28 @@
 #include <xwos/mp/pm.h>
 
 /**
- * @brief XWMP PM API：设置当前CPU的电源管理回调函数
+ * @brief XWMP PM API：设置当前CPU的电源管理操作函数
  * @details
- * 此CAPI只能设置当前CPU的电源管理回调函数，需要在每个CPU都执行一次。
+ * 此CAPI只能设置当前CPU的电源管理操作函数，需要在每个CPU都执行一次。
  */
 __xwmp_api
-void xwmp_pm_set_cb(xwmp_skd_pm_cb_f resume,
-                    xwmp_skd_pm_cb_f suspend,
-                    xwmp_skd_pm_cb_f wakeup,
-                    xwmp_skd_pm_cb_f sleep,
+void xwmp_pm_set_op(xwid_t cpuid,
+                    xwmp_skd_pm_op_f resume_periph,
+                    xwmp_skd_pm_op_f suspend_periph,
+                    xwmp_skd_pm_op_f wakeup_cpu,
+                    xwmp_skd_pm_op_f sleep_cpu,
                     void * arg)
 {
         struct xwmp_skd * xwskd;
 
-        xwskd = xwmp_skd_get_lc();
-        xwskd->pm.cb.resume = resume;
-        xwskd->pm.cb.suspend = suspend;
-        xwskd->pm.cb.wakeup = wakeup;
-        xwskd->pm.cb.sleep = sleep;
-        xwskd->pm.cb.arg = arg;
+        xwskd = xwmp_skd_get_by_cpuid(cpuid);
+        if (NULL != xwskd) {
+                xwskd->pm.op.resume_periph = resume_periph;
+                xwskd->pm.op.suspend_periph = suspend_periph;
+                xwskd->pm.op.wakeup_cpu = wakeup_cpu;
+                xwskd->pm.op.sleep_cpu = sleep_cpu;
+                xwskd->pm.op.arg = arg;
+        }
 }
 
 /**
@@ -45,20 +48,9 @@ __xwmp_api
 void xwmp_pm_suspend(void)
 {
         struct xwmp_skd * local;
-        struct xwmp_skd * xwskd;
-        xwid_t cpuid;
 
         local = xwmp_skd_get_lc();
-        for (cpuid = (xwid_t)0; cpuid < (xwid_t)CPUCFG_CPU_NUM; cpuid++) {
-                xwskd = xwmp_skd_get_by_cpuid(cpuid);
-                if (local == xwskd) {
-                        // cppcheck-suppress [misra-c2012-17.7]
-                        xwmp_skd_dec_wklkcnt_lc(xwskd);
-                } else if (NULL != xwskd) {
-                        xwospl_skd_suspend(xwskd);
-                } else {
-                }
-        }
+        xwmp_skd_dec_wklkcnt_lc(local);
 }
 
 /**
@@ -70,18 +62,15 @@ __xwmp_api
 void xwmp_pm_resume(void)
 {
         struct xwmp_skd * local;
-        struct xwmp_skd * xwskd;
-        xwid_t cpuid;
+        xwsq_t ctx;
+        xwirq_t irqn;
 
         local = xwmp_skd_get_lc();
-        for (cpuid = (xwid_t)0; cpuid < (xwid_t)CPUCFG_CPU_NUM; cpuid++) {
-                xwskd = xwmp_skd_get_by_cpuid(cpuid);
-                if (local == xwskd) {
-                        xwmp_skd_resume_lc(xwskd);
-                } else if (NULL != xwskd) {
-                        xwospl_skd_resume(xwskd);
-                } else {
-                }
+        xwmp_skd_get_context_lc(&ctx, &irqn);
+        if (XWMP_SKD_CONTEXT_ISR == ctx) {
+                xwmp_skd_resume_lc(local);
+        } else {
+                xwospl_skd_resume(local);
         }
 }
 
