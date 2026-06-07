@@ -137,10 +137,6 @@
  *
  * 线程自身可以通过 `xwos_cthd_self()` 获取自己的 @ref xwos_thd_d 。
  *
- *
- * ## C++
- *
- * C++头文件： @ref xwos/osal/thd.hxx
  * @{
  */
 

@@ -60,10 +60,6 @@
  * 已知软件定时器对象的指针的情况下，可以通过 `xwos_swt_get_d()` 获取 @ref xwos_swt_d ，
  * 或可以通过 `xwos_swt_get_tik()` 获取对象标签。
  *
- *
- * ## C++
- *
- * C++头文件： @ref xwos/osal/swt.hxx
  * @{
  */
 

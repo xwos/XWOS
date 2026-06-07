@@ -22,25 +22,19 @@ namespace sync {
  * @defgroup xwos_cxx_sync_Br_SBr 静态事件标志
  * @ingroup xwos_cxx_sync_Br
  *
- *
- * ## C++ API
- *
- * 头文件： @ref xwos/cxx/sync/SBr.hxx
- *
  * @{
  */
 
 /**
- * @brief 静态事件标志
+ * @brief 静态线程栅栏
  */
 template<xwsz_t TNum>
 class SBr : public Br<TNum>
 {
   private:
-    struct xwos_br mBr; /**< 事件标志结构体 */
+    struct xwos_br mBr; /**< 线程栅栏结构体 */
     xwos::Bmp<TNum> mThdBmp; /**< 线程位图 */
     xwos::Bmp<TNum> mThdMsk; /**< 线程掩码 */
-    xwer_t mCtorRc; /**< 事件标志构造的结果 */
 
   public:
     /**
@@ -48,21 +42,14 @@ class SBr : public Br<TNum>
      */
     SBr() : Br<TNum>()
     {
-        mCtorRc = xwos_br_init(&mBr, TNum, mThdBmp.mData, mMask);
-        if (XWOK == mCtorRc) {
-            Br<TNum>::mBrPtr = &mBr;
-        }
+        xwos_br_init(&mBr, TNum, mThdBmp.mData, mMask);
+        Br<TNum>::mBrPtr = &mBr;
     }
     ~SBr() { xwos_br_fini(&mBr); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取静态事件标志构造的结果 */
 
     /* 生命周期管理 */
     xwer_t grab() { return xwos_br_grab(&mBr); } /**< 增加引用计数 */
     xwer_t put() { return xwos_br_put(&mBr); } /**< 减少引用计数 */
-
-  private:
-    static void * operator new(xwsz_t sz) = delete;
-    void operator delete(void * obj) = delete;
 };
 
 /**

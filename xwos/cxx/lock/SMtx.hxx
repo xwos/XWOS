@@ -24,12 +24,6 @@ namespace lock {
  * @defgroup xwos_cxx_lock_Mtx_SMtx 静态互斥锁
  * @ingroup xwos_cxx_lock_Mtx
  *
- * 静态互斥锁是指互斥锁所需要的内存在编译期由编译器分配。
- *
- * ## 头文件
- *
- * @ref xwos/cxx/lock/SMtx.hxx
- *
  * @{
  */
 
@@ -40,7 +34,6 @@ class SMtx : public Mtx
 {
   private:
     struct xwos_mtx mMtx; /**< 互斥锁结构体 */
-    xwer_t mCtorRc; /**< 互斥锁构造的结果 */
 
   public:
     /**
@@ -50,22 +43,15 @@ class SMtx : public Mtx
     explicit SMtx(xwpr_t pr = XWOS_SKD_PRIORITY_RT_MAX)
         : Mtx()
     {
-        mCtorRc = xwos_mtx_init(&mMtx, pr);
-        if (XWOK == mCtorRc) {
-            Mtx::mMtxPtr = &mMtx;
-        }
+        xwos_mtx_init(&mMtx, pr);
+        Mtx::mMtxPtr = &mMtx;
     }
 
     ~SMtx() { xwos_mtx_fini(&mMtx); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取静态互斥锁构造的结果 */
 
     /* 生命周期管理 */
     xwer_t grab() { return xwos_mtx_grab(&mMtx); } /**< 增加引用计数 */
     xwer_t put() { return xwos_mtx_put(&mMtx); } /**< 减少引用计数 */
-
-  private:
-    static void * operator new(xwsz_t sz) = delete;
-    void operator delete(void * obj) = delete;
 };
 
 /**

@@ -24,12 +24,6 @@ namespace xwos {
  * @defgroup xwos_cxx_Bmp 位图库
  * @ingroup xwos_cxx
  *
- * XWOS位图库
- *
- * ## 头文件
- *
- * @ref xwos/cxx/Bmp.hxx
- *
  * @{
  */
 

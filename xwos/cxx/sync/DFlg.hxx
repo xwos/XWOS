@@ -23,11 +23,6 @@ namespace sync {
  * @defgroup xwos_cxx_sync_Flg_DFlg 动态事件标志
  * @ingroup xwos_cxx_sync_Flg
  *
- *
- * ## C++ API
- *
- * 头文件： @ref xwos/cxx/sync/DFlg.hxx
- *
  * @{
  */
 
@@ -53,8 +48,16 @@ class DFlg : public Flg<TNum>
             Flg<TNum>::mFlgPtr = mFlgDesc.flg;
         }
     }
-    ~DFlg() { xwos_flg_delete(mFlgDesc); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态事件标志构造的结果 */
+    /**
+     * @brief 析构函数
+     */
+    ~DFlg() { xwos_flg_delete(mFlgDesc); }
+    /**
+     * @brief 获取动态事件标志构造的结果
+     * @note
+     * 动态对象的创建可能会因为内存不足构造失败。
+     */
+    xwer_t getDFlgCtorRc() { return mCtorRc; }
 
     /* 生命周期管理 */
     xwer_t acquire() { return xwos_flg_acquire(mFlgDesc); } /**< 增加引用计数 */

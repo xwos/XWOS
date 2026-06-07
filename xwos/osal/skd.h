@@ -77,9 +77,6 @@
  * + `xwos_skd_pause_lc()` ：暂停调度器
  * + `xwos_skd_continue_lc()` ：继续已暂停的调度器
  *
- * ## C++
- *
- * C++头文件： @ref xwos/osal/skd.hxx
  * @{
  */
 

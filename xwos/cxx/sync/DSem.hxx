@@ -23,11 +23,6 @@ namespace sync {
  * @defgroup xwos_cxx_sync_Sem_DSem 动态信号量
  * @ingroup xwos_cxx_sync_Sem
  *
- *
- * ## C++ API
- *
- * 头文件： @ref xwos/cxx/sync/DSem.hxx
- *
  * @{
  */
 
@@ -52,8 +47,16 @@ class DSem : public Sem
             Sem::mSemPtr = mSemDesc.sem;
         }
     }
-    ~DSem() { xwos_sem_delete(mSemDesc); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态信号量构造的结果 */
+    /**
+     * @brief 析构函数
+     */
+    ~DSem() { xwos_sem_delete(mSemDesc); }
+    /**
+     * @brief 获取动态信号量构造的结果
+     * @note
+     * 动态对象的创建可能会因为内存不足构造失败。
+     */
+    xwer_t getDSemCtorRc() { return mCtorRc; }
 
     /* 生命周期管理 */
     xwer_t acquire() { return xwos_sem_acquire(mSemDesc); } /**< 增加引用计数 */

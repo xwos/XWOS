@@ -24,12 +24,6 @@ namespace lock {
  * @defgroup xwos_cxx_lock_Mtx_DMtx 动态互斥锁
  * @ingroup xwos_cxx_lock_Mtx
  *
- * 动态互斥锁是指互斥锁所需要的内存在编译期由编译器分配。
- *
- * ## 头文件
- *
- * @ref xwos/cxx/lock/DMtx.hxx
- *
  * @{
  */
 
@@ -54,9 +48,16 @@ class DMtx : public Mtx
             Mtx::mMtxPtr = mMtxDesc.mtx;
         }
     }
-
-    ~DMtx() { xwos_mtx_delete(mMtxDesc); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态互斥锁构造的结果 */
+    /**
+     * @brief 析构函数
+     */
+    ~DMtx() { xwos_mtx_delete(mMtxDesc); }
+    /**
+     * @brief 获取动态互斥锁构造的结果
+     * @note
+     * 动态对象的创建可能会因为内存不足构造失败。
+     */
+    xwer_t getDMtxCtorRc() { return mCtorRc; }
 
     /* 生命周期管理 */
     xwer_t acquire() { return xwos_mtx_acquire(mMtxDesc); } /**< 增加引用计数 */

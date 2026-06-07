@@ -20,26 +20,21 @@ namespace xwos {
 namespace sync {
 
 /**
- * @defgroup xwos_cxx_sync_Br_DBr 动态事件标志
+ * @defgroup xwos_cxx_sync_Br_DBr 动态线程栅栏
  * @ingroup xwos_cxx_sync_Br
- *
- *
- * ## C++ API
- *
- * 头文件： @ref xwos/cxx/sync/DBr.hxx
  *
  * @{
  */
 
 /**
- * @brief 动态事件标志
+ * @brief 动态线程栅栏
  */
 template<xwsz_t TNum>
 class DBr : public Br<TNum>
 {
   private:
-    xwos_br_d mBrDesc; /**< 事件标志对象描述符 */
-    xwer_t mCtorRc; /**< 事件标志构造的结果 */
+    xwos_br_d mBrDesc; /**< 线程栅栏对象描述符 */
+    xwer_t mCtorRc; /**< 线程栅栏构造的结果 */
 
   public:
     /**
@@ -52,8 +47,16 @@ class DBr : public Br<TNum>
             Br<TNum>::mBrPtr = mBrDesc.br;
         }
     }
-    ~DBr() { xwos_br_delete(mBrDesc); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态事件标志构造的结果 */
+    /**
+     * @brief 析构函数
+     */
+    ~DBr() { xwos_br_delete(mBrDesc); }
+    /**
+     * @brief 获取动态线程栅栏构造的结果
+     * @note
+     * 动态对象的创建可能会因为内存不足构造失败。
+     */
+    xwer_t getDBrCtorRc() { return mCtorRc; }
 
     /* 生命周期管理 */
     xwer_t acquire() { return xwos_br_acquire(mBrDesc); } /**< 增加引用计数 */

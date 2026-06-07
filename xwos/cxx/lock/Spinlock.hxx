@@ -242,11 +242,6 @@ namespace lock {
  * + `Spinlock::LkIrqsGrd::wait()`
  * + `Spinlock::TryLkIrqsGrd::wait()`
  *
- *
- * ## 头文件
- *
- * @ref xwos/cxx/lock/Spinlock.hxx
- *
  * @{
  */
 

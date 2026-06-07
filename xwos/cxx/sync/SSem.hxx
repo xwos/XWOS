@@ -23,7 +23,6 @@ namespace sync {
  * @defgroup xwos_cxx_sync_Sem_SSem 静态信号量
  * @ingroup xwos_cxx_sync_Sem
  *
- *
  * ## C++ API
  *
  * 头文件： @ref xwos/cxx/sync/SSem.hxx
@@ -38,7 +37,6 @@ class SSem : public Sem
 {
   private:
     struct xwos_sem mSem; /**< 信号量结构体 */
-    xwer_t mCtorRc; /**< 信号量构造的结果 */
 
   public:
     /**
@@ -47,21 +45,14 @@ class SSem : public Sem
     SSem(xwssq_t val = 0, xwssq_t max = XWSSQ_MAX)
         : Sem()
     {
-        mCtorRc = xwos_sem_init(&mSem, val, max);
-        if (XWOK == mCtorRc) {
-            Sem::mSemPtr = &mSem;
-        }
+        xwos_sem_init(&mSem, val, max);
+        Sem::mSemPtr = &mSem;
     }
     ~SSem() { xwos_sem_fini(&mSem); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取静态信号量构造的结果 */
 
     /* 生命周期管理 */
     xwer_t grab() { return xwos_sem_grab(&mSem); } /**< 增加引用计数 */
     xwer_t put() { return xwos_sem_put(&mSem); } /**< 减少引用计数 */
-
-  private:
-    static void * operator new(xwsz_t sz) = delete;
-    void operator delete(void * obj) = delete;
 };
 
 /**

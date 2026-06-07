@@ -24,10 +24,9 @@ namespace xwos {
  *
  * 静态线程是指线程所需要的内存在编译期由编译器分配。
  *
+ * `class SThd` 实现类的对象也只能定于为全局变量或类的静态成员。
  *
- * ## 头文件
- *
- * @ref xwos/cxx/SThd.hxx
+ * `class SThd` 不应该使用 `new` 与 `delete` 创建与删除。
  *
  * @{
  */
@@ -36,7 +35,7 @@ namespace xwos {
  * @brief 静态线程
  * @param[in] TCpu: 目标CPU
  */
-template<xwid_t TCpu = 0>
+template<xwid_t TCpu = 0UL>
 class SThd
 {
   private:
@@ -73,11 +72,8 @@ class SThd
     }
     /**
      * @brief 静态线程析构函数
-     * @note
-     * 静态线程是编译器创建，不支持删除，因此不会调用析构函数。
-     * 基类析构函数不能为 `virtual` ，否则编译器编译子类时，会链接 `operator delete` 。
      */
-    ~SThd() { xwos_thd_detach(mThdDesc); }
+    virtual ~SThd() { xwos_thd_detach(mThdDesc); }
     /**
      * @brief 加载线程
      * @return 错误码
@@ -216,8 +212,6 @@ class SThd
 
   private:
     static xwer_t sThdMainFunction(SThd * thd) { return thd->thdMainFunction(); }
-    static void * operator new(xwsz_t sz) = delete;
-    void operator delete(void * obj) = delete;
 };
 
 /**

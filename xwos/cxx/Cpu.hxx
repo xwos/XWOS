@@ -24,10 +24,6 @@ namespace xwos {
  *
  * CPU、调度器、中断、上下文相关的库。
  *
- * ## 头文件
- *
- * @ref xwos/cxx/Cpu.hxx
- *
  * @{
  */
 

@@ -23,11 +23,6 @@ namespace sync {
  * @defgroup xwos_cxx_sync_Sel_DSel 动态信号选择器
  * @ingroup xwos_cxx_sync_Sel
  *
- *
- * ## C++ API
- *
- * 头文件： @ref xwos/cxx/sync/DSel.hxx
- *
  * @{
  */
 
@@ -52,8 +47,16 @@ class DSel : public Sel<TNum>
             Sel<TNum>::mSelPtr = mSelDesc.sel;
         }
     }
-    ~DSel() { xwos_sel_delete(mSelDesc); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取动态信号选择器构造的结果 */
+    /**
+     * @brief 析构函数
+     */
+    ~DSel() { xwos_sel_delete(mSelDesc); }
+    /**
+     * @brief 获取动态信号选择器构造的结果
+     * @note
+     * 动态对象的创建可能会因为内存不足构造失败。
+     */
+    xwer_t getDSelCtorRc() { return mCtorRc; }
 
     /* 生命周期管理 */
     xwer_t acquire() { return xwos_sel_acquire(mSelDesc); } /**< 增加引用计数 */

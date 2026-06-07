@@ -22,11 +22,6 @@ namespace sync {
  * @defgroup xwos_cxx_sync_Sel_SSel 静态信号选择器
  * @ingroup xwos_cxx_sync_Sel
  *
- *
- * ## C++ API
- *
- * 头文件： @ref xwos/cxx/sync/SSel.hxx
- *
  * @{
  */
 
@@ -40,7 +35,6 @@ class SSel : public Sel<TNum>
     struct xwos_sel mSel; /**< 信号选择器结构体 */
     xwos::Bmp<TNum> mObjBmp; /**< 同步对象位图 */
     xwos::Bmp<TNum> mObjMsk; /**< 同步对象掩码 */
-    xwer_t mCtorRc; /**< 信号选择器构造的结果 */
 
   public:
     /**
@@ -48,21 +42,14 @@ class SSel : public Sel<TNum>
      */
     SSel() : Sel<TNum>()
     {
-        mCtorRc = xwos_sel_init(&mSel, TNum, mObjBmp.mData, mMask);
-        if (XWOK == mCtorRc) {
-            Sel<TNum>::mSelPtr = &mSel;
-        }
+        xwos_sel_init(&mSel, TNum, mObjBmp.mData, mMask);
+        Sel<TNum>::mSelPtr = &mSel;
     }
     ~SSel() { xwos_sel_fini(&mSel); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取静态信号选择器构造的结果 */
 
     /* 生命周期管理 */
     xwer_t grab() { return xwos_sel_grab(&mSel); } /**< 增加引用计数 */
     xwer_t put() { return xwos_sel_put(&mSel); } /**< 减少引用计数 */
-
-  private:
-    static void * operator new(xwsz_t sz) = delete;
-    void operator delete(void * obj) = delete;
 };
 
 /**

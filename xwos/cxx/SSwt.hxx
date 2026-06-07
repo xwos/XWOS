@@ -24,10 +24,9 @@ namespace xwos {
  *
  * 静态软件定时器是指软件定时器所需要的内存在编译期由编译器分配。
  *
+ * `class SSwt` 实现类的对象也只能定于为全局变量或类的静态成员。
  *
- * ## 头文件
- *
- * @ref xwos/cxx/SSwt.hxx
+ * `class SSwt` 不应该使用 `new` 与 `delete` 创建与删除。
  *
  * @{
  */
@@ -35,7 +34,7 @@ namespace xwos {
 /**
  * @brief 静态软件定时器
  */
-template<xwid_t TCpu = 0>
+template<xwid_t TCpu = 0UL>
 class SSwt
 {
   private:
@@ -52,11 +51,8 @@ class SSwt
     }
     /**
      * @brief 静态软件定时器析构函数
-     * @note
-     * 静态软件定时器是编译器创建，不支持删除，因此不会调用析构函数。
-     * 基类析构函数不能为 `virtual` ，否则编译器编译子类时，会链接 `operator delete` 。
      */
-    ~SSwt() {}
+    virtual ~SSwt() {}
     /**
      * @brief 启动软件定时器
      * @param[in] origin: 软件定时器的初始时间
@@ -98,8 +94,6 @@ class SSwt
 
   private:
     static void sSwtAlarmFunction(struct xwos_swt * swt, SSwt * obj) { obj->swtAlarmFunction(); }
-    static void * operator new(xwsz_t sz) = delete;
-    void operator delete(void * obj) = delete;
 };
 
 /**

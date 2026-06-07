@@ -469,10 +469,6 @@ namespace lock {
  * + `Seqlock::WrLkIrqsGrd::wait()`
  * + `Seqlock::TryWrLkIrqsGrd::wait()`
  *
- * ## 头文件
- *
- * @ref xwos/cxx/lock/Seqlock.hxx
- *
  * @{
  */
 

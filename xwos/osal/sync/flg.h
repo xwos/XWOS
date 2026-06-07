@@ -81,10 +81,6 @@
  * 已知事件标志对象的指针的情况下，可以通过 `xwos_flg_get_d()` 获取 @ref xwos_flg_d ，
  * 或可以通过 `xwos_flg_get_tik()` 获取对象标签。
  *
- *
- * ## C++
- *
- * C++头文件： @ref xwos/osal/sync/flg.hxx
  * @{
  */
 

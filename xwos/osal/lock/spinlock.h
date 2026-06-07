@@ -60,10 +60,6 @@
  *   + `xwos_splk_trylock_bh()` ：尝试上锁，关闭抢占、中断底半部
  *   + `xwos_splk_unlock_bh()` ：解锁，开启抢占、中断底半部
  *
- *
- * ## C++
- *
- * C++头文件： @ref xwos/osal/lock/spinlock.hxx
  * @{
  */
 

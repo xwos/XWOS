@@ -45,10 +45,6 @@
  * + `xwos_irq_save()` ：保存某个外设中断的开关，然后将其关闭
  * + `xwos_irq_restore()` ：恢复某个外设中断的开关
  *
- *
- * ## C++
- *
- * C++头文件： @ref xwos/osal/irq.hxx
  * @{
  */
 

@@ -21,11 +21,6 @@ namespace xwos {
  * @defgroup xwos_cxx_Thd_CThd 只作用于调用线程的函数集合
  * @ingroup xwos_cxx_Thd
  *
- *
- * ## 头文件
- *
- * @ref xwos/cxx/CThd.hxx
- *
  * @{
  */
 

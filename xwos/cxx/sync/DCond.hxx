@@ -23,11 +23,6 @@ namespace sync {
  * @defgroup xwos_cxx_sync_Cond_DCond 动态条件量
  * @ingroup xwos_cxx_sync_Cond
  *
- *
- * ## C++ API
- *
- * 头文件： @ref xwos/cxx/sync/DCond.hxx
- *
  * @{
  */
 
@@ -51,8 +46,16 @@ class DCond : public Cond
             Cond::mCondPtr = mCondDesc.cond;
         }
     }
-    ~DCond() { xwos_cond_delete(mCondDesc); } /**< 析构函数 */
-    xwer_t getCtorRc() { return mCtorRc; } /**< 获取静态条件量构造的结果 */
+    /**
+     * @brief 析构函数
+     */
+    ~DCond() { xwos_cond_delete(mCondDesc); }
+    /**
+     * @brief 获取动态条件量构造的结果
+     * @note
+     * 动态对象的创建可能会因为内存不足构造失败。
+     */
+    xwer_t getDCondCtorRc() { return mCtorRc; }
 
     /* 生命周期管理 */
     xwer_t acquire() { return xwos_cond_acquire(mCondDesc); } /**< 增加引用计数 */
