@@ -23,10 +23,10 @@
 
 
         .section        .xwos.text,"ax"
-        .global         soc_splk_lock
+        .global         xwospl_splk_lock
         .align          4
-soc_splk_lock:
-/* void soc_splk_lock(void * addr) */
+xwospl_splk_lock:
+/* void xwospl_splk_lock(struct xwospl_splk * osplsplk) */
         mbar            0
 1:
         lwarx           r4, 0, r3
@@ -37,15 +37,15 @@ soc_splk_lock:
         se_bne          1b
         msync
         se_blr
-soc_splk_lock_end:
-        .size           soc_splk_lock, . - soc_splk_lock
+xwospl_splk_lock_end:
+        .size           xwospl_splk_lock, . - xwospl_splk_lock
 
 
         .section        .xwos.text,"ax"
-        .global         soc_splk_trylock
+        .global         xwospl_splk_trylock
         .align          4
-soc_splk_trylock:
-/* int soc_splk_trylock(void * addr) */
+xwospl_splk_trylock:
+/* int xwospl_splk_trylock(struct xwospl_splk * osplsplk) */
         e_li            r6, EAGAIN /* r6 = EAGAIN */
         neg             r6, r6
         mbar            0
@@ -61,15 +61,15 @@ soc_splk_trylock:
         mr              r3, r6
         msync
         se_blr
-soc_splk_trylock_end:
-        .size           soc_splk_trylock, . - soc_splk_trylock
+xwospl_splk_trylock_end:
+        .size           xwospl_splk_trylock, . - xwospl_splk_trylock
 
 
         .section        .xwos.text,"ax"
-        .global         soc_splk_unlock
+        .global         xwospl_splk_unlock
         .align          4
-soc_splk_unlock:
-/* void soc_splk_unlock(void * addr) */
+xwospl_splk_unlock:
+/* void xwospl_splk_unlock(struct xwospl_splk * osplsplk) */
         mbar            0
 1:
         lwarx           r4, 0, r3
@@ -80,5 +80,5 @@ soc_splk_unlock:
         se_bne          1b
         msync
         se_blr
-soc_splk_unlock_end:
-        .size           soc_splk_unlock, . - soc_splk_unlock
+xwospl_splk_unlock_end:
+        .size           xwospl_splk_unlock, . - xwospl_splk_unlock

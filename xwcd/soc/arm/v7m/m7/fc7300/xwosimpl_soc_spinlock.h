@@ -21,40 +21,38 @@
 #ifndef __xwosimpl_soc_spinlock_h__
 #define __xwosimpl_soc_spinlock_h__
 
-#ifndef __xwos_ospl_soc_spinlock_h__
-#  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
+#ifndef __xwos_ospl_spinlock_h__
+#  error "This file should be included from <xwos/ospl/spinlock.h>."
 #endif
 
 #include <xwcd/soc/arm/v7m/m7/fc7300/soc_mb.h>
 
-#define SOC_MB_CH_SPINLOCK              8
-
-struct soc_splk {
+struct xwospl_splk {
         volatile xwu32_t lock;
 };
 
-#define SOC_SPLK_INITIALIZER { .lock = 0U, }
+#define XWOSPL_SPLK_INITIALIZER { .lock = 0U, }
 
 static __xwbsp_inline
-void soc_splk_init(struct soc_splk * socsplk)
+void xwospl_splk_init(struct xwospl_splk * osplsplk)
 {
-        socsplk->lock = 0;
+        osplsplk->lock = 0;
 }
 
 #if (CPUCFG_CPU_NUM > 1)
 static __xwbsp_inline
-void soc_splk_lock(struct soc_splk * socsplk)
+void xwospl_splk_lock(struct xwospl_splk * osplsplk)
 {
         xwu32_t locked;
 
         do {
-                while (socsplk->lock > 0U) {
+                while (osplsplk->lock > 0U) {
                 }
                 locked = soc_mb_lock(SOC_MB_CH_SPINLOCK);
                 if (locked > 0) {
-                        xwmb_mp_load_acquire(xwu32_t, locked, socsplk);
+                        xwmb_mp_load_acquire(xwu32_t, locked, osplsplk);
                         if (0U == locked) {
-                                xwmb_mp_store_release(xwu32_t, socsplk, 1U);
+                                xwmb_mp_store_release(xwu32_t, osplsplk, 1U);
                                 soc_mb_unlock(SOC_MB_CH_SPINLOCK);
                                 break;
                         }
@@ -64,7 +62,7 @@ void soc_splk_lock(struct soc_splk * socsplk)
 }
 
 static __xwbsp_inline
-xwer_t soc_splk_trylock(struct soc_splk * socsplk)
+xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 {
         xwu32_t locked;
         xwer_t rc;
@@ -72,9 +70,9 @@ xwer_t soc_splk_trylock(struct soc_splk * socsplk)
         do {
                 locked = soc_mb_lock(SOC_MB_CH_SPINLOCK);
                 if (locked > 0) {
-                        xwmb_mp_load_acquire(xwu32_t, locked, socsplk);
+                        xwmb_mp_load_acquire(xwu32_t, locked, osplsplk);
                         if (0U == locked) {
-                                xwmb_mp_store_release(xwu32_t, socsplk, 1U);
+                                xwmb_mp_store_release(xwu32_t, osplsplk, 1U);
                                 rc = XWOK;
                         } else {
                                 rc = -EAGAIN;
@@ -87,9 +85,9 @@ xwer_t soc_splk_trylock(struct soc_splk * socsplk)
 }
 
 static __xwbsp_inline
-void soc_splk_unlock(struct soc_splk * socsplk)
+void xwospl_splk_unlock(struct xwospl_splk * osplsplk)
 {
-        xwmb_mp_store_release(xwu32_t, socsplk, 0U);
+        xwmb_mp_store_release(xwu32_t, osplsplk, 0U);
 }
 #endif
 

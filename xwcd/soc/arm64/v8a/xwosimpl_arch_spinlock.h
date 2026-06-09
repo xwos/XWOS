@@ -21,24 +21,24 @@
 #ifndef __xwosimpl_arch_spinlock_h__
 #define __xwosimpl_arch_spinlock_h__
 
-#ifndef __xwos_ospl_soc_spinlock_h__
-#  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
+#ifndef __xwos_ospl_spinlock_h__
+#  error "This file should be included from <xwos/ospl/spinlock.h>."
 #endif
 
 #include <xwos/standard.h>
 #include <xwcd/soc/arm64/v8a/arch_isa.h>
 
-#define SOC_SPLK_QUEUE_SHIFT 16U
+#define XWOSPL_SPLK_QUEUE_SHIFT 16U
 
 /**
  * @brief ARMv8-A的自旋锁
  * @details
  * 自旋锁的实现，类似于银行的排队系统。每个CPU申请锁时，
- * 可从“排队系统” `soc_splk.v.q.n` 中申请到一个排队号。
- * `soc_splk.v.q.n` 输出一个排队号后自增1。
- * 当“叫号系统” `soc_splk.v.q.c` 叫到排队号时，持有排队号的CPU可以获得锁。
+ * 可从“排队系统” `xwospl_splk.v.q.n` 中申请到一个排队号。
+ * `xwospl_splk.v.q.n` 输出一个排队号后自增1。
+ * 当“叫号系统” `xwospl_splk.v.q.c` 叫到排队号时，持有排队号的CPU可以获得锁。
  */
-struct soc_splk {
+struct xwospl_splk {
         union {
                 xwu32_t raw; /**< 值 */
                 struct {
@@ -54,31 +54,31 @@ struct soc_splk {
 } __xwcc_aligned(4);
 
 
-#define SOC_SPLK_INITIALIZER { .v.q.n = 0, .v.q.c = 0, }
+#define XWOSPL_SPLK_INITIALIZER { .v.q.n = 0, .v.q.c = 0, }
 
 static __xwbsp_inline
-void soc_splk_init(struct soc_splk * splk)
+void xwospl_splk_init(struct xwospl_splk * osplsplk)
 {
-        splk->v.q.n = 0;
-        splk->v.q.c = 0;
+        osplsplk->v.q.n = 0;
+        osplsplk->v.q.c = 0;
 }
 
 #if (CPUCFG_CPU_NUM > 1)
 static __xwbsp_inline
-void soc_splk_lock(struct soc_splk * splk)
+void xwospl_splk_lock(struct xwospl_splk * osplsplk)
 {
         xwer_t rc;
-        struct soc_splk lkval;
+        struct xwospl_splk lkval;
         xwu16_t queue_number;
 
-        armv8a_prefetch_before_aop(splk->v.raw);
+        armv8a_prefetch_before_aop(osplsplk->v.raw);
         do {
                 lkval.v.raw = armv8a_load_acquire_exclusively_32b(
-                        (atomic_xwu32_t *)&splk->v.raw);
+                        (atomic_xwu32_t *)&osplsplk->v.raw);
                 queue_number = lkval.v.q.n;
                 lkval.v.q.n++;
                 rc = armv8a_store_exclusively_32b(
-                        (atomic_xwu32_t *)&splk->v.raw, lkval.v.raw);
+                        (atomic_xwu32_t *)&osplsplk->v.raw, lkval.v.raw);
         } while (rc);
         if (queue_number != lkval.v.q.c) {
                 /* ARM指令手册中建议在 `WFE` 等待循环之前插入一条 `SEVL` 指令。
@@ -88,42 +88,42 @@ void soc_splk_lock(struct soc_splk * splk)
                         __asm__ volatile("wfe" : : : "memory"
                         );
                         lkval.v.q.c = armv8a_load_acquire_exclusively_16b(
-                                (atomic_xwu16_t *)&splk->v.q.c);
+                                (atomic_xwu16_t *)&osplsplk->v.q.c);
                 } while (queue_number != lkval.v.q.c);
         }
 }
 
 static __xwbsp_inline
-xwer_t soc_splk_trylock(struct soc_splk * splk)
+xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 {
         xwer_t rc;
-        struct soc_splk lkval;
+        struct xwospl_splk lkval;
 
-        armv8a_prefetch_before_aop(splk->v.raw);
+        armv8a_prefetch_before_aop(osplsplk->v.raw);
         do {
                 lkval.v.raw = armv8a_load_acquire_exclusively_32b(
-                        (atomic_xwu32_t *)&splk->v.raw);
+                        (atomic_xwu32_t *)&osplsplk->v.raw);
                 if (lkval.v.q.n != lkval.v.q.c) {
                         rc = -EAGAIN;
                         break;
                 }
                 lkval.v.q.n++;
                 rc = armv8a_store_exclusively_32b(
-                        (atomic_xwu32_t *)&splk->v.raw, lkval.v.raw);
+                        (atomic_xwu32_t *)&osplsplk->v.raw, lkval.v.raw);
         } while (rc);
         return rc;
 }
 
 static __xwbsp_inline
-void soc_splk_unlock(struct soc_splk * splk)
+void xwospl_splk_unlock(struct xwospl_splk * osplsplk)
 {
         __xwcc_atomic xwu16_t n;
 
-        n = splk->v.q.c + 1;
+        n = osplsplk->v.q.c + 1;
         /* 根据ARM架构参考手册中的描述，"global monitor" 检测到 "PE" 的
            "Exclusive Access" 状态变为可访问时，会向 "PE" 发送一个 "Event" ，使得
            正在执行 `WFE` 指令的 "PE" 唤醒。*/
-        armv8a_store_release_16b((atomic_xwu16_t *)&splk->v.q.c, n);
+        armv8a_store_release_16b((atomic_xwu16_t *)&osplsplk->v.q.c, n);
 }
 #endif
 

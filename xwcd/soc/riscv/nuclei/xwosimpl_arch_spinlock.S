@@ -24,27 +24,27 @@
 
 
         .section        .xwos.text,"ax"
-        .global         soc_splk_lock
+        .global         xwospl_splk_lock
         .align          2
-        .func           soc_splk_lock
-soc_splk_lock:
-/* void soc_splk_lock(struct soc_splk * socsplk) */
+        .func           xwospl_splk_lock
+xwospl_splk_lock:
+/* void xwospl_splk_lock(struct xwospl_splk * osplsplk) */
         li              t0, 1
 1:
         amoswap.w.aq    t1, t0, (a0)
         bnez            t1, 1b
         ret
         .endfunc
-soc_splk_lock_end:
-        .size           soc_splk_lock, . - soc_splk_lock
+xwospl_splk_lock_end:
+        .size           xwospl_splk_lock, . - xwospl_splk_lock
 
 
         .section        .xwos.text,"ax"
-        .global         soc_splk_trylock
+        .global         xwospl_splk_trylock
         .align          2
-        .func           soc_splk_trylock
-soc_splk_trylock:
-/* int soc_splk_trylock(struct soc_splk * socsplk) */
+        .func           xwospl_splk_trylock
+xwospl_splk_trylock:
+/* int xwospl_splk_trylock(struct xwospl_splk * osplsplk) */
         li              t0, 1
         amoswap.w.aq    t1, t0, (a0)
         bnez            t1, 1f
@@ -55,19 +55,19 @@ soc_splk_trylock:
 2:
         ret
         .endfunc
-soc_splk_trylock_end:
-        .size           soc_splk_trylock, . - soc_splk_trylock
+xwospl_splk_trylock_end:
+        .size           xwospl_splk_trylock, . - xwospl_splk_trylock
 
 
         .section        .xwos.text,"ax"
-        .global         soc_splk_unlock
+        .global         xwospl_splk_unlock
         .align          2
-        .func           soc_splk_unlock
-soc_splk_unlock:
-/* void soc_splk_unlock(struct soc_splk * socsplk) */
+        .func           xwospl_splk_unlock
+xwospl_splk_unlock:
+/* void xwospl_splk_unlock(struct xwospl_splk * osplsplk) */
         li              t0, 0
         amoswap.w.rl    t0, t0, (a0)
         ret
         .endfunc
-soc_splk_unlock_end:
-        .size           soc_splk_unlock, . - soc_splk_unlock
+xwospl_splk_unlock_end:
+        .size           xwospl_splk_unlock, . - xwospl_splk_unlock

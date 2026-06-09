@@ -21,15 +21,15 @@
 #ifndef __xwosimpl_arch_spinlock_h__
 #define __xwosimpl_arch_spinlock_h__
 
-#ifndef __xwos_ospl_soc_spinlock_h__
-#  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
+#ifndef __xwos_ospl_spinlock_h__
+#  error "This file should be included from <xwos/ospl/spinlock.h>."
 #endif
 
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
 
-#define SOC_SPLK_TICKET_SHIFT          16
+#define XWOSPL_SPLK_TICKET_SHIFT          16
 
-struct soc_splk {
+struct xwospl_splk {
         union {
                 xwu32_t total;
                 struct {
@@ -44,28 +44,24 @@ struct soc_splk {
         } v;
 };
 
-#define SOC_SPLK_INITIALIZER { .v.tickets.curr = 0, .v.tickets.next = 0, }
+#define XWOSPL_SPLK_INITIALIZER { .v.tickets.curr = 0, .v.tickets.next = 0, }
 
-/**
- * @brief Initialize spinlock
- * @parem socsplk: SOC Spinlock
- */
 static __xwbsp_inline
-void soc_splk_init(struct soc_splk * socsplk)
+void xwospl_splk_init(struct xwospl_splk * osplsplk)
 {
-        socsplk->v.tickets.next = 0;
-        socsplk->v.tickets.curr = 0;
+        osplsplk->v.tickets.next = 0;
+        osplsplk->v.tickets.curr = 0;
 }
 
 #if (CPUCFG_CPU_NUM > 1)
 static __xwbsp_inline
-void soc_splk_lock(struct soc_splk * socsplk)
+void xwospl_splk_lock(struct xwospl_splk * osplsplk)
 {
         xwer_t rc;
         xwu32_t newval;
-        struct soc_splk tmp;
+        struct xwospl_splk tmp;
 
-        armv7m_prefetch(socsplk);
+        armv7m_prefetch(osplsplk);
         __asm__ volatile(
         "1:\n"
         "       ldrex   %[__tmp], [%[__lock]]\n"
@@ -76,26 +72,26 @@ void soc_splk_lock(struct soc_splk * socsplk)
         : [__tmp] "=&r" (tmp.v.total),
           [__newval] "=&r" (newval),
           [__rc] "=&r" (rc)
-        : [__lock] "r" (socsplk),
-          [__ticket] "I" (1 << SOC_SPLK_TICKET_SHIFT)
+        : [__lock] "r" (osplsplk),
+          [__ticket] "I" (1 << XWOSPL_SPLK_TICKET_SHIFT)
         : "cc", "memory"
         );
 
         while (tmp.v.tickets.next != tmp.v.tickets.curr) {
                 armv7m_wfe();
-                tmp.v.tickets.curr = xwmb_access(xwu16_t, &socsplk->v.tickets.curr);
+                tmp.v.tickets.curr = xwmb_access(xwu16_t, &osplsplk->v.tickets.curr);
         }
         xwmb_mp_mb();
 }
 
 static __xwbsp_inline
-xwer_t soc_splk_trylock(struct soc_splk * socsplk)
+xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 {
         xwer_t rc;
         xwu32_t contended;
-        struct soc_splk tmp;
+        struct xwospl_splk tmp;
 
-        armv7m_prefetch(socsplk);
+        armv7m_prefetch(osplsplk);
         do {
                 __asm__ volatile(
                 "       ldrex   %[__tmp], [%[__lock]]\n"
@@ -108,8 +104,8 @@ xwer_t soc_splk_trylock(struct soc_splk * socsplk)
                 : [__tmp] "=&r" (tmp.v.total),
                   [__contended] "=&r" (contended),
                   [__rc] "=&r" (rc)
-                : [__lock] "r" (socsplk),
-                  [__ticket] "I" (1 << SOC_SPLK_TICKET_SHIFT)
+                : [__lock] "r" (osplsplk),
+                  [__ticket] "I" (1 << XWOSPL_SPLK_TICKET_SHIFT)
                 : "cc"
                 );
         } while (rc);
@@ -123,10 +119,10 @@ xwer_t soc_splk_trylock(struct soc_splk * socsplk)
 }
 
 static __xwbsp_inline
-void soc_splk_unlock(struct soc_splk * socsplk)
+void xwospl_splk_unlock(struct xwospl_splk * osplsplk)
 {
         xwmb_mp_mb();
-        socsplk->v.tickets.curr++;
+        osplsplk->v.tickets.curr++;
         armv7m_dsb();
         armv7m_sev();
 }

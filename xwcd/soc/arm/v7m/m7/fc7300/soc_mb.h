@@ -62,6 +62,8 @@ struct soc_mb_regs {
 
 #define SOC_MB_MASTER_DONE_CODE         (0xFC730000U)
 
+#define SOC_MB_CH_SPINLOCK              15
+
 
 static __xwbsp_inline
 xwu32_t soc_mb_lock(xwu32_t ch)

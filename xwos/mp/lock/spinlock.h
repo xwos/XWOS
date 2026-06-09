@@ -14,19 +14,19 @@
 #define __xwos_mp_lock_spinlock_h__
 
 #include <xwos/standard.h>
-#include <xwos/ospl/soc/spinlock.h>
+#include <xwos/ospl/spinlock.h>
 
 /**
  * @brief 自旋锁
  */
 struct xwmp_splk {
-        struct soc_splk socsplk; /**< 架构描述层中的自旋锁结构体 */
+        struct xwospl_splk osplsplk; /**< 架构描述层中的自旋锁结构体 */
 };
 
 /**
  * @brief 自旋锁的初始值
  */
-#define XWMP_SPLK_INITIALIZER { .socsplk = SOC_SPLK_INITIALIZER, }
+#define XWMP_SPLK_INITIALIZER { .osplsplk = XWOSPL_SPLK_INITIALIZER, }
 
 void xwmp_rawly_lock(struct xwmp_splk * spl);
 xwer_t xwmp_rawly_trylock(struct xwmp_splk * spl);
