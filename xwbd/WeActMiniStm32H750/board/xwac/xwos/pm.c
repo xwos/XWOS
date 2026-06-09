@@ -58,7 +58,8 @@ void xwosac_pmop_sleep_cpu(void * arg)
 
 void xwosac_pm_init(void)
 {
-        xwos_pm_set_op(xwosac_pmop_resume_periph,
+        xwos_pm_set_op(0U,
+                       xwosac_pmop_resume_periph,
                        xwosac_pmop_suspend_periph,
                        xwosac_pmop_wakeup_cpu,
                        xwosac_pmop_sleep_cpu,

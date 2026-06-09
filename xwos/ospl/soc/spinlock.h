@@ -14,7 +14,13 @@
 #define __xwos_ospl_soc_spinlock_h__
 
 #include <xwos/standard.h>
-#include <xwosimpl_soc_spinlock.h>
+#if defined(SOCCFG_LIB_SPINLOCK) && (1 == SOCCFG_LIB_SPINLOCK)
+#  include <xwosimpl_soc_spinlock.h>
+#elif defined(ARCHCFG_LIB_SPINLOCK) && (1 == ARCHCFG_LIB_SPINLOCK)
+#  include <xwosimpl_arch_spinlock.h>
+#else
+#  error "Can't find LFQ configurations! SOCCFG_LIB_SPINLOCK or ARCHCFG_LIB_SPINLOCK."
+#endif
 
 struct soc_splk;
 

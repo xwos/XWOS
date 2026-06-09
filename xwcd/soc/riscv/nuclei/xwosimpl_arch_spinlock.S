@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC自旋锁
+ * @brief XWOS移植实现层：ARCH自旋锁
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,66 +19,55 @@
  */
 
 #include <cfg/project.h>
-#include <xwos/lib/errno.h>
+
+        .equ            EAGAIN, 11
 
 
         .section        .xwos.text,"ax"
         .global         soc_splk_lock
-        .align          4
+        .align          2
+        .func           soc_splk_lock
 soc_splk_lock:
-/* void soc_splk_lock(void * addr) */
-        mbar            0
+/* void soc_splk_lock(struct soc_splk * socsplk) */
+        li              t0, 1
 1:
-        lwarx           r4, 0, r3
-        e_andi.         r5, r4, 1
-        se_beq          1b /* CR0[EQ] == 1, result is zero */
-        e_addi          r4, r4, -1
-        stwcx.          r4, 0, r3
-        se_bne          1b
-        msync
-        se_blr
+        amoswap.w.aq    t1, t0, (a0)
+        bnez            t1, 1b
+        ret
+        .endfunc
 soc_splk_lock_end:
         .size           soc_splk_lock, . - soc_splk_lock
 
 
         .section        .xwos.text,"ax"
         .global         soc_splk_trylock
-        .align          4
+        .align          2
+        .func           soc_splk_trylock
 soc_splk_trylock:
-/* int soc_splk_trylock(void * addr) */
-        e_li            r6, EAGAIN /* r6 = EAGAIN */
-        neg             r6, r6
-        mbar            0
+/* int soc_splk_trylock(struct soc_splk * socsplk) */
+        li              t0, 1
+        amoswap.w.aq    t1, t0, (a0)
+        bnez            t1, 1f
+        li              a0, 0
+        j               2f
 1:
-        lwarx           r4, 0, r3
-        e_andi.         r5, r4, 1
-        se_beq          2f /* if (CR0[EQ] == 1) */
-        e_addi          r4, r4, -1
-        stwcx.          r4, 0, r3
-        se_bne          1b
-        se_li           r6, 0
+        li              a0, -EAGAIN
 2:
-        mr              r3, r6
-        msync
-        se_blr
+        ret
+        .endfunc
 soc_splk_trylock_end:
         .size           soc_splk_trylock, . - soc_splk_trylock
 
 
         .section        .xwos.text,"ax"
         .global         soc_splk_unlock
-        .align          4
+        .align          2
+        .func           soc_splk_unlock
 soc_splk_unlock:
-/* void soc_splk_unlock(void * addr) */
-        mbar            0
-1:
-        lwarx           r4, 0, r3
-        e_andi.         r5, r4, 1
-        se_bne          1b /* CR0[EQ] == 0, result is non-zero */
-        e_addi          r4, r4, 1
-        stwcx.          r4, 0, r3
-        se_bne          1b
-        msync
-        se_blr
+/* void soc_splk_unlock(struct soc_splk * socsplk) */
+        li              t0, 0
+        amoswap.w.rl    t0, t0, (a0)
+        ret
+        .endfunc
 soc_splk_unlock_end:
         .size           soc_splk_unlock, . - soc_splk_unlock

@@ -325,8 +325,8 @@ void xwvsnpf_format_move_right(char * buf, char * end, xwssz_t len, xwssz_t spac
                 memmove(buf + spaces, buf, (xwsz_t)len);
         }
         memset(buf, ' ', (xwsz_t)spaces);
-
 end:
+        return;
 }
 
 static inline
@@ -444,7 +444,7 @@ char * xwvsnpf_format_float(char * buf, char * end, double num,
                             struct xwvsnpf_format_spec spec)
 {
         char tmp[100];
-        char *p = tmp;
+        char * p = tmp;
         char sign = 0;
         int precision = (spec.precision == -1) ? 6 : spec.precision;
         int is_sci = (spec.type == XWVSNPF_FT_FLOAT_SCI);
@@ -806,8 +806,8 @@ precision:
 qualifier:
         /* get the conversion qualifier */
         spec->qualifier = 0;
-        if (('h' == *fmt) || ('l' == tolower(*fmt)) ||
-            ('z' == tolower(*fmt)) || ('t' == *fmt)) {
+        if (('h' == *fmt) || ('l' == *fmt) || ('L' == *fmt) ||
+            ('z' == *fmt) || ('Z' == *fmt) || ('t' == *fmt)) {
                 spec->qualifier = *fmt++;
                 if (spec->qualifier == *fmt) {
                         if ('l' == spec->qualifier) {
@@ -913,7 +913,7 @@ qualifier:
                 } else {
                         spec->type = XWVSNPF_FT_ULONG;
                 }
-        } else if ('z' == tolower(spec->qualifier)) {
+        } else if (('z' == spec->qualifier) || ('Z' == spec->qualifier)) {
                 spec->type = XWVSNPF_FT_XWSZ_T;
         } else if ('t' == spec->qualifier) {
                 spec->type = XWVSNPF_FT_PTRDIFF;

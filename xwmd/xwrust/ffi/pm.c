@@ -13,13 +13,15 @@
 #include <xwos/standard.h>
 #include <xwos/osal/pm.h>
 
-void xwrustffi_pm_set_op(xwos_pm_op_f resume_periph,
+void xwrustffi_pm_set_op(xwid_t cpuid,
+                         xwos_pm_op_f resume_periph,
                          xwos_pm_op_f suspend_periph,
                          xwos_pm_op_f wakeup_cpu,
                          xwos_pm_op_f sleep_cpu,
                          void * arg)
 {
-        xwos_pm_set_op(resume_periph,
+        xwos_pm_set_op(cpuid,
+                       resume_periph,
                        suspend_periph,
                        wakeup_cpu,
                        sleep_cpu,

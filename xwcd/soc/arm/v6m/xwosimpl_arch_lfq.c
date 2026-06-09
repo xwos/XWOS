@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC自旋锁
+ * @brief XWOS移植实现层：ARCH无锁队列
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,27 +18,30 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_spinlock_h__
-#define __xwosimpl_soc_spinlock_h__
+#include <xwos/standard.h>
+#include <xwcd/soc/arm/v6m/arch_irq.h>
+#include <xwos/ospl/soc/lfq.h>
 
-#ifndef __xwos_ospl_soc_spinlock_h__
-#  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
-#endif
-
-struct soc_splk {
-        xwu32_t lockval;
-};
-
-#define SOC_SPLK_INITIALIZER { .lockval = 0x1, }
-
-static __xwbsp_inline
-void soc_splk_init(struct soc_splk * socsplk)
+void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
-        socsplk->lockval = 1;
+        xwreg_t flag;
+
+        arch_cpuirq_save_lc(&flag);
+        *n = *h;
+        *h = (xwlfq_t)n;
+        arch_cpuirq_restore_lc(flag);
 }
 
-void soc_splk_lock(struct soc_splk * socsplk);
-xwer_t soc_splk_trylock(struct soc_splk * socsplk);
-void soc_splk_unlock(struct soc_splk * socsplk);
+xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
+{
+        xwreg_t flag;
+        xwlfq_t * top;
 
-#endif /* xwcd/soc/powerpc/e200x/xwosimpl_soc_spinlock.h */
+        arch_cpuirq_save_lc(&flag);
+        top = (xwlfq_t *)(*h);
+        if (top) {
+                *h = *top;
+        }
+        arch_cpuirq_restore_lc(flag);
+        return top;
+}

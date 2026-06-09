@@ -14,7 +14,6 @@
 #define __xwos_ospl_soc_xwbop_h__
 
 #include <xwos/standard.h>
-#include <xwosimpl_soc_xwbop.h>
 
 xwssq_t xwbop_ffs8(xwu8_t x);
 xwssq_t xwbop_fls8(xwu8_t x);

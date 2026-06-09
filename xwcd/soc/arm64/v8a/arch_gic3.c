@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：ARMv8A Generic Interrupt Controller Version 2
+ * @brief 架构描述层：ARMv8A Generic Interrupt Controller Version 3
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright

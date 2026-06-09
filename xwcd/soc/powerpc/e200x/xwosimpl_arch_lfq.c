@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC无锁队列
+ * @brief XWOS移植实现层：ARCH无锁队列
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -20,10 +20,10 @@
 
 #include <xwos/standard.h>
 #include <xwcd/soc/powerpc/e200x/e200x_isa.h>
-#include <xwos/lib/lfq.h>
+#include <xwos/ospl/soc/lfq.h>
 
 __xwbsp_code
-void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
+void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
         xwlfq_t * next;
 
@@ -36,7 +36,7 @@ void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 }
 
 __xwbsp_code
-xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h)
+xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
 {
         xwlfq_t * top;
         xwlfq_t * next;

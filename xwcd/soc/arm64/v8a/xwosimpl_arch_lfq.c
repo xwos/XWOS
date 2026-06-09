@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC无锁队列
+ * @brief XWOS移植实现层：ARCH无锁队列
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,36 +19,34 @@
  */
 
 #include <xwos/standard.h>
-#include <xwcd/soc/riscv/nuclei/riscv_isa.h>
-#include <xwos/lib/lfq.h>
+#include <xwcd/soc/arm64/v8a/arch_isa.h>
+#include <xwos/ospl/soc/lfq.h>
 
 __xwbsp_code
-void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
+void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
-        xwlfq_t * next;
+        register xwlfq_t * next;
 
+        armv8a_prefetch_before_aop(*h);
         do {
-                next = (xwlfq_t *)rv_lrw(h);
-                xwmb_mp_mb();
+                next = (xwlfq_t *)armv8a_load_acquire_exclusively_64b(h);
                 *n = (xwlfq_t)next;
-                xwmb_mp_mb();
-        } while (rv_scw(h, (xwu32_t)n));
+        } while (armv8a_store_release_exclusively_64b(h, (xwu64_t)n));
 }
 
 __xwbsp_code
-xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h)
+xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
 {
-        xwlfq_t * top;
-        xwlfq_t * next;
+        register xwlfq_t * top;
+        register xwlfq_t * next;
         xwer_t rc;
 
+        armv8a_prefetch_before_aop(*h);
         do {
-                top = (xwlfq_t *)rv_lrw(h);
-                xwmb_mp_mb();
+                top = (xwlfq_t *)armv8a_load_acquire_exclusively_64b(h);
                 if (top) {
                         next = (xwlfq_t *)(*top);
-                        xwmb_mp_mb();
-                        rc = rv_scw(h, (xwu32_t)next);
+                        rc = armv8a_store_release_exclusively_64b(h, (xwu64_t)next);
                 } else {
                         break;
                 }

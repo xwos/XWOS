@@ -40,4 +40,7 @@
 /******** lfq ********/
 #define SOCCFG_LIB_LFQ                          0
 
+/******** spinlock ********/
+#define SOCCFG_LIB_SPINLOCK                     0
+
 #endif /* cfg/soc.h */

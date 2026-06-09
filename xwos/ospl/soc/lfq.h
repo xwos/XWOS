@@ -14,9 +14,8 @@
 #define __xwos_ospl_soc_lfq_h__
 
 #include <xwos/standard.h>
-#include <xwosimpl_soc_lfq.h>
 
-void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n);
-xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h);
+void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n);
+xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h);
 
 #endif /* xwos/ospl/soc/lfq.h */

@@ -10,7 +10,8 @@ use core::cmp::{PartialOrd, Ordering};
 use crate::types::*;
 
 extern "C" {
-    fn xwrustffi_pm_set_op(resume_periph: PmOperation,
+    fn xwrustffi_pm_set_op(cpuid: XwId,
+                           resume_periph: PmOperation,
                            suspend_periph: PmOperation,
                            wakeup_cpu: PmOperation,
                            sleep_cpu: PmOperation,
@@ -27,14 +28,19 @@ pub type PmOperation = extern "C" fn(*mut c_void);
 ///
 /// # 参数说明
 ///
+/// + cpuid: CPU ID
 /// + resume_periph: 恢复外设
 /// + suspend_periph: 暂停外设
 /// + wakeup_cpu: 唤醒
 /// + sleep_cpu: 休眠
-pub fn set_op(resume_periph: PmOperation, suspend_periph: PmOperation,
-              wakeup_cpu: PmOperation, sleep_cpu: PmOperation) {
+pub fn set_op(cpuid: XwId,
+              resume_periph: PmOperation,
+              suspend_periph: PmOperation,
+              wakeup_cpu: PmOperation,
+              sleep_cpu: PmOperation) {
     unsafe {
-        xwrustffi_pm_set_op(resume_periph,
+        xwrustffi_pm_set_op(cpuid,
+                            resume_periph,
                             suspend_periph,
                             wakeup_cpu,
                             sleep_cpu,

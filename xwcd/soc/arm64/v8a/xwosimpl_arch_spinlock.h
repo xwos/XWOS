@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC：自旋锁
+ * @brief XWOS移植实现层：ARCH自旋锁
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_spinlock_h__
-#define __xwosimpl_soc_spinlock_h__
+#ifndef __xwosimpl_arch_spinlock_h__
+#define __xwosimpl_arch_spinlock_h__
 
 #ifndef __xwos_ospl_soc_spinlock_h__
 #  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
@@ -120,11 +120,11 @@ void soc_splk_unlock(struct soc_splk * splk)
         __xwcc_atomic xwu16_t n;
 
         n = splk->v.q.c + 1;
-        /* 根据ARM架构继续参考手册中的描述，"global monitor"检测到"PE"的
-           "Exclusive Access"状态变为可访问时，会向"PE"发送一个"Event"，使得
-           正在执行 `WFE` 指令的"PE"唤醒。*/
+        /* 根据ARM架构参考手册中的描述，"global monitor" 检测到 "PE" 的
+           "Exclusive Access" 状态变为可访问时，会向 "PE" 发送一个 "Event" ，使得
+           正在执行 `WFE` 指令的 "PE" 唤醒。*/
         armv8a_store_release_16b((atomic_xwu16_t *)&splk->v.q.c, n);
 }
 #endif
 
-#endif /* xwosimpl_soc_spinlock.h */
+#endif /* xwosimpl_arch_spinlock.h */

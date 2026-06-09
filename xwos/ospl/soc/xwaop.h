@@ -14,7 +14,6 @@
 #define __xwos_ospl_soc_xwaop_h__
 
 #include <xwos/standard.h>
-#include <xwosimpl_soc_xwaop.h>
 
 /******** ******** ******** ******** unsigned 8bit ******** ******** ******** ********/
 xwu8_t xwaop__xwu8_t__load(atomic_xwu8_t * a,

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：陷阱
+ * @brief 架构描述层：中断
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright

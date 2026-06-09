@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC自旋锁
+ * @brief XWOS移植实现层：ARCH自旋锁
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,27 +18,27 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_spinlock_h__
-#define __xwosimpl_soc_spinlock_h__
+#ifndef __xwosimpl_arch_spinlock_h__
+#define __xwosimpl_arch_spinlock_h__
 
 #ifndef __xwos_ospl_soc_spinlock_h__
 #  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
 #endif
 
 struct soc_splk {
-        atomic_xwu32_t lockval;
+        xwu32_t lockval;
 };
 
-#define SOC_SPLK_INITIALIZER { .lockval = 0x1, }
+#define SOC_SPLK_INITIALIZER { .lockval = 0U, }
 
 static __xwbsp_inline
 void soc_splk_init(struct soc_splk * socsplk)
 {
-        socsplk->lockval = 1;
+        socsplk->lockval = 0U;
 }
 
 void soc_splk_lock(struct soc_splk * socsplk);
 xwer_t soc_splk_trylock(struct soc_splk * socsplk);
 void soc_splk_unlock(struct soc_splk * socsplk);
 
-#endif /* xwcd/soc/riscv/nuclei/xwosimpl_soc_spinlock.h */
+#endif /* xwcd/soc/powerpc/e200x/xwosimpl_arch_spinlock.h */
