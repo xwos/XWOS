@@ -21,7 +21,7 @@
  * @{
  */
 
-#include <xwos/ospl/soc/type.h>
+#include <xwos/ospl/type.h>
 #include <stdarg.h>
 
 #ifndef NULL

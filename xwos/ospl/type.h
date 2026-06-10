@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植层：SOC Type
+ * @brief XWOS移植层：Type
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,9 +10,9 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwos_ospl_soc_type_h__
-#define __xwos_ospl_soc_type_h__
+#ifndef __xwos_ospl_type_h__
+#define __xwos_ospl_type_h__
 
-#include <xwosimpl_soc_type.h>
+#include <xwosimpl_arch_type.h>
 
-#endif /* xwos/ospl/soc/type.h */
+#endif /* xwos/ospl/type.h */

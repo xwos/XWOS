@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC基本类型
+ * @brief XWOS移植实现层：基本类型
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_type_h__
-#define __xwosimpl_soc_type_h__
+#ifndef __xwosimpl_arch_type_h__
+#define __xwosimpl_arch_type_h__
 
-#ifndef __xwos_ospl_soc_type_h__
-#  error "This file should be included from <xwos/ospl/soc/type.h>."
+#ifndef __xwos_ospl_type_h__
+#  error "This file should be included from <xwos/ospl/type.h>."
 #endif
 
 #include <cfg/project.h>
@@ -105,20 +105,38 @@ typedef int64_t xws64_t; /**< 有符号64位整数 */
 #define BITS_PER_XWS64_T        64U
 #define XWS64_T_SHIFT           6U
 
+#define ARCH_HAVE_XWU128_T      1
+typedef __uint128_t xwu128_t; /**< 无符号128位整数 */
+#define ARCH_HAVE_ATOMIC_XWU128_T       1
+typedef __xwcc_atomic xwu128_t atomic_xwu128_t;
+#define BITS_PER_XWU128_T       128U
+#define XWU128_T_SHIFT          7U
+#define XWU128_MAX              ((xwu128_t)(~((xwu128_t)0)))
+#define XWU128_MIN              ((xwu128_t)0)
+
+#define ARCH_HAVE_XWS128_T      1
+typedef __int128_t xws128_t; /**< 有符号128位整数 */
+#define ARCH_HAVE_ATOMIC_XWS128_T       1
+typedef __xwcc_atomic xws128_t atomic_xws128_t;
+#define BITS_PER_XWS128_T       128U
+#define XWS128_T_SHIFT          7U
+#define XWS128_MAX              ((xws128_t)(XWU128_MAX >> 1))
+#define XWS128_MIN              ((xws128_t)(-XWS128_MAX - 1))
+
 #define ARCH_HAVE_XWSZ_T        1
-typedef unsigned int xwsz_t; /**< 大小值 (无符号) */
-#define BITS_PER_XWSZ_T         BITS_PER_UINT
-#define XWSZ_T_SHIFT            UINT_SHIFT
+typedef unsigned long xwsz_t; /**< 大小值 (无符号) */
+#define BITS_PER_XWSZ_T         BITS_PER_ULONG
+#define XWSZ_T_SHIFT            ULONG_SHIFT
 
 #define ARCH_HAVE_XWSSZ_T       1
-typedef int xwssz_t; /**< 大小值 (有符号) */
-#define BITS_PER_XWSSZ_T        BITS_PER_INT
-#define XWSSZ_T_SHIFT           INT_SHIFT
+typedef long xwssz_t; /**< 大小值 (有符号) */
+#define BITS_PER_XWSSZ_T        BITS_PER_LONG
+#define XWSSZ_T_SHIFT           LONG_SHIFT
 
 #define ARCH_HAVE_XWPTR_T       1
-typedef xwu32_t xwptr_t; /**< 指针数值 */
-#define BITS_PER_XWPTR_T        BITS_PER_XWU32_T
-#define XWPTR_T_SHIFT           XWU32_T_SHIFT
+typedef xwu64_t xwptr_t; /**< 指针数值 */
+#define BITS_PER_XWPTR_T        BITS_PER_XWU64_T
+#define XWPTR_T_SHIFT           XWU64_T_SHIFT
 
 #define ARCH_HAVE_XWSTK_T       1
 typedef xwptr_t xwstk_t; /**< 栈槽 */
@@ -126,33 +144,43 @@ typedef xwptr_t xwstk_t; /**< 栈槽 */
 #define XWSTK_T_SHIFT           XWPTR_T_SHIFT
 
 #define ARCH_HAVE_XWREG_T       1
-typedef xwu32_t xwreg_t; /**< 寄存器数值 (无符号) */
-#define BITS_PER_XWREG_T        BITS_PER_XWU32_T
-#define XWREG_T_SHIFT           XWU32_T_SHIFT
+typedef xwu64_t xwreg_t; /**< 寄存器数值 (无符号) */
+#define BITS_PER_XWREG_T        BITS_PER_XWU64_T
+#define XWREG_T_SHIFT           XWU64_T_SHIFT
 
 #define ARCH_HAVE_XWSREG_T      1
-typedef xws32_t xwsreg_t; /**< 寄存器数值 (有符号) */
-#define BITS_PER_XWSREG_T       BITS_PER_XWS32_T
-#define XWSREG_T_SHIFT          XSU32_T_SHIFT
+typedef xws64_t xwsreg_t; /**< 寄存器数值 (有符号) */
+#define BITS_PER_XWSREG_T       BITS_PER_XWS64_T
+#define XWSREG_T_SHIFT          XWS64_T_SHIFT
 
 #define ARCH_HAVE_XWSQ_T        1
-typedef xwu32_t xwsq_t; /**< 顺序值 (无符号) */
-#define BITS_PER_XWSQ_T         BITS_PER_XWU32_T
-#define XWSQ_T_SHIFT            XWU32_T_SHIFT
+typedef xwu64_t xwsq_t; /**< 顺序值 (无符号) */
+#define BITS_PER_XWSQ_T         BITS_PER_XWU64_T
+#define XWSQ_T_SHIFT            XWU64_T_SHIFT
 
 #define ARCH_HAVE_XWSSQ_T       1
-typedef xws32_t xwssq_t; /**< 顺序值 (有符号) */
-#define BITS_PER_XWSSQ_T        BITS_PER_XWS32_T
-#define XWSSQ_T_SHIFT           XWS32_T_SHIFT
+typedef xws64_t xwssq_t; /**< 顺序值 (有符号) */
+#define BITS_PER_XWSSQ_T        BITS_PER_XWS64_T
+#define XWSSQ_T_SHIFT           XWS64_T_SHIFT
 
 #define ARCH_HAVE_XWID_T        1
-typedef xwu32_t xwid_t; /**< ID (无符号) */
-#define BITS_PER_XWID_T         BITS_PER_XWU32_T
-#define XWID_T_SHIFT            XWU32_T_SHIFT
+typedef xwu64_t xwid_t; /**< ID (无符号) */
+#define BITS_PER_XWID_T         BITS_PER_XWU64_T
+#define XWID_T_SHIFT            XWU64_T_SHIFT
 
 #define ARCH_HAVE_XWSID_T       1
-typedef xws32_t xwsid_t; /**< ID (有符号) */
-#define BITS_PER_XWSID_T        BITS_PER_XWS32_T
-#define XWSID_T_SHIFT           XWS32_T_SHIFT
+typedef xws64_t xwsid_t; /**< ID (有符号) */
+#define BITS_PER_XWSID_T        BITS_PER_XWS64_T
+#define XWSID_T_SHIFT           XWS64_T_SHIFT
 
-#endif /* xwcd/soc/riscv/nuclei/xwosimpl_soc_type.h */
+#define ARCH_HAVE_XWER_T        1
+typedef xws64_t xwer_t; /**< 错误码 (有符号) */
+#define BITS_PER_XWER_T         BITS_PER_XWS64_T
+#define XWER_T_SHIFT            XWS64_T_SHIFT
+
+#define ARCH_HAVE_XWBMP_T       1
+typedef xwu64_t xwbmp_t; /**< 位图 (无符号) */
+#define BITS_PER_XWBMP_T        BITS_PER_XWU64_T
+#define XWBMP_T_SHIFT           XWU64_T_SHIFT
+
+#endif /* xwcd/soc/arm64/v8a/xwosimpl_arch_type.h */

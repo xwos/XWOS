@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC基本类型
+ * @brief XWOS移植实现层：基本类型
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_type_h__
-#define __xwosimpl_soc_type_h__
+#ifndef __xwosimpl_arch_type_h__
+#define __xwosimpl_arch_type_h__
 
-#ifndef __xwos_ospl_soc_type_h__
-#  error "This file should be included from <xwos/ospl/soc/type.h>."
+#ifndef __xwos_ospl_type_h__
+#  error "This file should be included from <xwos/ospl/type.h>."
 #endif
 
 #include <cfg/project.h>
@@ -116,43 +116,43 @@ typedef int xwssz_t; /**< 大小值 (有符号) */
 #define XWSSZ_T_SHIFT           INT_SHIFT
 
 #define ARCH_HAVE_XWPTR_T       1
-typedef xwu32_t xwptr_t; /**< 指针数值 */
-#define BITS_PER_XWPTR_T        BITS_PER_XWU32_T
-#define XWPTR_T_SHIFT           XWU32_T_SHIFT
+typedef unsigned long xwptr_t; /**< 指针数值 */
+#define BITS_PER_XWPTR_T        BITS_PER_ULONG
+#define XWPTR_T_SHIFT           ULONG_SHIFT
 
 #define ARCH_HAVE_XWSTK_T       1
-typedef xwptr_t xwstk_t; /**< 栈槽 */
-#define BITS_PER_XWSTK_T        BITS_PER_XWPTR_T
-#define XWSTK_T_SHIFT           XWPTR_T_SHIFT
+typedef unsigned long xwstk_t; /**< 栈槽 */
+#define BITS_PER_XWSTK_T        BITS_PER_ULONG
+#define XWSTK_T_SHIFT           ULONG_SHIFT
 
 #define ARCH_HAVE_XWREG_T       1
-typedef xwu32_t xwreg_t; /**< 寄存器数值 (无符号) */
-#define BITS_PER_XWREG_T        BITS_PER_XWU32_T
-#define XWREG_T_SHIFT           XWU32_T_SHIFT
+typedef unsigned long xwreg_t; /**< 寄存器数值 (无符号) */
+#define BITS_PER_XWREG_T        BITS_PER_ULONG
+#define XWREG_T_SHIFT           ULONG_SHIFT
 
 #define ARCH_HAVE_XWSREG_T      1
-typedef xws32_t xwsreg_t; /**< 寄存器数值 (有符号) */
-#define BITS_PER_XWSREG_T       BITS_PER_XWS32_T
-#define XWSREG_T_SHIFT          XWS32_T_SHIFT
+typedef signed long xwsreg_t; /**< 寄存器数值 (有符号) */
+#define BITS_PER_XWSREG_T       BITS_PER_LONG
+#define XWSREG_T_SHIFT          LONG_SHIFT
 
 #define ARCH_HAVE_XWSQ_T        1
-typedef xwu32_t xwsq_t; /**< 顺序值 (无符号) */
-#define BITS_PER_XWSQ_T         BITS_PER_XWU32_T
-#define XWSQ_T_SHIFT            XWU32_T_SHIFT
+typedef unsigned long xwsq_t; /**< 顺序值 (无符号) */
+#define BITS_PER_XWSQ_T         BITS_PER_ULONG
+#define XWSQ_T_SHIFT            ULONG_SHIFT
 
 #define ARCH_HAVE_XWSSQ_T       1
-typedef xws32_t xwssq_t; /**< 顺序值 (有符号) */
-#define BITS_PER_XWSSQ_T        BITS_PER_XWS32_T
-#define XWSSQ_T_SHIFT           XWS32_T_SHIFT
+typedef signed long xwssq_t; /**< 顺序值 (有符号) */
+#define BITS_PER_XWSSQ_T        BITS_PER_LONG
+#define XWSSQ_T_SHIFT           LONG_SHIFT
 
 #define ARCH_HAVE_XWID_T        1
-typedef xwu32_t xwid_t; /**< ID (无符号) */
-#define BITS_PER_XWID_T         BITS_PER_XWU32_T
-#define XWID_T_SHIFT            XWU32_T_SHIFT
+typedef unsigned long xwid_t; /**< ID (无符号) */
+#define BITS_PER_XWID_T         BITS_PER_ULONG
+#define XWID_T_SHIFT            ULONG_SHIFT
 
 #define ARCH_HAVE_XWSID_T       1
-typedef xws32_t xwsid_t; /**< ID (有符号) */
-#define BITS_PER_XWSID_T        BITS_PER_XWS32_T
-#define XWSID_T_SHIFT           XWS32_T_SHIFT
+typedef signed long xwsid_t; /**< ID (有符号) */
+#define BITS_PER_XWSID_T        BITS_PER_LONG
+#define XWSID_T_SHIFT           LONG_SHIFT
 
-#endif /* xwcd/soc/arm/v6m/xwosimpl_soc_type.h */
+#endif /* xwcd/soc/powerpc/e200x/xwosimpl_arch_type.h */

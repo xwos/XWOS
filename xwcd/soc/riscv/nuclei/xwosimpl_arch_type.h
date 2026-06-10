@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC基本类型
+ * @brief XWOS移植实现层：基本类型
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_type_h__
-#define __xwosimpl_soc_type_h__
+#ifndef __xwosimpl_arch_type_h__
+#define __xwosimpl_arch_type_h__
 
-#ifndef __xwos_ospl_soc_type_h__
-#  error "This file should be included from <xwos/ospl/soc/type.h>."
+#ifndef __xwos_ospl_type_h__
+#  error "This file should be included from <xwos/ospl/type.h>."
 #endif
 
 #include <cfg/project.h>
@@ -133,7 +133,7 @@ typedef xwu32_t xwreg_t; /**< 寄存器数值 (无符号) */
 #define ARCH_HAVE_XWSREG_T      1
 typedef xws32_t xwsreg_t; /**< 寄存器数值 (有符号) */
 #define BITS_PER_XWSREG_T       BITS_PER_XWS32_T
-#define XWSREG_T_SHIFT          XWS32_T_SHIFT
+#define XWSREG_T_SHIFT          XSU32_T_SHIFT
 
 #define ARCH_HAVE_XWSQ_T        1
 typedef xwu32_t xwsq_t; /**< 顺序值 (无符号) */
@@ -155,4 +155,4 @@ typedef xws32_t xwsid_t; /**< ID (有符号) */
 #define BITS_PER_XWSID_T        BITS_PER_XWS32_T
 #define XWSID_T_SHIFT           XWS32_T_SHIFT
 
-#endif /* xwcd/soc/arm/v7m/xwosimpl_soc_type.h */
+#endif /* xwcd/soc/riscv/nuclei/xwosimpl_arch_type.h */
