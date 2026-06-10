@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC描述层：SOC系统调用汇编代码
+ * @brief XWOS移植实现层：系统调用汇编代码
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright

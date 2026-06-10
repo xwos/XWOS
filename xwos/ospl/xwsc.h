@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植层：SOC系统调用与系统特权
+ * @brief XWOS移植层：系统调用与系统特权
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,12 +10,11 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwos_ospl_soc_xwsc_h__
-#define __xwos_ospl_soc_xwsc_h__
+#ifndef __xwos_ospl_xwsc_h__
+#define __xwos_ospl_xwsc_h__
 
 #include <xwos/standard.h>
-#include <xwosimpl_soc_xwsc.h>
 
 xws64_t xwsc(xwsc_f func, xwreg_t argnum, ...);
 
-#endif /* xwos/ospl/soc/xwsc.h */
+#endif /* xwos/ospl/xwsc.h */

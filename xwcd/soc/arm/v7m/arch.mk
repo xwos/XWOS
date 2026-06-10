@@ -553,7 +553,7 @@ ifeq ($(XWLIBCFG_SETJMP),y)
 endif
 
 ARCH_CSRCS += arch_init.c
-ARCH_CSRCS += arch_firmware.c arch_irq.c xwosimpl_soc_xwsc.c
+ARCH_CSRCS += arch_firmware.c arch_irq.c xwosimpl_arch_xwsc.c
 ARCH_CSRCS += arch_skd.c arch_systick.c
 ifeq ($(ARCHCFG_FPU),y)
   ARCH_CSRCS += arch_fpu.c

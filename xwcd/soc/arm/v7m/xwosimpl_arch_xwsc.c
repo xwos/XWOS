@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC系统调用
+ * @brief XWOS移植实现层：系统调用
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -65,16 +65,16 @@ xws64_t xwsc(xwsc_f func, xwreg_t argnum, ...)
  * @param[in] args: 可变参数
  * @param[in] old_lr: LR寄存器的原始值
  * @note
- * - 此函数返回时，会将r0,r1作为结果，并恢复LR寄存器的原始值。
- * - 此函数扩展了C语言的语法，在C语言中，可变参函数的参数个数在编译时就已经确定，
+ * + 此函数返回时，会将r0,r1作为结果，并恢复LR寄存器的原始值。
+ * + 此函数扩展了C语言的语法，在C语言中，可变参函数的参数个数在编译时就已经确定，
  *   也就是运行时参数的数量就已经确定。此函数用汇编语言写成，可以做到运行时参数
  *   可变。也即是可以用任意数量的参数调用任意函数。遗憾的是，这种运行时的调用并不具备
  *   检查功能。假设一个函数的原型是void foo(int a); 可以使用xwsc(foo, 2, 1 ,2)传递两个
  *   参数给foo运行，但运行结果未知。
- * - 设计这个接口的目的是为了将系统调用的接口统一化，而不必像Linux定义系统调用时还需要
+ * + 设计这个接口的目的是为了将系统调用的接口统一化，而不必像Linux定义系统调用时还需要
  *   定义一堆指定参数个数的宏(SYSCALL_DEFINE1, SYSCALL_DEFINE2, SYSCALL_DEFINE3, ...)。
- * - 对于系统调用，XWOS会使用xwsc()直接给出参数具体化的封装，不建议直接使用xwsc()，
- *   除非用户对编译器产生的汇编代码十分了解。
+ * + 对于系统调用，XWOS会使用 `xwsc()` 直接给出参数具体化的封装，
+ *   不建议直接使用 `xwsc()` ，除非用户对编译器产生的汇编代码十分了解。
  */
 __xwbsp_code __xwcc_naked
 xws64_t soc_xwsc_entry(__xwcc_unused xwsc_f func, __xwcc_unused xwptr_t argnum,
@@ -161,8 +161,8 @@ xws64_t soc_xwsc_entry(__xwcc_unused xwsc_f func, __xwcc_unused xwptr_t argnum,
  *
  * 寄存器R3用于返回旧的LR的值，因此需要将原始LR的值覆盖到R3的位置 `[SP+12]` 。
  *
- * 当执行指令 `bx lr` 返回时，就会进入到 @ref soc_xwsc_entry() 函数，并且以 `r0, r1, r2` 作为参数，
- * 函数的第四个参数（通过R3的位置传递）作为LR的原始值。
+ * 当执行指令 `bx lr` 返回时，就会进入到 @ref soc_xwsc_entry() 函数，
+ * 并且以 `r0, r1, r2` 作为参数，函数的第四个参数（通过R3的位置传递）作为LR的原始值。
  *
  *         ------------------------------\n
  *         | stack      | change        |\n
