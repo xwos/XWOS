@@ -18,10 +18,8 @@
  * > limitations under the License.
  */
 
-#include <xwcd/soc/arm/v7m/armv7m_mpu.h>
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
-#include <xwcd/soc/arm/v7m/xwosimpl_soc_isa.h>
-#include <xwos/lib/errno.h>
+#include <xwcd/soc/arm/v7m/armv7m_mpu.h>
 
 /**
  * @brief 获取MPU的TYPE寄存器值

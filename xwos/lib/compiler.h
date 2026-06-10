@@ -53,7 +53,7 @@
  * @{
  */
 
-#include <xwos/ospl/soc/compiler.h>
+#include <xwos/ospl/compiler.h>
 
 #ifndef __xwcc_section
 #  define __xwcc_section(s)

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植层：指令与架构
+ * @brief XWOS移植层：架构与指令
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,10 +10,10 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwos_ospl_soc_isa_h__
-#define __xwos_ospl_soc_isa_h__
+#ifndef __xwos_ospl_isa_h__
+#define __xwos_ospl_isa_h__
 
 #include <xwos/standard.h>
-#include <xwosimpl_soc_isa.h>
+#include <xwosimpl_arch_isa.h>
 
-#endif /* xwos/ospl/soc/isa.h */
+#endif /* xwos/ospl/isa.h */

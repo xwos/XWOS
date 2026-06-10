@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC的架构指令
+ * @brief XWOS移植实现层：架构与指令
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm_v7m_xwosimpl_soc_isa_h__
-#define __xwcd_soc_arm_v7m_xwosimpl_soc_isa_h__
+#ifndef __xwosimpl_arch_isa_h__
+#define __xwosimpl_arch_isa_h__
 
-#ifndef __xwos_ospl_soc_isa_h__
-#  error "This file should be included from <xwos/ospl/soc/isa.h>."
+#ifndef __xwos_ospl_isa_h__
+#  error "This file should be included from <xwos/ospl/isa.h>."
 #endif
 
-#include <xwos/ospl/soc/compiler.h>
+#include <xwos/ospl/compiler.h>
 
 /******** ******** Bug report ******** ********/
 static __xwbsp_inline
@@ -35,26 +35,26 @@ void soc_bug(void)
 }
 
 /******** ******** barrier ******** ********/
-#define armv7m_isb()            __asm__ volatile("isb" : : : "memory")
-#define armv7m_dsb()            __asm__ volatile("dsb" : : : "memory")
-#define armv7m_dmb()            __asm__ volatile("dmb" : : : "memory")
+#define armv6m_isb()            __asm__ volatile("isb" : : : "memory")
+#define armv6m_dsb()            __asm__ volatile("dsb" : : : "memory")
+#define armv6m_dmb()            __asm__ volatile("dmb" : : : "memory")
 
 #define xwmb_compiler()         __asm__ volatile("": : :"memory")
-#define xwmb_isb()              armv7m_isb()
+#define xwmb_isb()              armv6m_isb()
 #define xwmb_ddb()              xwmb_compiler()
 
-#define xwmb_mb()               armv7m_dsb()
-#define xwmb_rmb()              armv7m_dsb()
-#define xwmb_wmb()              armv7m_dsb()
+#define xwmb_mb()               armv6m_dsb()
+#define xwmb_rmb()              armv6m_dsb()
+#define xwmb_wmb()              armv6m_dsb()
 
-#define xwmb_dma_mb()           armv7m_dsb()
-#define xwmb_dma_rmb()          armv7m_dsb()
-#define xwmb_dma_wmb()          armv7m_dsb()
+#define xwmb_dma_mb()           armv6m_dsb()
+#define xwmb_dma_rmb()          armv6m_dsb()
+#define xwmb_dma_wmb()          armv6m_dsb()
 
-#define xwmb_mp_mb()            armv7m_dmb()
-#define xwmb_mp_rmb()           armv7m_dmb()
-#define xwmb_mp_wmb()           armv7m_dmb()
+#define xwmb_mp_mb()            armv6m_dmb()
+#define xwmb_mp_rmb()           armv6m_dmb()
+#define xwmb_mp_wmb()           armv6m_dmb()
 #define xwmb_mp_acquire()       xwmb_mp_rmb()
 #define xwmb_mp_release()       xwmb_mp_wmb()
 
-#endif /* xwcd/soc/arm/v7m/xwosimpl_soc_isa.h */
+#endif /* xwcd/soc/arm/v6m/xwosimpl_arch_isa.h */

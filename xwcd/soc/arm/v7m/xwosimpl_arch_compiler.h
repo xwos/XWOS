@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC编译器宏定义
+ * @brief XWOS移植实现层：编译器宏定义
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,19 +18,19 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_compiler_h__
-#define __xwosimpl_soc_compiler_h__
+#ifndef __xwosimpl_arch_compiler_h__
+#define __xwosimpl_arch_compiler_h__
 
-#ifndef __xwos_ospl_soc_compiler_h__
-#  error "This file should be included from <xwos/ospl/soc/compiler.h>."
+#ifndef __xwos_ospl_compiler_h__
+#  error "This file should be included from <xwos/ospl/compiler.h>."
 #endif
 
 #if defined(__llvm__)
-#  include <compiler/llvm.h>
+#  include <xwcd/soc/arm/v7m/compiler/llvm.h>
 #elif defined(__GNUC__)
-#  include <compiler/gcc.h>
+#  include <xwcd/soc/arm/v7m/compiler/gcc.h>
 #else
 #  error "Unknown compiler!"
 #endif
 
-#endif /* xwcd/soc/powerpc/e200x/xwosimpl_soc_compiler.h */
+#endif /* xwcd/soc/arm/v7m/xwosimpl_arch_compiler.h */

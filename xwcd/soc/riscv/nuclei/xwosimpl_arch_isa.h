@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC的架构指令
+ * @brief XWOS移植实现层：架构与指令
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_isa_h__
-#define __xwosimpl_soc_isa_h__
+#ifndef __xwosimpl_arch_isa_h__
+#define __xwosimpl_arch_isa_h__
 
-#ifndef __xwos_ospl_soc_isa_h__
-#  error "This file should be included from <xwos/ospl/soc/isa.h>."
+#ifndef __xwos_ospl_isa_h__
+#  error "This file should be included from <xwos/ospl/isa.h>."
 #endif
 
-#include <xwos/ospl/soc/compiler.h>
+#include <xwos/ospl/compiler.h>
 
 /******** ******** Bug report ******** ********/
 static __xwbsp_inline
@@ -53,4 +53,4 @@ void soc_bug(void)
 #define xwmb_mp_acquire()       __asm__ volatile("fence r, rw" : : : "memory")
 #define xwmb_mp_release()       __asm__ volatile("fence rw, w" : : : "memory")
 
-#endif /* xwcd/soc/riscv/nuclei/xwosimpl_soc_isa.h */
+#endif /* xwcd/soc/riscv/nuclei/xwosimpl_arch_isa.h */

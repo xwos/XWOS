@@ -19,7 +19,7 @@
 #include <xwos/version.h>
 #include <xwos/lib/type.h>
 #include <xwos/lib/error.h>
-#include <xwos/ospl/soc/isa.h>
+#include <xwos/ospl/isa.h>
 #include <xwos/lib/mb.h>
 
 /**

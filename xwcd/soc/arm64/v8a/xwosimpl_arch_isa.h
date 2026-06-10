@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC架构指令
+ * @brief XWOS移植实现层：架构与指令
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm_v8a_xwosimpl_soc_isa_h__
-#define __xwcd_soc_arm_v8a_xwosimpl_soc_isa_h__
+#ifndef __xwosimpl_arch_isa_h__
+#define __xwosimpl_arch_isa_h__
 
-#ifndef __xwos_ospl_soc_isa_h__
-#  error "This file should be included from <xwos/ospl/soc/isa.h>."
+#ifndef __xwos_ospl_isa_h__
+#  error "This file should be included from <xwos/ospl/isa.h>."
 #endif
 
-#include <xwos/ospl/soc/compiler.h>
+#include <xwos/ospl/compiler.h>
 
 /******** ******** break point ******** ********/
 extern void soc_panic(const char * fmt, ...);
@@ -58,4 +58,4 @@ extern void soc_panic(const char * fmt, ...);
 #define xwmb_mp_acquire()       xwmb_mp_rmb()
 #define xwmb_mp_release()       xwmb_mp_wmb()
 
-#endif /* xwcd/soc/arm64/v8a/xwosimpl_soc_isa.h */
+#endif /* xwcd/soc/arm64/v8a/xwosimpl_arch_isa.h */

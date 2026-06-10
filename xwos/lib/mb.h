@@ -21,7 +21,7 @@
  * @{
  */
 
-#include <xwos/ospl/soc/isa.h>
+#include <xwos/ospl/isa.h>
 
 /**
  * @brief: 强制以指定类型访问内存地址p
