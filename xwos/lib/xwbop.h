@@ -21,7 +21,7 @@
  * @{
  */
 
-#include <xwos/ospl/soc/xwbop.h>
+#include <xwos/ospl/xwbop.h>
 
 /******** ******** macros ******** ********/
 #define XWBOP_BIT(n)  ((xwbmp_t)1 << (n))

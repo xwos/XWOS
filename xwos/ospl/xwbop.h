@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植层：SOC位操作
+ * @brief XWOS移植层：位操作
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,8 +10,8 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwos_ospl_soc_xwbop_h__
-#define __xwos_ospl_soc_xwbop_h__
+#ifndef __xwos_ospl_xwbop_h__
+#define __xwos_ospl_xwbop_h__
 
 #include <xwos/standard.h>
 
@@ -47,4 +47,4 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num);
 xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num);
 xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num);
 
-#endif /* xwos/ospl/soc/xwbop.h */
+#endif /* xwos/ospl/xwbop.h */
