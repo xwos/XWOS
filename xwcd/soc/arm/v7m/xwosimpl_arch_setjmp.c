@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC setjmp/longjmp
+ * @brief XWOS移植实现层：setjmp/longjmp
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright

@@ -549,7 +549,7 @@ ifeq ($(ARCHCFG_LIB_XWBMPOP_FLZ),y)
 endif
 
 ifeq ($(XWLIBCFG_SETJMP),y)
-  ARCH_CSRCS += xwosimpl_soc_setjmp.c
+  ARCH_CSRCS += xwosimpl_arch_setjmp.c
 endif
 
 ARCH_CSRCS += arch_init.c

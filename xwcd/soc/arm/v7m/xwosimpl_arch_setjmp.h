@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植实现层：SOC setjmp/longjmp
+ * @brief XWOS移植实现层：setjmp/longjmp
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,19 +18,19 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_setjmp_h__
-#define __xwosimpl_soc_setjmp_h__
+#ifndef __xwosimpl_arch_setjmp_h__
+#define __xwosimpl_arch_setjmp_h__
 
-#ifndef __xwos_ospl_soc_setjmp_h__
-#  error "This file should be included from <xwos/ospl/soc/setjmp.h>."
+#ifndef __xwos_ospl_setjmp_h__
+#  error "This file should be included from <xwos/ospl/setjmp.h>."
 #endif
 
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
-#  define SOC_JMPBUF_DEPTH 32 /* 16 FP Frame + 10 Basic Frame + 6 reserved */
+#  define XWOSPL_JMPBUF_DEPTH 32 /* 16 FP Frame + 10 Basic Frame + 6 reserved */
 #else
-#  define SOC_JMPBUF_DEPTH 16 /* 10 Basic Frame + 6 reserved */
+#  define XWOSPL_JMPBUF_DEPTH 16 /* 10 Basic Frame + 6 reserved */
 #endif
 
-typedef xwstk_t soc_jmpbuf_b[SOC_JMPBUF_DEPTH];
+typedef xwstk_t xwospl_jmpbuf_b[XWOSPL_JMPBUF_DEPTH];
 
-#endif /* xwcd/soc/arm/v7m/xwosimpl_soc_setjmp.h */
+#endif /* xwcd/soc/arm/v7m/xwosimpl_arch_setjmp.h */

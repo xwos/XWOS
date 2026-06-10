@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植层：SOC setjmp/longjmp
+ * @brief XWOS移植层：setjmp/longjmp
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,13 +10,13 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwos_ospl_soc_setjmp_h__
-#define __xwos_ospl_soc_setjmp_h__
+#ifndef __xwos_ospl_setjmp_h__
+#define __xwos_ospl_setjmp_h__
 
-#include <xwosimpl_soc_setjmp.h>
+#include <xwosimpl_arch_setjmp.h>
 
-typedef soc_jmpbuf_b xwjmpbuf_b;
+typedef xwospl_jmpbuf_b xwjmpbuf_b;
 int xwlib_setjmp(xwjmpbuf_b ctx);
 __xwcc_noreturn void xwlib_longjmp(xwjmpbuf_b ctx, int val);
 
-#endif /* xwos/ospl/soc/setjmp.h */
+#endif /* xwos/ospl/setjmp.h */

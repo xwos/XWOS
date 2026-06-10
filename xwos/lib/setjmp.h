@@ -22,7 +22,7 @@
  */
 
 #if defined(XWLIBCFG_SETJMP) && (1 == XWLIBCFG_SETJMP)
-#  include <xwos/ospl/soc/setjmp.h>
+#  include <xwos/ospl/setjmp.h>
 
 /**
  * @brief 设置跳转点并保存上下文到buffer
