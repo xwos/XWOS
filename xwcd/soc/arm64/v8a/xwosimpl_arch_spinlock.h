@@ -34,9 +34,9 @@
  * @brief ARMv8-A的自旋锁
  * @details
  * 自旋锁的实现，类似于银行的排队系统。每个CPU申请锁时，
- * 可从“排队系统” `xwospl_splk.v.q.n` 中申请到一个排队号。
- * `xwospl_splk.v.q.n` 输出一个排队号后自增1。
- * 当“叫号系统” `xwospl_splk.v.q.c` 叫到排队号时，持有排队号的CPU可以获得锁。
+ * 可从“排队系统” `xwospl_splk.v.ticket.n` 中申请到一个排队号。
+ * `xwospl_splk.v.ticket.n` 输出一个排队号后自增1。
+ * 当“叫号系统” `xwospl_splk.v.ticket.c` 叫到排队号时，持有排队号的CPU可以获得锁。
  */
 struct xwospl_splk {
         union {
@@ -49,18 +49,18 @@ struct xwospl_splk {
                         xwu16_t n; /**< 下一个持锁者 */
                         xwu16_t c; /**< 当前的持锁者 */
 #endif
-                } q; /**< 队列 */
+                } ticket;
         } v;
 } __xwcc_aligned(4);
 
 
-#define XWOSPL_SPLK_INITIALIZER { .v.q.n = 0, .v.q.c = 0, }
+#define XWOSPL_SPLK_INITIALIZER { .v.ticket.n = 0, .v.ticket.c = 0, }
 
 static __xwbsp_inline
 void xwospl_splk_init(struct xwospl_splk * osplsplk)
 {
-        osplsplk->v.q.n = 0;
-        osplsplk->v.q.c = 0;
+        osplsplk->v.ticket.n = 0;
+        osplsplk->v.ticket.c = 0;
 }
 
 #if (CPUCFG_CPU_NUM > 1)
@@ -69,27 +69,27 @@ void xwospl_splk_lock(struct xwospl_splk * osplsplk)
 {
         xwer_t rc;
         struct xwospl_splk lkval;
-        xwu16_t queue_number;
+        xwu16_t ticket;
 
         armv8a_prefetch_before_aop(osplsplk->v.raw);
         do {
                 lkval.v.raw = armv8a_load_acquire_exclusively_32b(
                         (atomic_xwu32_t *)&osplsplk->v.raw);
-                queue_number = lkval.v.q.n;
-                lkval.v.q.n++;
+                ticket = lkval.v.ticket.n;
+                lkval.v.ticket.n++;
                 rc = armv8a_store_exclusively_32b(
                         (atomic_xwu32_t *)&osplsplk->v.raw, lkval.v.raw);
         } while (rc);
-        if (queue_number != lkval.v.q.c) {
+        if (ticket != lkval.v.ticket.c) {
                 /* ARM指令手册中建议在 `WFE` 等待循环之前插入一条 `SEVL` 指令。
                    防止丢失其他CPU的解锁事件。 */
                 __asm__ volatile("sevl" : : : "memory");
                 do {
                         __asm__ volatile("wfe" : : : "memory"
                         );
-                        lkval.v.q.c = armv8a_load_acquire_exclusively_16b(
-                                (atomic_xwu16_t *)&osplsplk->v.q.c);
-                } while (queue_number != lkval.v.q.c);
+                        lkval.v.ticket.c = armv8a_load_acquire_exclusively_16b(
+                                (atomic_xwu16_t *)&osplsplk->v.ticket.c);
+                } while (ticket != lkval.v.ticket.c);
         }
 }
 
@@ -103,11 +103,11 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
         do {
                 lkval.v.raw = armv8a_load_acquire_exclusively_32b(
                         (atomic_xwu32_t *)&osplsplk->v.raw);
-                if (lkval.v.q.n != lkval.v.q.c) {
+                if (lkval.v.ticket.n != lkval.v.ticket.c) {
                         rc = -EAGAIN;
                         break;
                 }
-                lkval.v.q.n++;
+                lkval.v.ticket.n++;
                 rc = armv8a_store_exclusively_32b(
                         (atomic_xwu32_t *)&osplsplk->v.raw, lkval.v.raw);
         } while (rc);
@@ -117,13 +117,13 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 static __xwbsp_inline
 void xwospl_splk_unlock(struct xwospl_splk * osplsplk)
 {
-        __xwcc_atomic xwu16_t n;
+        __xwcc_atomic xwu16_t c;
 
-        n = osplsplk->v.q.c + 1;
+        c = osplsplk->v.ticket.c + 1U;
         /* 根据ARM架构参考手册中的描述，"global monitor" 检测到 "PE" 的
            "Exclusive Access" 状态变为可访问时，会向 "PE" 发送一个 "Event" ，使得
            正在执行 `WFE` 指令的 "PE" 唤醒。*/
-        armv8a_store_release_16b((atomic_xwu16_t *)&osplsplk->v.q.c, n);
+        armv8a_store_release_16b((atomic_xwu16_t *)&osplsplk->v.ticket.c, c);
 }
 #endif
 

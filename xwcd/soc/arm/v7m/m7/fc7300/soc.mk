@@ -46,6 +46,7 @@ endif
 SOC_CSRCS += xwosimpl_irq.c
 SOC_CSRCS += xwosimpl_skd.c
 SOC_CSRCS += xwosimpl_syshwt.c
+SOC_CSRCS += soc_mb.c
 
 ifeq ($(SOCCFG_LIB_XWAOP8),y)
   SOC_CSRCS += xwosimpl_soc_xwaop/u8/add.c

@@ -27,57 +27,77 @@
 
 #include <xwcd/soc/arm/v7m/m7/fc7300/soc_mb.h>
 
+#define XWOSPL_SPLK_TICKET_SHIFT          16
+
 struct xwospl_splk {
-        volatile xwu32_t lock;
+        union {
+                volatile xwu32_t raw;
+                struct {
+#if defined(ARCHCFG_LITTLE_ENDIAN) && (1 == ARCHCFG_LITTLE_ENDIAN)
+                        volatile xwu16_t curr; /**< current owner */
+                        volatile xwu16_t next; /**< next owner */
+#else
+                        volatile xwu16_t next; /**< next owner */
+                        volatile xwu16_t curr; /**< current owner */
+#endif
+                } ticket;
+        } v;
 };
 
-#define XWOSPL_SPLK_INITIALIZER { .lock = 0U, }
+#define XWOSPL_SPLK_INITIALIZER { .v.ticket.curr = 0, .v.ticket.next = 0, }
 
 static __xwbsp_inline
 void xwospl_splk_init(struct xwospl_splk * osplsplk)
 {
-        osplsplk->lock = 0;
+        osplsplk->v.ticket.next = 0;
+        osplsplk->v.ticket.curr = 0;
 }
 
-#if (CPUCFG_CPU_NUM > 1)
+#if (CPUCFG_CPU_NUM > 1U)
 static __xwbsp_inline
 void xwospl_splk_lock(struct xwospl_splk * osplsplk)
 {
-        xwu32_t locked;
+        xwu32_t mblkcode;
+        struct xwospl_splk lock;
+        xwu16_t ticket;
 
         do {
-                while (osplsplk->lock > 0U) {
-                }
-                locked = soc_mb_lock(SOC_MB_CH_SPINLOCK);
-                if (locked > 0) {
-                        xwmb_mp_load_acquire(xwu32_t, locked, osplsplk);
-                        if (0U == locked) {
-                                xwmb_mp_store_release(xwu32_t, osplsplk, 1U);
-                                soc_mb_unlock(SOC_MB_CH_SPINLOCK);
-                                break;
-                        }
-                        soc_mb_unlock(SOC_MB_CH_SPINLOCK);
+                mblkcode = soc_mb_lock(SOC_MB_CH_SPINLOCK);
+                if (mblkcode > 0) {
+                        xwmb_mp_load_acquire(xwu32_t, lock.v.raw, &osplsplk->v.raw);
+                        ticket = lock.v.ticket.next;
+                        lock.v.ticket.next += 1U;
+                        osplsplk->v.raw = lock.v.raw;
+                        soc_mb_unlock(SOC_MB_CH_SPINLOCK, mblkcode);
+                        break;
                 }
         } while (true);
+
+        while (ticket != lock.v.ticket.curr) {
+                xwmb_mp_load_acquire(xwu16_t, lock.v.ticket.curr,
+                                     &osplsplk->v.ticket.curr);
+        }
 }
 
 static __xwbsp_inline
 xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 {
-        xwu32_t locked;
         xwer_t rc;
+        xwu32_t mblkcode;
+        struct xwospl_splk lock;
 
         do {
-                locked = soc_mb_lock(SOC_MB_CH_SPINLOCK);
-                if (locked > 0) {
-                        xwmb_mp_load_acquire(xwu32_t, locked, osplsplk);
-                        if (0U == locked) {
-                                xwmb_mp_store_release(xwu32_t, osplsplk, 1U);
-                                rc = XWOK;
-                        } else {
+                mblkcode = soc_mb_lock(SOC_MB_CH_SPINLOCK);
+                if (mblkcode > 0) {
+                        xwmb_mp_load_acquire(xwu32_t, lock.v.raw, &osplsplk->v.raw);
+                        if (lock.v.ticket.curr != lock.v.ticket.next) {
                                 rc = -EAGAIN;
+                        } else {
+                                lock.v.ticket.next += 1U;
+                                osplsplk->v.raw = lock.v.raw;
+                                rc = XWOK;
                         }
-                        soc_mb_unlock(SOC_MB_CH_SPINLOCK);
+                        soc_mb_unlock(SOC_MB_CH_SPINLOCK, mblkcode);
                         break;
                 }
         } while (true);
@@ -87,7 +107,10 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 static __xwbsp_inline
 void xwospl_splk_unlock(struct xwospl_splk * osplsplk)
 {
-        xwmb_mp_store_release(xwu32_t, osplsplk, 0U);
+        volatile xwu16_t curr;
+
+        curr = osplsplk->v.ticket.curr + 1U;
+        xwmb_mp_store_release(xwu16_t, &osplsplk->v.ticket.curr, curr);
 }
 #endif
 

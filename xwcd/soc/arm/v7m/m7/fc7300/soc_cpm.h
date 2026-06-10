@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC描述层：SOC
+ * @brief SOC描述层：CPM
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,15 +18,23 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm_v7m_m7_flagchip_fc7300_regs_h__
-#define __xwcd_soc_arm_v7m_m7_flagchip_fc7300_regs_h__
+#ifndef __xwcd_soc_arm_v7m_m7_fc7300_soc_cpm_h__
+#define __xwcd_soc_arm_v7m_m7_fc7300_soc_cpm_h__
 
 #include <xwos/standard.h>
 
-#define SOC_CPM_MISCR (*((__xw_io xwreg_t *)0xE0080004UL))
+struct soc_cpm_regs {
+        xwu32_t fiscr; /* offset: 0x00 */
+        xwu32_t miscr; /* offset: 0x04 */
+        xwu32_t reserved0[6]; /* offset: 0x08 */
+        xwu32_t lock; /* offset: 0x20 */
+};
+
+
 #define SOC_CPM_MISCR_CPU_ID_MASK 0x000E0000UL
 #define SOC_CPM_MISCR_CPU_ID_SHIFT 17U
 
-#define SOC_CPM_LOCK (*((__xw_io xwreg_t *)0xE0080020UL))
+#define SOC_CPM_BASE (0xE0080000UL)
+#define soc_cpm (*((volatile struct soc_cpm_regs *)SOC_CPM_BASE))
 
-#endif /* xwcd/soc/arm/v7m/m7/fc7300/fc7300_regs.h */
+#endif /* xwcd/soc/arm/v7m/m7/fc7300/soc_cpm.h */

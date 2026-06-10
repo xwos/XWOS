@@ -31,7 +31,7 @@
 
 struct xwospl_splk {
         union {
-                xwu32_t total;
+                xwu32_t raw;
                 struct {
 #if defined(ARCHCFG_LITTLE_ENDIAN) && (1 == ARCHCFG_LITTLE_ENDIAN)
                         xwu16_t curr; /**< current owner */
@@ -40,20 +40,20 @@ struct xwospl_splk {
                         xwu16_t next; /**< next owner */
                         xwu16_t curr; /**< current owner */
 #endif
-                } tickets;
+                } ticket;
         } v;
 };
 
-#define XWOSPL_SPLK_INITIALIZER { .v.tickets.curr = 0, .v.tickets.next = 0, }
+#define XWOSPL_SPLK_INITIALIZER { .v.ticket.curr = 0, .v.ticket.next = 0, }
 
 static __xwbsp_inline
 void xwospl_splk_init(struct xwospl_splk * osplsplk)
 {
-        osplsplk->v.tickets.next = 0;
-        osplsplk->v.tickets.curr = 0;
+        osplsplk->v.ticket.next = 0;
+        osplsplk->v.ticket.curr = 0;
 }
 
-#if (CPUCFG_CPU_NUM > 1)
+#if (CPUCFG_CPU_NUM > 1U)
 static __xwbsp_inline
 void xwospl_splk_lock(struct xwospl_splk * osplsplk)
 {
@@ -65,11 +65,12 @@ void xwospl_splk_lock(struct xwospl_splk * osplsplk)
         __asm__ volatile(
         "1:\n"
         "       ldrex   %[__tmp], [%[__lock]]\n"
+        "       dmb\n"
         "       add     %[__newval], %[__tmp], %[__ticket]\n"
         "       strex   %[__rc], %[__newval], [%[__lock]]\n"
         "       teq     %[__rc], #0\n"
         "       bne     1b\n"
-        : [__tmp] "=&r" (tmp.v.total),
+        : [__tmp] "=&r" (tmp.v.raw),
           [__newval] "=&r" (newval),
           [__rc] "=&r" (rc)
         : [__lock] "r" (osplsplk),
@@ -77,11 +78,15 @@ void xwospl_splk_lock(struct xwospl_splk * osplsplk)
         : "cc", "memory"
         );
 
-        while (tmp.v.tickets.next != tmp.v.tickets.curr) {
-                armv7m_wfe();
-                tmp.v.tickets.curr = xwmb_access(xwu16_t, &osplsplk->v.tickets.curr);
+        if (tmp.v.ticket.next != tmp.v.ticket.curr) {
+                /* armv7m_sev(); */
+                while (tmp.v.ticket.next != tmp.v.ticket.curr) {
+                        /* armv7m_wfe(); */
+                        xwmb_mp_load_acquire(xwu16_t, tmp.v.ticket.curr,
+                                             &osplsplk->v.ticket.curr);
+                }
+                xwmb_mp_mb();
         }
-        xwmb_mp_mb();
 }
 
 static __xwbsp_inline
@@ -95,13 +100,14 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
         do {
                 __asm__ volatile(
                 "       ldrex   %[__tmp], [%[__lock]]\n"
+                "       dmb\n"
                 "       mov     %[__rc], #0\n"
                 "       ror     %[__contended], %[__tmp], #16\n"
                 "       subs    %[__contended], %[__tmp]\n"
                 "       itt     eq\n"
                 "       addeq   %[__tmp], %[__tmp], %[__ticket]\n"
                 "       strexeq %[__rc], %[__tmp], [%[__lock]]\n"
-                : [__tmp] "=&r" (tmp.v.total),
+                : [__tmp] "=&r" (tmp.v.raw),
                   [__contended] "=&r" (contended),
                   [__rc] "=&r" (rc)
                 : [__lock] "r" (osplsplk),
@@ -121,10 +127,11 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 static __xwbsp_inline
 void xwospl_splk_unlock(struct xwospl_splk * osplsplk)
 {
-        xwmb_mp_mb();
-        osplsplk->v.tickets.curr++;
-        armv7m_dsb();
-        armv7m_sev();
+        volatile xwu16_t curr;
+
+        curr = osplsplk->v.ticket.curr + 1U;
+        xwmb_mp_store_release(xwu16_t, &osplsplk->v.ticket.curr, curr);
+        /* armv7m_sev(); */
 }
 #endif
 

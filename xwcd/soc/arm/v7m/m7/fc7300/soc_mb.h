@@ -60,21 +60,19 @@ struct soc_mb_regs {
                                                     SOC_MB_SEMA_LOCK_SHIFT) & \
                                                    SOC_MB_SEMA_LOCK_MASK))
 
+#define SOC_MB_SEMA_MASTER_ID_MASK      (0xF0U)
+#define SOC_MB_SEMA_MASTER_ID_SHIFT     (4U)
+#define SOC_MB_SEMA_MASTER_ID_WIDTH     (4U)
+
+#define SOC_MB_SEMA_LOCK_MASTER_ID_MASK (0x800000F0U)
 #define SOC_MB_MASTER_DONE_CODE         (0xFC730000U)
+#define SOC_MB_NESTED_LOCKCODE          (0x00800000U)
 
-#define SOC_MB_CH_SPINLOCK              15
+#define SOC_MB_CH_SPINLOCK              (8U)
+#define SOC_MB_CH_XWAOP                 (9U)
+#define SOC_MB_CH_CPU_CROSS_WKUP        (10U)
 
-
-static __xwbsp_inline
-xwu32_t soc_mb_lock(xwu32_t ch)
-{
-        return soc_mb.channel[ch].sema & SOC_MB_SEMA_LOCK_MASK;
-}
-
-static __xwbsp_inline
-void soc_mb_unlock(xwu32_t ch)
-{
-        soc_mb.channel[ch].done = SOC_MB_MASTER_DONE_CODE;
-}
+xwu32_t soc_mb_lock(xwu32_t ch);
+void soc_mb_unlock(xwu32_t ch, xwu32_t lockcode);
 
 #endif /* xwcd/soc/arm/v7m/m7/fc7300/soc_mb.h */

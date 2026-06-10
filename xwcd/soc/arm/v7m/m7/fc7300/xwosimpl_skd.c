@@ -22,7 +22,7 @@
 #include <xwos/ospl/skd.h>
 #include <xwcd/soc/arm/v7m/arch_irq.h>
 #include <xwcd/soc/arm/v7m/arch_skd.h>
-#include <xwcd/soc/arm/v7m/m7/fc7300/fc7300_regs.h>
+#include <xwcd/soc/arm/v7m/m7/fc7300/soc_cpm.h>
 
 __xwbsp_code
 xwer_t xwospl_skd_init(__unused struct xwospl_skd * xwskd)
@@ -42,8 +42,10 @@ __xwbsp_code
 xwid_t xwospl_skd_get_cpuid_lc(void)
 {
         __xwcc_unused xwu32_t dummy;
-        xwid_t cpuid = (SOC_CPM_MISCR & SOC_CPM_MISCR_CPU_ID_MASK);
-        dummy = SOC_CPM_LOCK; /* Fix Errata: ERR_CPM_001 */
+        xwid_t cpuid;
+
+        cpuid = soc_cpm.miscr & SOC_CPM_MISCR_CPU_ID_MASK;
+        dummy = soc_cpm.lock; /* Fix Errata: ERR_CPM_001 */
         cpuid >>= SOC_CPM_MISCR_CPU_ID_SHIFT;
         return cpuid;
 }
