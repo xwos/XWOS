@@ -20,6 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwcd/soc/powerpc/e200x/e200x_isa.h>
+#include <xwos/ospl/xwaop.h>
 
 __xwlib_code
 xwu32_t xwaop__xwu32_t__load(atomic_xwu32_t * a,

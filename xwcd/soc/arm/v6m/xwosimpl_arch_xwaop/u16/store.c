@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <armv6m_isa.h>
-#include <xwos/lib/xwaop.h>
+#include <xwos/ospl/xwaop.h>
 
 __xwlib_code
 xwu16_t xwaop__xwu16_t__store(atomic_xwu16_t * a,

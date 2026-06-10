@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwcd/soc/arm/v6m/arch_irq.h>
-#include <xwos/lib/xwaop.h>
+#include <xwos/ospl/xwaop.h>
 
 __xwlib_code
 xwer_t xwaop__xwu64_t__tne_then_write(atomic_xwu64_t * a,

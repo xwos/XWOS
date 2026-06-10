@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <armv7m_isa.h>
-#include <xwos/lib/xwaop.h>
+#include <xwos/ospl/xwaop.h>
 
 __xwlib_code
 xwu64_t xwaop__xwu64_t__load(atomic_xwu64_t * a,

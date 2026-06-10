@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植层：SOC：原子操作
+ * @brief XWOS移植层：原子操作
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,8 +10,8 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwos_ospl_soc_xwaop_h__
-#define __xwos_ospl_soc_xwaop_h__
+#ifndef __xwos_ospl_xwaop_h__
+#define __xwos_ospl_xwaop_h__
 
 #include <xwos/standard.h>
 
@@ -2245,4 +2245,4 @@ xwer_t xwaop__xws64_t__tst_then_op(atomic_xws64_t * a,
                                    xwaop_op_f op, void * op_args,
                                    xws64_t * nv, xws64_t * ov);
 
-#endif /* xwos/ospl/soc/xwaop.h */
+#endif /* xwos/ospl/xwaop.h */

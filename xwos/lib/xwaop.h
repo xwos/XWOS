@@ -22,7 +22,7 @@
  * @{
  */
 
-#include <xwos/ospl/soc/xwaop.h>
+#include <xwos/ospl/xwaop.h>
 
 /**
  * @brief 调用原子操作函数，并指明内存序

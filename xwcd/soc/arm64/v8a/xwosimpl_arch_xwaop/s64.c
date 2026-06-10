@@ -20,6 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwcd/soc/arm64/v8a/arch_isa.h>
+#include <xwos/ospl/xwaop.h>
 
 xws64_t xwaop__xws64_t__load(atomic_xws64_t * a,
                              const enum xwaop_memory_order_em mo)
