@@ -20,9 +20,9 @@
 
 #include <xwos/standard.h>
 #include <xwcd/soc/arm/v6m/arch_irq.h>
-#include <xwos/ospl/soc/lfq.h>
+#include <xwos/ospl/lfq.h>
 
-void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
+void xwospl_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
         xwreg_t flag;
 
@@ -32,7 +32,7 @@ void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
         arch_cpuirq_restore_lc(flag);
 }
 
-xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
+xwlfq_t * xwospl_lfq_pop(atomic_xwlfq_t * h)
 {
         xwreg_t flag;
         xwlfq_t * top;

@@ -20,10 +20,10 @@
 
 #include <xwos/standard.h>
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
-#include <xwos/ospl/soc/lfq.h>
+#include <xwos/ospl/lfq.h>
 
 __xwbsp_code
-void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
+void xwospl_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
         register xwlfq_t * next;
 
@@ -36,7 +36,7 @@ void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 }
 
 __xwbsp_code
-xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
+xwlfq_t * xwospl_lfq_pop(atomic_xwlfq_t * h)
 {
         register xwlfq_t * top;
         register xwlfq_t * next;

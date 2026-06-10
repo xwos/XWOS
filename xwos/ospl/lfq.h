@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS移植层：SOC无锁队列
+ * @brief XWOS移植层：无锁队列
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,12 +10,12 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwos_ospl_soc_lfq_h__
-#define __xwos_ospl_soc_lfq_h__
+#ifndef __xwos_ospl_lfq_h__
+#define __xwos_ospl_lfq_h__
 
 #include <xwos/standard.h>
 
-void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n);
-xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h);
+void xwospl_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n);
+xwlfq_t * xwospl_lfq_pop(atomic_xwlfq_t * h);
 
-#endif /* xwos/ospl/soc/lfq.h */
+#endif /* xwos/ospl/lfq.h */
