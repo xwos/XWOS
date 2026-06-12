@@ -26,45 +26,49 @@
 __xwbsp_code
 void xwospl_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
-        xwreg_t cpuirq;
         xwu32_t mblkcode;
         xwlfq_t top;
 
-        arch_cpuirq_save_lc(&cpuirq);
         do {
-                mblkcode = soc_mb_lock(SOC_MB_CH_SPINLOCK);
+                mblkcode = soc_mb_lock(SOC_MB_CH_XWAOP);
                 if (mblkcode > 0) {
-                        xwmb_mp_load_acquire(xwlfq_t, top, h);
-                        *n = top;
-                        xwmb_mp_store_release(xwlfq_t, h, (xwlfq_t)n);
-                        soc_mb_unlock(SOC_MB_CH_SPINLOCK, mblkcode);
+                        do {
+                                top = (xwlfq_t)armv7m_ldrex(h);
+                                xwmb_mp_mb();
+                                *n = top;
+                                xwmb_mp_mb();
+                        } while (armv7m_strex(h, (xwu32_t)n));
+                        soc_mb_unlock(SOC_MB_CH_XWAOP, mblkcode);
                         break;
                 }
         } while (true);
-        arch_cpuirq_restore_lc(cpuirq);
 }
 
 __xwbsp_code
 xwlfq_t * xwospl_lfq_pop(atomic_xwlfq_t * h)
 {
-        xwreg_t cpuirq;
+        xwer_t rc;
         xwu32_t mblkcode;
         xwlfq_t top;
         xwlfq_t next;
 
-        arch_cpuirq_save_lc(&cpuirq);
         do {
-                mblkcode = soc_mb_lock(SOC_MB_CH_SPINLOCK);
+                mblkcode = soc_mb_lock(SOC_MB_CH_XWAOP);
                 if (mblkcode > 0) {
-                        xwmb_mp_load_acquire(xwlfq_t, top, h);
-                        if (top) {
-                                next = *((xwlfq_t *)top);
-                                xwmb_mp_store_release(xwlfq_t, h, next);
-                        }
-                        soc_mb_unlock(SOC_MB_CH_SPINLOCK, mblkcode);
+                        do {
+                                top = armv7m_ldrex(h);
+                                xwmb_mp_mb();
+                                if (top) {
+                                        next = (*(xwlfq_t *)top);
+                                        xwmb_mp_mb();
+                                        rc = armv7m_strex(h, (xwu32_t)next);
+                                } else {
+                                        break;
+                                }
+                        } while (rc);
+                        soc_mb_unlock(SOC_MB_CH_XWAOP, mblkcode);
                         break;
                 }
         } while (true);
-        arch_cpuirq_restore_lc(cpuirq);
         return (xwlfq_t *)top;
 }
