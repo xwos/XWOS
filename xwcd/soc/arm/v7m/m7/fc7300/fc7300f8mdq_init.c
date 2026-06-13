@@ -205,88 +205,172 @@ void soc_disable_ecc(void)
 
 void soc_disable_wdog0(void)
 {
-        xwu32_t val;
+        register xwu32_t val;
+        register xwu32_t try = 128u;
 
-        /* Unlock the wdog.
-           Note: The unlock status only persist for 128 bus clocks.
-           SHALL NOT use single-step or break points in the following lines. */
-        xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_COUNTER_OFFSET) =
-                WDOG_COUNTER_UNLOCK;
-        do {
-                /* Wait until the unlock take effect. */
+        /* If it is not the first time to configure wdog, unlock status will only
+           persist for 128 bus clocks. */
+        while (0UL != try) {
                 val = xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET);
-        } while ((val & WDOG_CS_ULK_STAT) == 0U);
+                if ((val & WDOG_CS_ULK_STAT) == 0U) {
+                        break;
+                }
+                try--;
+        }
+        /* If ULK_STAT turns into 0 in 128 try counts, it means this is not the
+           first time to configure the wdog. */
+        if (0UL != try) {
+                /* When ULK_STAT = 0, the wdog can only be unlocked when RECFG_STAT
+                   becomes 1. */
+                do {
+                        val = xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_RECFG_STAT) == 0U);
+
+                /* Unlock the wdog.
+                   Note: The unlock status only persist for 128 bus clocks.
+                   SHALL NOT use single-step or break points in the following lines. */
+                xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_COUNTER_OFFSET) =
+                        WDOG_COUNTER_UNLOCK;
+
+                do {
+                        /* Wait until the unlock take effect. */
+                        val = xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_ULK_STAT) == 0U);
+        }
         /* Disable Watchdog */
         xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET) = WDOG_CS_DISABLE_WDOG;
-        xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xF000U;
+        xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xFFFFU;
+        /* Wait the RECFG_STAT to become 1. */
         do {
-                /* Wait for done */
                 val = xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET);
         } while ((val & WDOG_CS_RECFG_STAT) == 0U);
 }
 
 void soc_disable_wdog1(void)
 {
-        xwu32_t val;
+        register xwu32_t val;
+        register xwu32_t try = 128u;
 
-        /* Unlock the wdog.
-           Note: The unlock status only persist for 128 bus clocks.
-           SHALL NOT use single-step or break points in the following lines. */
-        xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_COUNTER_OFFSET) =
-                WDOG_COUNTER_UNLOCK;
-        do {
-                /* Wait until the unlock take effect. */
+        /* If it is not the first time to configure wdog, unlock status will only
+           persist for 128 bus clocks. */
+        while (0UL != try) {
                 val = xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET);
-        } while ((val & WDOG_CS_ULK_STAT) == 0U);
+                if ((val & WDOG_CS_ULK_STAT) == 0U) {
+                        break;
+                }
+                try--;
+        }
+        /* If ULK_STAT turns into 0 in 128 try counts, it means this is not the
+           first time to configure the wdog. */
+        if (0UL != try) {
+                /* When ULK_STAT = 0, the wdog can only be unlocked when RECFG_STAT
+                   becomes 1. */
+                do {
+                        val = xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_RECFG_STAT) == 0U);
+
+                /* Unlock the wdog.
+                   Note: The unlock status only persist for 128 bus clocks.
+                   SHALL NOT use single-step or break points in the following lines. */
+                xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_COUNTER_OFFSET) =
+                        WDOG_COUNTER_UNLOCK;
+
+                do {
+                        /* Wait until the unlock take effect. */
+                        val = xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_ULK_STAT) == 0U);
+        }
         /* Disable Watchdog */
         xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET) = WDOG_CS_DISABLE_WDOG;
-        xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xF000U;
+        xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xFFFFU;
+        /* Wait the RECFG_STAT to become 1. */
         do {
-                /* Wait for done */
                 val = xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET);
         } while ((val & WDOG_CS_RECFG_STAT) == 0U);
 }
 
 void soc_disable_wdog2(void)
 {
-        xwu32_t val;
+        register xwu32_t val;
+        register xwu32_t try = 128u;
 
-        /* Unlock the wdog.
-           Note: The unlock status only persist for 128 bus clocks.
-           SHALL NOT use single-step or break points in the following lines. */
-        xwmb_access(xwu32_t, WDOG2_BASE_ADDR + WDOG_COUNTER_OFFSET) =
-                WDOG_COUNTER_UNLOCK;
-        do {
-                /* Wait until the unlock take effect. */
+        /* If it is not the first time to configure wdog, unlock status will only
+           persist for 128 bus clocks. */
+        while (0UL != try) {
                 val = xwmb_access(xwu32_t, WDOG2_BASE_ADDR + WDOG_CS_OFFSET);
-        } while ((val & WDOG_CS_ULK_STAT) == 0U);
+                if ((val & WDOG_CS_ULK_STAT) == 0U) {
+                        break;
+                }
+                try--;
+        }
+        /* If ULK_STAT turns into 0 in 128 try counts, it means this is not the
+           first time to configure the wdog. */
+        if (0UL != try) {
+                /* When ULK_STAT = 0, the wdog can only be unlocked when RECFG_STAT
+                   becomes 1. */
+                do {
+                        val = xwmb_access(xwu32_t, WDOG2_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_RECFG_STAT) == 0U);
+
+                /* Unlock the wdog.
+                   Note: The unlock status only persist for 128 bus clocks.
+                   SHALL NOT use single-step or break points in the following lines. */
+                xwmb_access(xwu32_t, WDOG2_BASE_ADDR + WDOG_COUNTER_OFFSET) =
+                        WDOG_COUNTER_UNLOCK;
+
+                do {
+                        /* Wait until the unlock take effect. */
+                        val = xwmb_access(xwu32_t, WDOG2_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_ULK_STAT) == 0U);
+        }
         /* Disable Watchdog */
         xwmb_access(xwu32_t, WDOG2_BASE_ADDR + WDOG_CS_OFFSET) = WDOG_CS_DISABLE_WDOG;
-        xwmb_access(xwu32_t, WDOG2_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xF000U;
+        xwmb_access(xwu32_t, WDOG2_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xFFFFU;
+        /* Wait the RECFG_STAT to become 1. */
         do {
-                /* Wait for done */
                 val = xwmb_access(xwu32_t, WDOG2_BASE_ADDR + WDOG_CS_OFFSET);
         } while ((val & WDOG_CS_RECFG_STAT) == 0U);
 }
 
 void soc_disable_wdog3(void)
 {
-        xwu32_t val;
+        register xwu32_t val;
+        register xwu32_t try = 128u;
 
-        /* Unlock the wdog.
-           Note: The unlock status only persist for 128 bus clocks.
-           SHALL NOT use single-step or break points in the following lines. */
-        xwmb_access(xwu32_t, WDOG3_BASE_ADDR + WDOG_COUNTER_OFFSET) =
-                WDOG_COUNTER_UNLOCK;
-        do {
-                /* Wait until the unlock take effect. */
+        /* If it is not the first time to configure wdog, unlock status will only
+           persist for 128 bus clocks. */
+        while (0UL != try) {
                 val = xwmb_access(xwu32_t, WDOG3_BASE_ADDR + WDOG_CS_OFFSET);
-        } while ((val & WDOG_CS_ULK_STAT) == 0U);
+                if ((val & WDOG_CS_ULK_STAT) == 0U) {
+                        break;
+                }
+                try--;
+        }
+        /* If ULK_STAT turns into 0 in 128 try counts, it means this is not the
+           first time to configure the wdog. */
+        if (0UL != try) {
+                /* When ULK_STAT = 0, the wdog can only be unlocked when RECFG_STAT
+                   becomes 1. */
+                do {
+                        val = xwmb_access(xwu32_t, WDOG3_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_RECFG_STAT) == 0U);
+
+                /* Unlock the wdog.
+                   Note: The unlock status only persist for 128 bus clocks.
+                   SHALL NOT use single-step or break points in the following lines. */
+                xwmb_access(xwu32_t, WDOG3_BASE_ADDR + WDOG_COUNTER_OFFSET) =
+                        WDOG_COUNTER_UNLOCK;
+
+                do {
+                        /* Wait until the unlock take effect. */
+                        val = xwmb_access(xwu32_t, WDOG3_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_ULK_STAT) == 0U);
+        }
         /* Disable Watchdog */
         xwmb_access(xwu32_t, WDOG3_BASE_ADDR + WDOG_CS_OFFSET) = WDOG_CS_DISABLE_WDOG;
-        xwmb_access(xwu32_t, WDOG3_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xF000U;
+        xwmb_access(xwu32_t, WDOG3_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xFFFFU;
+        /* Wait the RECFG_STAT to become 1. */
         do {
-                /* Wait for done */
                 val = xwmb_access(xwu32_t, WDOG3_BASE_ADDR + WDOG_CS_OFFSET);
         } while ((val & WDOG_CS_RECFG_STAT) == 0U);
 }
