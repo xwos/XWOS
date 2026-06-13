@@ -89,7 +89,7 @@ struct xwup_skdobj_stack {
         xwup_thd_f main; /**< 主函数 */
         void * arg; /**< 主函数的参数 */
         const char * name; /**< 名字字符串 */
-        atomic_xwsq_t flag; /**< 标签，取值 @ref xwup_skdobj_flag_em */
+        xwsq_t flag; /**< 标签，取值 @ref xwup_skdobj_flag_em */
 };
 
 /**
