@@ -22,12 +22,23 @@
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include <xwos/ospl/xwaop.h>
 
+#if defined(SOCCFG_LIB_XWAOP_HOOK) && (1 == SOCCFG_LIB_XWAOP_HOOK)
+#  include <soc_xwaop_hook.h>
+#endif
+#ifndef SOC_XWAOP_BEGIN
+#  define SOC_XWAOP_BEGIN
+#endif
+#ifndef SOC_XWAOP_END
+#  define SOC_XWAOP_END
+#endif
+
 __xwlib_code
 xwu16_t xwaop__xwu16_t__load(atomic_xwu16_t * a,
                              const enum xwaop_memory_order_em mo)
 {
         xwu16_t v;
 
+        SOC_XWAOP_BEGIN
         switch (mo) {
         case xwaop_mo_relaxed:
                 v = *a;
@@ -56,5 +67,6 @@ xwu16_t xwaop__xwu16_t__load(atomic_xwu16_t * a,
                 v = *a;
                 break;
         }
+        SOC_XWAOP_END
         return v;
 }

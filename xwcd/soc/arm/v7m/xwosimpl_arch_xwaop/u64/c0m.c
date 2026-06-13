@@ -22,6 +22,16 @@
 #include <xwcd/soc/arm/v7m/arch_irq.h>
 #include <xwos/ospl/xwaop.h>
 
+#if defined(SOCCFG_LIB_XWAOP_HOOK) && (1 == SOCCFG_LIB_XWAOP_HOOK)
+#  include <soc_xwaop_hook.h>
+#endif
+#ifndef SOC_XWAOP_BEGIN
+#  define SOC_XWAOP_BEGIN
+#endif
+#ifndef SOC_XWAOP_END
+#  define SOC_XWAOP_END
+#endif
+
 __xwlib_code
 void xwaop__xwu64_t__c0m(atomic_xwu64_t * a,
                          xwu64_t m,
@@ -31,11 +41,13 @@ void xwaop__xwu64_t__c0m(atomic_xwu64_t * a,
         xwu64_t o;
         xwreg_t flag;
 
+        SOC_XWAOP_BEGIN
         arch_cpuirq_save_lc(&flag);
         o = *a;
         n = o & (~m);
         *a = n;
         arch_cpuirq_restore_lc(flag);
+        SOC_XWAOP_END
         if (nv) {
                 *nv = n;
         }

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xws16_t__read
+ * @brief SOC描述层：XWAOP HOOK
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,30 +18,22 @@
  * > limitations under the License.
  */
 
+#ifndef __xwcd_soc_arm_v7m_m7_fc7300_soc_xwaop_hook_h__
+#define __xwcd_soc_arm_v7m_m7_fc7300_soc_xwaop_hook_h__
+
 #include <xwos/standard.h>
-#include <xwcd/soc/arm/v7m/armv7m_isa.h>
-#include <xwos/ospl/xwaop.h>
+#include <xwcd/soc/arm/v7m/m7/fc7300/soc_mb.h>
 
-#if defined(SOCCFG_LIB_XWAOP_HOOK) && (1 == SOCCFG_LIB_XWAOP_HOOK)
-#  include <soc_xwaop_hook.h>
-#endif
-#ifndef SOC_XWAOP_BEGIN
-#  define SOC_XWAOP_BEGIN
-#endif
-#ifndef SOC_XWAOP_END
-#  define SOC_XWAOP_END
-#endif
+#define SOC_XWAOP_BEGIN \
+        do { \
+                xwu32_t __soc_xwaop_mblkcode = soc_mb_lock(SOC_MB_CH_XWAOP); \
+                if (__soc_xwaop_mblkcode > 0) {
 
-__xwlib_code
-void xwaop__xws16_t__read(atomic_xws16_t * a,
-                          xws16_t * ov)
-{
-        xws16_t o;
 
-        SOC_XWAOP_BEGIN
-        o = xwaop__xws16_t__load(a, xwaop_mo_acquire);
-        SOC_XWAOP_END
-        if (ov) {
-                *ov = o;
-        }
-}
+#define SOC_XWAOP_END \
+                        soc_mb_unlock(SOC_MB_CH_XWAOP, __soc_xwaop_mblkcode); \
+                        break; \
+                } \
+        } while (true);
+
+#endif /* xwcd/soc/arm/v7m/m7/fc7300/soc_xwaop_hook.h */

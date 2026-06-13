@@ -22,6 +22,16 @@
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include <xwos/ospl/xwaop.h>
 
+#if defined(SOCCFG_LIB_XWAOP_HOOK) && (1 == SOCCFG_LIB_XWAOP_HOOK)
+#  include <soc_xwaop_hook.h>
+#endif
+#ifndef SOC_XWAOP_BEGIN
+#  define SOC_XWAOP_BEGIN
+#endif
+#ifndef SOC_XWAOP_END
+#  define SOC_XWAOP_END
+#endif
+
 __xwlib_code
 xwer_t xwaop__xwu16_t__tgtle_then_sub(atomic_xwu16_t * a,
                                       xwu16_t l, xwu16_t r,
@@ -32,6 +42,7 @@ xwer_t xwaop__xwu16_t__tgtle_then_sub(atomic_xwu16_t * a,
         xwu16_t o;
         xwer_t rc;
 
+        SOC_XWAOP_BEGIN
         do {
                 o = (xwu16_t)armv7m_ldrexh(a);
                 if ((o > l) && (o <= r)) {
@@ -45,6 +56,7 @@ xwer_t xwaop__xwu16_t__tgtle_then_sub(atomic_xwu16_t * a,
                         break;
                 }
         } while (rc);
+        SOC_XWAOP_END
         if (nv) {
                 *nv = n;
         }

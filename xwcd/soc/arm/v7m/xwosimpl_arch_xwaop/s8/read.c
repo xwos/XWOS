@@ -22,13 +22,25 @@
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
 #include <xwos/ospl/xwaop.h>
 
+#if defined(SOCCFG_LIB_XWAOP_HOOK) && (1 == SOCCFG_LIB_XWAOP_HOOK)
+#  include <soc_xwaop_hook.h>
+#endif
+#ifndef SOC_XWAOP_BEGIN
+#  define SOC_XWAOP_BEGIN
+#endif
+#ifndef SOC_XWAOP_END
+#  define SOC_XWAOP_END
+#endif
+
 __xwlib_code
 void xwaop__xws8_t__read(atomic_xws8_t * a,
                          xws8_t * ov)
 {
         xws8_t o;
 
+        SOC_XWAOP_BEGIN
         o = xwaop__xws8_t__load(a, xwaop_mo_acquire);
+        SOC_XWAOP_END
         if (ov) {
                 *ov = o;
         }
