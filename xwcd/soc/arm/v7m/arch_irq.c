@@ -93,9 +93,8 @@ void arch_isr_hardfault(void)
         : "memory", "cc"
         );
         board_esr_hardfault(lr, sp);
-#else
-        arch_skd_chk_stk();
 #endif
+        arch_skd_chk_stk();
         while (true) {
         }
 }
@@ -122,9 +121,8 @@ void arch_isr_mm(void)
         : "memory", "cc"
         );
         board_esr_mm(lr ,sp);
-#else
-        arch_skd_chk_stk();
 #endif
+        arch_skd_chk_stk();
 }
 
 #if defined(BRDCFG_ESR_BUSFAULT) && (1 == BRDCFG_ESR_BUSFAULT)
@@ -149,9 +147,8 @@ void arch_isr_busfault(void)
         : "memory", "cc"
         );
         board_esr_busfault(lr, sp);
-#else
-        arch_skd_chk_stk();
 #endif
+        arch_skd_chk_stk();
         while (true) {
         }
 }
@@ -178,9 +175,8 @@ void arch_isr_usagefault(void)
         : "memory", "cc"
         );
         board_esr_usagefault(lr, sp);
-#else
-        arch_skd_chk_stk();
 #endif
+        arch_skd_chk_stk();
         while (true) {
         }
 }
