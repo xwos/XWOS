@@ -62,13 +62,13 @@ void xwospl_splk_lock(struct xwospl_splk * osplsplk)
         xwu16_t ticket;
 
         do {
-                mblkcode = soc_mb_lock(SOC_MB_CH_SPINLOCK);
+                mblkcode = soc_mb_lock(SOC_MB_CH_XWOS_SPINLOCK);
                 if (mblkcode > 0) {
                         xwmb_mp_load_acquire(xwu32_t, lock.v.raw, &osplsplk->v.raw);
                         ticket = lock.v.ticket.next;
                         lock.v.ticket.next += 1U;
                         osplsplk->v.raw = lock.v.raw;
-                        soc_mb_unlock(SOC_MB_CH_SPINLOCK, mblkcode);
+                        soc_mb_unlock(SOC_MB_CH_XWOS_SPINLOCK, mblkcode);
                         break;
                 }
         } while (true);
@@ -87,7 +87,7 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
         struct xwospl_splk lock;
 
         do {
-                mblkcode = soc_mb_lock(SOC_MB_CH_SPINLOCK);
+                mblkcode = soc_mb_lock(SOC_MB_CH_XWOS_SPINLOCK);
                 if (mblkcode > 0) {
                         xwmb_mp_load_acquire(xwu32_t, lock.v.raw, &osplsplk->v.raw);
                         if (lock.v.ticket.curr != lock.v.ticket.next) {
@@ -97,7 +97,7 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
                                 osplsplk->v.raw = lock.v.raw;
                                 rc = XWOK;
                         }
-                        soc_mb_unlock(SOC_MB_CH_SPINLOCK, mblkcode);
+                        soc_mb_unlock(SOC_MB_CH_XWOS_SPINLOCK, mblkcode);
                         break;
                 }
         } while (true);

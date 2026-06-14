@@ -68,9 +68,8 @@ struct soc_mb_regs {
 #define SOC_MB_MASTER_DONE_CODE         (0xFC730000U)
 #define SOC_MB_NESTED_LOCKCODE          (0x00800000U)
 
-#define SOC_MB_CH_SPINLOCK              (8U)
-#define SOC_MB_CH_XWAOP                 (9U)
-#define SOC_MB_CH_CPU_CROSS_WKUP        (10U)
+#define SOC_MB_CH_XWOS_SPINLOCK         (SOCCFG_MB_CH_XWOS_SPINLOCK)
+#define SOC_MB_CH_XWAOP                 (SOCCFG_MB_CH_XWAOP)
 
 xwu32_t soc_mb_lock(xwu32_t ch);
 void soc_mb_unlock(xwu32_t ch, xwu32_t lockcode);
