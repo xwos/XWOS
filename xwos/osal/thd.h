@@ -193,6 +193,8 @@ struct xwos_thd_stack_info {
         xwsz_t size; /**< 栈内存的大小，单位：字节 */
         xwstk_t * guard_base; /**< 栈内存警戒线的基地址 */
         xwsz_t guard_size; /**< 栈内存警戒线，单位：字节 */
+        xwstk_t * line; /**< 栈用量线 */
+        xwsz_t usage; /**< 栈用量，单位：字节 */
 };
 
 /**
@@ -468,8 +470,27 @@ xwer_t xwos_thd_get_stack_info(xwos_thd_d thdd, struct xwos_thd_stack_info * sta
                 stack->size = info.size;
                 stack->guard_base = info.guard_base;
                 stack->guard_size = info.guard_size;
+                stack->line = info.line;
+                stack->usage = info.usage;
         }
         return rc;
+}
+
+/**
+ * @brief XWOS API：获取线程的栈用量信息
+ * @param[in] thdd: 线程对象描述符
+ * @param[out] usage: 用于返回线程栈用量信息的缓冲区
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EOBJDEAD: 线程对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * + 上下文：任意
+ */
+static __xwos_inline_api
+xwer_t xwos_thd_get_stack_usage(xwos_thd_d thdd, xwsz_t * usage)
+{
+        return xwosdl_thd_get_stack_usage(&thdd.thd->osthd, thdd.tik, usage);
 }
 
 /**
@@ -664,6 +685,22 @@ void xwos_cthd_get_stack_info(struct xwos_thd_stack_info * stack)
 {
         // cppcheck-suppress [misra-c2012-17.7]
         xwos_thd_get_stack_info(xwos_cthd_self(), stack);
+}
+
+/**
+ * @brief XWOS API：获取线程自身的栈用量信息
+ * @return 线程栈用量信息
+ * @note
+ * + 上下文：线程
+ */
+static __xwos_inline_api
+xwsz_t xwos_cthd_get_stack_usage(void)
+{
+        xwsz_t usage;
+
+        // cppcheck-suppress [misra-c2012-17.7]
+        xwos_thd_get_stack_usage(xwos_cthd_self(), &usage);
+        return usage;
 }
 
 /**

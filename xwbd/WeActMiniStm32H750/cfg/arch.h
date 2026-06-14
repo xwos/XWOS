@@ -30,14 +30,17 @@
 #define ARCHCFG_32BIT                           1
 #define ARCHCFG_64BIT                           0
 
-/******** ******** fpu ******** ********/
+/******** ******** FPU ******** ********/
 #define ARCHCFG_FPU                             1
 
-/******** ******** fpu ******** ********/
+/******** ******** MPU ******** ********/
 #define ARCHCFG_MPU                             1
 
+/******** ******** Thread Stack Usage ******** ********/
+#define ARCHCFG_THD_STACK_USAGE                 1
+
 /******** ******** architecture libs ******** ********/
-/******** libc.a ********/
+/******** compiler ********/
 #define ARCHCFG_COMPILER_ERRNO                  1
 
 /******** xwbop ********/

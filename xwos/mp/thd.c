@@ -521,6 +521,8 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 #endif
         thd->stack.guard_base = thd->stack.tls;
         thd->stack.guard_size = attr->stack_guard_size;
+        thd->stack.line = thd->stack.sp;
+        thd->stack.usage = 0U;
 
 #if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         xwmp_cond_init(&thd->completion); // cppcheck-suppress [misra-c2012-17.7]
@@ -620,6 +622,12 @@ __xwmp_api
 void xwmp_thd_get_stack_info(struct xwmp_thd * thd, struct xwmp_skdobj_stack * stack)
 {
         *stack = thd->stack;
+}
+
+__xwmp_api
+void xwmp_thd_get_stack_usage(struct xwmp_thd * thd, xwsz_t * usage)
+{
+        *usage = thd->stack.usage;
 }
 
 __xwmp_api

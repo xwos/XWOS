@@ -110,6 +110,21 @@ xwer_t xwosdl_thd_get_stack_info(struct xwosdl_thd * thd, xwsq_t tik,
 }
 
 __xwmp_code
+xwer_t xwosdl_thd_get_stack_usage(struct xwosdl_thd * thd, xwsq_t tik, xwsz_t * usage)
+{
+        xwer_t rc;
+
+        XWOS_VALIDATE((usage), "nullptr", -EFAULT);
+
+        rc = xwmp_thd_acquire(thd, tik);
+        if (XWOK == rc) {
+                xwmp_thd_get_stack_usage(thd, usage);
+                xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
+        }
+        return rc;
+}
+
+__xwmp_code
 xwer_t xwosdl_thd_intr(struct xwosdl_thd * thd, xwsq_t tik)
 {
         xwer_t rc;

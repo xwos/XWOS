@@ -71,7 +71,7 @@ void arch_skd_init_stack(struct xwospl_skdobj_stack * stk,
         stkbtn = (xwstk_t *)stk->base;
         stknum = stk->size / sizeof(xwstk_t);
         for (i = 0; i < stknum; i++) {
-                stkbtn[i] = 0xFFFFFFFFU;
+                stkbtn[i] = 0xDEADBEEFU;
         }
 
 #if (defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU))
@@ -347,6 +347,49 @@ void xwospl_skd_isr_swcx(void)
         __asm__ volatile("      pop     {pc}");
 }
 
+#if defined(ARCHCFG_THD_STACK_USAGE) && (1 == ARCHCFG_THD_STACK_USAGE)
+__xwbsp_code
+void arch_skd_search_stack_usageline(struct xwospl_skdobj_stack * stk, xwptr_t psp)
+{
+        bool dirdown;
+        bool found;
+        xwstk_t * line;
+        xwsq_t i;
+
+        dirdown = true;
+        found = false;
+        line = (xwstk_t *)(psp & (~((xwptr_t)stk->guard_size - (xwptr_t)1)));
+        do {
+                for (i = 0UL; i < stk->guard_size / sizeof(xwstk_t); i++) {
+                        if (0xDEADBEEFU != line[i]) {
+                                found = true;
+                                break;
+                        }
+                }
+                if (found) {
+                        if (dirdown) {
+                                line -= (stk->guard_size / sizeof(xwstk_t));
+                                found = false;
+                        } else {
+                                found = true;
+                        }
+                } else {
+                        line += (stk->guard_size / sizeof(xwstk_t));
+                        if (dirdown) {
+                                dirdown = false;
+                                found = false;
+                        } else {
+                                found = false;
+                        }
+                }
+        } while (!found);
+        stk->line = line;
+        stk->usage = (xwptr_t)stk->base + stk->size - (xwptr_t)line;
+}
+#else
+#  define arch_skd_search_stack_usageline(stk, psp)
+#endif
+
 /**
  * @brief 切换线程上下文时检查线程的栈溢出
  * @return 调度器的指针
@@ -375,6 +418,7 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
                 arch_skd_report_stk_overflow(pstk, psp);
         }
 #  endif
+        arch_skd_search_stack_usageline(pstk, psp);
 #else
         xwskd = xwosplcb_skd_get_lc();
 #endif
@@ -414,10 +458,11 @@ struct xwospl_skd * arch_skd_chk_stk(void)
         }
 #endif
         for (i = 0; i < (grdsz / sizeof(xwstk_t)); i++) {
-                if (0xFFFFFFFFU != stkbtn[i]) {
+                if (0xDEADBEEFU != stkbtn[i]) {
                         arch_skd_report_stk_overflow(cstk, stk.value);
                 }
         }
+        arch_skd_search_stack_usageline(cstk, stk.value);
         return xwskd;
 }
 

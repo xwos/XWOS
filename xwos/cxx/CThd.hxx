@@ -39,6 +39,14 @@ class CThd
         xwos_cthd_get_stack_info(stack);
     }
     /**
+     * @brief 获取当前线程的栈用量信息
+     * @param[out] stack: 用于返回线程栈信息的缓冲区
+     */
+    static xwsz_t getStackUsage()
+    {
+        return xwos_cthd_get_stack_usage();
+    }
+    /**
      * @brief 当前线程通知调度器重新调度
      */
     static void yield() { xwos_cthd_yield(); }

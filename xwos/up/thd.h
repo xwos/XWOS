@@ -180,6 +180,7 @@ xwer_t xwup_thd_grab(struct xwup_thd * thd);
 xwer_t xwup_thd_put(struct xwup_thd * thd);
 void xwup_thd_get_attr(struct xwup_thd * thd, struct xwup_thd_attr * attr);
 void xwup_thd_get_stack_info(struct xwup_thd * thd, struct xwup_skdobj_stack * stack);
+void xwup_thd_get_stack_usage(struct xwup_thd * thd, xwsz_t * usage);
 void xwup_cthd_yield(void);
 void xwup_cthd_exit(xwer_t rc);
 void xwup_thd_quit(struct xwup_thd * thd);

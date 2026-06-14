@@ -497,6 +497,8 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
 #endif
         thd->stack.guard_base = thd->stack.tls;
         thd->stack.guard_size = attr->stack_guard_size;
+        thd->stack.line = thd->stack.sp;
+        thd->stack.usage = 0U;
 
 #if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         xwup_cond_init(&thd->completion); //cppcheck-suppress [misra-c2012-17.7]
@@ -578,6 +580,12 @@ __xwup_api
 void xwup_thd_get_stack_info(struct xwup_thd * thd, struct xwup_skdobj_stack * stack)
 {
         *stack = thd->stack;
+}
+
+__xwup_api
+void xwup_thd_get_stack_usage(struct xwup_thd * thd, xwsz_t * usage)
+{
+        *usage = thd->stack.usage;
 }
 
 __xwup_api

@@ -84,6 +84,8 @@ xwer_t xwosdl_thd_get_attr(struct xwosdl_thd * thd, xwsq_t tik,
 xwer_t xwosdl_thd_get_stack_info(struct xwosdl_thd * thd, xwsq_t tik,
                                  struct xwosdl_thd_stack_info * stack);
 
+xwer_t xwosdl_thd_get_stack_usage(struct xwosdl_thd * thd, xwsq_t tik, xwsz_t * usage);
+
 xwer_t xwosdl_thd_intr(struct xwosdl_thd * thd, xwsq_t tik);
 
 xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik);
