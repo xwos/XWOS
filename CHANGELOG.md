@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.0] - 2026-04-10
+## [4.0.0] - 2026-06-14
 
 ### Added
 
@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 增加CherryReadline
 - 增加命令行终端xwsh
 - 增加xwioc
+- 集成CmBacktrace
+- 重构电源管理框架
+- 优化多核系统
+- 增加栈用量统计功能
 
 ### Changed
 
