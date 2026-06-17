@@ -36,8 +36,9 @@ namespace lock {
  *
  * void foo()
  * {
- *     xwsq_t seq = gLock.readBegin();
+ *     xwsq_t seq;
  *     do {
+ *         seq = gLock.readBegin();
  *         共享读临界区
  *     } while (gLock.readRetry(seq));
  * }

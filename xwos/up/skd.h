@@ -221,8 +221,8 @@ xwer_t xwup_skd_stop_syshwt_lc(void);
 
 struct xwup_skd * xwup_skd_dsth_lc(void);
 struct xwup_skd * xwup_skd_enth_lc(void);
-struct xwup_skd * xwup_skd_svth_lc(xwsq_t * dis_bh_cnt);
-struct xwup_skd * xwup_skd_rsth_lc(xwsq_t dis_bh_cnt);
+struct xwup_skd * xwup_skd_svth_lc(xwsq_t * dis_th_cnt);
+struct xwup_skd * xwup_skd_rsth_lc(xwsq_t dis_th_cnt);
 bool xwup_skd_tstth_lc(void);
 
 struct xwup_skd * xwup_skd_dsbh_lc(void);

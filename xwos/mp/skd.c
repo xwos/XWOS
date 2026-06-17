@@ -485,7 +485,7 @@ __xwmp_code
 struct xwmp_skd * xwmp_skd_dsth_lc(struct xwmp_skd * xwskd)
 {
         xwospl_cpuirq_disable_lc();
-        xwaop_add(xwsq_t, &xwskd->dis_th_cnt, 1, NULL, NULL);
+        xwskd->dis_th_cnt++;
         return xwskd;
 }
 
@@ -497,10 +497,8 @@ struct xwmp_skd * xwmp_skd_dsth_lc(struct xwmp_skd * xwskd)
 __xwmp_code
 struct xwmp_skd * xwmp_skd_enth_lc(struct xwmp_skd * xwskd)
 {
-        xwsq_t nv;
-
-        xwaop_sub(xwsq_t, &xwskd->dis_th_cnt, 1, &nv, NULL);
-        if ((xwsq_t)0 == nv) {
+        xwskd->dis_th_cnt--;
+        if ((xwsq_t)0 == xwskd->dis_th_cnt) {
                 xwospl_cpuirq_enable_lc();
         }
         return xwskd;
@@ -516,7 +514,8 @@ __xwmp_code
 struct xwmp_skd * xwmp_skd_svth_lc(struct xwmp_skd * xwskd, xwsq_t * dis_th_cnt)
 {
         xwospl_cpuirq_disable_lc();
-        xwaop_add(xwsq_t, &xwskd->dis_th_cnt, 1, NULL, dis_th_cnt);
+        *dis_th_cnt = xwskd->dis_th_cnt;
+        xwskd->dis_th_cnt++;
         return xwskd;
 }
 
@@ -529,7 +528,7 @@ struct xwmp_skd * xwmp_skd_svth_lc(struct xwmp_skd * xwskd, xwsq_t * dis_th_cnt)
 __xwmp_code
 struct xwmp_skd * xwmp_skd_rsth_lc(struct xwmp_skd * xwskd, xwsq_t dis_th_cnt)
 {
-        xwaop_write(xwsq_t, &xwskd->dis_th_cnt, dis_th_cnt, NULL);
+        xwskd->dis_th_cnt = dis_th_cnt;
         if ((xwsq_t)0 == dis_th_cnt) {
                 xwospl_cpuirq_enable_lc();
         }
@@ -545,10 +544,7 @@ struct xwmp_skd * xwmp_skd_rsth_lc(struct xwmp_skd * xwskd, xwsq_t dis_th_cnt)
 __xwmp_code
 bool xwmp_skd_tstth(struct xwmp_skd * xwskd)
 {
-        xwsq_t cnt;
-
-        cnt = xwaop_load(xwsq_t, &xwskd->dis_th_cnt, xwaop_mo_acquire);
-        return ((xwsq_t)0 == cnt);
+        return ((xwsq_t)0 == xwskd->dis_th_cnt);
 }
 
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
