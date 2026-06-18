@@ -280,6 +280,8 @@ void soc_init_ram(void)
 
         /* STCU PCC Enable */
         xwmb_access(xwu32_t, PCC_STCU_ADDR) = 0x00800000U;
+        __asm__ volatile("dsb");
+        __asm__ volatile("isb");
 
         /* Get the reset reason */
         val = xwmb_access(xwu32_t, RGM_BASE_ADDR + RGM_SRS_OFFSET);
