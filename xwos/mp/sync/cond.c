@@ -767,6 +767,7 @@ xwer_t xwmp_cond_block_to(struct xwmp_cond * cond,
         xwsq_t bh;
 #endif
         xwsq_t th;
+        xwreg_t th_cpuirq;
         struct xwmp_tt * xwtt;
 
         xwtt = &xwskd->tt;
@@ -819,14 +820,16 @@ xwer_t xwmp_cond_block_to(struct xwmp_cond * cond,
         xwmp_skd_svbh_lc(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_rsbh_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #endif
-
-        xwmp_skd_svth_lc(xwskd, &th); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsth_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
+        xwospl_cpuirq_enable_lc();
         xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_wakelock_lock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsth_lc(xwskd, th); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwmp_skd_rsbh_lc(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
@@ -1034,6 +1037,7 @@ xwer_t xwmp_cond_block_unintr(struct xwmp_cond * cond,
         xwsq_t bh;
 #endif
         xwsq_t th;
+        xwreg_t th_cpuirq;
         xwer_t rc;
 
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
@@ -1068,11 +1072,14 @@ xwer_t xwmp_cond_block_unintr(struct xwmp_cond * cond,
         xwmp_skd_svbh_lc(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_rsbh_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwmp_skd_svth_lc(xwskd, &th); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsth_lc(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
+        xwospl_cpuirq_enable_lc();
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwmp_skd_rsth_lc(xwskd, th); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwmp_skd_rsbh_lc(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
 #endif

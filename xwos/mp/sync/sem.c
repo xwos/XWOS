@@ -690,10 +690,12 @@ xwer_t xwmp_plsem_block_to(struct xwmp_sem * sem,
                            xwtm_t to, xwreg_t cpuirq)
 {
         struct xwmp_tt * xwtt;
+        xwer_t rc;
         xwpr_t dprio;
         xwsq_t reason;
         xwsq_t wkuprs;
-        xwer_t rc;
+        xwsq_t th;
+        xwreg_t th_cpuirq;
 
         xwtt = &xwskd->tt;
 
@@ -734,11 +736,16 @@ xwer_t xwmp_plsem_block_to(struct xwmp_sem * sem,
         }
 
         /* 调度 */
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
         xwospl_cpuirq_enable_lc();
         xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_wakelock_lock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
@@ -959,9 +966,11 @@ xwer_t xwmp_plsem_block_unintr(struct xwmp_sem * sem,
                                struct xwmp_thd * thd, struct xwmp_skd * xwskd,
                                xwreg_t cpuirq)
 {
+        xwer_t rc;
         xwpr_t dprio;
         xwsq_t reason;
-        xwer_t rc;
+        xwsq_t th;
+        xwreg_t th_cpuirq;
 
         /* 加入等待队列 */
         xwmp_splk_lock(&thd->stlock);
@@ -982,9 +991,14 @@ xwer_t xwmp_plsem_block_unintr(struct xwmp_sem * sem,
         xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
 
         /* 调度 */
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
         xwospl_cpuirq_enable_lc();
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
@@ -1265,11 +1279,13 @@ xwer_t xwmp_rtsem_block_to(struct xwmp_sem * sem,
                            struct xwmp_skd * xwskd, struct xwmp_thd * thd,
                            xwtm_t to, xwreg_t cpuirq)
 {
-        xwer_t rc;
         struct xwmp_tt * xwtt;
+        xwer_t rc;
         xwsq_t reason;
         xwsq_t wkuprs;
         xwpr_t dprio;
+        xwsq_t th;
+        xwreg_t th_cpuirq;
 
         xwtt = &xwskd->tt;
         xwmp_splk_lock(&thd->stlock);
@@ -1308,11 +1324,16 @@ xwer_t xwmp_rtsem_block_to(struct xwmp_sem * sem,
         }
 
         /* 调度 */
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
         xwospl_cpuirq_enable_lc();
         xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_wakelock_lock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
@@ -1537,6 +1558,8 @@ xwer_t xwmp_rtsem_block_unintr(struct xwmp_sem * sem,
         xwer_t rc;
         xwsq_t reason;
         xwpr_t dprio;
+        xwsq_t th;
+        xwreg_t th_cpuirq;
 
         /* 加入等待队列 */
         xwmp_splk_lock(&thd->stlock);
@@ -1557,9 +1580,14 @@ xwer_t xwmp_rtsem_block_unintr(struct xwmp_sem * sem,
         xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
 
         /* 调度 */
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
         xwospl_cpuirq_enable_lc();
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);

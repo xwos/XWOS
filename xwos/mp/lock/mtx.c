@@ -690,6 +690,8 @@ xwer_t xwmp_mtx_block_to(struct xwmp_mtx * mtx,
         xwpr_t dprio;
         xwsq_t reason;
         xwsq_t wkuprs;
+        xwsq_t th;
+        xwreg_t th_cpuirq;
 
         xwtt = &xwskd->tt;
         xwmp_splk_lock(&thd->stlock);
@@ -733,12 +735,17 @@ xwer_t xwmp_mtx_block_to(struct xwmp_mtx * mtx,
         }
 
         /* 调度 */
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
         xwospl_cpuirq_enable_lc();
         xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_wakelock_lock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
@@ -975,10 +982,12 @@ static __xwmp_code
 xwer_t xwmp_mtx_block_unintr(struct xwmp_mtx * mtx, struct xwmp_thd * thd,
                              xwreg_t cpuirq)
 {
+        xwer_t rc;
         struct xwmp_skd * xwskd;
         xwsq_t reason;
         xwpr_t dprio;
-        xwer_t rc;
+        xwsq_t th;
+        xwreg_t th_cpuirq;
 
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         /* 加入等待队列 */
@@ -997,10 +1006,15 @@ xwer_t xwmp_mtx_block_unintr(struct xwmp_mtx * mtx, struct xwmp_thd * thd,
         xwmp_mtx_chprio(mtx);
 
         /* 调度 */
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
         xwospl_cpuirq_enable_lc();
         xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);

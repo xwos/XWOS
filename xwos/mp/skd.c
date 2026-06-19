@@ -168,6 +168,7 @@ xwer_t xwmp_skd_init_lc(void)
         xwmp_skd_init_bhd(xwskd);
 #endif
         xwskd->dis_th_cnt = (xwsq_t)0;
+        xwskd->th_cpuirq = 0;
         xwmp_splk_init(&xwskd->cxlock);
         xwmp_splk_init(&xwskd->thdlistlock);
         xwlib_bclst_init_head(&xwskd->thdlist);
@@ -484,7 +485,7 @@ void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
 __xwmp_code
 struct xwmp_skd * xwmp_skd_dsth_lc(struct xwmp_skd * xwskd)
 {
-        xwospl_cpuirq_disable_lc();
+        xwospl_cpuirq_save_lc(&xwskd->th_cpuirq);
         xwskd->dis_th_cnt++;
         return xwskd;
 }
@@ -499,38 +500,7 @@ struct xwmp_skd * xwmp_skd_enth_lc(struct xwmp_skd * xwskd)
 {
         xwskd->dis_th_cnt--;
         if ((xwsq_t)0 == xwskd->dis_th_cnt) {
-                xwospl_cpuirq_enable_lc();
-        }
-        return xwskd;
-}
-
-/**
- * @brief 保存调度器的中断顶半部禁止计数器并关闭中断
- * @param[in] xwskd: XWOS MP调度器的指针
- * @param[out] dis_th_cnt: 指向缓冲区的指针，通过此缓冲区返回计数器的值
- * @return XWOS MP调度器的指针
- */
-__xwmp_code
-struct xwmp_skd * xwmp_skd_svth_lc(struct xwmp_skd * xwskd, xwsq_t * dis_th_cnt)
-{
-        xwospl_cpuirq_disable_lc();
-        *dis_th_cnt = xwskd->dis_th_cnt;
-        xwskd->dis_th_cnt++;
-        return xwskd;
-}
-
-/**
- * @brief 恢复调度器的中断顶半部禁止计数器
- * @param[in] xwskd: XWOS MP调度器的指针
- * @param[in] dis_th_cnt: 计数器的值
- * @return XWOS MP调度器的指针
- */
-__xwmp_code
-struct xwmp_skd * xwmp_skd_rsth_lc(struct xwmp_skd * xwskd, xwsq_t dis_th_cnt)
-{
-        xwskd->dis_th_cnt = dis_th_cnt;
-        if ((xwsq_t)0 == dis_th_cnt) {
-                xwospl_cpuirq_enable_lc();
+                xwospl_cpuirq_restore_lc(xwskd->th_cpuirq);
         }
         return xwskd;
 }

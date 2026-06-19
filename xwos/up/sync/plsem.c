@@ -491,6 +491,8 @@ xwer_t xwup_plsem_block_to(struct xwup_plsem * sem,
 {
         struct xwup_tt * xwtt;
         xwer_t rc;
+        xwsq_t th;
+        xwreg_t th_cpuirq;
 
         xwtt = &xwskd->tt;
         XWOS_BUG_ON((xwsq_t)0 != (((xwsq_t)XWUP_SKDOBJ_ST_BLOCKING |
@@ -521,6 +523,9 @@ xwer_t xwup_plsem_block_to(struct xwup_plsem * sem,
         }
 
         /* 调度 */
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
         xwospl_cpuirq_enable_lc();
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_unlock(); // cppcheck-suppress [misra-c2012-17.7]
@@ -530,6 +535,8 @@ xwer_t xwup_plsem_block_to(struct xwup_plsem * sem,
         xwup_skd_wakelock_lock(); // cppcheck-suppress [misra-c2012-17.7]
 #endif
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
         if ((xwu16_t)XWUP_WQN_REASON_INTR == thd->wqn.reason) {
@@ -730,8 +737,12 @@ static __xwup_code
 xwer_t xwup_plsem_block_unintr(struct xwup_plsem * sem, struct xwup_thd * thd,
                                xwreg_t cpuirq)
 {
+        struct xwup_skd * xwskd;
         xwer_t rc;
+        xwsq_t th;
+        xwreg_t th_cpuirq;
 
+        xwskd = xwup_skd_get_lc();
         XWOS_BUG_ON((xwsq_t)0 != (((xwsq_t)XWUP_SKDOBJ_ST_BLOCKING |
                                    (xwsq_t)XWUP_SKDOBJ_ST_SLEEPING |
                                    (xwsq_t)XWUP_SKDOBJ_ST_READY |
@@ -746,9 +757,14 @@ xwer_t xwup_plsem_block_unintr(struct xwup_plsem * sem, struct xwup_thd * thd,
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 调度 */
+        th = xwskd->dis_th_cnt;
+        th_cpuirq = xwskd->th_cpuirq;
+        xwskd->dis_th_cnt = 0;
         xwospl_cpuirq_enable_lc();
         xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwskd->th_cpuirq = th_cpuirq;
+        xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
         if ((xwu16_t)XWUP_WQN_REASON_UP == thd->wqn.reason) {

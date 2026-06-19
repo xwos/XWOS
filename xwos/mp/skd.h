@@ -183,6 +183,7 @@ struct __xwcc_alignl1cache xwmp_skd {
         struct xwmp_skdobj_stack bh; /**< 中断底半部任务的栈信息 */
 #endif
         xwsq_t dis_th_cnt; /**< 关闭中断顶半部的计数器 */
+        xwreg_t th_cpuirq; /**< 原本的CPU的中断标志 */
         struct xwmp_tt tt; /**< 时间树 */
         struct xwmp_splk cxlock; /**< 上下文切换的锁 */
         struct xwmp_skd_pm pm; /**< 调度器电源管理控制块 */
@@ -218,8 +219,6 @@ bool xwmp_skd_tst_in_bh(struct xwmp_skd * xwskd);
 
 struct xwmp_skd * xwmp_skd_dsth_lc(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_enth_lc(struct xwmp_skd * xwskd);
-struct xwmp_skd * xwmp_skd_svth_lc(struct xwmp_skd * xwskd, xwsq_t * dis_th_cnt);
-struct xwmp_skd * xwmp_skd_rsth_lc(struct xwmp_skd * xwskd, xwsq_t dis_th_cnt);
 bool xwmp_skd_tstth(struct xwmp_skd * xwskd);
 
 void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd);
