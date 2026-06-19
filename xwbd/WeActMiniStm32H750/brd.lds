@@ -49,7 +49,6 @@ axisram_mr_size = LENGTH(axisram_mr);
 
 qspiflash_mr_origin = ORIGIN(qspiflash_mr);
 qspiflash_mr_size = LENGTH(qspiflash_mr);
-qspiflash_mr_end = ORIGIN(qspiflash_mr) + LENGTH(qspiflash_mr);
 
 firmware_info_mr_origin = ORIGIN(firmware_info_mr);
 firmware_info_mr_size = LENGTH(firmware_info_mr);
@@ -57,8 +56,13 @@ firmware_info_offset = firmware_info_mr_origin - qspiflash_mr_origin;
 
 armv7m_isr_stack_mr_origin = ORIGIN(armv7m_isr_stack_mr);
 armv7m_isr_stack_mr_size = LENGTH(armv7m_isr_stack_mr);
-armv7m_isr_stack_mr_end = ORIGIN(armv7m_isr_stack_mr) + LENGTH(armv7m_isr_stack_mr);
 armv7m_isr_stack_top = armv7m_isr_stack_mr_origin + armv7m_isr_stack_mr_size;
 armv7m_isr_stack_end = armv7m_isr_stack_mr_origin;
 
 INCLUDE h7.lds
+
+/* 用于CmBacktrace */
+cmb_cstack_mr_origin = armv7m_isr_stack_mr_origin;
+cmb_cstack_mr_end = armv7m_isr_stack_mr_origin + armv7m_isr_stack_mr_size;
+cmb_code_mr_origin = qspiflash_mr_origin;
+cmb_code_mr_end = qspiflash_mr_origin + qspiflash_mr_size;

@@ -19,7 +19,7 @@
  */
 
 #include "board/std.h"
-#include <bm/CmBacktrace/cm_backtrace.h>
+#include <xwem/debug/CmBacktrace/cm_backtrace.h>
 
 __xwbsp_isr
 void board_esr_nmi(void)

@@ -29,7 +29,7 @@
 #ifndef _CMB_CFG_H_
 #define _CMB_CFG_H_
 
-#ifdef	CMB_USER_CFG
+#ifdef CMB_USER_CFG
 #  include "cmb_user_cfg.h"
 #else
 /* print line, must config by user */

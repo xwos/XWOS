@@ -34,12 +34,12 @@
 #include <bm/Stm32Hal/mi.h>
 
 #include <xwos/lib/xwlog.h>
-#define MAINTHD_LOGTAG "MainThd"
+#define MTHD_LOGTAG "Mthd"
 
-#define MAINTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+#define MTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
-xwer_t mainthd_mainfunc(void * arg);
-xwos_thd_d mainthd;
+xwer_t mthd_mainfunc(void * arg);
+xwos_thd_d mthd;
 
 xwer_t xwos_main(void)
 {
@@ -50,12 +50,12 @@ xwer_t xwos_main(void)
         attr.name = "main.thd";
         attr.stack = NULL;
         attr.stack_size = 8192;
-        attr.priority = MAINTHD_PRIORITY;
+        attr.priority = MTHD_PRIORITY;
         attr.detached = true;
         attr.privileged = true;
-        rc = xwos_thd_create(&mainthd,
+        rc = xwos_thd_create(&mthd,
                              &attr,
-                             mainthd_mainfunc,
+                             mthd_mainfunc,
                              NULL);
         if (rc < 0) {
                 goto err_thd_create;
@@ -77,7 +77,7 @@ err_thd_create:
 extern const xwu8_t bootlogo[25600];
 extern void xwrust_main(void);
 
-xwer_t mainthd_mainfunc(void * arg)
+xwer_t mthd_mainfunc(void * arg)
 {
         xwer_t rc;
 
@@ -87,25 +87,25 @@ xwer_t mainthd_mainfunc(void * arg)
         sdcard_fatfs_mount();
         xwds_st7735_draw(&stm32xwds_st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 
-        xwlogf(I, MAINTHD_LOGTAG, "Init C++ Runtime ...\r\n");
+        xwlogf(I, MTHD_LOGTAG, "Init C++ Runtime ...\r\n");
 #ifdef XWCFG_LIBC__newlib
         newlibac_init();
 #endif
 #ifdef XWCFG_LIBC__picolibc
         picolibcac_init();
 #endif
-        xwlogf(I, MAINTHD_LOGTAG, "Init XWSSC.UART3 ...\r\n");
+        xwlogf(I, MTHD_LOGTAG, "Init XWSSC.UART3 ...\r\n");
         xwssc3_init();
 
-        xwlogf(I, MAINTHD_LOGTAG, "Start Rust Applications ...\r\n");
+        xwlogf(I, MTHD_LOGTAG, "Start Rust Applications ...\r\n");
         xwrust_main();
 
         rc = xwlua_start();
         if (rc < 0) {
-                xwlogf(ERR, MAINTHD_LOGTAG, "Start Lua VM ... <rc:%d>", rc);
+                xwlogf(ERR, MTHD_LOGTAG, "Start Lua VM ... <rc:%d>", rc);
         }
 
-        xwlogf(I, MAINTHD_LOGTAG, "Start the Blinky LED ...\r\n");
+        xwlogf(I, MTHD_LOGTAG, "Start the Blinky LED ...\r\n");
         xwds_gpio_req(&stm32xwds_soc, XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {

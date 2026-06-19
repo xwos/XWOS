@@ -23,7 +23,7 @@
 #include <xwcd/soc/arm/v7m/m7/stm32/soc_init.h>
 #include <string.h>
 #include <xwos/mm/mempool/allocator.h>
-#include <bm/CmBacktrace/cm_backtrace.h>
+#include <xwem/debug/CmBacktrace/cm_backtrace.h>
 #include <bm/Stm32Hal/mi.h>
 #include "board/xwac/xwos/pm.h"
 #include "board/xwac/xwlib/crc.h"
@@ -100,7 +100,7 @@ void xwos_preinit(void)
 __xwbsp_init_code
 void xwos_postinit(void)
 {
-        cm_backtrace_init("XWOS", "V1.1", XWOS_VERSION);
+        cm_backtrace_init("XWOS", "V1.1", XWOS_VERSION, 0U);
         stm32hal_init();
         xwosac_pm_init();
         xwlibac_crc_init();
