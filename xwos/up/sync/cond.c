@@ -565,9 +565,11 @@ xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
         xwer_t rc;
 
         retry = false;
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         do {
                 rc = xwup_cond_broadcast_once(cond, &retry);
         } while (retry);
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         if (XWOK == rc) {
                 xwreg_t cpuirq;

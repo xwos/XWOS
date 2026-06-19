@@ -591,13 +591,17 @@ xwer_t xwmp_cond_broadcast_once(struct xwmp_cond * cond, bool * retry)
 __xwmp_api
 xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond)
 {
+        struct xwmp_skd * xwskd;
         bool retry;
         xwer_t rc;
 
         retry = false;
+        xwskd = xwmp_skd_get_lc();
+        xwmp_skd_dspmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         do {
                 rc = xwmp_cond_broadcast_once(cond, &retry);
         } while (retry);
+        xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         if (XWOK == rc) {
                 struct xwmp_evt * evt;
