@@ -135,6 +135,7 @@ SECTIONS {
 
         .xwos.data : ALIGN(32) {
                 *(.xwos.data)
+                *(.percpu.data)
                 . = ALIGN(32);
                 xwos_data_vma_end = .;
         } > xwos_data_mr AT> code_mr
@@ -143,6 +144,7 @@ SECTIONS {
 
         .data : ALIGN(32) {
                 *(.data .data.* .gnu.linkonce.d.*)
+                *(.RamFunc*)
                 . = ALIGN(32);
                 data_vma_end = .;
         } > data_mr AT> code_mr

@@ -135,6 +135,7 @@ SECTIONS {
 
         .xwos.data : ALIGN(32) {
                 *(.xwos.data)
+                *(.percpu.data)
                 . = ALIGN(32);
                 xwos_data_vma_end = .;
         } > xwos_data_mr AT> code_mr
@@ -151,6 +152,7 @@ SECTIONS {
 
         .tdata : ALIGN(32) {
                 *(.tdata .tdata.* .gnu.linkonce.td.*)
+                *(.RamFunc*)
                 tdata_vma_end = .;
 	} > data_mr AT> code_mr
         tdata_vma_base = ADDR(.tdata);
