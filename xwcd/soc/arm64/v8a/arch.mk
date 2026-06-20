@@ -52,7 +52,6 @@ ifeq ($(ARCHCFG_LIB_LFQ),y)
   ARCH_CSRCS += xwosimpl_arch_lfq.c
 endif
 ARCH_CSRCS += xwosimpl_arch_xwbop.c
-ARCH_CSRCS += xwosimpl_tls.c
 ARCH_CSRCS += arch_init.c
 ARCH_CSRCS += arch_isa.c
 ARCH_CSRCS += arch_irq.c
@@ -67,3 +66,4 @@ endif
 ARCH_CSRCS += arch_timer.c
 ARCH_CSRCS += arch_mmu.c
 ARCH_CSRCS += arch_cache.c
+ARCH_CSRCS += xwosimpl_arch_tls.c
