@@ -10,19 +10,19 @@ crate-type = ["staticlib"]
 [dependencies]
 cortex-m = "0.7"
 xwrust = {path = "../../../../xwmd/xwrust"}
-xwrust_example_vector = {path = "../../../../xwam/example/xwrust/xwrust_example_vector"}
-xwrust_example_swt = {path = "../../../../xwam/example/xwrust/xwrust_example_swt"}
-xwrust_example_dthd = {path = "../../../../xwam/example/xwrust/xwrust_example_dthd"}
-xwrust_example_sthd = {path = "../../../../xwam/example/xwrust/xwrust_example_sthd"}
-xwrust_example_mutex = {path = "../../../../xwam/example/xwrust/xwrust_example_mutex"}
-xwrust_example_spinlock = {path = "../../../../xwam/example/xwrust/xwrust_example_spinlock"}
-xwrust_example_seqlock = {path = "../../../../xwam/example/xwrust/xwrust_example_seqlock"}
-xwrust_example_sem = {path = "../../../../xwam/example/xwrust/xwrust_example_sem"}
-xwrust_example_cond = {path = "../../../../xwam/example/xwrust/xwrust_example_cond"}
-xwrust_example_flg = {path = "../../../../xwam/example/xwrust/xwrust_example_flg"}
-xwrust_example_br = {path = "../../../../xwam/example/xwrust/xwrust_example_br"}
-xwrust_example_sel = {path = "../../../../xwam/example/xwrust/xwrust_example_sel"}
-xwrust_example_xwcq = {path = "../../../../xwam/example/xwrust/xwrust_example_xwcq"}
-xwrust_example_xwmq = {path = "../../../../xwam/example/xwrust/xwrust_example_xwmq"}
+xwrust_sample_vector = {path = "../../../../xwam/sample/xwrust/xwrust_sample_vector"}
+xwrust_sample_swt = {path = "../../../../xwam/sample/xwrust/xwrust_sample_swt"}
+xwrust_sample_dthd = {path = "../../../../xwam/sample/xwrust/xwrust_sample_dthd"}
+xwrust_sample_sthd = {path = "../../../../xwam/sample/xwrust/xwrust_sample_sthd"}
+xwrust_sample_mutex = {path = "../../../../xwam/sample/xwrust/xwrust_sample_mutex"}
+xwrust_sample_spinlock = {path = "../../../../xwam/sample/xwrust/xwrust_sample_spinlock"}
+xwrust_sample_seqlock = {path = "../../../../xwam/sample/xwrust/xwrust_sample_seqlock"}
+xwrust_sample_sem = {path = "../../../../xwam/sample/xwrust/xwrust_sample_sem"}
+xwrust_sample_cond = {path = "../../../../xwam/sample/xwrust/xwrust_sample_cond"}
+xwrust_sample_flg = {path = "../../../../xwam/sample/xwrust/xwrust_sample_flg"}
+xwrust_sample_br = {path = "../../../../xwam/sample/xwrust/xwrust_sample_br"}
+xwrust_sample_sel = {path = "../../../../xwam/sample/xwrust/xwrust_sample_sel"}
+xwrust_sample_xwcq = {path = "../../../../xwam/sample/xwrust/xwrust_sample_xwcq"}
+xwrust_sample_xwmq = {path = "../../../../xwam/sample/xwrust/xwrust_sample_xwmq"}
 libc-print = "0.1"
 # lazy_static = { version = "1.4", features = ["spin_no_std"] }

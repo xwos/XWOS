@@ -21,29 +21,30 @@
 #ifndef __cfg_xwam_h__
 #define __cfg_xwam_h__
 
-#define XWAMCFG_example_c_xwobj                         1
-#define XWAMCFG_example_c_thd_new                       1
-#define XWAMCFG_example_c_thd_exit                      1
-#define XWAMCFG_example_c_thd_sleep                     1
-#define XWAMCFG_example_c_swt                           1
-#define XWAMCFG_example_c_lock_cpuirq                   1
-#define XWAMCFG_example_c_lock_mtx                      1
-#define XWAMCFG_example_c_lock_spinlock                 1
-#define XWAMCFG_example_c_lock_seqlock                  1
-#define XWAMCFG_example_c_sync_sem                      1
-#define XWAMCFG_example_c_sync_cond                     1
-#define XWAMCFG_example_c_sync_br                       1
-#define XWAMCFG_example_c_sync_flg                      1
-#define XWAMCFG_example_c_sync_sel                      1
-#define XWAMCFG_example_c_mm_sma                        1
-#define XWAMCFG_example_c_mm_memslice                   1
-#define XWAMCFG_example_c_mm_bma                        1
-#define XWAMCFG_example_c_xwlib_crc                     1
-#define XWAMCFG_example_c_cxx                           1
-#define XWAMCFG_example_c_isc_xwmq                      1
-#define XWAMCFG_example_c_isc_xwcq                      1
+#define XWAMCFG_sample_c_xwobj                          1
+#define XWAMCFG_sample_c_thd_new                        1
+#define XWAMCFG_sample_c_thd_exit                       1
+#define XWAMCFG_sample_c_thd_sleep                      1
+#define XWAMCFG_sample_c_swt                            1
+#define XWAMCFG_sample_c_lock_cpuirq                    1
+#define XWAMCFG_sample_c_lock_mtx                       1
+#define XWAMCFG_sample_c_lock_spinlock                  1
+#define XWAMCFG_sample_c_lock_seqlock                   1
+#define XWAMCFG_sample_c_sync_sem                       1
+#define XWAMCFG_sample_c_sync_cond                      1
+#define XWAMCFG_sample_c_sync_br                        1
+#define XWAMCFG_sample_c_sync_flg                       1
+#define XWAMCFG_sample_c_sync_sel                       1
+#define XWAMCFG_sample_c_mm_sma                         1
+#define XWAMCFG_sample_c_mm_memslice                    1
+#define XWAMCFG_sample_c_mm_bma                         1
+#define XWAMCFG_sample_c_xwlib_crc                      1
+#define XWAMCFG_sample_c_cxx                            1
+#define XWAMCFG_sample_c_isc_xwmq                       1
+#define XWAMCFG_sample_c_isc_xwcq                       1
 
-#define XWAMCFG_example_cxx_Event                       1
+#define XWAMCFG_sample_cxx_Event                        1
+#define XWAMCFG_sample_cxx_SmpMutex                     0
 
 #define XWAMCFG_application_w25qpt                      0
 #define XWAMCFG_application_ramcode                     0
