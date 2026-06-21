@@ -45,6 +45,7 @@
 
 #define XWAMCFG_sample_cxx_Event                        0
 #define XWAMCFG_sample_cxx_SmpMutex                     0
+#define XWAMCFG_sample_cxx_SameCpuMutex                 0
 
 #define XWAMCFG_application_w25qpt                      0
 #define XWAMCFG_application_ramcode                     0
