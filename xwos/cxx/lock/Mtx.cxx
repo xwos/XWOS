@@ -48,6 +48,38 @@ Mtx::Grd::Grd(Mtx * mtx, enum LockMode mode, xwtm_t to)
     }
 }
 
+Mtx::Grd::Grd(Mtx & mtx, enum LockMode mode, xwtm_t to)
+    : mMtx(&mtx)
+    , mLockMode(mode)
+{
+    if (nullptr != mMtx) {
+        switch (mode) {
+            case Mtx::LockMode::MtxLock:
+                mRc = xwos_mtx_lock(mMtx->mMtxPtr);
+                break;
+            case Mtx::LockMode::MtxLockTimed:
+                mRc = xwos_mtx_lock_to(mMtx->mMtxPtr, to);
+                break;
+            case Mtx::LockMode::MtxLockUninterruptable:
+                mRc = xwos_mtx_lock_unintr(mMtx->mMtxPtr);
+                break;
+            case Mtx::LockMode::MtxLockTry:
+                mRc = xwos_mtx_trylock(mMtx->mMtxPtr);
+                break;
+            case Mtx::LockMode::MtxUnlock:
+                mRc = XWOK;
+                break;
+            default:
+                mLockMode = Mtx::LockMode::MtxUnlock;
+                mRc = XWOK;
+                break;
+        }
+        if (mRc < 0) {
+            mLockMode = Mtx::LockMode::MtxUnlock;
+        }
+    }
+}
+
 Mtx::Grd::~Grd()
 {
     if (nullptr != mMtx) {
