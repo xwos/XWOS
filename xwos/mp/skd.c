@@ -771,7 +771,7 @@ struct xwmp_skd * xwmp_skd_enpmpt_lc(struct xwmp_skd * xwskd)
         if ((xwsq_t)0 == nv) {
                 if ((xwsq_t)0 != xwaop_load(xwsq_t, &xwskd->req_chkpmpt_cnt,
                                             xwaop_mo_acquire)) {
-                        xwmp_skd_chkpmpt(xwskd);
+                        xwmp_skd_chkpmpt_lc(xwskd);
                 }
         }
         return xwskd;
@@ -803,7 +803,7 @@ struct xwmp_skd * xwmp_skd_rspmpt_lc(struct xwmp_skd * xwskd, xwsq_t dis_pmpt_cn
         if ((xwsq_t)0 == dis_pmpt_cnt) {
                 if ((xwsq_t)0 != xwaop_load(xwsq_t, &xwskd->req_chkpmpt_cnt,
                                             xwaop_mo_acquire)) {
-                        xwmp_skd_chkpmpt(xwskd);
+                        xwmp_skd_chkpmpt_lc(xwskd);
                 }
         }
         return xwskd;

@@ -23,6 +23,7 @@
 #include <xwcd/soc/arm/v7m/arch_irq.h>
 #include <xwcd/soc/arm/v7m/arch_skd.h>
 #include <xwcd/soc/arm/v7m/m7/fc7300/soc_cpm.h>
+#include <xwcd/soc/arm/v7m/m7/fc7300/soc_icc.h>
 
 __xwbsp_code
 xwer_t xwospl_skd_init(__unused struct xwospl_skd * xwskd)
@@ -64,8 +65,9 @@ xwer_t xwospl_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
 }
 
 __xwbsp_code __xwcc_weak
-void xwospl_skd_chkpmpt_oc(__xwcc_unused struct xwospl_skd * xwskd)
+void xwospl_skd_chkpmpt_oc(struct xwospl_skd * xwskd)
 {
+        soc_icc_call(xwskd->id, (soc_icc_func_f)xwosplcb_skd_chkpmpt_lc, (void *)xwskd);
 }
 
 __xwbsp_code __xwcc_naked

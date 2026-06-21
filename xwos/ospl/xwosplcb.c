@@ -35,6 +35,17 @@ struct xwospl_skd * xwosplcb_skd_post_start_lic(struct xwospl_skd * xwskd)
 }
 
 __xwos_code
+void xwosplcb_skd_chkpmpt_lc(struct xwospl_skd * skd)
+{
+        struct xwmp_skd * local;
+
+        local = xwmp_skd_get_lc();
+        if (local == skd) {
+                xwmp_skd_chkpmpt_lc(skd); // cppcheck-suppress [misra-c2012-17.7]
+        }
+}
+
+__xwos_code
 struct xwospl_skd * xwosplcb_skd_pre_swcx_lic(struct xwospl_skd * xwskd)
 {
         return xwmp_skd_pre_swcx_lic(xwskd);
