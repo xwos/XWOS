@@ -47,6 +47,7 @@ SOC_CSRCS += xwosimpl_irq.c
 SOC_CSRCS += xwosimpl_skd.c
 SOC_CSRCS += xwosimpl_syshwt.c
 SOC_CSRCS += soc_mb.c
+SOC_CSRCS += soc_icc.c
 
 ifeq ($(SOCCFG_LIB_LFQ),y)
   SOC_CSRCS += xwosimpl_soc_lfq.c

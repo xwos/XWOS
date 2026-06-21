@@ -21,6 +21,19 @@
 #include <xwcd/soc/arm/v7m/m7/fc7300/soc_mb.h>
 #include <xwos/ospl/skd.h>
 
+
+#if defined(SOCCFG_CHIP_FC7300F8MDQ) && (1U == SOCCFG_CHIP_FC7300F8MDQ)
+__xwbsp_rodata
+const xwu8_t soc_mb_master_id_tab[SOC_MB_CORE_NUM] = {
+        0U, 2U, 4U, 8U, 6U
+};
+#else
+__xwbsp_rodata
+const xwu8_t soc_mb_master_id_tab[SOC_MB_CORE_NUM] = {
+        0U, 2U, 4U, 8U
+};
+#endif
+
 __xwbsp_code
 xwu32_t soc_mb_lock(xwu32_t ch)
 {

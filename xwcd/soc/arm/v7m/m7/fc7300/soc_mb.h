@@ -53,24 +53,120 @@ struct soc_mb_regs {
 #define SOC_MB_BASE (0x40058000U)
 #define soc_mb (*((volatile struct soc_mb_regs *)SOC_MB_BASE))
 
-#define SOC_MB_SEMA_LOCK_MASK           (0x80000000U)
-#define SOC_MB_SEMA_LOCK_SHIFT          (31U)
-#define SOC_MB_SEMA_LOCK_WIDTH          (1U)
-#define SOC_MB_SEMA_LOCK(x)             ((xwu32_t)((((xwu32_t)(x)) << \
-                                                    SOC_MB_SEMA_LOCK_SHIFT) & \
-                                                   SOC_MB_SEMA_LOCK_MASK))
+#define SOC_MB_MASTER_DONE_CODE                 (0xFC730000U)
+#define SOC_MB_NESTED_LOCKCODE                  (0x00800000U)
+#define SOC_MB_CH_XWOS_SPINLOCK                 (SOCCFG_MB_CH_XWOS_SPINLOCK)
+#define SOC_MB_CH_XWAOP                         (SOCCFG_MB_CH_XWAOP)
+#define SOC_MB_CH_ICC                           (SOCCFG_MB_CH_ICC)
 
-#define SOC_MB_SEMA_MASTER_ID_MASK      (0xF0U)
-#define SOC_MB_SEMA_MASTER_ID_SHIFT     (4U)
-#define SOC_MB_SEMA_MASTER_ID_WIDTH     (4U)
+#if defined(SOCCFG_CHIP_FC7300F8MDQ) && (1U == SOCCFG_CHIP_FC7300F8MDQ)
+#  define SOC_MB_CORE_NUM                       (5U)
+#else
+#  define SOC_MB_CORE_NUM                       (4U)
+#endif
+
+extern const xwu8_t soc_mb_master_id_tab[SOC_MB_CORE_NUM];
+
+#if defined(CPUCFG_CPU_NUM) && (4U == CPUCFG_CPU_NUM)
+#  define SOC_MB_CPU2MB_IDX(c) ((xwu32_t)((c) == 3U ? 4U : (c)))
+#  define SOC_MB_MB2CPU_IDX(m) ((xwu32_t)((m) == 4U ? 3U : (m)))
+#else
+#  define SOC_MB_CPU2MB_IDX(c) ((xwu32_t)(c))
+#  define SOC_MB_MB2CPU_IDX(m) ((xwu32_t)(m))
+#endif
+
+/* MB.DONE_MASK Bit Fields */
+#define SOC_MB_SEMA_LOCK_MASK                   (0x80000000U)
+#define SOC_MB_SEMA_LOCK_SHIFT                  (31U)
+#define SOC_MB_SEMA_LOCK_WIDTH                  (1U)
+#define SOC_MB_SEMA_LOCK(x)                     \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_SEMA_LOCK_SHIFT) & SOC_MB_SEMA_LOCK_MASK))
+
+#define SOC_MB_SEMA_MASTER_ID_MASK              (0xF0U)
+#define SOC_MB_SEMA_MASTER_ID_SHIFT             (4U)
+#define SOC_MB_SEMA_MASTER_ID_WIDTH             (4U)
+#define SOC_MB_SEMA_MASTER_ID(x)                \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_SEMA_MASTER_ID_SHIFT) & \
+                   SOC_MB_SEMA_MASTER_ID_MASK))
 
 #define SOC_MB_SEMA_LOCK_MASTER_ID_MASK (0x800000F0U)
-#define SOC_MB_MASTER_DONE_CODE         (0xFC730000U)
-#define SOC_MB_NESTED_LOCKCODE          (0x00800000U)
 
-#define SOC_MB_CH_XWOS_SPINLOCK         (SOCCFG_MB_CH_XWOS_SPINLOCK)
-#define SOC_MB_CH_XWAOP                 (SOCCFG_MB_CH_XWAOP)
+/* MB.SEMA_UNLK Bit Fields */
+#define SOC_MB_SEMA_UNLK_AUTO_CLEAR_EN_MASK     (0x1F)
+#define SOC_MB_SEMA_UNLK_AUTO_CLEAR_EN_SHIFT    (0U)
+#define SOC_MB_SEMA_UNLK_AUTO_CLEAR_EN_WIDTH    (5U)
+#define SOC_MB_SEMA_UNLK_AUTO_CLEAR_EN(x)       \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_SEMA_UNLK_AUTO_CLEAR_EN_SHIFT) & \
+                   SOC_MB_SEMA_UNLK_AUTO_CLEAR_EN_MASK))
 
+/* MB.REQUEST Bit Fields */
+#define SOC_MB_REQUEST_REQ_MASK                 (0x1F)
+#define SOC_MB_REQUEST_REQ_SHIFT                (0U)
+#define SOC_MB_REQUEST_REQ_WIDTH                (5U)
+#define SOC_MB_REQUEST_REQ(x)                   \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_REQUEST_REQ_SHIFT) & \
+                   SOC_MB_REQUEST_REQ_MASK))
+
+/* MB.DONE Bit Fields */
+#define SOC_MB_DONE_DONE_MASK                   (0x1F)
+#define SOC_MB_DONE_DONE_SHIFT                  (0U)
+#define SOC_MB_DONE_DONE_WIDTH                  (5U)
+#define SOC_MB_DONE_DONE(x)                     \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_DONE_DONE_SHIFT) & \
+                   SOC_MB_DONE_DONE_MASK))
+
+/* MB_DONE_MASK Bit Fields */
+#define SOC_MB_DONE_MASK_DONE_MASTER_ID_MASK    (0xF0000U)
+#define SOC_MB_DONE_MASK_DONE_MASTER_ID_SHIFT   (16U)
+#define SOC_MB_DONE_MASK_DONE_MASTER_ID_WIDTH   (4U)
+#define SOC_MB_DONE_MASK_DONE_MASTER_ID(x)      \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_DONE_MASK_DONE_MASTER_ID_SHIFT) & \
+                   SOC_MB_DONE_MASK_DONE_MASTER_ID_MASK))
+
+#define SOC_MB_DONE_MASK_DONE_MASK_MASK         (0x1FU)
+#define SOC_MB_DONE_MASK_DONE_MASK_SHIFT        (0U)
+#define SOC_MB_DONE_MASK_DONE_MASK_WIDTH        (5U)
+#define SOC_MB_DONE_MASK_DONE_MASK(x)           \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_DONE_MASK_DONE_MASK_SHIFT) & \
+                   SOC_MB_DONE_MASK_DONE_MASK0_MASK))
+
+/* MB.STAT Bit Fields */
+#define SOC_MB_STAT_CURRENT_LOCK_STATUS_MASK    (0x80000000U)
+#define SOC_MB_STAT_CURRENT_LOCK_STATUS_SHIFT   (31U)
+#define SOC_MB_STAT_CURRENT_LOCK_STATUS_WIDTH   (1U)
+#define SOC_MB_STAT_CURRENT_LOCK_STATUS(x)      \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_STAT_CURRENT_LOCK_STATUS_SHIFT) & \
+                   SOC_MB_STAT_CURRENT_LOCK_STATUS_MASK))
+
+#define SOC_MB_STAT_CURRENT_CPU_STATUS_MASK     (0xFFFF00U)
+#define SOC_MB_STAT_CURRENT_CPU_STATUS_SHIFT    (8U)
+#define SOC_MB_STAT_CURRENT_CPU_STATUS_WIDTH    (16U)
+#define SOC_MB_STAT_CURRENT_CPU_STATUS(x)       \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_STAT_CURRENT_CPU_STATUS_SHIFT) & \
+                   SOC_MB_STAT_CURRENT_CPU_STATUS_MASK))
+
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_ID_MASK         (0xF0U)
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_ID_SHIFT        (4U)
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_ID_WIDTH        (4U)
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_ID(x)           \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_STAT_CURRENT_LOCK_MASTER_ID_SHIFT) & \
+                   SOC_MB_STAT_CURRENT_LOCK_MASTER_ID_MASK))
+
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_SEC_MASK        (0x2U)
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_SEC_SHIFT       (1U)
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_SEC_WIDTH       (1U)
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_SEC(x)          \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_STAT_CURRENT_LOCK_MASTER_SEC_SHIFT) & \
+                   SOC_MB_STAT_CURRENT_LOCK_MASTER_SEC_MASK))
+
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_SUPERVISOR_MASK         (0x1U)
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_SUPERVISOR_SHIFT        (0U)
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_SUPERVISOR_WIDTH        (1U)
+#define SOC_MB_STAT_CURRENT_LOCK_MASTER_SUPERVISOR(x)   \
+        ((xwu32_t)((((xwu32_t)(x)) << SOC_MB_STAT_CURRENT_LOCK_MASTER_SUPERVISOR_SHIFT) & \
+                   SOC_MB_STAT_CURRENT_LOCK_MASTER_SUPERVISOR_MASK))
+
+/* MB functions */
 xwu32_t soc_mb_lock(xwu32_t ch);
 void soc_mb_unlock(xwu32_t ch, xwu32_t lockcode);
 
