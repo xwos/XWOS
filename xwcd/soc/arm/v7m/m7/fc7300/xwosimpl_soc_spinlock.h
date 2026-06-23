@@ -25,6 +25,7 @@
 #  error "This file should be included from <xwos/ospl/spinlock.h>."
 #endif
 
+#include <xwos/ospl/irq.h>
 #include <xwcd/soc/arm/v7m/m7/fc7300/soc_mb.h>
 
 #define XWOSPL_SPLK_TICKET_SHIFT          16
@@ -57,36 +58,44 @@ void xwospl_splk_init(struct xwospl_splk * osplsplk)
 static __xwbsp_inline
 void xwospl_splk_lock(struct xwospl_splk * osplsplk)
 {
-        xwu32_t mblkcode;
         struct xwospl_splk lock;
+        xwu32_t mblkcode;
+        xwreg_t cpuirq;
         xwu16_t ticket;
 
         do {
+                xwospl_cpuirq_save_lc(&cpuirq);
                 mblkcode = soc_mb_lock(SOC_MB_CH_XWOS_SPINLOCK);
                 if (mblkcode > 0) {
                         xwmb_mp_load_acquire(xwu32_t, lock.v.raw, &osplsplk->v.raw);
                         ticket = lock.v.ticket.next;
                         lock.v.ticket.next += 1U;
-                        osplsplk->v.raw = lock.v.raw;
+                        xwmb_mp_store_release(xwu16_t,
+                                              &osplsplk->v.ticket.next,
+                                              lock.v.ticket.next);
                         soc_mb_unlock(SOC_MB_CH_XWOS_SPINLOCK, mblkcode);
+                        xwospl_cpuirq_restore_lc(cpuirq);
                         break;
+                } else {
+                        xwospl_cpuirq_restore_lc(cpuirq);
                 }
         } while (true);
 
         while (ticket != lock.v.ticket.curr) {
-                xwmb_mp_load_acquire(xwu16_t, lock.v.ticket.curr,
-                                     &osplsplk->v.ticket.curr);
+                xwmb_mp_load_acquire(xwu32_t, lock.v.raw, &osplsplk->v.raw);
         }
 }
 
 static __xwbsp_inline
 xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 {
-        xwer_t rc;
-        xwu32_t mblkcode;
         struct xwospl_splk lock;
+        xwu32_t mblkcode;
+        xwreg_t cpuirq;
+        xwer_t rc;
 
         do {
+                xwospl_cpuirq_save_lc(&cpuirq);
                 mblkcode = soc_mb_lock(SOC_MB_CH_XWOS_SPINLOCK);
                 if (mblkcode > 0) {
                         xwmb_mp_load_acquire(xwu32_t, lock.v.raw, &osplsplk->v.raw);
@@ -94,11 +103,16 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
                                 rc = -EAGAIN;
                         } else {
                                 lock.v.ticket.next += 1U;
-                                osplsplk->v.raw = lock.v.raw;
+                                xwmb_mp_store_release(xwu16_t,
+                                                      &osplsplk->v.ticket.next,
+                                                      lock.v.ticket.next);
                                 rc = XWOK;
                         }
                         soc_mb_unlock(SOC_MB_CH_XWOS_SPINLOCK, mblkcode);
+                        xwospl_cpuirq_restore_lc(cpuirq);
                         break;
+                } else {
+                        xwospl_cpuirq_restore_lc(cpuirq);
                 }
         } while (true);
         return rc;
@@ -107,10 +121,11 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 static __xwbsp_inline
 void xwospl_splk_unlock(struct xwospl_splk * osplsplk)
 {
-        volatile xwu16_t curr;
+        struct xwospl_splk lock;
 
-        curr = osplsplk->v.ticket.curr + 1U;
-        xwmb_mp_store_release(xwu16_t, &osplsplk->v.ticket.curr, curr);
+        xwmb_mp_load_acquire(xwu32_t, lock.v.raw, &osplsplk->v.raw);
+        lock.v.ticket.curr += 1U;
+        xwmb_mp_store_release(xwu16_t, &osplsplk->v.ticket.curr, lock.v.ticket.curr);
 }
 #endif
 

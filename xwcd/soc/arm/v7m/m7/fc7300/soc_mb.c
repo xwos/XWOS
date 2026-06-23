@@ -48,6 +48,8 @@ xwu32_t soc_mb_lock(xwu32_t ch)
                             (SOC_MB_SEMA_MASTER_ID_SHIFT + 1U));
                 if (cpuid == masterid) {
                         lockcode |= SOC_MB_NESTED_LOCKCODE;
+                } else {
+                        lockcode = 0U;
                 }
         }
         return lockcode;

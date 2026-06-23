@@ -22,17 +22,23 @@
 #define __xwcd_soc_arm_v7m_m7_fc7300_soc_xwaop_hook_h__
 
 #include <xwos/standard.h>
+#include <xwos/ospl/irq.h>
 #include <xwcd/soc/arm/v7m/m7/fc7300/soc_mb.h>
 
 #define SOC_XWAOP_BEGIN \
         do { \
+                xwreg_t __soc_xwaop_cpuirq; \
+                xwospl_cpuirq_save_lc(&__soc_xwaop_cpuirq); \
                 xwu32_t __soc_xwaop_mblkcode = soc_mb_lock(SOC_MB_CH_XWAOP); \
-                if (__soc_xwaop_mblkcode > 0) {
+                if (__soc_xwaop_mblkcode > 0U) {
 
 
 #define SOC_XWAOP_END \
                         soc_mb_unlock(SOC_MB_CH_XWAOP, __soc_xwaop_mblkcode); \
+                        xwospl_cpuirq_restore_lc(__soc_xwaop_cpuirq); \
                         break; \
+                } else { \
+                        xwospl_cpuirq_restore_lc(__soc_xwaop_cpuirq); \
                 } \
         } while (true);
 

@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwcd/soc/arm/v7m/arch_irq.h>
+#include <xwos/ospl/irq.h>
 #include <xwcd/soc/arm/v7m/m7/fc7300/soc_mb.h>
 #include <xwos/ospl/lfq.h>
 
@@ -27,9 +27,11 @@ __xwbsp_code
 void xwospl_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
         xwu32_t mblkcode;
+        xwreg_t cpuirq;
         xwlfq_t top;
 
         do {
+                xwospl_cpuirq_save_lc(&cpuirq);
                 mblkcode = soc_mb_lock(SOC_MB_CH_XWAOP);
                 if (mblkcode > 0) {
                         do {
@@ -39,7 +41,10 @@ void xwospl_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
                                 xwmb_mp_mb();
                         } while (armv7m_strex(h, (xwu32_t)n));
                         soc_mb_unlock(SOC_MB_CH_XWAOP, mblkcode);
+                        xwospl_cpuirq_restore_lc(cpuirq);
                         break;
+                } else {
+                        xwospl_cpuirq_restore_lc(cpuirq);
                 }
         } while (true);
 }
@@ -49,10 +54,12 @@ xwlfq_t * xwospl_lfq_pop(atomic_xwlfq_t * h)
 {
         xwer_t rc;
         xwu32_t mblkcode;
+        xwreg_t cpuirq;
         xwlfq_t top;
         xwlfq_t next;
 
         do {
+                xwospl_cpuirq_save_lc(&cpuirq);
                 mblkcode = soc_mb_lock(SOC_MB_CH_XWAOP);
                 if (mblkcode > 0) {
                         do {
@@ -67,7 +74,10 @@ xwlfq_t * xwospl_lfq_pop(atomic_xwlfq_t * h)
                                 }
                         } while (rc);
                         soc_mb_unlock(SOC_MB_CH_XWAOP, mblkcode);
+                        xwospl_cpuirq_restore_lc(cpuirq);
                         break;
+                } else {
+                        xwospl_cpuirq_restore_lc(cpuirq);
                 }
         } while (true);
         return (xwlfq_t *)top;
