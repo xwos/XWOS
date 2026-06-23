@@ -144,18 +144,30 @@ SECTIONS {
         /* -------- Global Offset Table -------- */
 
         /* ++++++++ Data ++++++++ */
-        .cpu0.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+        cpu0_dtcm_backdoor_offset = 0x2000000;
+        cpu1_dtcm_backdoor_offset = 0x2100000;
+        cpu2_dtcm_backdoor_offset = 0x2200000;
+        cpu3_dtcm_backdoor_offset = 0x2300000;
+        cpu0_itcm_backdoor_offset = 0x4000000;
+        cpu1_itcm_backdoor_offset = 0x4100000;
+        cpu2_itcm_backdoor_offset = 0x4200000;
+        cpu3_itcm_backdoor_offset = 0x4300000;
+        cpu0_thd_stack_origin = ORIGIN(dtcm_thd_stack_mr) + cpu0_dtcm_backdoor_offset;
+        cpu1_thd_stack_origin = ORIGIN(dtcm_thd_stack_mr) + cpu1_dtcm_backdoor_offset;
+        cpu2_thd_stack_origin = ORIGIN(dtcm_thd_stack_mr) + cpu2_dtcm_backdoor_offset;
+        cpu3_thd_stack_origin = ORIGIN(dtcm_thd_stack_mr) + cpu3_dtcm_backdoor_offset;
+        .cpu0.thd.stack cpu0_thd_stack_origin (NOLOAD) : {
                 *(.cpu0.thd.stack*)
-        } > dtcm_thd_stack_mr
-        .cpu1.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+        }
+        .cpu1.thd.stack cpu1_thd_stack_origin (NOLOAD) : {
                 *(.cpu1.thd.stack*)
-        } > dtcm_thd_stack_mr
-        .cpu2.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+        }
+        .cpu2.thd.stack cpu2_thd_stack_origin (NOLOAD) : {
                 *(.cpu2.thd.stack*)
-        } > dtcm_thd_stack_mr
-        .cpu3.thd.stack ORIGIN(dtcm_thd_stack_mr) (NOLOAD) : {
+        }
+        .cpu3.thd.stack cpu3_thd_stack_origin (NOLOAD) : {
                 *(.cpu3.thd.stack*)
-        } > dtcm_thd_stack_mr
+        }
 
         OVERLAY : {
                 .cpu0.data {
