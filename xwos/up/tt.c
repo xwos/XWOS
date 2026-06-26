@@ -440,12 +440,12 @@ void xwup_syshwt_task(struct xwup_syshwt * hwt)
 {
         struct xwup_tt * xwtt;
         xwer_t rc;
-        xwreg_t flags[hwt->irqs_num];
+        xwreg_t cpuirq;
 
         xwtt = xwup_syshwt_get_tt(hwt);
-        xwup_sqlk_wr_lock_irqssv(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
+        xwup_sqlk_wr_lock_cpuirqsv(&hwt->lock, &cpuirq);
         hwt->timetick = xwtm_add(hwt->timetick, XWOSCFG_SYSHWT_PERIOD);
-        xwup_sqlk_wr_unlock_irqsrs(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
+        xwup_sqlk_wr_unlock_cpuirqrs(&hwt->lock, cpuirq);
         rc = xwup_tt_check_deadline(xwtt);
         if (-ETIMEDOUT == rc) {
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
