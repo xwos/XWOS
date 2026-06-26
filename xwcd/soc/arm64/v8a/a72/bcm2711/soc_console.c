@@ -48,8 +48,8 @@ void soc_console_init(void)
          * generated baud rate = 48M / (16 * 26.046875) = 115177
          * error = |(115177 - 115200) / 115200 * 100| = 0.02%
          */
-        soc_console.ibrd.u32 = 26U;
-        soc_console.fbrd.u32 = 3U;
+        soc_console.ibrd.u32 = 2U;
+        soc_console.fbrd.u32 = 0U;
 
         soc_console.lcrh.bit.fen = 1;
         soc_console.lcrh.bit.wlen = SOC_UART_LCRH_WLEN_8BIT;
