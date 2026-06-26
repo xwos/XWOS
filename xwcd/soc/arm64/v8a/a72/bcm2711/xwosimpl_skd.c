@@ -44,7 +44,7 @@ xwid_t xwospl_skd_get_cpuid_lc(void)
         xwu64_t mpidr;
 
         armv8a_sysreg_read(&mpidr, mpidr_el1);
-        cpuid = ((xwid_t)mpidr >> (xwid_t)8) & (xwid_t)0xFF;
+        cpuid = ((xwid_t)mpidr >> (xwid_t)0) & (xwid_t)0x3;
         return cpuid;
 }
 

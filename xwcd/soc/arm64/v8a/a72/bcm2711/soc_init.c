@@ -176,7 +176,7 @@ void soc_percpu_boot(void)
         __asm__ volatile(
         "       msr     spsel, #1\n"
         "       mrs     x0, mpidr_el1\n"
-        "       ubfx    x0, x0, #8, #8\n"
+        "       ubfx    x0, x0, #0, #2\n"
         "       mov     x1, #%[__stack_size]\n"
         "       mul     x1, x1, x0\n"
         "       ldr     x2, =soc_percpu_stack\n"
