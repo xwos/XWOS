@@ -646,7 +646,9 @@ xwer_t xwup_skd_req_bh(void)
         xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        xwskd->req_bh_cnt++;
+        if (xwskd->req_bh_cnt < XWSQ_MAX) {
+                xwskd->req_bh_cnt++;
+        }
         if ((xwsq_t)0 == xwskd->dis_bh_cnt) {
                 if (NULL != xwskd->pstk) {
                         rc = -EINPROGRESS;
