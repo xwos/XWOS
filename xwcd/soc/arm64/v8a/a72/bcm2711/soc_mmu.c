@@ -18,6 +18,7 @@
  * > limitations under the License.
  */
 
+#include <xwos/ospl/skd.h>
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_mmu.h>
 #include <xwcd/soc/arm64/v8a/arch_isa.h>
 #include <xwcd/soc/arm64/v8a/arch_regs.h>
@@ -111,10 +112,14 @@ void soc_mmu_init(void)
 {
         xwu64_t el;
         xwu64_t sctlr;
+        xwid_t cpuid;
 
+        cpuid = xwospl_skd_get_cpuid_lc();
         armv8a_invalidate_tlb_all();
-        soc_mmu_init_ram_td();
-        soc_mmu_init_peri_td();
+        if (CPUCFG_MAIN_CPU == cpuid) {
+                soc_mmu_init_ram_td();
+                soc_mmu_init_peri_td();
+        }
 
         armv8a_sysreg_read(&el, CurrentEL);
         el >>= 2UL;

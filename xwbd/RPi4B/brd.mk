@@ -37,10 +37,11 @@ BRD_EOBJS :=
 
 BRD_CSRCS := board/init.c
 BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwos)
+BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/libc)
 ifeq ($(XWCFG_LIBC),newlib)
-  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/newlib)
+  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/libc/newlib)
 endif
 ifeq ($(XWCFG_LIBC),picolibc)
-  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/picolibc)
+  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/libc/picolibc)
 endif
 BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwds)

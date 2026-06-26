@@ -31,6 +31,9 @@ SOC_CXXSRCS :=
 SOC_EOBJS :=
 
 SOC_CSRCS += soc_init.c
+SOC_CSRCS += soc_mp.c
+SOC_CSRCS += soc_miniuart.c
+SOC_CSRCS += soc_uart.c
 SOC_CSRCS += soc_console.c
 SOC_CSRCS += soc_debug.c
 SOC_CSRCS += soc_mmu.c

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：XWOS适配层：newlib：动态内存池
+ * @brief SOC描述层：mulit-core
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,7 +18,11 @@
  * > limitations under the License.
  */
 
-#include "board/std.h"
-#include "board/mempool.h"
+#ifndef __xwcd_soc_arm64_v8a_a72_bcm2711_soc_mp_h__
+#define __xwcd_soc_arm64_v8a_a72_bcm2711_soc_mp_h__
 
-struct xwmm_mempool * newlibac_mempool = &board_mempool;
+#include <xwos/standard.h>
+
+void soc_boot_mp(xwsq_t cpumsk);
+
+#endif /* xwcd/soc/arm64/v8a/a72/bcm2711/soc_mp.h */

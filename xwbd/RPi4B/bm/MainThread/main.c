@@ -19,52 +19,136 @@
  */
 
 #include "board/std.h"
-#include <xwos/lib/xwlog.h>
 #include <xwos/osal/skd.h>
 #include <xwos/osal/thd.h>
+#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_mp.h>
+#include "board/xwac/libc/mi.h"
 #include "board/xwac/xwds/device.h"
-#ifdef XWCFG_LIBC__newlib
-#  include <xwmd/libc/newlibac/mi.h>
-#endif
-#ifdef XWCFG_LIBC__picolibc
-#  include <xwmd/libc/picolibcac/mi.h>
-#endif
 
-#define SOC_DBGF
-#include <soc_debug.h>
-#define LOGTAG "MainThd"
+#include <xwos/lib/xwlog.h>
+#define LOGTAG "MThd"
+#define MTHD_DBG
+#if defined(MTHD_DBG)
+#  define mthdlogd(fmt, ...) xwlogf(D, LOGTAG, fmt, ##__VA_ARGS__)
+#else
+#  define mthdlogd(fmt, ...)
+#endif
+#define mthdlogi(fmt, ...) xwlogf(I, LOGTAG, fmt, ##__VA_ARGS__)
+#define mthdloge(fmt, ...) xwlogf(E, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define MAINTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
-xwer_t mainthd_mainfunc(void * arg);
-__xwcc_aligned(16) xwu8_t mainthd_stack[8192] = {0};
-const struct xwos_thd_desc mainthd_desc = {
+#define CPU0_MTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+xwer_t cpu0_mthd_mainfunc(void * arg);
+__xwos_thd_stack xwstk_t cpu0_mthd_stack[1024U] = {0};
+const struct xwos_thd_desc cpu0_mthd_desc = {
         .attr = {
-                .name = "main.thd",
-                .stack = (xwstk_t *)mainthd_stack,
-                .stack_size = sizeof(mainthd_stack),
+                .name = "mthd@0",
+                .stack = (xwstk_t *)cpu0_mthd_stack,
+                .stack_size = sizeof(cpu0_mthd_stack),
                 .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
-                .priority = MAINTHD_PRIORITY,
+                .priority = CPU0_MTHD_PRIORITY,
                 .detached = true,
                 .privileged = true,
         },
-        .func = mainthd_mainfunc,
+        .func = cpu0_mthd_mainfunc,
         .arg = NULL,
 };
-struct xwos_thd mainthd;
-xwos_thd_d mainthdd;
+struct xwos_thd cpu0_mthd;
+xwos_thd_d cpu0_mthdd;
+
+#define CPU1_MTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+xwer_t cpu1_mthd_mainfunc(void * arg);
+__xwos_thd_stack xwstk_t cpu1_mthd_stack[1024U] = {0};
+const struct xwos_thd_desc cpu1_mthd_desc = {
+        .attr = {
+                .name = "mthd@1",
+                .stack = (xwstk_t *)cpu1_mthd_stack,
+                .stack_size = sizeof(cpu1_mthd_stack),
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = CPU1_MTHD_PRIORITY,
+                .detached = true,
+                .privileged = true,
+        },
+        .func = cpu1_mthd_mainfunc,
+        .arg = NULL,
+};
+struct xwos_thd cpu1_mthd;
+xwos_thd_d cpu1_mthdd;
+
+#define CPU2_MTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+xwer_t cpu2_mthd_mainfunc(void * arg);
+__xwos_thd_stack xwstk_t cpu2_mthd_stack[1024U] = {0};
+const struct xwos_thd_desc cpu2_mthd_desc = {
+        .attr = {
+                .name = "mthd@2",
+                .stack = (xwstk_t *)cpu2_mthd_stack,
+                .stack_size = sizeof(cpu2_mthd_stack),
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = CPU2_MTHD_PRIORITY,
+                .detached = true,
+                .privileged = true,
+        },
+        .func = cpu2_mthd_mainfunc,
+        .arg = NULL,
+};
+struct xwos_thd cpu2_mthd;
+xwos_thd_d cpu2_mthdd;
+
+#define CPU3_MTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+xwer_t cpu3_mthd_mainfunc(void * arg);
+__xwos_thd_stack xwstk_t cpu3_mthd_stack[1024U] = {0};
+const struct xwos_thd_desc cpu3_mthd_desc = {
+        .attr = {
+                .name = "mthd@3",
+                .stack = (xwstk_t *)cpu3_mthd_stack,
+                .stack_size = sizeof(cpu3_mthd_stack),
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = CPU3_MTHD_PRIORITY,
+                .detached = true,
+                .privileged = true,
+        },
+        .func = cpu3_mthd_mainfunc,
+        .arg = NULL,
+};
+struct xwos_thd cpu3_mthd;
+xwos_thd_d cpu3_mthdd;
 
 xwer_t xwos_main(void)
 {
         xwer_t rc;
+        xwid_t cpu;
 
-        soc_dbgf("Main", "create task ...\r\n");
-        rc = xwos_thd_init(&mainthd, &mainthdd,
-                           &mainthd_desc.attr,
-                           mainthd_desc.func,
-                           mainthd_desc.arg);
+        cpu = xwos_skd_get_cpuid_lc();
+        switch (cpu) {
+        case 0U:
+                rc = xwos_thd_init(&cpu0_mthd, &cpu0_mthdd,
+                                   &cpu0_mthd_desc.attr,
+                                   cpu0_mthd_desc.func,
+                                   cpu0_mthd_desc.arg);
+                break;
+        case 1U:
+                rc = xwos_thd_init(&cpu1_mthd, &cpu1_mthdd,
+                                   &cpu1_mthd_desc.attr,
+                                   cpu1_mthd_desc.func,
+                                   cpu1_mthd_desc.arg);
+                break;
+        case 2U:
+                rc = xwos_thd_init(&cpu2_mthd, &cpu2_mthdd,
+                                   &cpu2_mthd_desc.attr,
+                                   cpu2_mthd_desc.func,
+                                   cpu2_mthd_desc.arg);
+                break;
+        case 3U:
+                rc = xwos_thd_init(&cpu3_mthd, &cpu3_mthdd,
+                                   &cpu3_mthd_desc.attr,
+                                   cpu3_mthd_desc.func,
+                                   cpu3_mthd_desc.arg);
+                break;
+        default:
+                rc = -ENOSYS;
+                break;
+        }
         if (rc < 0) {
-                soc_dbgf("Main", "Failed to init task ... [%ld]\r\n", rc);
-                goto err_init_mainthd;
+                goto err_init_mthd;
         }
 
         rc = xwos_skd_start_lc();
@@ -74,26 +158,23 @@ xwer_t xwos_main(void)
 
         return XWOK;
 
-err_init_mainthd:
-        BOARD_BUG();
+err_init_mthd:
+        XWOS_BUG();
 err_skd_start_lc:
-        BOARD_BUG();
+        XWOS_BUG();
         return rc;
 }
 
-xwer_t mainthd_mainfunc(void * arg)
+xwer_t cpu0_mthd_mainfunc(void * arg)
 {
-        xwu64_t ms = 0;
         xwtm_t origin;
+        xwu64_t ms;
 
         XWOS_UNUSED(arg);
-        xwlogf(I, LOGTAG, "Init C++ Runtime ...\r\n");
-#ifdef XWCFG_LIBC__newlib
-        newlibac_init();
-#endif
-#ifdef XWCFG_LIBC__picolibc
-        picolibcac_init();
-#endif
+        ms = 0;
+        mthdlogi("Init C/C++ Runtime ...\r\n");
+        libc_init();
+        soc_boot_mp(XWBOP_BIT(1) | XWBOP_BIT(2) | XWBOP_BIT(3));
         origin = xwtm_now();
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {
@@ -102,7 +183,73 @@ xwer_t mainthd_mainfunc(void * arg)
                         xwos_cthd_sleep_from(&origin, xwtm_ms(10));
                         ms += 10;
                         if (0 == (ms % 1000)) {
-                                xwlogf(I, LOGTAG, "Loop ... %ld ms\r\n", ms);
+                                mthdlogi("Loop ... %ld ms\r\n", ms);
+                        }
+                }
+        }
+        return XWOK;
+}
+
+xwer_t cpu1_mthd_mainfunc(void * arg)
+{
+        xwtm_t origin;
+        xwu64_t ms;
+
+        XWOS_UNUSED(arg);
+        ms = 0;
+        origin = xwtm_now();
+        while (!xwos_cthd_shld_stop()) {
+                if (xwos_cthd_shld_frz()) {
+                        xwos_cthd_freeze();
+                } else {
+                        xwos_cthd_sleep_from(&origin, xwtm_ms(10));
+                        ms += 10;
+                        if (0 == (ms % 1000)) {
+                                mthdlogi("Loop ... %ld ms\r\n", ms);
+                        }
+                }
+        }
+        return XWOK;
+}
+
+xwer_t cpu2_mthd_mainfunc(void * arg)
+{
+        xwtm_t origin;
+        xwu64_t ms;
+
+        XWOS_UNUSED(arg);
+        ms = 0;
+        origin = xwtm_now();
+        while (!xwos_cthd_shld_stop()) {
+                if (xwos_cthd_shld_frz()) {
+                        xwos_cthd_freeze();
+                } else {
+                        xwos_cthd_sleep_from(&origin, xwtm_ms(10));
+                        ms += 10;
+                        if (0 == (ms % 1000)) {
+                                mthdlogi("Loop ... %ld ms\r\n", ms);
+                        }
+                }
+        }
+        return XWOK;
+}
+
+xwer_t cpu3_mthd_mainfunc(void * arg)
+{
+        xwtm_t origin;
+        xwu64_t ms;
+
+        XWOS_UNUSED(arg);
+        ms = 0;
+        origin = xwtm_now();
+        while (!xwos_cthd_shld_stop()) {
+                if (xwos_cthd_shld_frz()) {
+                        xwos_cthd_freeze();
+                } else {
+                        xwos_cthd_sleep_from(&origin, xwtm_ms(10));
+                        ms += 10;
+                        if (0 == (ms % 1000)) {
+                                mthdlogi("Loop ... %ld ms\r\n", ms);
                         }
                 }
         }

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：XWOS适配层：newlib：标准输入输出
+ * @brief 板级描述层：XWOS适配层：libc：初始化
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,30 +19,20 @@
  */
 
 #include "board/std.h"
-#include <xwos/lib/errno.h>
-#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_console.h>
-#include "board/xwac/xwds/device.h"
+#ifdef XWCFG_LIBC__newlib
+#  include <xwmd/libc/newlibac/mi.h>
+#endif
+#ifdef XWCFG_LIBC__picolibc
+#  include <xwmd/libc/picolibcac/mi.h>
+#endif
+#include "board/xwac/libc/mi.h"
 
-xwssz_t newlibac_fops_read_stdin(int fd, void * buf, xwsz_t cnt)
+void libc_init(void)
 {
-        XWOS_UNUSED(fd);
-        soc_console_rx(buf, cnt);
-        errno = 0;
-        return cnt;
-}
-
-xwssz_t newlibac_fops_write_stdout(int fd, const void * data, xwsz_t cnt)
-{
-        XWOS_UNUSED(fd);
-        soc_console_tx((const xwu8_t *)data, cnt);
-        errno = 0;
-        return cnt;
-}
-
-xwssz_t newlibac_fops_write_stderr(int fd, const void * data, xwsz_t cnt)
-{
-        XWOS_UNUSED(fd);
-        soc_console_tx((const xwu8_t *)data, cnt);
-        errno = 0;
-        return cnt;
+#ifdef XWCFG_LIBC__newlib
+        newlibac_init();
+#endif
+#ifdef XWCFG_LIBC__picolibc
+        picolibcac_init();
+#endif
 }

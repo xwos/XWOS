@@ -127,18 +127,18 @@ void soc_init(void)
                 armv8a_switch_el3_to_el2_aarch64();
                 soc_infof("BCM2711", "Drop CPU%d to EL%d\n\r", cpuid, el - 1);
         }
-        if (0 == cpuid) {
+        if (CPUCFG_MAIN_CPU == cpuid) {
                 soc_console_init();
         }
         armv8a_init_vector();
 
         if (CPUCFG_MAIN_CPU == cpuid) {
                 soc_clear_bss();
-                soc_mmu_init();
-                armv8a_flush_dcache_all();
-                armv8a_dcache_enable();
-                /* armv8a_icache_enable(); */
         }
+        soc_mmu_init();
+        armv8a_flush_dcache_all();
+        armv8a_dcache_enable();
+        /* armv8a_icache_enable(); */
 
         armv8a_init();
         soc_init_sysreg();

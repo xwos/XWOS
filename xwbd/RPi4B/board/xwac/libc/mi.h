@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC描述层：初始化
+ * @brief 板级描述层：XWOS适配层：libc：mi
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,13 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm64_v8a_a72_bcm2711_soc_init_h__
-#define __xwcd_soc_arm64_v8a_a72_bcm2711_soc_init_h__
+#ifndef __board_xwac_libc_mi_h__
+#define __board_xwac_libc_mi_h__
 
-#include <xwos/standard.h>
+#include "board/std.h"
 
-void soc_percpu_boot(void);
-void soc_init(void);
-void soc_relocate_data(void);
+void libc_init(void);
 
-#endif /* xwcd/soc/arm64/v8a/a72/bcm2711/soc_init.h */
+#endif /* board/xwac/libc/mi.h */

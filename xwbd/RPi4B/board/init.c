@@ -20,6 +20,7 @@
 
 #include "board/std.h"
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_init.h>
+#include <xwos/ospl/skd.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/lib/xwaop.h>
 #include "board/xwac/xwds/device.h"
@@ -63,7 +64,12 @@ void xwos_preinit(void)
 __xwbsp_init_code
 void xwos_postinit(void)
 {
-        board_mm_init();
-        rpi4bxwds_init();
-        rpi4bxwds_uart_init();
+        xwid_t cpuid;
+
+        cpuid = xwospl_skd_get_cpuid_lc();
+        if (0U == cpuid) {
+                board_mm_init();
+                rpi4bxwds_init();
+                rpi4bxwds_uart_init();
+        }
 }

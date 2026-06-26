@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC描述层：初始化
+ * @brief 板级描述层：XWOS适配层：libc：newlib：动态内存池
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,13 +18,7 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm64_v8a_a72_bcm2711_soc_init_h__
-#define __xwcd_soc_arm64_v8a_a72_bcm2711_soc_init_h__
+#include "board/std.h"
+#include "board/mempool.h"
 
-#include <xwos/standard.h>
-
-void soc_percpu_boot(void);
-void soc_init(void);
-void soc_relocate_data(void);
-
-#endif /* xwcd/soc/arm64/v8a/a72/bcm2711/soc_init.h */
+struct xwmm_mempool * newlibac_mempool = &board_mempool;

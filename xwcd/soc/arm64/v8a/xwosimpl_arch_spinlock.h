@@ -40,14 +40,14 @@
  */
 struct xwospl_splk {
         union {
-                xwu32_t raw; /**< 值 */
+                volatile xwu32_t raw; /**< 值 */
                 struct {
 #if defined(ARCHCFG_LITTLE_ENDIAN) && (1 == ARCHCFG_LITTLE_ENDIAN)
-                        xwu16_t c; /**< 当前的持锁者 */
-                        xwu16_t n; /**< 下一个持锁者 */
+                        volatile xwu16_t c; /**< 当前的持锁者 */
+                        volatile xwu16_t n; /**< 下一个持锁者 */
 #else
-                        xwu16_t n; /**< 下一个持锁者 */
-                        xwu16_t c; /**< 当前的持锁者 */
+                        volatile xwu16_t n; /**< 下一个持锁者 */
+                        volatile xwu16_t c; /**< 当前的持锁者 */
 #endif
                 } ticket;
         } v;
@@ -69,14 +69,14 @@ void xwospl_splk_lock(struct xwospl_splk * osplsplk)
 {
         xwer_t rc;
         struct xwospl_splk lkval;
-        xwu16_t ticket;
+        volatile xwu16_t ticket;
 
         armv8a_prefetch_before_aop(osplsplk->v.raw);
         do {
                 lkval.v.raw = armv8a_load_acquire_exclusively_32b(
                         (atomic_xwu32_t *)&osplsplk->v.raw);
                 ticket = lkval.v.ticket.n;
-                lkval.v.ticket.n++;
+                lkval.v.ticket.n += 1U;
                 rc = armv8a_store_exclusively_32b(
                         (atomic_xwu32_t *)&osplsplk->v.raw, lkval.v.raw);
         } while (rc);
@@ -85,10 +85,9 @@ void xwospl_splk_lock(struct xwospl_splk * osplsplk)
                    防止丢失其他CPU的解锁事件。 */
                 __asm__ volatile("sevl" : : : "memory");
                 do {
-                        __asm__ volatile("wfe" : : : "memory"
-                        );
-                        lkval.v.ticket.c = armv8a_load_acquire_exclusively_16b(
-                                (atomic_xwu16_t *)&osplsplk->v.ticket.c);
+                        __asm__ volatile("wfe" : : : "memory");
+                        lkval.v.raw = armv8a_load_acquire_exclusively_32b(
+                                (atomic_xwu32_t *)&osplsplk->v.raw);
                 } while (ticket != lkval.v.ticket.c);
         }
 }
@@ -107,7 +106,7 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
                         rc = -EAGAIN;
                         break;
                 }
-                lkval.v.ticket.n++;
+                lkval.v.ticket.n += 1U;
                 rc = armv8a_store_exclusively_32b(
                         (atomic_xwu32_t *)&osplsplk->v.raw, lkval.v.raw);
         } while (rc);
@@ -117,7 +116,7 @@ xwer_t xwospl_splk_trylock(struct xwospl_splk * osplsplk)
 static __xwbsp_inline
 void xwospl_splk_unlock(struct xwospl_splk * osplsplk)
 {
-        __xwcc_atomic xwu16_t c;
+        volatile xwu16_t c;
 
         c = osplsplk->v.ticket.c + 1U;
         /* 根据ARM架构参考手册中的描述，"global monitor" 检测到 "PE" 的
