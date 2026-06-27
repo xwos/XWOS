@@ -20,19 +20,15 @@
 
 MEMORY {
         ram_mr (rwx): org = 0x0, len = 8192M /* RAM */
-        peri_mr (rw): org = 0x400000000, len = 8192M /* Peripherals */
-        pcie_mr (rw): org = 0x600000000, len = 8192M /* PCIE */
+        periph_mr (rw): org = 0x400000000, len = 8192M /* Peripherals */
 
-        runtime_mr (rwx): org = 0x80000, len = 0x7F80000 /* code, 128M - 0x80000 */
+        runtime_mr (rwx): org = 0x80000, len = 8388096K /* code */
 }
 
 ram_mr_origin = ORIGIN(ram_mr);
 ram_mr_size = LENGTH(ram_mr);
 
-peri_mr_origin = ORIGIN(peri_mr);
-peri_mr_size = LENGTH(peri_mr);
-
-pcie_mr_origin = ORIGIN(pcie_mr);
-pcie_mr_size = LENGTH(pcie_mr);
+periph_mr_origin = ORIGIN(periph_mr);
+periph_mr_size = LENGTH(periph_mr);
 
 INCLUDE soc.lds

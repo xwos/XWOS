@@ -24,7 +24,6 @@
 #define CPUCFG_SVE                              0
 #define CPUCFG_SME                              0
 #define CPUCFG_CPU_NUM                          (4U)
-#define CPUCFG_MAIN_CPU                         (0U)
 #define CPUCFG_CPU_STACK_SIZE                   (8192U)
 #define CPUCFG_L1_CACHELINE_SIZE                (64U)
 

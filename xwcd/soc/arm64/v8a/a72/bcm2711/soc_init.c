@@ -103,7 +103,7 @@ void soc_init_sysreg(void)
                 armv8a_sysreg_write(S3_1_C15_C2_1, cpuectlr);
 
                 armv8a_sysreg_read(&l2ctlr, S3_1_C11_C0_2);
-                l2ctlr |= 0x22U;
+                l2ctlr |= 0x22U; /* Set L2 read/write cache latency to 3 */
                 armv8a_sysreg_write(S3_1_C11_C0_2, l2ctlr);
                 break;
         default:
@@ -125,26 +125,31 @@ void soc_init(void)
         cpuid = xwospl_skd_get_cpuid_lc();
         if (3 == el) {
                 armv8a_switch_el3_to_el2_aarch64();
-                soc_infof("BCM2711", "Drop CPU%d to EL%d\n\r", cpuid, el - 1);
         }
-        if (CPUCFG_MAIN_CPU == cpuid) {
+        armv8a_init();
+        soc_init_sysreg();
+        switch (cpuid) {
+        case 0U:
                 soc_console_init();
+                soc_clear_bss();
+                break;
+        case 1U:
+                break;
+        case 2U:
+                break;
+        case 3U:
+                break;
+        default:
+                break;
         }
         armv8a_init_vector();
-
-        if (CPUCFG_MAIN_CPU == cpuid) {
-                soc_clear_bss();
-        }
         soc_mmu_init();
         armv8a_flush_dcache_all();
         armv8a_dcache_enable();
         /* armv8a_icache_enable(); */
-
-        armv8a_init();
-        soc_init_sysreg();
         armv8a_timer_init();
 
-        if (CPUCFG_MAIN_CPU == cpuid) {
+        if (0U == cpuid) {
                 armv8a_gic2_init_runtime();
                 armv8a_gic2_init_distributor();
         }
