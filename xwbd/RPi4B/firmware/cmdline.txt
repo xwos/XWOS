@@ -1,0 +1,1 @@
+console=serial0,2000000
