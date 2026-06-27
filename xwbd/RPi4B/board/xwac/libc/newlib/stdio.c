@@ -20,29 +20,96 @@
 
 #include "board/std.h"
 #include <xwos/lib/errno.h>
-#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_console.h>
+#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include "board/xwac/xwds/device.h"
 
 xwssz_t newlibac_fops_read_stdin(int fd, void * buf, xwsz_t cnt)
 {
+        xwssz_t rdsz;
+        xwsz_t bufsz = cnt;
+        xwer_t rc;
         XWOS_UNUSED(fd);
-        soc_console_rx(buf, cnt);
-        errno = 0;
-        return cnt;
+
+        do {
+                cnt = bufsz;
+                rc = xwds_uartc_rx(&rpi4bxwds_miniuart, buf, &cnt,
+                                   xwtm_ft(xwtm_ms(20)));
+                if (-ETIMEDOUT == rc) {
+                        rdsz = (xwssz_t)cnt;
+                        errno = 0;
+                } else if (rc < 0) {
+                        rdsz = -1;
+                        errno = -rc;
+                        break;
+                } else {
+                        rdsz = (xwssz_t)cnt;
+                        errno = 0;
+                }
+        } while (0 == rdsz);
+        return rdsz;
 }
 
 xwssz_t newlibac_fops_write_stdout(int fd, const void * data, xwsz_t cnt)
 {
+        xwsq_t ctx;
+        xwssz_t wrsz;
+        xwer_t rc;
         XWOS_UNUSED(fd);
-        soc_console_tx((const xwu8_t *)data, cnt);
-        errno = 0;
-        return cnt;
+
+        xwos_skd_get_context_lc(&ctx, NULL);
+        if (XWOS_SKD_CONTEXT_BOOT == ctx) {
+                rc = -EPERM;
+        } else if (XWOS_SKD_CONTEXT_THD == ctx) {
+                if (xwos_cthd_shld_frz()) {
+                        rc = xwds_uartc_etx(&rpi4bxwds_miniuart,
+                                            (const xwu8_t *)data, &cnt);
+                } else {
+                        rc = xwds_uartc_tx(&rpi4bxwds_miniuart,
+                                           (const xwu8_t *)data, &cnt,
+                                           XWTM_MAX);
+                }
+        } else {
+                rc = xwds_uartc_etx(&rpi4bxwds_miniuart,
+                                    (const xwu8_t *)data, &cnt);
+        }
+        errno = -rc;
+        if (rc < 0) {
+                wrsz = -1;
+        } else {
+                wrsz = (xwssz_t)cnt;
+        }
+        return wrsz;
 }
 
 xwssz_t newlibac_fops_write_stderr(int fd, const void * data, xwsz_t cnt)
 {
+        xwsq_t ctx;
+        xwssz_t wrsz;
+        xwer_t rc;
         XWOS_UNUSED(fd);
-        soc_console_tx((const xwu8_t *)data, cnt);
-        errno = 0;
-        return cnt;
+
+        xwos_skd_get_context_lc(&ctx, NULL);
+        if (XWOS_SKD_CONTEXT_BOOT == ctx) {
+                rc = -EPERM;
+        } else if (XWOS_SKD_CONTEXT_THD == ctx) {
+                if (xwos_cthd_shld_frz()) {
+                        rc = xwds_uartc_etx(&rpi4bxwds_miniuart,
+                                            (const xwu8_t *)data, &cnt);
+                } else {
+                        rc = xwds_uartc_tx(&rpi4bxwds_miniuart,
+                                           (const xwu8_t *)data, &cnt,
+                                           XWTM_MAX);
+                }
+        } else {
+                rc = xwds_uartc_etx(&rpi4bxwds_miniuart,
+                                    (const xwu8_t *)data, &cnt);
+        }
+        errno = -rc;
+        if (rc < 0) {
+                wrsz = -1;
+        } else {
+                wrsz = (xwssz_t)cnt;
+        }
+        return wrsz;
 }

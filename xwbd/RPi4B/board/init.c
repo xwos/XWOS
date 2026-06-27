@@ -67,9 +67,20 @@ void xwos_postinit(void)
         xwid_t cpuid;
 
         cpuid = xwospl_skd_get_cpuid_lc();
-        if (0U == cpuid) {
+        switch (cpuid) {
+        case 0U:
                 board_mm_init();
                 rpi4bxwds_init();
+                rpi4bxwds_miniuart_init();
                 rpi4bxwds_uart_init();
+                break;
+        case 1U:
+                break;
+        case 2U:
+                break;
+        case 3U:
+                break;
+        default:
+                break;
         }
 }

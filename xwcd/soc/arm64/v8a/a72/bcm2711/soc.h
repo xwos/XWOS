@@ -68,10 +68,6 @@
 #define SOC_GIC2_H_OFFSET (0x4000UL)
 #define SOC_GIC2_V_OFFSET (0x6000UL)
 
-#define SOC_GIC2_IRQn_OFFSET_ARMC (64UL)
-#define SOC_GIC2_IRQn_OFFSET_VC (96UL)
-#define SOC_GIC2_IRQn_OFFSET_PCIeL2 (160UL)
-
 #define SOC_ARM_CORE_REGBASE (SOC_MAIN_PERI_BASE + 0x0200B000UL)
 
 #define SOC_PCM_REGBASE (SOC_MAIN_PERI_BASE + 0x02203000UL)
@@ -179,5 +175,115 @@ struct soc_armc_regs {
         } irq3;
 };
 #define soc_armc (*((volatile struct soc_armc_regs *)SOC_ARM_CORE_REGBASE))
+
+/* IRQ */
+#define SOC_GIC2_IRQ_OFFSET_ARMC        (64UL)
+#define SOC_GIC2_IRQ_OFFSET_VC          (96UL)
+#define SOC_GIC2_IRQ_OFFSET_PCIE        (160UL)
+
+enum soc_irq_em {
+        SOC_MB_IRQ0 = 32,
+        SOC_MB_IRQ1,
+        SOC_MB_IRQ2,
+        SOC_MB_IRQ3,
+        SOC_MB_IRQ4,
+        SOC_MB_IRQ5,
+        SOC_MB_IRQ6,
+        SOC_MB_IRQ7,
+        SOC_MB_IRQ8,
+        SOC_MB_IRQ9,
+        SOC_MB_IRQ10,
+        SOC_MB_IRQ11,
+        SOC_MB_IRQ12,
+        SOC_MB_IRQ13,
+        SOC_MB_IRQ14,
+        SOC_MB_IRQ15,
+        SOC_CORE0_PMU_IRQ,
+        SOC_CORE1_PMU_IRQ,
+        SOC_CORE2_PMU_IRQ,
+        SOC_CORE3_PMU_IRQ,
+        SOC_AXIERR_IRQ,
+        SOC_LOCAL_TIMER_IRQ,
+        SOC_ARMC_IRQ_TIMER = SOC_GIC2_IRQ_OFFSET_ARMC,
+        SOC_ARMC_IRQ_MAILBOX,
+        SOC_ARMC_IRQ_DOORBELL0,
+        SOC_ARMC_IRQ_DOORBELL1,
+        SOC_ARMC_IRQ_VPU0_HALTED,
+        SOC_ARMC_IRQ_VPU1_HALTED,
+        SOC_ARMC_IRQ_ARM_ADDRESS_ERROR,
+        SOC_ARMC_IRQ_ARM_AXI_ERROR,
+        SOC_ARMC_IRQ_SWI0,
+        SOC_ARMC_IRQ_SWI1,
+        SOC_ARMC_IRQ_SWI2,
+        SOC_ARMC_IRQ_SWI3,
+        SOC_ARMC_IRQ_SWI4,
+        SOC_ARMC_IRQ_SWI5,
+        SOC_ARMC_IRQ_SWI6,
+        SOC_ARMC_IRQ_SWI7,
+        SOC_VC_IRQ_TIMER0 = SOC_GIC2_IRQ_OFFSET_VC,
+        SOC_VC_IRQ_TIMER1,
+        SOC_VC_IRQ_TIMER2,
+        SOC_VC_IRQ_TIMER3,
+        SOC_VC_IRQ_H264_0,
+        SOC_VC_IRQ_H264_1,
+        SOC_VC_IRQ_H264_2,
+        SOC_VC_IRQ_JPEG,
+        SOC_VC_IRQ_ISP,
+        SOC_VC_IRQ_USB,
+        SOC_VC_IRQ_V3D,
+        SOC_VC_IRQ_TRANSPOSER,
+        SOC_VC_IRQ_MULTICORE_SYNC0,
+        SOC_VC_IRQ_MULTICORE_SYNC1,
+        SOC_VC_IRQ_MULTICORE_SYNC2,
+        SOC_VC_IRQ_MULTICORE_SYNC3,
+        SOC_VC_IRQ_DMA0,
+        SOC_VC_IRQ_DMA1,
+        SOC_VC_IRQ_DMA2,
+        SOC_VC_IRQ_DMA3,
+        SOC_VC_IRQ_DMA4,
+        SOC_VC_IRQ_DMA5,
+        SOC_VC_IRQ_DMA6,
+        SOC_VC_IRQ_DMA7_8,
+        SOC_VC_IRQ_DMA9_10,
+        SOC_VC_IRQ_DMA11,
+        SOC_VC_IRQ_DMA12,
+        SOC_VC_IRQ_DMA13,
+        SOC_VC_IRQ_DMA14,
+        SOC_VC_IRQ_AUX,
+        SOC_VC_IRQ_ARM,
+        SOC_VC_IRQ_DMA15,
+        SOC_VC_IRQ_HDMI_CEC,
+        SOC_VC_IRQ_HVS,
+        SOC_VC_IRQ_RPIVID,
+        SOC_VC_IRQ_SDC,
+        SOC_VC_IRQ_DSI0,
+        SOC_VC_IRQ_PIXEL_VALVE2,
+        SOC_VC_IRQ_CAMERA0,
+        SOC_VC_IRQ_CAMERA1,
+        SOC_VC_IRQ_HDMI0,
+        SOC_VC_IRQ_HDMI1,
+        SOC_VC_IRQ_PIXEL_VALVE3,
+        SOC_VC_IRQ_SPI_BSC_SLAVE,
+        SOC_VC_IRQ_DSI1,
+        SOC_VC_IRQ_PIXEL_VALVE0,
+        SOC_VC_IRQ_PIXEL_VALVE1_4,
+        SOC_VC_IRQ_CPR,
+        SOC_VC_IRQ_SMI,
+        SOC_VC_IRQ_GPIO0,
+        SOC_VC_IRQ_GPIO1,
+        SOC_VC_IRQ_GPIO2,
+        SOC_VC_IRQ_GPIO3,
+        SOC_VC_IRQ_I2C,
+        SOC_VC_IRQ_SPI,
+        SOC_VC_IRQ_PCM_I2S,
+        SOC_VC_IRQ_SDHOST,
+        SOC_VC_IRQ_UART,
+        SOC_VC_IRQ_ETH_PCIEL2,
+        SOC_VC_IRQ_VEC,
+        SOC_VC_IRQ_CPG,
+        SOC_VC_IRQ_RNG,
+        SOC_VC_IRQ_EMMC,
+        SOC_VC_IRQ_ETH_PCIE_SECURE,
+};
 
 #endif /* xwcd/soc/arm64/v8a/a72/bcm2711/soc.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC描述层：终端
+ * @brief SOC描述层：终端控制台
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -25,8 +25,6 @@
 
 void soc_console_init(void);
 void soc_console_puts(const char * s);
-xwsz_t soc_console_gets(char * buf, xwsz_t bufsz);
-void soc_console_tx(const xwu8_t * d, xwsz_t size);
-xwsz_t soc_console_rx(char * buf, xwsz_t bufsz);
+void soc_console_write(const xwu8_t * d, xwsz_t size);
 
 #endif /* xwcd/soc/arm64/v8a/a72/bcm2711/soc_console.h */

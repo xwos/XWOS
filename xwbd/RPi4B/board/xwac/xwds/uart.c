@@ -83,7 +83,7 @@ void rpi4bxwds_uartc_cb_rx(struct xwds_uartc * uartc)
         soccfg = uartcfg->soccfg;
         regs = (volatile struct soc_uart_regs *)soccfg->regbase;
         i = 0;
-        while (0 == regs->fr.bit.rxfe) {
+        while (0 == regs->fr.b.rxfe) {
                 byte = regs->dr & (xwu8_t)0xFF;
                 pub = xwds_uartc_drvcb_rxq_fill(uartc, &byte, 1);
                 i++;
@@ -111,41 +111,41 @@ void rpi4bxwds_uartc_isr(void)
                 uartcfg = uartc->cfg;
                 soccfg = uartcfg->soccfg;
                 regs = (volatile struct soc_uart_regs *)soccfg->regbase;
-                if ((1 == regs->ris.bit.ctsmris) && (1 == regs->mis.bit.ctsmmis)) {
-                        regs->icr.bit.ctsmic = 1;
+                if ((1 == regs->ris.b.ctsmris) && (1 == regs->mis.b.ctsmmis)) {
+                        regs->icr.b.ctsmic = 1;
                         rpi4buart_dbgf(uartc, "CTS IRQ\r\n");
                 }
-                if ((1 == regs->ris.bit.rxris) && (1 == regs->mis.bit.rxmis)) {
-                        regs->icr.bit.rxic = 1;
+                if ((1 == regs->ris.b.rxris) && (1 == regs->mis.b.rxmis)) {
+                        regs->icr.b.rxic = 1;
                         rpi4buart_dbgf(uartc, "RX IRQ\r\n");
                         rpi4bxwds_uartc_cb_rx(uartc);
                 }
-                if ((1 == regs->ris.bit.txris) && (1 == regs->mis.bit.txmis)) {
-                        regs->icr.bit.txic = 1;
+                if ((1 == regs->ris.b.txris) && (1 == regs->mis.b.txmis)) {
+                        regs->icr.b.txic = 1;
                         rpi4buart_dbgf(uartc, "TX IRQ\r\n");
                         rpi4bxwds_uartc_cb_tx_completion(uartc, XWOK);
                 }
-                if ((1 == regs->ris.bit.rtris) && (1 == regs->mis.bit.rtmis)) {
-                        regs->icr.bit.rtic = 1;
+                if ((1 == regs->ris.b.rtris) && (1 == regs->mis.b.rtmis)) {
+                        regs->icr.b.rtic = 1;
                         rpi4buart_dbgf(uartc, "RX Timeout IRQ\r\n");
                         rpi4bxwds_uartc_cb_rx(uartc);
                 }
-                if ((1 == regs->ris.bit.feris) && (1 == regs->mis.bit.femis)) {
-                        regs->icr.bit.feic = 1;
+                if ((1 == regs->ris.b.feris) && (1 == regs->mis.b.femis)) {
+                        regs->icr.b.feic = 1;
                         rpi4buart_dbgf(uartc, "Frame Error IRQ\r\n");
                         rpi4bxwds_uartc_cb_rx_error(uartc);
                 }
-                if ((1 == regs->ris.bit.peris) && (1 == regs->mis.bit.pemis)) {
-                        regs->icr.bit.peic = 1;
+                if ((1 == regs->ris.b.peris) && (1 == regs->mis.b.pemis)) {
+                        regs->icr.b.peic = 1;
                         rpi4buart_dbgf(uartc, "Parity Error IRQ\r\n");
                         rpi4bxwds_uartc_cb_rx_error(uartc);
                 }
-                if ((1 == regs->ris.bit.beris) && (1 == regs->mis.bit.bemis)) {
-                        regs->icr.bit.beic = 1;
+                if ((1 == regs->ris.b.beris) && (1 == regs->mis.b.bemis)) {
+                        regs->icr.b.beic = 1;
                         rpi4buart_dbgf(uartc, "Break IRQ\r\n");
                 }
-                if ((1 == regs->ris.bit.oeris) && (1 == regs->mis.bit.oemis)) {
-                        regs->icr.bit.oeic = 1;
+                if ((1 == regs->ris.b.oeris) && (1 == regs->mis.b.oemis)) {
+                        regs->icr.b.oeic = 1;
                         rpi4buart_dbgf(uartc, "Overrun Error IRQ\r\n");
                         rpi4bxwds_uartc_cb_rx_error(uartc);
                 }
@@ -211,32 +211,32 @@ xwer_t rpi4bxwds_uartc_drv_start(struct xwds_device * dev)
         regs->cr.u32 = 0U;
         regs->imsc.u32 = 0U;
         /* Attribute */
-        regs->lcrh.bit.wlen = uartcfg->bus.bits;
+        regs->lcrh.b.wlen = uartcfg->bus.bits;
         if (XWDS_UART_PARITY_NONE == uartcfg->bus.parity) {
-                regs->lcrh.bit.pen = 0U;
+                regs->lcrh.b.pen = 0U;
         } else {
-                regs->lcrh.bit.pen = 1U;
-                regs->imsc.bit.peim = 1U;
+                regs->lcrh.b.pen = 1U;
+                regs->imsc.b.peim = 1U;
                 if (XWDS_UART_PARITY_EVEN == uartcfg->bus.parity) {
-                        regs->lcrh.bit.eps = 1U;
+                        regs->lcrh.b.eps = 1U;
                 } else {
-                        regs->lcrh.bit.eps = 0U;
+                        regs->lcrh.b.eps = 0U;
                 }
         }
         if (XWDS_UART_HFC_RTS & uartcfg->bus.hfc) {
-                regs->cr.bit.rtsen = 1U;
+                regs->cr.b.rtsen = 1U;
         }
         if (XWDS_UART_HFC_CTS & uartcfg->bus.hfc) {
-                regs->cr.bit.ctsen = 1U;
-                regs->imsc.bit.ctsmim = 1U;
+                regs->cr.b.ctsen = 1U;
+                regs->imsc.b.ctsmim = 1U;
         }
         if (XWDS_UART_MODE_TX & uartcfg->bus.mode) {
-                regs->cr.bit.txe = 1U;
+                regs->cr.b.txe = 1U;
         }
         if (XWDS_UART_MODE_RX & uartcfg->bus.mode) {
-                regs->cr.bit.rxe = 1U;
-                regs->imsc.bit.rtim = 1U;
-                regs->imsc.bit.rxim = 1U;
+                regs->cr.b.rxe = 1U;
+                regs->imsc.b.rtim = 1U;
+                regs->imsc.b.rxim = 1U;
         }
 
         /* Baudrate */
@@ -248,23 +248,23 @@ xwer_t rpi4bxwds_uartc_drv_start(struct xwds_device * dev)
         regs->fbrd.u32 = (xwu32_t)fractional;
 
         /* FIFO */
-        regs->ifls.bit.txiflsel = SOC_UART_IFLS_FIFO_1_8;
-        regs->ifls.bit.rxiflsel = SOC_UART_IFLS_FIFO_1_2;
-        regs->lcrh.bit.fen = 1U;
+        regs->ifls.b.txiflsel = SOC_UART_IFLS_FIFO_1_8;
+        regs->ifls.b.rxiflsel = SOC_UART_IFLS_FIFO_1_2;
+        regs->lcrh.b.fen = 1U;
 
         /* IRQs */
-        regs->imsc.bit.oeim = 1U;
-        regs->imsc.bit.beim = 1U;
-        regs->imsc.bit.feim = 1U;
+        regs->imsc.b.oeim = 1U;
+        regs->imsc.b.beim = 1U;
+        regs->imsc.b.feim = 1U;
 
         armv8a_gic_irq_set_isr(soccfg->irqn, rpi4bxwds_uartc_isr);
         armv8a_gic_irq_set_priority(soccfg->irqn, armv8a_gic_get_max_priority());
         armv8a_gic_irq_set_trigger_type(soccfg->irqn, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
         armv8a_gic_irq_set_affinity_lc(soccfg->irqn);
         armv8a_gic_irq_enable(soccfg->irqn);
-        armv8a_gic_irq_dump(soccfg->irqn);
+        /* armv8a_gic_irq_dump(soccfg->irqn); */
 
-        regs->cr.bit.uarten = 1U;
+        regs->cr.b.uarten = 1U;
         rpi4buart_dbgf(uartc, "Start RPi4B UART.\r\n");
         return XWOK;
 }
@@ -282,7 +282,7 @@ xwer_t rpi4bxwds_uartc_drv_stop(struct xwds_device * dev)
         regs = (volatile struct soc_uart_regs *)soccfg->regbase;
 
         regs->imsc.u32 = 0U;
-        regs->cr.bit.uarten = 0;
+        regs->cr.b.uarten = 0;
         rpi4buart_dbgf(uartc, "Stop RPi4B UART.\r\n");
         return XWOK;
 }
@@ -329,10 +329,10 @@ xwer_t rpi4bxwds_uartc_drv_tx(struct xwds_uartc * uartc,
         while (wrsz > 0) {
                 xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &cpuirq);
                 drvdata->tx.rc = -EINPROGRESS;
-                for (i = 0; ((i < wrsz) && (0U == regs->fr.bit.txff)); i++, pos++) {
+                for (i = 0; ((i < wrsz) && (0U == regs->fr.b.txff)); i++, pos++) {
                         regs->dr = *pos;
                 }
-                regs->imsc.bit.txim = 1U;
+                regs->imsc.b.txim = 1U;
                 rc = xwos_cond_wait_to(&drvdata->tx.completion,
                                        ulk, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
@@ -366,7 +366,7 @@ xwer_t rpi4bxwds_uartc_drv_putc(struct xwds_uartc * uartc,
         uartcfg = uartc->cfg;
         soccfg = uartcfg->soccfg;
         regs = (volatile struct soc_uart_regs *)soccfg->regbase;
-        while (1U == regs->fr.bit.txff) {
+        while (1U == regs->fr.b.txff) {
         }
         regs->dr = byte;
         return XWOK;
@@ -393,31 +393,31 @@ const struct xwds_uartc_driver rpi4bxwds_uartc_drv = {
 /******** UART5 ********/
 void rpi4bxwds_uart5_pin_init(void)
 {
-        soc_gpio.gpfsel1.bit.fsel12 = SOC_GPIO_ALT4;
-        soc_gpio.gpfsel1.bit.fsel13 = SOC_GPIO_ALT4;
-        soc_gpio.gpio_pup_pdn_cntrl_reg0.bit.pin12 = SOC_GPIO_PUPDC_PU;
-        soc_gpio.gpio_pup_pdn_cntrl_reg0.bit.pin13 = SOC_GPIO_PUPDC_PU;
+        soc_gpio.gpfsel1.b.fsel12 = SOC_GPIO_ALT4;
+        soc_gpio.gpfsel1.b.fsel13 = SOC_GPIO_ALT4;
+        soc_gpio.gpio_pup_pdn_cntrl_reg0.b.pin12 = SOC_GPIO_PUPDC_PU;
+        soc_gpio.gpio_pup_pdn_cntrl_reg0.b.pin13 = SOC_GPIO_PUPDC_PU;
 }
 
 void rpi4bxwds_uart5_pin_fini(void)
 {
-        soc_gpio.gpfsel1.bit.fsel12 = SOC_GPIO_ALT_GPI;
-        soc_gpio.gpfsel1.bit.fsel13 = SOC_GPIO_ALT_GPI;
-        soc_gpio.gpio_pup_pdn_cntrl_reg0.bit.pin12 = SOC_GPIO_PUPDC_NO;
-        soc_gpio.gpio_pup_pdn_cntrl_reg0.bit.pin13 = SOC_GPIO_PUPDC_NO;
+        soc_gpio.gpfsel1.b.fsel12 = SOC_GPIO_ALT_GPI;
+        soc_gpio.gpfsel1.b.fsel13 = SOC_GPIO_ALT_GPI;
+        soc_gpio.gpio_pup_pdn_cntrl_reg0.b.pin12 = SOC_GPIO_PUPDC_NO;
+        soc_gpio.gpio_pup_pdn_cntrl_reg0.b.pin13 = SOC_GPIO_PUPDC_NO;
 }
 
 __xwcc_alignl1cache xwu8_t rpi4bxwds_uart5_rxq[8192U] = {0};
 
 const struct rpi4bxwds_uartc_cfg rpi4bxwds_uart5_soc_cfg = {
         .regbase = SOC_UART5_REGBASE,
-        .irqn = 57 + SOC_GIC2_IRQn_OFFSET_VC,
+        .irqn = SOC_VC_IRQ_UART,
         .pin_init = rpi4bxwds_uart5_pin_init,
         .pin_fini = rpi4bxwds_uart5_pin_fini,
 };
 
 const struct xwds_uart_cfg rpi4bxwds_uart5_cfg = {
-        .baudrate = 1000000U,
+        .baudrate = 2000000U,
         .bus = {
                 .bits = XWDS_UART_BITS_8,
                 .stopbits = XWDS_UART_STOPBITS_1_0,

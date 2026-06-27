@@ -155,9 +155,9 @@ void soc_init(void)
         }
         armv8a_gic2_init_cpuif();
 
-        soc_infof("BCM2711",
-                  "******** Start XWOS on CPU%d@EL%d ********\n\r",
-                  cpuid, el);
+        soc_dbgf("BCM2711",
+                 "******** Start XWOS on CPU%d@EL%d ********\n\r",
+                 cpuid, el);
 }
 
 __xwcc_section(".armv8a.percpu.stack") __xwcc_aligned(0x800)

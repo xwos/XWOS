@@ -45,7 +45,7 @@ void soc_logf(const char * fmt, ...)
         i = xwvsnpf(buf, sizeof(buf), fmt, args);
         va_end(args);
         if (i > 0) {
-               soc_console_puts(buf);
+                soc_console_write((xwu8_t *)buf, i);
         }
 }
 

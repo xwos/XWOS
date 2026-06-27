@@ -51,7 +51,7 @@ xwer_t xwospl_syshwt_start(struct xwospl_syshwt * hwt)
 {
         XWOS_UNUSED(hwt);
         armv8a_cnthp_init(XWOSPL_SYSHWT_HZ, xwospl_syshwt_timeout_callback);
-        armv8a_gic_irq_dump(ARMV8A_IRQn_CNTHP);
+        /* armv8a_gic_irq_dump(ARMV8A_IRQn_CNTHP); */
         return XWOK;
 }
 

@@ -33,6 +33,10 @@ void rpi4bxwds_init(void);
 void rpi4bxwds_fini(void);
 
 /******** ******** uart ******** ********/
+extern struct xwds_uartc rpi4bxwds_miniuart;
+xwer_t rpi4bxwds_miniuart_init(void);
+xwer_t rpi4bxwds_miniuart_fini(void);
+
 extern struct xwds_uartc rpi4bxwds_uart5;
 xwer_t rpi4bxwds_uart_init(void);
 xwer_t rpi4bxwds_uart_fini(void);

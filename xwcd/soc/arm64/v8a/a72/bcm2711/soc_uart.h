@@ -36,7 +36,7 @@ struct soc_uart_regs {
                         xwu32_t be:1;
                         xwu32_t oe:1;
                         xwu32_t reserved:28;
-                } bit;
+                } b;
                 xwu32_t u32;
         } rsrecr; /**< 0x04 */
 
@@ -54,7 +54,7 @@ struct soc_uart_regs {
                         xwu32_t txfe:1;
                         xwu32_t ri:1;
                         xwu32_t reserved:23;
-                } bit;
+                } b;
                 xwu32_t u32;
         } fr; /**< 0x18 flag register */
 
@@ -65,7 +65,7 @@ struct soc_uart_regs {
                 struct {
                         xwu32_t ibrd:16;
                         xwu32_t reserved:16;
-                } bit;
+                } b;
                 xwu32_t u32;
         } ibrd; /**< 0x24 Integer Baud rate divisor */
 
@@ -73,7 +73,7 @@ struct soc_uart_regs {
                 struct {
                         xwu32_t fbrd:6;
                         xwu32_t reserved:26;
-                } bit;
+                } b;
                 xwu32_t u32;
         } fbrd; /**< 0x28 Fractional Baud rate divisor */
 
@@ -91,7 +91,7 @@ struct soc_uart_regs {
                         xwu32_t wlen:2;
                         xwu32_t sps:1;
                         xwu32_t reserved:24;
-                } bit;
+                } b;
                 xwu32_t u32;
         } lcrh; /**< 0x2C Line Control register */
 
@@ -111,7 +111,7 @@ struct soc_uart_regs {
                         xwu32_t rtsen:1;
                         xwu32_t ctsen:1;
                         xwu32_t reserved1:16;
-                } bit;
+                } b;
                 xwu32_t u32;
         } cr; /**< 0x30 Control register */
 
@@ -127,7 +127,7 @@ struct soc_uart_regs {
                         xwu32_t txifpsel:3;
                         xwu32_t rxifpsel:3;
                         xwu32_t reserved:20;
-                } bit;
+                } b;
                 xwu32_t u32;
         } ifls; /**< 0x34 Interrupt FIFO Level Select Register */
 
@@ -145,7 +145,7 @@ struct soc_uart_regs {
                         xwu32_t beim:1;
                         xwu32_t oeim:1;
                         xwu32_t reserved0:21;
-                } bit;
+                } b;
                 xwu32_t u32;
         } imsc; /**< 0x38 Interrupt Mask Set Clear Register */
 
@@ -163,7 +163,7 @@ struct soc_uart_regs {
                         xwu32_t beris:1;
                         xwu32_t oeris:1;
                         xwu32_t reserved0:21;
-                } bit;
+                } b;
                 xwu32_t u32;
         } ris; /**< 0x3C Raw Interrupt Status Register */
 
@@ -181,7 +181,7 @@ struct soc_uart_regs {
                         xwu32_t bemis:1;
                         xwu32_t oemis:1;
                         xwu32_t reserved0:21;
-                } bit;
+                } b;
                 xwu32_t u32;
         } mis; /**< 0x40 Masked Interrupt Status Register */
 
@@ -199,7 +199,7 @@ struct soc_uart_regs {
                         xwu32_t beic:1;
                         xwu32_t oeic:1;
                         xwu32_t reserved0:21;
-                } bit;
+                } b;
                 xwu32_t u32;
         } icr; /**< 0x44 Interrupt Clear Register */
 
@@ -209,7 +209,7 @@ struct soc_uart_regs {
                         xwu32_t txdmae:1;
                         xwu32_t dmaonerr:1;
                         xwu32_t reserved0:29;
-                } bit;
+                } b;
                 xwu32_t u32;
         } dmacr; /**< 0x48 DMA Control Register */
 

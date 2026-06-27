@@ -39,7 +39,7 @@ struct soc_gpio_regs {
                         xwu32_t fsel8:3;
                         xwu32_t fsel9:3;
                         xwu32_t reserved0:2;
-                } bit;
+                } b;
         } gpfsel0; /**< 0x00 GPIO Function Select 0 */
         union {
                 xwu32_t u32;
@@ -55,7 +55,7 @@ struct soc_gpio_regs {
                         xwu32_t fsel18:3;
                         xwu32_t fsel19:3;
                         xwu32_t reserved0:2;
-                } bit;
+                } b;
         } gpfsel1; /**< 0x04 GPIO Function Select 1 */
         union {
                 xwu32_t u32;
@@ -71,7 +71,7 @@ struct soc_gpio_regs {
                         xwu32_t fsel28:3;
                         xwu32_t fsel29:3;
                         xwu32_t reserved0:2;
-                } bit;
+                } b;
         } gpfsel2; /**< 0x08 GPIO Function Select 2 */
         union {
                 xwu32_t u32;
@@ -87,7 +87,7 @@ struct soc_gpio_regs {
                         xwu32_t fsel38:3;
                         xwu32_t fsel39:3;
                         xwu32_t reserved0:2;
-                } bit;
+                } b;
         } gpfsel3; /**< 0x0C GPIO Function Select 3 */
         union {
                 xwu32_t u32;
@@ -103,7 +103,7 @@ struct soc_gpio_regs {
                         xwu32_t fsel48:3;
                         xwu32_t fsel49:3;
                         xwu32_t reserved0:2;
-                } bit;
+                } b;
         } gpfsel4; /**< 0x10 GPIO Function Select 4 */
         union {
                 xwu32_t u32;
@@ -117,7 +117,7 @@ struct soc_gpio_regs {
                         xwu32_t fsel56:3;
                         xwu32_t fsel57:3;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gpfsel5; /**< 0x14 GPIO Function Select 5 */
         xwu32_t reserved0; /**< 0x18 */
         union {
@@ -155,7 +155,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gpset0; /**< 0x1C GPIO Pin Output Set 0 */
         union {
                 xwu32_t u32;
@@ -187,7 +187,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gpset1; /**< 0x20 GPIO Pin Output Set 1 */
         xwu32_t reserved1; /**< 0x24 */
         union {
@@ -225,7 +225,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gpclr0; /**< 0x28 GPIO Pin Output Clear 0 */
         union {
                 xwu32_t u32;
@@ -257,7 +257,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gpclr1; /**< 0x2C GPIO Pin Output Clear 1 */
         xwu32_t reserved2; /**< 0x30 */
         union {
@@ -295,7 +295,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gplev0; /**< 0x34 GPIO Pin Level 0 */
         union {
                 xwu32_t u32;
@@ -327,7 +327,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gplev1; /**< 0x38 GPIO Pin Level 1 */
         xwu32_t reserved3; /**< 0x3C */
         union {
@@ -365,7 +365,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gpeds0; /**< 0x40 GPIO Pin Event Detect Status 0 */
         union {
                 xwu32_t u32;
@@ -397,7 +397,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gpeds1; /**< 0x44 GPIO Pin Event Detect Status 1 */
         xwu32_t reserved4; /**< 0x48 */
         union {
@@ -435,7 +435,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gpren0; /**< 0x4C GPIO Pin Rising Edge Detect Enable 0 */
         union {
                 xwu32_t u32;
@@ -467,7 +467,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gpren1; /**< 0x50 GPIO Pin Rising Edge Detect Enable 1 */
         xwu32_t reserved5; /**< 0x54 */
         union {
@@ -505,7 +505,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gpfen0; /**< 0x58 GPIO Pin Falling Edge Detect Enable 0 */
         union {
                 xwu32_t u32;
@@ -537,7 +537,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gpfen1; /**< 0x5C GPIO Pin Falling Edge Detect Enable 1 */
         xwu32_t reserved6; /**< 0x60 */
         union {
@@ -575,7 +575,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gphen0; /**< 0x64 GPIO Pin High Detect Enable 0 */
         union {
                 xwu32_t u32;
@@ -607,7 +607,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gphen1; /**< 0x68 GPIO Pin High Detect Enable 1 */
         xwu32_t reserved7; /**< 0x6C */
         union {
@@ -645,7 +645,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gplen0; /**< 0x70 GPIO Pin Low Detect Enable 0 */
         union {
                 xwu32_t u32;
@@ -677,7 +677,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gplen1; /**< 0x74 GPIO Pin Low Detect Enable 1 */
         xwu32_t reserved8; /**< 0x78 */
         union {
@@ -715,7 +715,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gparen0; /**< 0x7C GPIO Pin Async. Rising Edge Detect 0 */
         union {
                 xwu32_t u32;
@@ -747,7 +747,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gparen1; /**< 0x80 GPIO Pin Async. Rising Edge Detect 1 */
         xwu32_t reserved9; /**< 0x84 */
         union {
@@ -785,7 +785,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:1;
                         xwu32_t pin30:1;
                         xwu32_t pin31:1;
-                } bit;
+                } b;
         } gpafen0; /**< 0x88 GPIO Pin Async. Falling Edge Detect 0 */
         union {
                 xwu32_t u32;
@@ -817,7 +817,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
                         xwu32_t reserved0:8;
-                } bit;
+                } b;
         } gpafen1; /**< 0x8C GPIO Pin Async. Falling Edge Detect 1 */
         xwu32_t reserved10[21]; /**< 0x90 ~ 0xE0 */
         union {
@@ -839,7 +839,7 @@ struct soc_gpio_regs {
                         xwu32_t pin13:2;
                         xwu32_t pin14:2;
                         xwu32_t pin15:2;
-                } bit;
+                } b;
         } gpio_pup_pdn_cntrl_reg0; /**< 0xE4 GPIO Pull-up / Pull-down Register 0 */
         union {
                 xwu32_t u32;
@@ -860,7 +860,7 @@ struct soc_gpio_regs {
                         xwu32_t pin29:2;
                         xwu32_t pin30:2;
                         xwu32_t pin31:2;
-                } bit;
+                } b;
         } gpio_pup_pdn_cntrl_reg1; /**< 0xE8 GPIO Pull-up / Pull-down Register 1 */
         union {
                 xwu32_t u32;
@@ -881,7 +881,7 @@ struct soc_gpio_regs {
                         xwu32_t pin45:2;
                         xwu32_t pin46:2;
                         xwu32_t pin47:2;
-                } bit;
+                } b;
         } gpio_pup_pdn_cntrl_reg2; /**< 0xEC GPIO Pull-up / Pull-down Register 2 */
         union {
                 xwu32_t u32;
@@ -897,7 +897,7 @@ struct soc_gpio_regs {
                         xwu32_t pin56:2;
                         xwu32_t pin57:2;
                         xwu32_t reserved0:12;
-                } bit;
+                } b;
         } gpio_pup_pdn_cntrl_reg3; /**< 0xF0 GPIO Pull-up / Pull-down Register 3 */
 };
 
