@@ -217,16 +217,14 @@
 typedef union {
         struct {
                 xwu64_t type:2; /**< IA[0:1] type, must be 3U */
-                xwu64_t res0_0:10; /**< IA[2:11] */
-                xwu64_t nlta48_51:4; /**< IA[12:15] next-level address[48:51] */
+                xwu64_t res0_0:14; /**< IA[2:15] */
                 xwu64_t nlta16_47:32; /**< IA[16:47] next-level address[16:47] */
-                xwu64_t res0_1:3; /**< IA[48:50] */
-                xwu64_t res0_2:8; /**< IA[51:58] */
+                xwu64_t res0_1:11; /**< IA[48:58] */
                 xwu64_t pxn:1; /**< IA[59] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[60] The Unprivileged execute-never bit */
                 xwu64_t ap:2; /**< IA[61:62] AP */
                 xwu64_t ns:1; /**< IA[63] NS */
-        } b;
+        } td; /* Level 1/2 translation descriptor */
         xwu64_t u64;
 } armv8a_mmu_s1td64k_table_t;
 
@@ -242,18 +240,18 @@ typedef union {
                 xwu64_t sh:2; /**< IA[8:9] Shareability field */
                 xwu64_t af:1; /**< IA[10] The Access flag bit */
                 xwu64_t ng:1; /**< IA[11] The not global bit */
-                xwu64_t oa48_51:4; /**< IA[12:15] output address[48:51] */
+                xwu64_t res0_0:4; /**< IA[12:15] */
                 xwu64_t nt:1; /**< IA[16] ARMv8.3 FEAT_BBML1 */
-                xwu64_t res0_0:12; /**< IA[17:28] */
-                xwu64_t oa29_47:19; /**< IA[29:47] output address[29:47] */
-                xwu64_t res0_1:2; /**< IA[48:49] */
+                xwu64_t res0_1:25; /**< IA[17:41] */
+                xwu64_t oa42_47:6; /**< IA[42:47] output address[42:47] */
+                xwu64_t res0_2:2; /**< IA[48:49] */
                 xwu64_t gp:1; /**< IA[50] Guarded Page */
                 xwu64_t dbm:1; /**< IA[51] Dirty bit modifier */
                 xwu64_t contiguous:1; /**< IA[52] The contiguous bit */
                 xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
-                xwu64_t res0_2:9; /**< IA[55:63] */
-        } sz512m;
+                xwu64_t res0_3:9; /**< IA[55:63] */
+        } l1td4t; /* Level 1 translation descriptor, granule: 4TiB */
         struct {
                 xwu64_t type:2; /**< IA[0:1] type, must be 1U */
                 xwu64_t attridx:3; /**< IA[2:4] memory attribute selector */
@@ -262,18 +260,18 @@ typedef union {
                 xwu64_t sh:2; /**< IA[8:9] Shareability field */
                 xwu64_t af:1; /**< IA[10] The Access flag bit */
                 xwu64_t ng:1; /**< IA[11] The not global bit */
-                xwu64_t oa48_51:4; /**< IA[12:15] output address[48:51] */
+                xwu64_t res0_0:4; /**< IA[12:15] */
                 xwu64_t nt:1; /**< IA[16] ARMv8.3 FEAT_BBML1 */
-                xwu64_t res0_0:25; /**< IA[17:41] */
-                xwu64_t oa42_47:6; /**< IA[42:47] output address[42:47] */
-                xwu64_t res0_1:2; /**< IA[48:49] */
+                xwu64_t res0_1:12; /**< IA[17:28] */
+                xwu64_t oa29_47:19; /**< IA[29:47] output address[29:47] */
+                xwu64_t res0_2:2; /**< IA[48:49] */
                 xwu64_t gp:1; /**< IA[50] Guarded Page */
                 xwu64_t dbm:1; /**< IA[51] Dirty bit modifier */
                 xwu64_t contiguous:1; /**< IA[52] The contiguous bit */
                 xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
-                xwu64_t res0_2:9; /**< IA[55:63] */
-        } sz4t;
+                xwu64_t res0_3:9; /**< IA[55:63] */
+        } l2td512m; /* Level 2 translation descriptor, granule: 512MiB */
         xwu64_t u64;
 } armv8a_mmu_s1td64k_block_t;
 
@@ -289,16 +287,16 @@ typedef union {
                 xwu64_t sh:2; /**< IA[8:9] Shareability field */
                 xwu64_t af:1; /**< IA[10] The Access flag bit */
                 xwu64_t ng:1; /**< IA[11] The not global bit */
-                xwu64_t oa48_51:4; /**< IA[12:15] */
+                xwu64_t res0_0:4; /**< IA[12:15] */
                 xwu64_t oa16_47:32; /**< IA[16:47] output address[16:47] */
-                xwu64_t res0_0:2; /**< IA[48:49] */
+                xwu64_t res0_1:2; /**< IA[48:49] */
                 xwu64_t gp:1; /**< IA[50] Guarded Page */
                 xwu64_t dbm:1; /**< IA[51] Dirty bit modifier */
                 xwu64_t contiguous:1; /**< IA[52] The contiguous bit */
                 xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
-                xwu64_t res0_1:9; /**< IA[55:63] */
-        } sz64k;
+                xwu64_t res0_2:9; /**< IA[55:63] */
+        } l3td64k; /* Level 3 translation descriptor, granule: 512MiB */
         xwu64_t u64;
 } armv8a_mmu_s1td64k_page_t;
 
@@ -321,17 +319,14 @@ typedef union {
 typedef union {
         struct {
                 xwu64_t type:2; /**< IA[0:1] type, must be 3U */
-                xwu64_t res0_0:6; /**< IA[2:7] */
-                xwu64_t nlta50_51:2; /**< IA[8:9] next-level address[50:51] */
-                xwu64_t res0_1:4; /**< IA[10:13] */
-                xwu64_t nlta14_49:36; /**< IA[14:49] next-level address[14:49] */
-                xwu64_t res0_2:1; /**< IA[50] */
-                xwu64_t res0_3:8; /**< IA[51:58] */
+                xwu64_t res0_0:12; /**< IA[2:13] */
+                xwu64_t nlta14_47:34; /**< IA[14:47] next-level address[14:47] */
+                xwu64_t res0_1:11; /**< IA[48:58] */
                 xwu64_t pxn:1; /**< IA[59] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[60] The Unprivileged execute-never bit */
                 xwu64_t ap:2; /**< IA[61:62] AP */
                 xwu64_t ns:1; /**< IA[63] NS */
-        } b;
+        } td; /* Level 0/1/2 translation descriptor */
         xwu64_t u64;
 } armv8a_mmu_s1td16k_table_t;
 
@@ -347,7 +342,27 @@ typedef union {
                 xwu64_t sh:2; /**< IA[8:9] Shareability field */
                 xwu64_t af:1; /**< IA[10] The Access flag bit */
                 xwu64_t ng:1; /**< IA[11] The not global bit */
-                xwu64_t res0_0:4; /**< IA[12:15] output address[48:51] */
+                xwu64_t res0_0:4; /**< IA[12:15] */
+                xwu64_t nt:1; /**< IA[16] ARMv8.3 FEAT_BBML1 */
+                xwu64_t res0_1:30; /**< IA[17:46] */
+                xwu64_t oa47:1; /**< IA[47] output address[47] */
+                xwu64_t res0_2:2; /**< IA[48:49] */
+                xwu64_t gp:1; /**< IA[50] Guarded Page */
+                xwu64_t dbm:1; /**< IA[51] Dirty bit modifier */
+                xwu64_t contiguous:1; /**< IA[52] The contiguous bit */
+                xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
+                xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
+                xwu64_t res0_3:9; /**< IA[55:63] */
+        } l0td128t; /* Level 0 translation descriptor, granule: 128TiB */
+        struct {
+                xwu64_t type:2; /**< IA[0:1] type, must be 1U */
+                xwu64_t attridx:3; /**< IA[2:4] memory attribute selector */
+                xwu64_t ns:1; /**< IA[5] Non-secure */
+                xwu64_t ap:2; /**< IA[6:7] Data Access Permissions */
+                xwu64_t sh:2; /**< IA[8:9] Shareability field */
+                xwu64_t af:1; /**< IA[10] The Access flag bit */
+                xwu64_t ng:1; /**< IA[11] The not global bit */
+                xwu64_t res0_0:4; /**< IA[12:15] */
                 xwu64_t nt:1; /**< IA[16] ARMv8.3 FEAT_BBML1 */
                 xwu64_t res0_1:19; /**< IA[17:35] */
                 xwu64_t oa36_47:12; /**< IA[36:47] output address[36:47] */
@@ -358,7 +373,7 @@ typedef union {
                 xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
                 xwu64_t res0_3:9; /**< IA[55:63] */
-        } sz64g;
+        } l1td64g; /* Level 1 translation descriptor, granule: 64GiB */
         struct {
                 xwu64_t type:2; /**< IA[0:1] type, must be 1U */
                 xwu64_t attridx:3; /**< IA[2:4] memory attribute selector */
@@ -367,7 +382,7 @@ typedef union {
                 xwu64_t sh:2; /**< IA[8:9] Shareability field */
                 xwu64_t af:1; /**< IA[10] The Access flag bit */
                 xwu64_t ng:1; /**< IA[11] The not global bit */
-                xwu64_t res0_0:4; /**< IA[12:15] output address[48:51] */
+                xwu64_t res0_0:4; /**< IA[12:15] */
                 xwu64_t nt:1; /**< IA[16] ARMv8.3 FEAT_BBML1 */
                 xwu64_t res0_1:8; /**< IA[17:24] */
                 xwu64_t oa25_47:23; /**< IA[25:47] output address[25:47] */
@@ -378,7 +393,7 @@ typedef union {
                 xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
                 xwu64_t res0_3:9; /**< IA[55:63] */
-        } sz32m;
+        } l2td32m; /* Level 2 translation descriptor, granule: 32MiB */
         xwu64_t u64;
 } armv8a_mmu_s1td16k_block_t;
 
@@ -403,7 +418,7 @@ typedef union {
                 xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
                 xwu64_t res0_2:9; /**< IA[55:63] */
-        } sz4k;
+        } l3td16k; /* Level 3 translation descriptor, granule: 16KiB */
         xwu64_t u64;
 } armv8a_mmu_s1td16k_page_t;
 
@@ -427,17 +442,14 @@ typedef union {
 typedef union {
         struct {
                 xwu64_t type:2; /**< IA[0:1] type, must be 3U */
-                xwu64_t res0_0:6; /**< IA[2:7] */
-                xwu64_t nlta50_51:2; /**< IA[8:9] next-level address[50:51] */
-                xwu64_t res0_1:2; /**< IA[10:11] */
-                xwu64_t nlta12_49:38; /**< IA[12:49] next-level address[12:49] */
-                xwu64_t res0_2:1; /**< IA[50] */
-                xwu64_t res0_3:8; /**< IA[51:58] */
+                xwu64_t res0_0:10; /**< IA[2:11] */
+                xwu64_t nlta12_47:36; /**< IA[12:47] next-level address[12:47] */
+                xwu64_t res0_1:11; /**< IA[48:58] */
                 xwu64_t pxn:1; /**< IA[59] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[60] The Unprivileged execute-never bit */
                 xwu64_t ap:2; /**< IA[61:62] AP */
                 xwu64_t ns:1; /**< IA[63] NS */
-        } b;
+        } td; /* Level 0/1/2 translation descriptor */
         xwu64_t u64;
 } armv8a_mmu_s1td4k_table_t;
 
@@ -453,7 +465,27 @@ typedef union {
                 xwu64_t sh:2; /**< IA[8:9] Shareability field */
                 xwu64_t af:1; /**< IA[10] The Access flag bit */
                 xwu64_t ng:1; /**< IA[11] The not global bit */
-                xwu64_t res0_0:4; /**< IA[12:15] output address[48:51] */
+                xwu64_t res0_0:4; /**< IA[12:15] */
+                xwu64_t nt:1; /**< IA[16] ARMv8.3 FEAT_BBML1 */
+                xwu64_t res0_1:22; /**< IA[17:38] */
+                xwu64_t oa39_47:9; /**< IA[39:47] output address[39:47] */
+                xwu64_t res0_2:2; /**< IA[48:49] */
+                xwu64_t gp:1; /**< IA[50] Guarded Page */
+                xwu64_t dbm:1; /**< IA[51] Dirty bit modifier */
+                xwu64_t contiguous:1; /**< IA[52] The contiguous bit */
+                xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
+                xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
+                xwu64_t res0_3:9; /**< IA[55:63] */
+        } l0td512g; /* Level 0 translation descriptor, granule: 512GiB */
+        struct {
+                xwu64_t type:2; /**< IA[0:1] type, must be 1U */
+                xwu64_t attridx:3; /**< IA[2:4] memory attribute selector */
+                xwu64_t ns:1; /**< IA[5] Non-secure */
+                xwu64_t ap:2; /**< IA[6:7] Data Access Permissions */
+                xwu64_t sh:2; /**< IA[8:9] Shareability field */
+                xwu64_t af:1; /**< IA[10] The Access flag bit */
+                xwu64_t ng:1; /**< IA[11] The not global bit */
+                xwu64_t res0_0:4; /**< IA[12:15] */
                 xwu64_t nt:1; /**< IA[16] ARMv8.3 FEAT_BBML1 */
                 xwu64_t res0_1:13; /**< IA[17:29] */
                 xwu64_t oa30_47:18; /**< IA[30:47] output address[30:47] */
@@ -464,7 +496,7 @@ typedef union {
                 xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
                 xwu64_t res0_3:9; /**< IA[55:63] */
-        } sz1g;
+        } l1td1g; /* Level 1 translation descriptor, granule: 1GiB */
         struct {
                 xwu64_t type:2; /**< IA[0:1] type, must be 1U */
                 xwu64_t attridx:3; /**< IA[2:4] memory attribute selector */
@@ -473,7 +505,7 @@ typedef union {
                 xwu64_t sh:2; /**< IA[8:9] Shareability field */
                 xwu64_t af:1; /**< IA[10] The Access flag bit */
                 xwu64_t ng:1; /**< IA[11] The not global bit */
-                xwu64_t res0_0:4; /**< IA[12:15] output address[48:51] */
+                xwu64_t res0_0:4; /**< IA[12:15] */
                 xwu64_t nt:1; /**< IA[16] ARMv8.3 FEAT_BBML1 */
                 xwu64_t res0_1:4; /**< IA[17:20] */
                 xwu64_t oa21_47:27; /**< IA[21:47] output address[21:47] */
@@ -484,7 +516,7 @@ typedef union {
                 xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
                 xwu64_t res0_3:9; /**< IA[55:63] */
-        } sz2m;
+        } l2td2m; /* Level 2 translation descriptor, granule: 2MiB */
         xwu64_t u64;
 } armv8a_mmu_s1td4k_block_t;
 
@@ -508,7 +540,7 @@ typedef union {
                 xwu64_t pxn:1; /**< IA[53] The privileged execute-never bit */
                 xwu64_t uxn:1; /**< IA[54] The Unprivileged execute-never bit */
                 xwu64_t res0_1:9; /**< IA[55:63] */
-        } sz4k;
+        } l3td4k; /* Level 3 translation descriptor, granule: 4KiB */
         xwu64_t u64;
 } armv8a_mmu_s1td4k_page_t;
 
