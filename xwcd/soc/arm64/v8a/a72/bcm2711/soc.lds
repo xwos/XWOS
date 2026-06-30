@@ -26,7 +26,7 @@ SECTIONS {
         .boot : {
                 *(.armv8a.boot)
                 *(.armv8a.percpu.stack)
-        } > runtime_mr
+        } > xwos_mr
 
         .exception : {
                 *(.armv8a.exception.vector.el3)
@@ -35,7 +35,7 @@ SECTIONS {
                 *(.armv8a.exception.text.el3)
                 *(.armv8a.exception.text.el2)
                 *(.armv8a.exception.text.el1)
-        } > runtime_mr
+        } > xwos_mr
 
         .xwos.rx : ALIGN(16) {
                 *(.xwos.init.text)
@@ -45,7 +45,7 @@ SECTIONS {
                 *(.xwos.isr.text)
                 *(.xwos.text)
                 *(.xwos.rodata)
-        } > runtime_mr
+        } > xwos_mr
 
         .rx : ALIGN(16) {
                 KEEP (*(.init))
@@ -58,42 +58,42 @@ SECTIONS {
                 *(.glue_7t) /* glue thumb to arm code */
                 *(.vfp11_veneer) /* 用于VFP单元 */
                 *(.v4_bx) /* linker stubs */
-        } > runtime_mr
+        } > xwos_mr
 
         /* ++++++++ 以下与unwinding有关，用于异常处理和栈回溯 ++++++++ */
         .ARM.extab : ALIGN(16) { /* @ref aaelf32.pdf for details */
                 *(.ARM.extab* .gnu.linkonce.armextab.*)
-        } > runtime_mr
+        } > xwos_mr
 
         .ARM.exidx : ALIGN(16) { /* @ref aaelf32.pdf for details */
                 PROVIDE(__exidx_start = .);
                 *(.ARM.exidx* .gnu.linkonce.armexidx.*)
                 PROVIDE(__exidx_end = .);
-        } > runtime_mr
+        } > xwos_mr
 
         .eh_frame_hdr : ALIGN(16) { /* 用于栈展开 */
                 KEEP(*(.eh_frame_hdr .eh_frame_entry .eh_frame_entry.*))
-        } > runtime_mr
+        } > xwos_mr
 
         .sframe : ALIGN(16) { /* 用于栈展开 */
                 KEEP(*(.sframe .sframe.*))
-        } > runtime_mr
+        } > xwos_mr
 
         .eh_frame : ALIGN(16) { /* 用于栈展开 */
                 KEEP(*(.eh_frame .eh_frame.*))
-        } > runtime_mr
+        } > xwos_mr
 
         .gcc_except_table : ALIGN(16) { /* 用于try ... catch ... */
                 *(.gcc_except_table .gcc_except_table.*)
-        } > runtime_mr
+        } > xwos_mr
 
         .gnu_extab : ALIGN(16) {
                 *(.gnu_extab*)
-        } > runtime_mr
+        } > xwos_mr
 
         .exception_ranges : ALIGN(16) {
                 *(.exception_ranges*)
-        } > runtime_mr
+        } > xwos_mr
         /* -------- 以上与unwinding有关，用于异常处理和栈回溯 -------- */
 
         /* ++++++++ 以下与C++全局对象的构造函数与析构函数有关 ++++++++ */
@@ -102,7 +102,7 @@ SECTIONS {
                 KEEP (*(.preinit_array*))
                 PROVIDE_HIDDEN (__preinit_array_end = .);
                 preinit_array_vma_end = .;
-        } > runtime_mr
+        } > xwos_mr
         preinit_array_vma_base = ADDR(.preinit_array);
         preinit_array_lma_base = LOADADDR(.preinit_array);
 
@@ -112,7 +112,7 @@ SECTIONS {
                 KEEP (*(SORT_BY_INIT_PRIORITY(.ctors*)))
                 PROVIDE_HIDDEN (__init_array_end = .);
                 init_array_vma_end = .;
-        } > runtime_mr
+        } > xwos_mr
         init_array_vma_base = ADDR(.init_array);
         init_array_lma_base = LOADADDR(.init_array);
 
@@ -123,7 +123,7 @@ SECTIONS {
                 PROVIDE_HIDDEN (__fini_array_end = .);
                 fini_array_vma_end = .;
                 . = ALIGN(32);
-        } > runtime_mr
+        } > xwos_mr
         fini_array_vma_base = ADDR(.fini_array);
         fini_array_lma_base = LOADADDR(.fini_array);
         /* -------- 以上与C++全局对象的构造函数与析构函数有关 -------- */
@@ -134,14 +134,14 @@ SECTIONS {
         /* MCU静态连接的环境，C11标准中的thread_local 变量只能是以上两种模型。 */
         .got : ALIGN(16) {
                 *(.got.plt) *(.igot.plt) *(.got) *(.igot)
-        } > runtime_mr
+        } > xwos_mr
         /* -------- Global Offset Table -------- */
 
         .xwos.data : ALIGN(32) {
                 *(.xwos.data)
                 . = ALIGN(32);
                 xwos_data_vma_end = .;
-        } > runtime_mr
+        } > xwos_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
 
@@ -149,14 +149,14 @@ SECTIONS {
                 *(.data .data.* .gnu.linkonce.d.*)
                 . = ALIGN(32);
                 data_vma_end = .;
-        } > runtime_mr
+        } > xwos_mr
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
 
         .tdata : ALIGN(32) {
                 *(.tdata .tdata.* .gnu.linkonce.td.*)
                 tdata_vma_end = .;
-	} > runtime_mr
+	} > xwos_mr
         tdata_vma_base = ADDR(.tdata);
         tdata_lma_base = LOADADDR(.tdata);
 
@@ -164,7 +164,7 @@ SECTIONS {
                 *(.tbss .tbss.* .gnu.linkonce.tb.*)
                 *(.tcommon)
                 tbss_vma_end = .;
-        } > runtime_mr
+        } > xwos_mr
         tbss_vma_base = ADDR(.tbss);
         tbss_vma_offset = ADDR(.tbss) - ADDR(.tdata);
         tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
@@ -176,13 +176,13 @@ SECTIONS {
                 *(COMMON)
                 . = ALIGN(16);
                 bss_vma_end = .;
-        } > runtime_mr
+        } > xwos_mr
         bss_vma_base = ADDR(.bss);
 
         .mempool : ALIGN(0x10000) {
                 . = ALIGN(0x10000);
                 PROVIDE(mempool_mr_origin = .);
-        } > runtime_mr
+        } > xwos_mr
 
         /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */
         .rel.dyn : {

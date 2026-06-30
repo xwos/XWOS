@@ -19,10 +19,11 @@
  */
 
 MEMORY {
-        ram_mr (rwx): org = 0x0, len = 8192M /* RAM */
-        periph_mr (rw): org = 0x400000000, len = 8192M /* Peripherals */
+        ram_mr (rwx): org = 0x0, len = 8192M /* Ram */
+        periph_mr (rw): org = 0x400000000, len = 16384M /* Peripherals */
 
-        runtime_mr (rwx): org = 0x80000, len = 8388096K /* code */
+        mmu_mr (rwx): org = 0x1F0000000, len = 256M
+        xwos_mr (rwx): org = 0x80000, len = 256M
 }
 
 ram_mr_origin = ORIGIN(ram_mr);
@@ -30,5 +31,8 @@ ram_mr_size = LENGTH(ram_mr);
 
 periph_mr_origin = ORIGIN(periph_mr);
 periph_mr_size = LENGTH(periph_mr);
+
+mmu_mr_origin = ORIGIN(mmu_mr);
+mmu_mr_size = LENGTH(mmu_mr);
 
 INCLUDE soc.lds

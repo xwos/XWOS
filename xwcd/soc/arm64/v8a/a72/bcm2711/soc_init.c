@@ -172,12 +172,23 @@ xwu8_t soc_percpu_stack[CPUCFG_CPU_NUM][CPUCFG_CPU_STACK_SIZE];
 __xwcc_section(".armv8a.boot")
 void soc_percpu_boot(void)
 {
+        /* 关闭IRQ */
         __asm__ volatile(
         "       msr     daifclr, #0xC\n"
         "       msr     daifset, #0x3\n"
         : : :
         );
-        /* get stack */
+        /* 若XWOS运行在不正确的地址，跳转到正确地址 */
+        __asm__ volatile(
+        "       movz    x0, #:abs_g3:abs_boot_entry\n"
+        "       movk    x0, #:abs_g2_nc:abs_boot_entry\n"
+        "       movk    x0, #:abs_g1_nc:abs_boot_entry\n"
+        "       movk    x0, #:abs_g0_nc:abs_boot_entry\n"
+        "       br      x0\n"
+        "abs_boot_entry:\n"
+        : : : "x0"
+        );
+        /* 为每个CPU准备中断函数栈 */
         __asm__ volatile(
         "       msr     spsel, #1\n"
         "       mrs     x0, mpidr_el1\n"
