@@ -21,4 +21,4 @@
 #include "board/std.h"
 #include "board/mempool.h"
 
-struct xwmm_mempool * newlibac_mempool = &board_mempool;
+struct xwmm_mempool * newlibac_mempool = &mempool_allocator;

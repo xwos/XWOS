@@ -179,9 +179,8 @@ SECTIONS {
         } > xwos_mr
         bss_vma_base = ADDR(.bss);
 
-        .mempool : ALIGN(0x10000) {
-                . = ALIGN(0x10000);
-                PROVIDE(mempool_mr_origin = .);
+        .mempool.allocator : ALIGN(0x1000) {
+                PROVIDE(mempool_allocator = .);
         } > xwos_mr
 
         /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */

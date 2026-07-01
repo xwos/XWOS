@@ -25,13 +25,9 @@
 #include <xwos/lib/xwaop.h>
 #include "board/xwac/xwds/device.h"
 
-extern void * mempool_mr_origin[];
-
-#define BOARD_MEMPOOL_MR_SIZE (8U * 1024U * 1024U)
-#define BOARD_MEMPOOL_MR_ORDER (11U)
-
-__xwbsp_data
-XWMM_MEMPOOL_RAWOBJ_DEF(board_mempool, BOARD_MEMPOOL_MR_ORDER);
+extern struct xwmm_mempool mempool_allocator;
+extern xwu64_t * ram_mr_origin[];
+extern xwu64_t * ram_mr_size[];
 
 /**
  * @brief 初始化内存管理
@@ -40,12 +36,14 @@ __xwbsp_init_code
 void board_mm_init(void)
 {
         xwer_t rc;
+        xwssq_t odr;
 
-        rc = xwmm_mempool_init((struct xwmm_mempool *)&board_mempool, "mempool",
-                               (xwptr_t)mempool_mr_origin,
-                               (xwsz_t)BOARD_MEMPOOL_MR_SIZE,
-                               (xwsz_t)BOARD_MEMPOOL_MR_ORDER,
-                               (xwsz_t)0, NULL);
+        odr = xwbop_fls(xwsz_t, (xwu64_t)ram_mr_size / XWMM_MEMPOOL_PAGE_SIZE);
+        rc = xwmm_mempool_init(&mempool_allocator, "mempool",
+                               (xwptr_t)ram_mr_origin,
+                               (xwsz_t)ram_mr_size,
+                               (xwsz_t)odr,
+                               (xwsz_t)0x40000000, NULL);
         BOARD_BUG_ON(rc < 0);
 }
 

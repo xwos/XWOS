@@ -30,7 +30,7 @@ xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
         } mem;
         xwer_t rc;
 
-        rc = xwmm_mempool_malloc(&board_mempool, stack_size, &mem.anon);
+        rc = xwmm_mempool_malloc(&mempool_allocator, stack_size, &mem.anon);
         if (XWOK == rc) {
                 *membuf = mem.stk;
         } else {
@@ -42,5 +42,5 @@ xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
 __xwos_code
 xwer_t board_thd_stack_pool_free(xwstk_t * stk)
 {
-        return xwmm_mempool_free(&board_mempool, stk);
+        return xwmm_mempool_free(&mempool_allocator, stk);
 }

@@ -22,8 +22,8 @@ MEMORY {
         ram_mr (rwx): org = 0x0, len = 8192M /* Ram */
         periph_mr (rw): org = 0x400000000, len = 16384M /* Peripherals */
 
-        mmu_mr (rwx): org = 0x1F0000000, len = 256M
-        xwos_mr (rwx): org = 0x80000, len = 256M
+        mmu_mr (rwx): org = 0x18000000, len = 128M
+        xwos_mr (rwx): org = 0x80000, len = 392704K
 }
 
 ram_mr_origin = ORIGIN(ram_mr);

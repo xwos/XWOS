@@ -34,6 +34,6 @@
  *   + 释放：xwmm_mempool_free(&board_mempool, ...)
  *   + 重新申请：xwmm_mempool_realloc(&board_mempool, ...)
  */
-extern struct xwmm_mempool board_mempool;
+extern struct xwmm_mempool mempool_allocator;
 
 #endif /* board/mempool.h */
