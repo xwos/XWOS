@@ -59,10 +59,10 @@ $(XWMO_RUSTLIB):
 #	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) fix --lib -p xwrust --allow-dirty -Zjson-target-spec --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
 
 doc:
-	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) doc --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
+	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) doc -Zjson-target-spec --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
 
 rustdoc:
-	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) rustdoc --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
+	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) rustdoc -Zjson-target-spec --target=$(XWOS_PATH)/$(XWOS_CPU_DIR)/$(RUST_TARGET).json $(CARGO_BUILD_FLAGS)
 
 clean:
 	@$(RM) -f $(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
