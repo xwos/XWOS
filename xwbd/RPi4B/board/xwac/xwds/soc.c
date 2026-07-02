@@ -24,6 +24,8 @@
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_gpio.h>
+#include <xwcd/soc/arm64/v8a/arch_gic2.h>
+#include <xwcd/ds/soc/eirq.h>
 #include "board/xwac/xwds/device.h"
 #include "board/xwac/xwds/soc.h"
 
@@ -86,6 +88,20 @@ xwer_t rpi4bxwds_soc_drv_gpio_input(struct xwds_soc * soc,
                                     xwid_t port, xwsq_t pinmask,
                                     xwsq_t * in);
 
+static
+xwer_t rpi4bxwds_soc_drv_eirq_req(struct xwds_soc * soc,
+                                  xwid_t port, xwsq_t pinmask,
+                                  xwid_t eiid, xwsq_t eiflag);
+
+static
+xwer_t rpi4bxwds_soc_drv_eirq_rls(struct xwds_soc * soc,
+                                  xwid_t port, xwsq_t pinmask,
+                                  xwid_t eiid);
+
+static void rpi4bxwds_soc_eirq_bank0_isr(void);
+static void rpi4bxwds_soc_eirq_bank1_isr(void);
+static void rpi4bxwds_soc_eirq_bank2_isr(void);
+
 const struct xwds_soc_driver rpi4bxwds_soc_drv = {
         .base = {
                 .name = "rpi4bxwds.soc",
@@ -109,8 +125,8 @@ const struct xwds_soc_driver rpi4bxwds_soc_drv = {
         .gpio_read_output = NULL,
         .gpio_input = rpi4bxwds_soc_drv_gpio_input,
 
-        .eirq_req = NULL,
-        .eirq_rls = NULL,
+        .eirq_req = rpi4bxwds_soc_drv_eirq_req,
+        .eirq_rls = rpi4bxwds_soc_drv_eirq_rls,
 };
 
 atomic_xwsq_t rpi4bxwds_gpio_pin_state[] = {
@@ -120,6 +136,10 @@ atomic_xwsq_t rpi4bxwds_gpio_pin_state[] = {
 struct rpi4bxwds_soc_driver_data rpi4bxwds_soc_drvdata = {
         .splk = XWOS_SPLK_INITIALIZER,
 };
+
+#define RPI4B_EIRQ_NUM  58U
+static xwds_eirq_f rpi4bxwds_eirq_isrs[RPI4B_EIRQ_NUM];
+static xwds_eirq_arg_t rpi4bxwds_eirq_isrargs[RPI4B_EIRQ_NUM];
 
 struct xwds_soc rpi4bxwds_soc = {
         .dev = {
@@ -137,9 +157,9 @@ struct xwds_soc rpi4bxwds_soc = {
                 .pin_num = 58,
         },
         .eirq = {
-                .isrs = NULL,
-                .isrargs = NULL,
-                .num = 0,
+                .isrs = rpi4bxwds_eirq_isrs,
+                .isrargs = rpi4bxwds_eirq_isrargs,
+                .num = RPI4B_EIRQ_NUM,
         },
 };
 
@@ -151,6 +171,25 @@ xwer_t rpi4bxwds_soc_drv_probe(struct xwds_device * dev)
 
         drvdata = dev->data;
         xwos_splk_init(&drvdata->splk);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_GPIO0, rpi4bxwds_soc_eirq_bank0_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_GPIO0, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_GPIO0, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_GPIO0);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_GPIO0);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_GPIO1, rpi4bxwds_soc_eirq_bank1_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_GPIO1, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_GPIO1, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_GPIO1);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_GPIO1);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_GPIO2, rpi4bxwds_soc_eirq_bank2_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_GPIO2, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_GPIO2, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_GPIO2);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_GPIO2);
+
         return XWOK;
 }
 
@@ -487,5 +526,180 @@ xwer_t rpi4bxwds_soc_drv_gpio_input(struct xwds_soc * soc,
                 result |= (xwsq_t)(soc_gpio.gplev1.u32 & mask_hi) << 32U;
         }
         *in = result;
+        return XWOK;
+}
+
+/******** ******** EIRQ operation driver ******** ********/
+#define EIRQ_BANK0_PIN_LO   0U
+#define EIRQ_BANK0_PIN_HI   27U
+#define EIRQ_BANK1_PIN_LO   28U
+#define EIRQ_BANK1_PIN_HI   45U
+#define EIRQ_BANK2_PIN_LO   46U
+#define EIRQ_BANK2_PIN_HI   57U
+
+static inline
+xwu32_t rpi4bxwds_eirq_pin_bit(xwsq_t pin)
+{
+        return (xwu32_t)(1U << (pin & 0x1FU));
+}
+
+static
+void rpi4bxwds_soc_eirq_bank0_isr(void)
+{
+        struct xwds_soc * soc;
+        xwu32_t eds;
+        xwsq_t p;
+
+        soc = &rpi4bxwds_soc;
+        eds = soc_gpio.gpeds0.u32;
+        soc_gpio.gpeds0.u32 = eds;
+        for (p = EIRQ_BANK0_PIN_LO; p <= EIRQ_BANK0_PIN_HI; p++) {
+                if ((eds & rpi4bxwds_eirq_pin_bit(p)) &&
+                    (soc->eirq.isrs[p])) {
+                        soc->eirq.isrs[p](soc, (xwid_t)p, soc->eirq.isrargs[p]);
+                }
+        }
+}
+
+static
+void rpi4bxwds_soc_eirq_bank1_isr(void)
+{
+        struct xwds_soc * soc;
+        xwu32_t eds0;
+        xwu32_t eds1;
+        xwsq_t p;
+
+        soc = &rpi4bxwds_soc;
+        eds0 = soc_gpio.gpeds0.u32;
+        eds1 = soc_gpio.gpeds1.u32;
+        soc_gpio.gpeds0.u32 = eds0;
+        soc_gpio.gpeds1.u32 = eds1;
+        for (p = EIRQ_BANK1_PIN_LO; p <= 31U; p++) {
+                if ((eds0 & rpi4bxwds_eirq_pin_bit(p)) &&
+                    (soc->eirq.isrs[p])) {
+                        soc->eirq.isrs[p](soc, (xwid_t)p, soc->eirq.isrargs[p]);
+                }
+        }
+        for (p = 32U; p <= EIRQ_BANK1_PIN_HI; p++) {
+                if ((eds1 & rpi4bxwds_eirq_pin_bit(p)) &&
+                    (soc->eirq.isrs[p])) {
+                        soc->eirq.isrs[p](soc, (xwid_t)p, soc->eirq.isrargs[p]);
+                }
+        }
+}
+
+static
+void rpi4bxwds_soc_eirq_bank2_isr(void)
+{
+        struct xwds_soc * soc;
+        xwu32_t eds;
+        xwsq_t p;
+
+        soc = &rpi4bxwds_soc;
+        eds = soc_gpio.gpeds1.u32;
+        soc_gpio.gpeds1.u32 = eds;
+        for (p = EIRQ_BANK2_PIN_LO; p <= EIRQ_BANK2_PIN_HI; p++) {
+                if ((eds & rpi4bxwds_eirq_pin_bit(p)) &&
+                    (soc->eirq.isrs[p])) {
+                        soc->eirq.isrs[p](soc, (xwid_t)p, soc->eirq.isrargs[p]);
+                }
+        }
+}
+
+static
+xwer_t rpi4bxwds_soc_drv_eirq_req(struct xwds_soc * soc,
+                                  xwid_t port, xwsq_t pinmask,
+                                  xwid_t eiid, xwsq_t eiflag)
+{
+        struct rpi4bxwds_soc_driver_data * drvdata;
+        xwu32_t bit;
+        xwreg_t cpuirq;
+
+        XWOS_UNUSED(port);
+        XWOS_UNUSED(pinmask);
+
+        drvdata = soc->dev.data;
+        bit = rpi4bxwds_eirq_pin_bit(eiid);
+        if (eiid < (xwid_t)32U) {
+                xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+                if (XWDS_SOC_EIF_TM_RISING & eiflag) {
+                        soc_gpio.gparen0.u32 |= bit;
+                } else {
+                        soc_gpio.gparen0.u32 &= ~bit;
+                }
+                if (XWDS_SOC_EIF_TM_FALLING & eiflag) {
+                        soc_gpio.gpafen0.u32 |= bit;
+                } else {
+                        soc_gpio.gpafen0.u32 &= ~bit;
+                }
+                if (XWDS_SOC_EIF_TM_HIGH & eiflag) {
+                        soc_gpio.gphen0.u32 |= bit;
+                } else {
+                        soc_gpio.gphen0.u32 &= ~bit;
+                }
+                if (XWDS_SOC_EIF_TM_LOW & eiflag) {
+                        soc_gpio.gplen0.u32 |= bit;
+                } else {
+                        soc_gpio.gplen0.u32 &= ~bit;
+                }
+                xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        } else {
+                xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+                if (XWDS_SOC_EIF_TM_RISING & eiflag) {
+                        soc_gpio.gparen1.u32 |= bit;
+                } else {
+                        soc_gpio.gparen1.u32 &= ~bit;
+                }
+                if (XWDS_SOC_EIF_TM_FALLING & eiflag) {
+                        soc_gpio.gpafen1.u32 |= bit;
+                } else {
+                        soc_gpio.gpafen1.u32 &= ~bit;
+                }
+                if (XWDS_SOC_EIF_TM_HIGH & eiflag) {
+                        soc_gpio.gphen1.u32 |= bit;
+                } else {
+                        soc_gpio.gphen1.u32 &= ~bit;
+                }
+                if (XWDS_SOC_EIF_TM_LOW & eiflag) {
+                        soc_gpio.gplen1.u32 |= bit;
+                } else {
+                        soc_gpio.gplen1.u32 &= ~bit;
+                }
+                xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        }
+        return XWOK;
+}
+
+static
+xwer_t rpi4bxwds_soc_drv_eirq_rls(struct xwds_soc * soc,
+                                  xwid_t port, xwsq_t pinmask,
+                                  xwid_t eiid)
+{
+        struct rpi4bxwds_soc_driver_data * drvdata;
+        xwu32_t bit;
+        xwreg_t cpuirq;
+
+        XWOS_UNUSED(port);
+        XWOS_UNUSED(pinmask);
+
+        drvdata = soc->dev.data;
+        bit = rpi4bxwds_eirq_pin_bit(eiid);
+        if (eiid < (xwid_t)32U) {
+                xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+                soc_gpio.gparen0.u32 &= ~bit;
+                soc_gpio.gpafen0.u32 &= ~bit;
+                soc_gpio.gphen0.u32 &= ~bit;
+                soc_gpio.gplen0.u32 &= ~bit;
+                soc_gpio.gpeds0.u32 = bit;
+                xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        } else {
+                xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+                soc_gpio.gparen1.u32 &= ~bit;
+                soc_gpio.gpafen1.u32 &= ~bit;
+                soc_gpio.gphen1.u32 &= ~bit;
+                soc_gpio.gplen1.u32 &= ~bit;
+                soc_gpio.gpeds1.u32 = bit;
+                xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        }
         return XWOK;
 }
