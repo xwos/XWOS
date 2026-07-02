@@ -32,6 +32,8 @@
 #  define SOC_ARM_LOCAL_PERI_BASE 0xFF800000UL
 #endif
 
+#define SOC_PACTL_REGBASE (SOC_MAIN_PERI_BASE + 0x02204E00UL)
+
 #define SOC_AUX_REGBASE (SOC_MAIN_PERI_BASE + 0x02215000UL)
 
 #define SOC_BSC0_REGBASE (SOC_MAIN_PERI_BASE + 0x02205000UL)
@@ -42,6 +44,7 @@
 #define SOC_BSC6_REGBASE (SOC_MAIN_PERI_BASE + 0x02205C00UL)
 
 #define SOC_DMA_REGBASE (SOC_MAIN_PERI_BASE + 0x02007000UL)
+#define SOC_DMA_GLOBAL_REGBASE (SOC_DMA_REGBASE + 0xF00UL)
 #define SOC_DMA0_REGBASE (SOC_DMA_REGBASE + 0x000UL)
 #define SOC_DMA1_REGBASE (SOC_DMA_REGBASE + 0x100UL)
 #define SOC_DMA2_REGBASE (SOC_DMA_REGBASE + 0x200UL)
@@ -90,6 +93,39 @@
 #define SOC_UART5_REGBASE (SOC_MAIN_PERI_BASE + 0x02201A00UL)
 
 #define SOC_TIMER_REGBASE (SOC_MAIN_PERI_BASE + 0x0200B000UL)
+
+union soc_pactl_reg {
+        xwu32_t u32;
+        struct {
+                xwu32_t spi0_irq:1;
+                xwu32_t spi1_irq:1;
+                xwu32_t spi2_irq:1;
+                xwu32_t spi3_irq:1;
+                xwu32_t spi4_irq:1;
+                xwu32_t spi5_irq:1;
+                xwu32_t spi6_irq:1;
+                xwu32_t reserved0:1;
+                xwu32_t i2c0_irq:1;
+                xwu32_t i2c1_irq:1;
+                xwu32_t i2c2_irq:1;
+                xwu32_t i2c3_irq:1;
+                xwu32_t i2c4_irq:1;
+                xwu32_t i2c5_irq:1;
+                xwu32_t i2c6_irq:1;
+                xwu32_t i2c7_irq:1;
+                xwu32_t uart5_irq:1;
+                xwu32_t uart4_irq:1;
+                xwu32_t uart3_irq:1;
+                xwu32_t uart2_irq:1;
+                xwu32_t uart0_irq:1;
+                xwu32_t reserved1:2;
+                xwu32_t dma_ctrl_mux_2:1;
+                xwu32_t dma_ctrl_mux_0:1;
+                xwu32_t dma_ctrl_mux_1:1;
+                xwu32_t reserved2:6;
+        } b;
+};
+#define soc_pactl (*((volatile union soc_pactl_reg *)SOC_PACTL_REGBASE))
 
 struct soc_armlocal_regs {
         xwu32_t arm_control; /**< 0x0*/
