@@ -46,10 +46,10 @@
 #define BITS_PER_UINT           32U
 #define UINT_SHIFT              5U
 
-#define BITS_PER_LONG           32U
-#define LONG_SHIFT              5U
-#define BITS_PER_ULONG          32U
-#define LONG_SHIFT              5U
+#define BITS_PER_LONG           64U
+#define LONG_SHIFT              6U
+#define BITS_PER_ULONG          64U
+#define ULONG_SHIFT             6U
 
 #define BITS_PER_LLONG          64U
 #define LLONG_SHIFT             6U
