@@ -1,0 +1,10 @@
+schema: spec-driven
+
+context: |
+  语言: 简体中文
+  上下文: AGENTS.md
+  领域: 嵌入式
+
+rules:
+  tasks:
+    - 将任务分解为最多2小时的块

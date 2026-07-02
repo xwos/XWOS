@@ -1,0 +1,157 @@
+---
+description: 归档已完成的变更
+---
+
+归档已完成的变更。
+
+**输入**：可选在 `/opsx-archive` 后指定变更名称（如 `/opsx-archive add-auth`）。如果省略，检查是否可以从对话上下文推断。如果模糊或不明确，你必须提示用户选择可用变更。
+
+**步骤**
+
+1. **如果未提供变更名称，提示用户选择**
+
+   运行 `openspec-cn list --json` 获取可用变更。使用 **AskUserQuestion tool** 让用户选择。
+
+   仅显示活跃变更（未归档的）。
+   如果可用，显示每个变更使用的 Schema。
+
+   **重要**：不要猜测或自动选择变更。始终让用户选择。
+
+2. **检查产出物完成状态**
+
+   运行 `openspec-cn status --change "<name>" --json` 检查产出物完成情况。
+
+   解析 JSON 以了解：
+   - `schemaName`：使用的工作流
+   - `planningHome`、`changeRoot`、`artifactPaths` 和 `actionContext`：路径和范围上下文
+   - `artifacts`：产出物列表及其状态（`done` 或其他）
+
+   如果状态报告 `actionContext.mode: "workspace-planning"`，说明工作区归档在当前版本中不支持并停止。不要将工作区变更移动到仓库本地归档或编辑链接的仓库。
+
+   **如果有产出物未完成（不是 `done`）：**
+   - 显示警告，列出未完成的产出物
+   - 提示用户确认是否继续
+   - 用户确认后继续
+
+3. **检查任务完成状态**
+
+   读取任务文件（通常是 `tasks.md`）检查未完成的任务。
+
+   统计标记为 `- [ ]`（未完成）和 `- [x]`（已完成）的任务。
+
+   **如果发现未完成任务：**
+   - 显示警告，显示未完成任务数量
+   - 提示用户确认是否继续
+   - 用户确认后继续
+
+   **如果没有任务文件：** 继续执行，不显示任务相关警告。
+
+4. **评估增量规范同步状态**
+
+   使用状态 JSON 中的 `artifactPaths.specs.existingOutputPaths` 检查增量规范。如果不存在，无需同步提示直接继续。
+
+   **如果增量规范存在：**
+   - 将每个增量规范与对应的主规范 `openspec/specs/<capability>/spec.md` 进行比较
+   - 确定将应用哪些变更（新增、修改、删除、重命名）
+   - 在提示前显示合并摘要
+
+   **提示选项：**
+   - 如果需要变更："立即同步（推荐）"、"不同步直接归档"
+   - 如果已同步："立即归档"、"仍然同步"、"取消"
+
+   如果用户选择同步，使用 Task tool（subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"）。无论选择如何，继续归档。
+
+5. **执行归档**
+
+   在 `planningHome.changesDir` 下创建 `archive` 目录（如果不存在）：
+   ```bash
+   mkdir -p "<planningHome.changesDir>/archive"
+   ```
+
+   使用当前日期生成目标名称：`YYYY-MM-DD-<change-name>`
+
+   **检查目标是否已存在：**
+   - 如果存在：报错失败，建议重命名现有归档或使用不同日期
+   - 如果不存在：将 `changeRoot` 移动到归档目录
+
+   ```bash
+   mv "<changeRoot>" "<planningHome.changesDir>/archive/YYYY-MM-DD-<name>"
+   ```
+
+6. **显示摘要**
+
+   显示归档完成摘要，包括：
+   - 变更名称
+   - 使用的 Schema
+   - 归档位置
+   - 规范同步状态（已同步 / 跳过同步 / 无增量规范）
+   - 关于任何警告的说明（未完成的产出物/任务）
+
+**成功输出**
+
+```
+## 归档完成
+
+**变更：** <change-name>
+**Schema：** <schema-name>
+**归档到：** 从 `planningHome.changesDir`/YYYY-MM-DD-<name>/ 派生的归档路径
+**规范：** ✓ 已同步到主规范
+
+所有产出物已完成。所有任务已完成。
+```
+
+**成功输出（无增量规范）**
+
+```
+## 归档完成
+
+**变更：** <change-name>
+**Schema：** <schema-name>
+**归档到：** 从 `planningHome.changesDir`/YYYY-MM-DD-<name>/ 派生的归档路径
+**规范：** 无增量规范
+
+所有产出物已完成。所有任务已完成。
+```
+
+**带警告的成功输出**
+
+```
+## 归档完成（有警告）
+
+**变更：** <change-name>
+**Schema：** <schema-name>
+**归档到：** 从 `planningHome.changesDir`/YYYY-MM-DD-<name>/ 派生的归档路径
+**规范：** 跳过同步（用户选择跳过）
+
+**警告：**
+- 归档时有 2 个未完成的产出物
+- 归档时有 3 个未完成的任务
+- 增量规范同步被跳过（用户选择跳过）
+
+如果非有意为之，请检查归档内容。
+```
+
+**错误输出（归档已存在）**
+
+```
+## 归档失败
+
+**变更：** <change-name>
+**目标：** 从 `planningHome.changesDir`/YYYY-MM-DD-<name>/ 派生的归档路径
+
+目标归档目录已存在。
+
+**选项：**
+1. 重命名现有归档
+2. 如果是重复的，删除现有归档
+3. 等到另一天再归档
+```
+
+**护栏**
+- 如果未提供，始终提示用户选择变更
+- 使用产出物图（openspec-cn status --json）进行完成度检查
+- 不要因警告阻止归档 - 只需通知并确认
+- 移动到归档时保留 .openspec.yaml（它随目录一起移动）
+- 显示清晰的操作摘要
+- 如果请求同步，使用 Skill tool 调用 `openspec-sync-specs`（代理驱动）
+- 如果存在增量规范，始终运行同步评估并在提示前显示合并摘要
