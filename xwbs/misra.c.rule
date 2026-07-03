@@ -20,11 +20,14 @@
 
 MSG := echo -e
 CPPCHECK := cppcheck
+XWTC ?= $(shell xwtcwd)
+XWTC := $(subst \,/,$(XWTC))
+export XWTC
 J ?= 8
 CPPCHECK_OUT ?= $(XWOS_WKSPC_DIR)/cppcheck
-CPPCHECK_INCDIRS = -I. -I$(XWOS_ARCH_DIR) -I$(XWOS_CPU_DIR) -I$(XWOS_SOC_DIR) -I$(XWOS_BRD_DIR)
-CPPCHECK_FLAGS = --force --addon=misra --cppcheck-build-dir=$(CPPCHECK_OUT) --template=gcc -j$(J)
-CPPCHECK_FLAGS += --inline-suppr --suppressions-list=xwbs/misra-c2012-suppressions.txt
+CPPCHECK_INCDIRS := -I. -I$(XWOS_ARCH_DIR) -I$(XWOS_CPU_DIR) -I$(XWOS_SOC_DIR) -I$(XWOS_BRD_DIR)
+CPPCHECK_FLAGS := --force --addon=misra --cppcheck-build-dir=$(CPPCHECK_OUT) --template=gcc -j$(J) -D__cppcheck__
+CPPCHECK_FLAGS += --std=c11 --inline-suppr --suppressions-list=xwbs/misra-c2012-suppressions.txt
 CPPCHECK_FLAGS += $(ARCH_CPPCHECK_FLAGS)
 CPPCHECK_FLAGS += $(CPU_CPPCHECK_FLAGS)
 CPPCHECK_FLAGS += $(SOC_CPPCHECK_FLAGS)

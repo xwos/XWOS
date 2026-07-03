@@ -53,3 +53,5 @@ ARCH_CSRCS += xwosimpl_arch_tls.c
 
 ARCH_ASRCS += e200x_isa.S
 ARCH_ASRCS += startup.S arch_isr.S
+
+ARCH_CPPCHECK_FLAGS := --platform=unix32

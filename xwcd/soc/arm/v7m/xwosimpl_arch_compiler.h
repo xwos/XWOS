@@ -30,7 +30,15 @@
 #elif defined(__GNUC__)
 #  include <xwcd/soc/arm/v7m/compiler/gcc.h>
 #else
-#  error "Unknown compiler!"
+#  if defined(__cppcheck__)
+#    if defined(XWCFG_COMPILER__gcc)
+#      include <xwcd/soc/arm/v7m/compiler/gcc.h>
+#    elif defined(XWCFG_COMPILER__llvm)
+#      include <xwcd/soc/arm/v7m/compiler/llvm.h>
+#    endif
+#  else
+#    error "Unknown compiler!"
+#  endif
 #endif
 
 #endif /* xwcd/soc/arm/v7m/xwosimpl_arch_compiler.h */

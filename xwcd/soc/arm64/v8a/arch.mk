@@ -67,3 +67,5 @@ ARCH_CSRCS += arch_timer.c
 ARCH_CSRCS += arch_mmu.c
 ARCH_CSRCS += arch_cache.c
 ARCH_CSRCS += xwosimpl_arch_tls.c
+
+ARCH_CPPCHECK_FLAGS := --platform=unix64

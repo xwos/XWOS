@@ -565,3 +565,5 @@ ifeq ($(ARCHCFG_MPU),y)
 endif
 ARCH_CSRCS += xwosimpl_arch_xwsc.c
 ARCH_CSRCS += xwosimpl_arch_tls.c
+
+ARCH_CPPCHECK_FLAGS := --platform=unix32
