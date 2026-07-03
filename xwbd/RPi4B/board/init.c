@@ -69,6 +69,7 @@ void xwos_postinit(void)
         case 0U:
                 board_mm_init();
                 rpi4bxwds_init();
+                rpi4bxwds_soc_init();
                 rpi4bxwds_miniuart_init();
                 rpi4bxwds_uart_init();
                 break;

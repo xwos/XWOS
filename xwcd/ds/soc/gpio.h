@@ -29,8 +29,8 @@
  * @{
  */
 
-#define XWDS_GPIO_PIN(n)                (1U << (n))
-#define XWDS_GPIO_PIN_MASK(n)           (XWDS_GPIO_PIN(n) - 1U)
+#define XWDS_GPIO_PIN(n)                (1UL << (n))
+#define XWDS_GPIO_PIN_MASK(n)           (XWDS_GPIO_PIN(n) - 1UL)
 
 /**
  * @brief XWDS GPIO Port 枚举
@@ -100,6 +100,40 @@ enum xwds_gpio_pin_em {
         XWDS_GPIO_PIN_29 = XWDS_GPIO_PIN(29), /**< Pin 29 */
         XWDS_GPIO_PIN_30 = XWDS_GPIO_PIN(30), /**< Pin 30 */
         XWDS_GPIO_PIN_31 = XWDS_GPIO_PIN(31), /**< Pin 31 */
+#if BITS_PER_ULONG > 32
+        XWDS_GPIO_PIN_32 = XWDS_GPIO_PIN(32), /**< Pin 32 */
+        XWDS_GPIO_PIN_33 = XWDS_GPIO_PIN(33), /**< Pin 33 */
+        XWDS_GPIO_PIN_34 = XWDS_GPIO_PIN(34), /**< Pin 34 */
+        XWDS_GPIO_PIN_35 = XWDS_GPIO_PIN(35), /**< Pin 35 */
+        XWDS_GPIO_PIN_36 = XWDS_GPIO_PIN(36), /**< Pin 36 */
+        XWDS_GPIO_PIN_37 = XWDS_GPIO_PIN(37), /**< Pin 37 */
+        XWDS_GPIO_PIN_38 = XWDS_GPIO_PIN(38), /**< Pin 38 */
+        XWDS_GPIO_PIN_39 = XWDS_GPIO_PIN(39), /**< Pin 39 */
+        XWDS_GPIO_PIN_40 = XWDS_GPIO_PIN(40), /**< Pin 40 */
+        XWDS_GPIO_PIN_41 = XWDS_GPIO_PIN(41), /**< Pin 41 */
+        XWDS_GPIO_PIN_42 = XWDS_GPIO_PIN(42), /**< Pin 42 */
+        XWDS_GPIO_PIN_43 = XWDS_GPIO_PIN(43), /**< Pin 43 */
+        XWDS_GPIO_PIN_44 = XWDS_GPIO_PIN(44), /**< Pin 44 */
+        XWDS_GPIO_PIN_45 = XWDS_GPIO_PIN(45), /**< Pin 45 */
+        XWDS_GPIO_PIN_46 = XWDS_GPIO_PIN(46), /**< Pin 46 */
+        XWDS_GPIO_PIN_47 = XWDS_GPIO_PIN(47), /**< Pin 47 */
+        XWDS_GPIO_PIN_48 = XWDS_GPIO_PIN(48), /**< Pin 48 */
+        XWDS_GPIO_PIN_49 = XWDS_GPIO_PIN(49), /**< Pin 49 */
+        XWDS_GPIO_PIN_50 = XWDS_GPIO_PIN(50), /**< Pin 50 */
+        XWDS_GPIO_PIN_51 = XWDS_GPIO_PIN(51), /**< Pin 51 */
+        XWDS_GPIO_PIN_52 = XWDS_GPIO_PIN(52), /**< Pin 52 */
+        XWDS_GPIO_PIN_53 = XWDS_GPIO_PIN(53), /**< Pin 53 */
+        XWDS_GPIO_PIN_54 = XWDS_GPIO_PIN(54), /**< Pin 54 */
+        XWDS_GPIO_PIN_55 = XWDS_GPIO_PIN(55), /**< Pin 55 */
+        XWDS_GPIO_PIN_56 = XWDS_GPIO_PIN(56), /**< Pin 56 */
+        XWDS_GPIO_PIN_57 = XWDS_GPIO_PIN(57), /**< Pin 57 */
+        XWDS_GPIO_PIN_58 = XWDS_GPIO_PIN(58), /**< Pin 58 */
+        XWDS_GPIO_PIN_59 = XWDS_GPIO_PIN(59), /**< Pin 59 */
+        XWDS_GPIO_PIN_60 = XWDS_GPIO_PIN(60), /**< Pin 60 */
+        XWDS_GPIO_PIN_61 = XWDS_GPIO_PIN(61), /**< Pin 61 */
+        XWDS_GPIO_PIN_62 = XWDS_GPIO_PIN(62), /**< Pin 62 */
+        XWDS_GPIO_PIN_63 = XWDS_GPIO_PIN(63), /**< Pin 63 */
+#endif
 };
 
 /**

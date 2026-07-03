@@ -32,6 +32,11 @@ extern struct xwds rpi4bxwds;
 void rpi4bxwds_init(void);
 void rpi4bxwds_fini(void);
 
+/******** ******** soc ******** ********/
+extern struct xwds_soc rpi4bxwds_soc;
+xwer_t rpi4bxwds_soc_init(void);
+xwer_t rpi4bxwds_soc_fini(void);
+
 /******** ******** uart ******** ********/
 extern struct xwds_uartc rpi4bxwds_miniuart;
 xwer_t rpi4bxwds_miniuart_init(void);

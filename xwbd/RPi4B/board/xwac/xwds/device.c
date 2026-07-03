@@ -32,6 +32,38 @@ void rpi4bxwds_fini(void)
 {
 }
 
+xwer_t rpi4bxwds_soc_init(void)
+{
+        xwer_t rc;
+
+        xwds_soc_construct(&rpi4bxwds_soc);
+        rc = xwds_device_probe(&rpi4bxwds,
+                               xwds_cast(struct xwds_device *, &rpi4bxwds_soc),
+                               NULL);
+        if (rc < 0) {
+                goto err_soc_probe;
+        }
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &rpi4bxwds_soc));
+        if (rc < 0) {
+                goto err_soc_start;
+        }
+        return XWOK;
+
+err_soc_start:
+        xwds_device_remove(xwds_cast(struct xwds_device *, &rpi4bxwds_soc));
+err_soc_probe:
+        xwds_soc_destruct(&rpi4bxwds_soc);
+        return rc;
+}
+
+xwer_t rpi4bxwds_soc_fini(void)
+{
+        xwds_device_stop(xwds_cast(struct xwds_device *, &rpi4bxwds_soc));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &rpi4bxwds_soc));
+        xwds_soc_destruct(&rpi4bxwds_soc);
+        return XWOK;
+}
+
 xwer_t rpi4bxwds_miniuart_init(void)
 {
         xwer_t rc;

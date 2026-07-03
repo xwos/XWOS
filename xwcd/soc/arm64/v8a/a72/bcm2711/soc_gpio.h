@@ -186,7 +186,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gpset1; /**< 0x20 GPIO Pin Output Set 1 */
         xwu32_t reserved1; /**< 0x24 */
@@ -256,7 +256,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gpclr1; /**< 0x2C GPIO Pin Output Clear 1 */
         xwu32_t reserved2; /**< 0x30 */
@@ -326,7 +326,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gplev1; /**< 0x38 GPIO Pin Level 1 */
         xwu32_t reserved3; /**< 0x3C */
@@ -396,7 +396,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gpeds1; /**< 0x44 GPIO Pin Event Detect Status 1 */
         xwu32_t reserved4; /**< 0x48 */
@@ -466,7 +466,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gpren1; /**< 0x50 GPIO Pin Rising Edge Detect Enable 1 */
         xwu32_t reserved5; /**< 0x54 */
@@ -536,7 +536,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gpfen1; /**< 0x5C GPIO Pin Falling Edge Detect Enable 1 */
         xwu32_t reserved6; /**< 0x60 */
@@ -606,7 +606,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gphen1; /**< 0x68 GPIO Pin High Detect Enable 1 */
         xwu32_t reserved7; /**< 0x6C */
@@ -676,7 +676,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gplen1; /**< 0x74 GPIO Pin Low Detect Enable 1 */
         xwu32_t reserved8; /**< 0x78 */
@@ -746,7 +746,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gparen1; /**< 0x80 GPIO Pin Async. Rising Edge Detect 1 */
         xwu32_t reserved9; /**< 0x84 */
@@ -816,7 +816,7 @@ struct soc_gpio_regs {
                         xwu32_t pin55:1;
                         xwu32_t pin56:1;
                         xwu32_t pin57:1;
-                        xwu32_t reserved0:8;
+                        xwu32_t reserved0:6;
                 } b;
         } gpafen1; /**< 0x8C GPIO Pin Async. Falling Edge Detect 1 */
         xwu32_t reserved10[21]; /**< 0x90 ~ 0xE0 */
