@@ -321,21 +321,23 @@ xwer_t rpi4bxwds_soc_drv_gpio_cfg(struct xwds_soc * soc,
 {
         const struct rpi4bxwds_gpio_cfg * gpio_cfg;
         struct rpi4bxwds_soc_driver_data * drvdata;
+        xwsq_t copy;
+        xwssq_t pin;
         xwreg_t cpuirq;
-        xwu32_t i;
 
         XWOS_UNUSED(soc);
         XWOS_UNUSED(port);
 
-        drvdata = soc->dev.data;
         gpio_cfg = (const struct rpi4bxwds_gpio_cfg *)cfg;
-
+        drvdata = soc->dev.data;
+        copy = pinmask;
         xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
-        for (i = 0U; i < 58U; i++) {
-                if (pinmask & XWDS_GPIO_PIN(i)) {
-                        rpi4bxwds_gpfsel_set(i, gpio_cfg->function);
-                        rpi4bxwds_pupd_set(i, gpio_cfg->pud);
-                }
+        pin = xwbop_ffs(xwsq_t, copy);
+        while (pin >= 0L) {
+                rpi4bxwds_gpfsel_set(pin, gpio_cfg->function);
+                rpi4bxwds_pupd_set(pin, gpio_cfg->pud);
+                copy &= ~XWBOP_BIT(pin);
+                pin = xwbop_ffs(xwsq_t, copy);
         }
         xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
         return XWOK;
