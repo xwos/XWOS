@@ -24,6 +24,7 @@
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_mp.h>
 #include "board/xwac/libc/mi.h"
 #include "board/xwac/xwds/device.h"
+#include "bm/Xwssc/mi.h"
 
 #include <xwos/lib/xwlog.h>
 #define LOGTAG "MThd"
@@ -175,6 +176,7 @@ xwer_t cpu0_mthd_mainfunc(void * arg)
         mthdlogi("Init C/C++ Runtime ...\r\n");
         libc_init();
         soc_boot_mp(XWBOP_BIT(1) | XWBOP_BIT(2) | XWBOP_BIT(3));
+        xwssc_ch0_init();
         origin = xwtm_now();
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {

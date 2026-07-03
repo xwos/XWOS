@@ -31,7 +31,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** SOC to SOC Communication ******** ********/
 #define XWMDCFG_isc_xwssc                                       1
-#define XWMDCFG_isc_xwssc_LOG                                   0
+#define XWMDCFG_isc_xwssc_LOG                                   1
 #define XWMDCFG_isc_xwssc_PORT_NUM                              (12U)
 #define XWMDCFG_isc_xwssc_PRI_NUM                               (4U)
 #define XWMDCFG_isc_xwssc_RETRY_PERIOD                          (XWTM_MS(1000))

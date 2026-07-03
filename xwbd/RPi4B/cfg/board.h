@@ -56,5 +56,6 @@
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BMCFG_MainThread                        1
+#define BMCFG_Xwssc                             1
 
 #endif /* cfg/board.h */
