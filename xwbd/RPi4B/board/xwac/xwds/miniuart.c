@@ -27,9 +27,9 @@ struct rpi4bxwds_miniuart_driver_data {
                 struct xwos_splk splk;
                 struct xwos_cond completion;
                 xwer_t rc;
-                xwsz_t size;
-                xwsz_t pos;
-                xwsz_t tail;
+                xwsz_t qsize;
+                xwsz_t qpos;
+                xwsz_t qtail;
                 xwu8_t * q;
         } tx;
 };
@@ -109,9 +109,9 @@ struct rpi4bxwds_miniuart_driver_data rpi4bxwds_miniuart_drvdata = {
         .tx = {
                 .splk = XWOS_SPLK_INITIALIZER,
                 .rc = XWOK,
-                .size = sizeof(rpi4bxwds_miniuart_txq),
-                .pos = 0U,
-                .tail = 0U,
+                .qsize = sizeof(rpi4bxwds_miniuart_txq),
+                .qpos = 0U,
+                .qtail = 0U,
                 .q = rpi4bxwds_miniuart_txq,
         },
 };
@@ -142,12 +142,12 @@ void rpi4bxwds_miniuart_on_tx_empty(struct xwds_uartc * uartc)
         soc_miniuart_disable_tx_irq();
         xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &cpuirq);
         if (-EINPROGRESS == drvdata->tx.rc) {
-                while ((soc_aux.miniuart.lsr.b.tx_empty) &&
-                       (drvdata->tx.pos < drvdata->tx.tail)) {
-                        soc_aux.miniuart.io.u32 = (xwu32_t)drvdata->tx.q[drvdata->tx.pos];
-                        drvdata->tx.pos++;
+                while ((soc_aux.mu.lsr.b.tx_empty) &&
+                       (drvdata->tx.qpos < drvdata->tx.qtail)) {
+                        soc_aux.mu.io.u32 = (xwu32_t)drvdata->tx.q[drvdata->tx.qpos];
+                        drvdata->tx.qpos++;
                 }
-                if (drvdata->tx.pos == drvdata->tx.tail) {
+                if (drvdata->tx.qpos == drvdata->tx.qtail) {
                         drvdata->tx.rc = XWOK;
                         xwos_splk_unlock_cpuirqrs(&drvdata->tx.splk, cpuirq);
                         xwos_cond_unicast(&drvdata->tx.completion);
@@ -163,14 +163,14 @@ void rpi4bxwds_miniuart_on_tx_empty(struct xwds_uartc * uartc)
 static
 void rpi4bxwds_miniuart_on_rx_available(struct xwds_uartc * uartc)
 {
-        xwu8_t data[8U];
+        xwu8_t data[16U];
         xwsz_t i;
         xwsq_t pub;
 
         i = 0;
         soc_miniuart_disable_rx_irq();
-        while (soc_aux.miniuart.lsr.b.data_ready) {
-                data[i] = (xwu8_t)soc_aux.miniuart.io.u32;
+        while ((soc_aux.mu.lsr.b.data_ready) && (i < sizeof(data))) {
+                data[i] = (xwu8_t)soc_aux.mu.io.u32;
                 i++;
         }
         soc_miniuart_enable_rx_irq();
@@ -183,10 +183,10 @@ void rpi4bxwds_miniuart_on_rx_available(struct xwds_uartc * uartc)
 static
 void rpi4bxwds_miniuart_isr(void)
 {
-        if (2U == soc_aux.miniuart.iir.b.status) {
+        if (2U == soc_aux.mu.iir.b.status) {
                 rpi4bxwds_miniuart_on_rx_available(&rpi4bxwds_miniuart);
         }
-        if (1U == soc_aux.miniuart.iir.b.status) {
+        if (1U == soc_aux.mu.iir.b.status) {
                 rpi4bxwds_miniuart_on_tx_empty(&rpi4bxwds_miniuart);
         }
 }
@@ -287,13 +287,13 @@ xwer_t rpi4bxwds_miniuart_drv_tx(struct xwds_uartc * uartc,
         rc = XWOK;
         drvdata = uartc->dev.data;
         wrsz = *size;
-        wrsz = (wrsz > drvdata->tx.size) ? drvdata->tx.size : wrsz;
+        wrsz = (wrsz > drvdata->tx.qsize) ? drvdata->tx.qsize : wrsz;
         ulk.osal.splk = &drvdata->tx.splk;
 
         xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &cpuirq);
         memcpy(&drvdata->tx.q[0U], &data[0U], wrsz);
-        drvdata->tx.pos = 0U;
-        drvdata->tx.tail = wrsz;
+        drvdata->tx.qpos = 0U;
+        drvdata->tx.qtail = wrsz;
         drvdata->tx.rc = -EINPROGRESS;
         soc_miniuart_enable_tx_irq();
         rc = xwos_cond_wait_to(&drvdata->tx.completion,

@@ -33,17 +33,17 @@ void soc_miniuart_init(void)
 
         /* Init UART */
         soc_aux.enables.b.mini_uart_en = 1U;
-        soc_aux.miniuart.baud.u32 = 30U; /* 2M = 500M / (8 * (Baud + 1)) */
-        soc_aux.miniuart.lcr.b.data_size = 3U; /* 8bit */
-        soc_aux.miniuart.cntl.b.rx = 1U;
-        soc_aux.miniuart.cntl.b.tx = 1U;
+        soc_aux.mu.baud.u32 = 30U; /* 2M = 500M / (8 * (Baud + 1)) */
+        soc_aux.mu.lcr.b.data_size = 3U; /* 8bit */
+        soc_aux.mu.cntl.b.rx = 1U;
+        soc_aux.mu.cntl.b.tx = 1U;
 }
 
 void soc_miniuart_putc(char c)
 {
-        while (soc_aux.miniuart.stat.b.tx_fifo_full) {
+        while (soc_aux.mu.stat.b.tx_fifo_full) {
         }
-        soc_aux.miniuart.io.u32 = (xwu32_t)c;
+        soc_aux.mu.io.u32 = (xwu32_t)c;
 }
 
 void soc_miniuart_puts(const char * s)
@@ -52,8 +52,8 @@ void soc_miniuart_puts(const char * s)
 
         idx = 0;
         while ('\0' != s[idx]) {
-                if (soc_aux.miniuart.lsr.b.tx_empty) {
-                        soc_aux.miniuart.io.u32 = (xwu32_t)s[idx];
+                if (soc_aux.mu.lsr.b.tx_empty) {
+                        soc_aux.mu.io.u32 = (xwu32_t)s[idx];
                         idx++;
                 }
         }
@@ -65,8 +65,8 @@ void soc_miniuart_write(const xwu8_t * data, xwsz_t size)
 
         idx = 0;
         while (idx < size) {
-                if (soc_aux.miniuart.lsr.b.tx_empty) {
-                        soc_aux.miniuart.io.u32 = (xwu32_t)data[idx];
+                if (soc_aux.mu.lsr.b.tx_empty) {
+                        soc_aux.mu.io.u32 = (xwu32_t)data[idx];
                         idx++;
                 }
         }
@@ -75,7 +75,7 @@ void soc_miniuart_write(const xwu8_t * data, xwsz_t size)
 void soc_miniuart_flush_rx_fifo(void)
 {
         __xwcc_unused xwu32_t data;
-        while (soc_aux.miniuart.lsr.b.data_ready) {
-                data = soc_aux.miniuart.io.u32;
+        while (soc_aux.mu.lsr.b.data_ready) {
+                data = soc_aux.mu.io.u32;
         }
 }

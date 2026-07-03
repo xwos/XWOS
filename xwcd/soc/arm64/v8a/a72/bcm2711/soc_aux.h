@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_soc_arm_v8a_a72_bcm2711_soc_uart_h__
-#define __xwcd_soc_arm_v8a_a72_bcm2711_soc_uart_h__
+#ifndef __xwcd_soc_arm_v8a_a72_bcm2711_soc_aux_h__
+#define __xwcd_soc_arm_v8a_a72_bcm2711_soc_aux_h__
 
 #include <xwos/standard.h>
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc.h>
@@ -155,7 +155,7 @@ struct soc_aux_regs {
                         } b;
                         xwu32_t u32;
                 } baud; /**< 0x068, Mini Uart Baudrate */
-        } miniuart;
+        } mu; /**< mini uart */
 };
 
 #define soc_aux (*((volatile struct soc_aux_regs *)SOC_AUX_REGBASE))
@@ -165,25 +165,25 @@ void soc_miniuart_init(void);
 static __xwbsp_inline
 void soc_miniuart_enable_tx_irq(void)
 {
-        soc_aux.miniuart.ier.b.tx = 1U;
+        soc_aux.mu.ier.b.tx = 1U;
 }
 
 static __xwbsp_inline
 void soc_miniuart_disable_tx_irq(void)
 {
-        soc_aux.miniuart.ier.b.tx = 0U;
+        soc_aux.mu.ier.b.tx = 0U;
 }
 
 static __xwbsp_inline
 void soc_miniuart_enable_rx_irq(void)
 {
-        soc_aux.miniuart.ier.b.rx = 1U;
+        soc_aux.mu.ier.b.rx = 1U;
 }
 
 static __xwbsp_inline
 void soc_miniuart_disable_rx_irq(void)
 {
-        soc_aux.miniuart.ier.b.rx = 0U;
+        soc_aux.mu.ier.b.rx = 0U;
 }
 
 void soc_miniuart_putc(char c);
@@ -191,4 +191,4 @@ void soc_miniuart_puts(const char * s);
 void soc_miniuart_write(const xwu8_t * d, xwsz_t size);
 void soc_miniuart_flush_rx_fifo(void);
 
-#endif /* xwcd/soc/arm64/v8a/a72/bcm2711/soc_uart.h */
+#endif /* xwcd/soc/arm64/v8a/a72/bcm2711/soc_aux.h */
