@@ -1,0 +1,36 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "-j20",
+            ],
+            "options" : {
+                "cwd": "xwbd/RPi4B"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "d",
+            ],
+            "options" : {
+                "cwd": "xwbd/RPi4B"
+            },
+            "group": {
+                "kind": "build",
+            },
+            "problemMatcher": "$gcc"
+        }
+    ]
+}

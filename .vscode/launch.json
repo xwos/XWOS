@@ -1,0 +1,246 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Rpi4b-AllCores-Openocd-Jlink-Launch",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "servertype": "openocd",
+            "interface": "jtag",
+            "targetProcessor": 0,
+            "numberOfProcessors": 4,
+            "configFiles": [
+                "xwbd/RPi4B/debug/openocd/jlink.cfg"
+            ],
+            "device": "BCM2711",
+            "svdFile": "xwbd/RPi4B/debug/bcm2711_lpa.svd",
+            "executable": "xwbd/RPi4B/WKSPC/XWOS.elf",
+            "runToEntryPoint": "soc_init",
+            "armToolchainPath": "${env:XWTC}/arm/bin",
+            "gdbPath": "${env:XWTC}/arm/bin/aarch64-none-elf-gdb",
+            "serverLaunchTimeout": 100000,
+            "preLaunchCommands": [
+                "mon adapter speed 4000",
+                "set remote hardware-breakpoint-limit 6",
+                "set remote hardware-watchpoint-limit 4"
+            ],
+            "chainedConfigurations": {
+                "enabled": true,
+                "detached": true,
+                "waitOnEvent": "postInit",
+                "lifecycleManagedByParent": true,
+                "launches": [
+                    {
+                        "name": "Rpi4b-Core1-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    },
+                    {
+                        "name": "Rpi4b-Core2-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    },
+                    {
+                        "name": "Rpi4b-Core3-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Rpi4b-AllCores-Openocd-Jlink-Attach",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "servertype": "openocd",
+            "interface": "jtag",
+            "targetProcessor": 0,
+            "numberOfProcessors": 4,
+            "configFiles": [
+                "xwbd/RPi4B/debug/openocd/jlink.cfg"
+            ],
+            "device": "BCM2711",
+            "svdFile": "xwbd/RPi4B/debug/bcm2711_lpa.svd",
+            "executable": "xwbd/RPi4B/WKSPC/XWOS.elf",
+            "armToolchainPath": "${env:XWTC}/arm/bin",
+            "gdbPath": "${env:XWTC}/arm/bin/aarch64-none-elf-gdb",
+            "serverLaunchTimeout": 100000,
+            "preLaunchCommands": [
+                "mon adapter speed 4000",
+                "set remote hardware-breakpoint-limit 6",
+                "set remote hardware-watchpoint-limit 4"
+            ],
+            "chainedConfigurations": {
+                "enabled": true,
+                "detached": true,
+                "waitOnEvent": "postInit",
+                "lifecycleManagedByParent": true,
+                "launches": [
+                    {
+                        "name": "Rpi4b-Core1-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    },
+                    {
+                        "name": "Rpi4b-Core2-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    },
+                    {
+                        "name": "Rpi4b-Core3-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Rpi4b-AllCores-Openocd-Daplink-Launch",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "servertype": "openocd",
+            "interface": "jtag",
+            "targetProcessor": 0,
+            "numberOfProcessors": 4,
+            "configFiles": [
+                "xwbd/RPi4B/debug/openocd/daplink.cfg"
+            ],
+            "device": "BCM2711",
+            "svdFile": "xwbd/RPi4B/debug/bcm2711_lpa.svd",
+            "executable": "xwbd/RPi4B/WKSPC/XWOS.elf",
+            "runToEntryPoint": "soc_init",
+            "armToolchainPath": "${env:XWTC}/arm/bin",
+            "gdbPath": "${env:XWTC}/arm/bin/aarch64-none-elf-gdb",
+            "serverLaunchTimeout": 100000,
+            "preLaunchCommands": [
+                "mon adapter speed 4000",
+                "set remote hardware-breakpoint-limit 6",
+                "set remote hardware-watchpoint-limit 4"
+            ],
+            "chainedConfigurations": {
+                "enabled": true,
+                "detached": true,
+                "waitOnEvent": "postInit",
+                "lifecycleManagedByParent": true,
+                "launches": [
+                    {
+                        "name": "Rpi4b-Core1-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    },
+                    {
+                        "name": "Rpi4b-Core2-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    },
+                    {
+                        "name": "Rpi4b-Core3-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Rpi4b-AllCores-Openocd-Daplink-Attach",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "servertype": "openocd",
+            "interface": "jtag",
+            "targetProcessor": 0,
+            "numberOfProcessors": 4,
+            "configFiles": [
+                "xwbd/RPi4B/debug/openocd/daplink.cfg"
+            ],
+            "device": "BCM2711",
+            "svdFile": "xwbd/RPi4B/debug/bcm2711_lpa.svd",
+            "executable": "xwbd/RPi4B/WKSPC/XWOS.elf",
+            "armToolchainPath": "${env:XWTC}/arm/bin",
+            "gdbPath": "${env:XWTC}/arm/bin/aarch64-none-elf-gdb",
+            "serverLaunchTimeout": 100000,
+            "preLaunchCommands": [
+                "mon adapter speed 4000",
+                "set remote hardware-breakpoint-limit 6",
+                "set remote hardware-watchpoint-limit 4"
+            ],
+            "chainedConfigurations": {
+                "enabled": true,
+                "detached": true,
+                "waitOnEvent": "postInit",
+                "lifecycleManagedByParent": true,
+                "launches": [
+                    {
+                        "name": "Rpi4b-Core1-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    },
+                    {
+                        "name": "Rpi4b-Core2-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    },
+                    {
+                        "name": "Rpi4b-Core3-Openocd-Attach",
+                        "folder": "${workspaceFolder}"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Rpi4b-Core1-Openocd-Attach",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "servertype": "external",
+            "interface": "jtag",
+            "targetProcessor": 1,
+            "numberOfProcessors": 4,
+            "device": "BCM2711",
+            "svdFile": "xwbd/RPi4B/debug/bcm2711_lpa.svd",
+            "executable": "xwbd/RPi4B/WKSPC/XWOS.elf",
+            "armToolchainPath": "${env:XWTC}/arm/bin",
+            "gdbPath": "${env:XWTC}/arm/bin/aarch64-none-elf-gdb",
+            "gdbTarget": "localhost:50001",
+            "serverLaunchTimeout": 100000,
+            "preLaunchCommands": [
+                "set remote hardware-breakpoint-limit 6",
+                "set remote hardware-watchpoint-limit 4"
+            ]
+        },
+        {
+            "name": "Rpi4b-Core2-Openocd-Attach",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "servertype": "external",
+            "interface": "jtag",
+            "targetProcessor": 2,
+            "numberOfProcessors": 4,
+            "device": "BCM2711",
+            "svdFile": "xwbd/RPi4B/debug/bcm2711_lpa.svd",
+            "executable": "xwbd/RPi4B/WKSPC/XWOS.elf",
+            "armToolchainPath": "${env:XWTC}/arm/bin",
+            "gdbPath": "${env:XWTC}/arm/bin/aarch64-none-elf-gdb",
+            "gdbTarget": "localhost:50002",
+            "serverLaunchTimeout": 100000,
+            "preLaunchCommands": [
+                "set remote hardware-breakpoint-limit 6",
+                "set remote hardware-watchpoint-limit 4"
+            ]
+        },
+        {
+            "name": "Rpi4b-Core3-Openocd-Attach",
+            "type": "cortex-debug",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "servertype": "external",
+            "interface": "jtag",
+            "targetProcessor": 3,
+            "numberOfProcessors": 4,
+            "device": "BCM2711",
+            "svdFile": "xwbd/RPi4B/debug/bcm2711_lpa.svd",
+            "executable": "xwbd/RPi4B/WKSPC/XWOS.elf",
+            "armToolchainPath": "${env:XWTC}/arm/bin",
+            "gdbPath": "${env:XWTC}/arm/bin/aarch64-none-elf-gdb",
+            "gdbTarget": "localhost:50003",
+            "serverLaunchTimeout": 100000,
+            "preLaunchCommands": [
+                "set remote hardware-breakpoint-limit 6",
+                "set remote hardware-watchpoint-limit 4"
+            ]
+        }
+    ]
+}
