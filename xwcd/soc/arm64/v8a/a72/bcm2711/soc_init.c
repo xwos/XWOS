@@ -146,7 +146,7 @@ void soc_init(void)
         soc_mmu_init();
         armv8a_flush_dcache_all();
         armv8a_dcache_enable();
-        /* armv8a_icache_enable(); */
+        armv8a_icache_enable();
         armv8a_timer_init();
 
         if (0U == cpuid) {
