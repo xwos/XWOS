@@ -168,27 +168,19 @@ void soc_mmu_init_periph_td(void)
         xwu64_t periph_td_num;
         xwu64_t periph_td_end;
 
-        /* 更改periph区的L1TD为Table */
-        periph_td_origin = (xwu64_t)periph_mr_origin >> SOC_MMU_L1TD_1G_SHIFT;
-        periph_td_num = (xwu64_t)periph_mr_size >> SOC_MMU_L1TD_1G_SHIFT;
+#if !defined(SOCCFG_PERI_HIGH) || (0 == SOCCFG_PERI_HIGH)
+        /* 当使用低地址模式，外设地址：[0xFC000000:64M]，修改内存属性为nGnRnE Device */
+        /* 修改L2TD为Block */
+        periph_td_origin = (xwu64_t)0xFC000000 >> SOC_MMU_L2TD_2M_SHIFT;
+        periph_td_num = (xwu64_t)0x04000000 >> SOC_MMU_L2TD_2M_SHIFT;
         periph_td_end = periph_td_origin + periph_td_num;
-        for (m = periph_td_origin; m < periph_td_end; m++) {
-                soc_mmu_td.l1[0][m].table.u64 = 0UL;
-                soc_mmu_td.l1[0][m].table.td.type = ARMV8A_MMU_TD_TYPE_TABLE;
-                soc_mmu_td.l1[0][m].table.td.nlta12_47 = ((xwu64_t)soc_mmu_td.l2[m] >> ARMV8A_MMU_S1TD4K_TABLE_SHIFT);
-                soc_mmu_td.l1[0][m].table.td.pxn = 1;
-                soc_mmu_td.l1[0][m].table.td.uxn = 1;
-                soc_mmu_td.l1[0][m].table.td.ap = (ARMV8A_MMU_TD_ATTR_APTAB1_RW | ARMV8A_MMU_TD_ATTR_APTAB0_PRIV);
-        }
-
-        /* 初始化L2TD为Block */
-        periph_td_origin = (xwu64_t)periph_mr_origin >> SOC_MMU_L2TD_2M_SHIFT;
-        periph_td_num = (xwu64_t)periph_mr_size >> SOC_MMU_L2TD_2M_SHIFT;
-        periph_td_end = periph_td_origin + periph_td_num;
-        for (m = periph_td_origin, n = periph_td_origin / ARMV8A_MMU_S1TD4K_TD_NUM;
+        m = periph_td_origin & ((xwu64_t)(~(ARMV8A_MMU_S1TD4K_TD_NUM - 1UL)));
+        for (n = m / ARMV8A_MMU_S1TD4K_TD_NUM;
              m < periph_td_end;
              m += ARMV8A_MMU_S1TD4K_TD_NUM, n++) {
-                for (k = 0; k < ARMV8A_MMU_S1TD4K_TD_NUM; k++) {
+                for (k = periph_td_origin % ARMV8A_MMU_S1TD4K_TD_NUM;
+                     k < ARMV8A_MMU_S1TD4K_TD_NUM;
+                     k++) {
                         soc_mmu_td.l2[n][k].block.u64 = 0UL;
                         soc_mmu_td.l2[n][k].block.l2td2m.type = ARMV8A_MMU_TD_TYPE_BLOCK;
                         soc_mmu_td.l2[n][k].block.l2td2m.attridx = ARMV8A_MT_DEVICE_NGNRNE;
@@ -200,6 +192,7 @@ void soc_mmu_init_periph_td(void)
                         soc_mmu_td.l2[n][k].block.l2td2m.uxn = 1;
                 }
         }
+#endif
 }
 
 void soc_mmu_init(void)
@@ -213,7 +206,7 @@ void soc_mmu_init(void)
         if (0U == cpuid) {
                 soc_mmu_init_l1td();
                 soc_mmu_init_ram_td();
-                /* soc_mmu_init_periph_td(); */
+                soc_mmu_init_periph_td();
         }
 
         armv8a_sysreg_read(&el, CurrentEL);

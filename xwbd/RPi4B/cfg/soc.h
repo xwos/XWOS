@@ -22,7 +22,7 @@
 #define __cfg_soc_h__
 
 /******** ******** SOC ******** ********/
-#define SOCCFG_PERI_HIGH                        1
+#define SOCCFG_PERI_HIGH                        0
 #define SOCCFG_EXC_NUM                          (64U)
 #define SOCCFG_IRQ_NUM                          (512U)
 
