@@ -26,11 +26,25 @@
 #include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_gpio.h>
 #include <xwcd/soc/arm64/v8a/arch_gic2.h>
 #include <xwcd/ds/soc/eirq.h>
+#include <xwcd/ds/soc/dma.h>
+#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_dma.h>
 #include "board/xwac/xwds/device.h"
 #include "board/xwac/xwds/soc.h"
 
+#define RPI4B_DMA_CH_NUM  15U
+#define RPI4B_DMA_CH_VPU  15U
+
 struct rpi4bxwds_soc_driver_data {
-        struct xwos_splk splk;
+        struct {
+                struct xwos_splk lock;
+        } gpio;
+        struct {
+                struct xwos_splk lock;
+        } eirq;
+        struct {
+                xwu16_t channels;
+                struct xwos_splk lock;
+        } dma;
 };
 
 static
@@ -98,9 +112,47 @@ xwer_t rpi4bxwds_soc_drv_eirq_rls(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask,
                                   xwid_t eiid);
 
+static
+xwer_t rpi4bxwds_soc_drv_dma_req(struct xwds_soc * soc, xwid_t ch);
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_rls(struct xwds_soc * soc, xwid_t ch);
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg);
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_enable(struct xwds_soc * soc, xwid_t ch);
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_disable(struct xwds_soc * soc, xwid_t ch);
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_start(struct xwds_soc * soc, xwid_t ch);
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_stop(struct xwds_soc * soc, xwid_t ch);
+
 static void rpi4bxwds_soc_eirq_bank0_isr(void);
 static void rpi4bxwds_soc_eirq_bank1_isr(void);
 static void rpi4bxwds_soc_eirq_bank2_isr(void);
+
+static void rpi4bxwds_soc_dma0_isr(void);
+static void rpi4bxwds_soc_dma1_isr(void);
+static void rpi4bxwds_soc_dma2_isr(void);
+static void rpi4bxwds_soc_dma3_isr(void);
+static void rpi4bxwds_soc_dma4_isr(void);
+static void rpi4bxwds_soc_dma5_isr(void);
+static void rpi4bxwds_soc_dma6_isr(void);
+static void rpi4bxwds_soc_dma7_8_isr(void);
+static void rpi4bxwds_soc_dma9_10_isr(void);
+static void rpi4bxwds_soc_dma11_isr(void);
+static void rpi4bxwds_soc_dma12_isr(void);
+static void rpi4bxwds_soc_dma13_isr(void);
+static void rpi4bxwds_soc_dma14_isr(void);
+
+static
+void rpi4bxwds_soc_dmach_isr(xwsq_t ch);
 
 const struct xwds_soc_driver rpi4bxwds_soc_drv = {
         .base = {
@@ -127,6 +179,14 @@ const struct xwds_soc_driver rpi4bxwds_soc_drv = {
 
         .eirq_req = rpi4bxwds_soc_drv_eirq_req,
         .eirq_rls = rpi4bxwds_soc_drv_eirq_rls,
+
+        .dma_req = rpi4bxwds_soc_drv_dma_req,
+        .dma_rls = rpi4bxwds_soc_drv_dma_rls,
+        .dma_cfg = rpi4bxwds_soc_drv_dma_cfg,
+        .dma_enable = rpi4bxwds_soc_drv_dma_enable,
+        .dma_disable = rpi4bxwds_soc_drv_dma_disable,
+        .dma_start = rpi4bxwds_soc_drv_dma_start,
+        .dma_stop = rpi4bxwds_soc_drv_dma_stop,
 };
 
 atomic_xwsq_t rpi4bxwds_gpio_pin_state[] = {
@@ -134,12 +194,24 @@ atomic_xwsq_t rpi4bxwds_gpio_pin_state[] = {
 };
 
 struct rpi4bxwds_soc_driver_data rpi4bxwds_soc_drvdata = {
-        .splk = XWOS_SPLK_INITIALIZER,
+        .gpio = {
+                .lock = XWOS_SPLK_INITIALIZER,
+        },
+        .eirq = {
+                .lock = XWOS_SPLK_INITIALIZER,
+        },
+        .dma = {
+                .lock = XWOS_SPLK_INITIALIZER,
+                .channels = 0U,
+        },
 };
 
 #define RPI4B_EIRQ_NUM  58U
 static xwds_eirq_f rpi4bxwds_eirq_isrs[RPI4B_EIRQ_NUM];
 static xwds_eirq_arg_t rpi4bxwds_eirq_isrargs[RPI4B_EIRQ_NUM];
+
+static xwds_dma_f rpi4bxwds_dma_chcbs[RPI4B_DMA_CH_NUM];
+static xwds_dma_cbarg_t rpi4bxwds_dma_chcbargs[RPI4B_DMA_CH_NUM];
 
 struct xwds_soc rpi4bxwds_soc = {
         .dev = {
@@ -161,6 +233,12 @@ struct xwds_soc rpi4bxwds_soc = {
                 .isrargs = rpi4bxwds_eirq_isrargs,
                 .num = RPI4B_EIRQ_NUM,
         },
+        .dma = {
+                .ch_num = RPI4B_DMA_CH_NUM,
+                .ccfg = NULL,
+                .chcbs = rpi4bxwds_dma_chcbs,
+                .chcbargs = rpi4bxwds_dma_chcbargs,
+        },
 };
 
 /******** ******** base driver ******** ********/
@@ -170,7 +248,7 @@ xwer_t rpi4bxwds_soc_drv_probe(struct xwds_device * dev)
         struct rpi4bxwds_soc_driver_data * drvdata;
 
         drvdata = dev->data;
-        xwos_splk_init(&drvdata->splk);
+        xwos_splk_init(&drvdata->gpio.lock);
 
         armv8a_gic_irq_set_isr(SOC_VC_IRQ_GPIO0, rpi4bxwds_soc_eirq_bank0_isr);
         armv8a_gic_irq_set_priority(SOC_VC_IRQ_GPIO0, armv8a_gic_get_max_priority());
@@ -189,6 +267,84 @@ xwer_t rpi4bxwds_soc_drv_probe(struct xwds_device * dev)
         armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_GPIO2, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
         armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_GPIO2);
         armv8a_gic_irq_enable(SOC_VC_IRQ_GPIO2);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA0, rpi4bxwds_soc_dma0_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA0, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA0, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA0);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA0);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA1, rpi4bxwds_soc_dma1_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA1, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA1, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA1);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA1);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA2, rpi4bxwds_soc_dma2_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA2, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA2, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA2);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA2);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA3, rpi4bxwds_soc_dma3_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA3, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA3, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA3);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA3);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA4, rpi4bxwds_soc_dma4_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA4, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA4, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA4);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA4);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA5, rpi4bxwds_soc_dma5_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA5, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA5, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA5);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA5);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA6, rpi4bxwds_soc_dma6_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA6, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA6, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA6);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA6);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA7_8, rpi4bxwds_soc_dma7_8_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA7_8, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA7_8, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA7_8);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA7_8);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA9_10, rpi4bxwds_soc_dma9_10_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA9_10, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA9_10, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA9_10);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA9_10);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA11, rpi4bxwds_soc_dma11_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA11, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA11, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA11);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA11);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA12, rpi4bxwds_soc_dma12_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA12, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA12, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA12);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA12);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA13, rpi4bxwds_soc_dma13_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA13, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA13, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA13);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA13);
+
+        armv8a_gic_irq_set_isr(SOC_VC_IRQ_DMA14, rpi4bxwds_soc_dma14_isr);
+        armv8a_gic_irq_set_priority(SOC_VC_IRQ_DMA14, armv8a_gic_get_max_priority());
+        armv8a_gic_irq_set_trigger_type(SOC_VC_IRQ_DMA14, ARMV8A_IRQ_TRIGGER_TYPE_LEVEL);
+        armv8a_gic_irq_set_affinity_lc(SOC_VC_IRQ_DMA14);
+        armv8a_gic_irq_enable(SOC_VC_IRQ_DMA14);
 
         return XWOK;
 }
@@ -331,7 +487,7 @@ xwer_t rpi4bxwds_soc_drv_gpio_cfg(struct xwds_soc * soc,
         gpio_cfg = (const struct rpi4bxwds_gpio_cfg *)cfg;
         drvdata = soc->dev.data;
         copy = pinmask;
-        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->gpio.lock, &cpuirq);
         pin = xwbop_ffs(xwsq_t, copy);
         while (pin >= 0L) {
                 rpi4bxwds_gpfsel_set(pin, gpio_cfg->function);
@@ -339,7 +495,7 @@ xwer_t rpi4bxwds_soc_drv_gpio_cfg(struct xwds_soc * soc,
                 copy &= ~XWBOP_BIT(pin);
                 pin = xwbop_ffs(xwsq_t, copy);
         }
-        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&drvdata->gpio.lock, cpuirq);
         return XWOK;
 }
 
@@ -359,14 +515,14 @@ xwer_t rpi4bxwds_soc_drv_gpio_set(struct xwds_soc * soc,
         mask_lo = (xwu32_t)(pinmask & 0xFFFFFFFFUL);
         mask_hi = (xwu32_t)((pinmask >> 32U) & 0xFFFFFFFFUL);
 
-        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->gpio.lock, &cpuirq);
         if (0U != mask_lo) {
                 soc_gpio.gpset0.u32 = mask_lo;
         }
         if (0U != mask_hi) {
                 soc_gpio.gpset1.u32 = mask_hi;
         }
-        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&drvdata->gpio.lock, cpuirq);
         return XWOK;
 }
 
@@ -386,14 +542,14 @@ xwer_t rpi4bxwds_soc_drv_gpio_reset(struct xwds_soc * soc,
         mask_lo = (xwu32_t)(pinmask & 0xFFFFFFFFUL);
         mask_hi = (xwu32_t)((pinmask >> 32U) & 0xFFFFFFFFUL);
 
-        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->gpio.lock, &cpuirq);
         if (0U != mask_lo) {
                 soc_gpio.gpclr0.u32 = mask_lo;
         }
         if (0U != mask_hi) {
                 soc_gpio.gpclr1.u32 = mask_hi;
         }
-        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&drvdata->gpio.lock, cpuirq);
         return XWOK;
 }
 
@@ -421,7 +577,7 @@ xwer_t rpi4bxwds_soc_drv_gpio_toggle(struct xwds_soc * soc,
         lev_lo = 0U;
         lev_hi = 0U;
 
-        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->gpio.lock, &cpuirq);
         if (0U != mask_lo) {
                 lev_lo = soc_gpio.gplev0.u32 & mask_lo;
         }
@@ -444,7 +600,7 @@ xwer_t rpi4bxwds_soc_drv_gpio_toggle(struct xwds_soc * soc,
         if (0U != clr_hi) {
                 soc_gpio.gpclr1.u32 = clr_hi;
         }
-        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&drvdata->gpio.lock, cpuirq);
         return XWOK;
 }
 
@@ -478,7 +634,7 @@ xwer_t rpi4bxwds_soc_drv_gpio_output(struct xwds_soc * soc,
         lev_lo = 0U;
         lev_hi = 0U;
 
-        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->gpio.lock, &cpuirq);
         if (0U != mask_lo) {
                 lev_lo = soc_gpio.gplev0.u32 & mask_lo;
         }
@@ -501,7 +657,7 @@ xwer_t rpi4bxwds_soc_drv_gpio_output(struct xwds_soc * soc,
         if (0U != clr_hi) {
                 soc_gpio.gpclr1.u32 = clr_hi;
         }
-        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&drvdata->gpio.lock, cpuirq);
         return XWOK;
 }
 
@@ -623,7 +779,7 @@ xwer_t rpi4bxwds_soc_drv_eirq_req(struct xwds_soc * soc,
         drvdata = soc->dev.data;
         bit = rpi4bxwds_eirq_pin_bit(eiid);
         if (eiid < (xwid_t)32U) {
-                xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+                xwos_splk_lock_cpuirqsv(&drvdata->eirq.lock, &cpuirq);
                 if (XWDS_SOC_EIF_TM_RISING & eiflag) {
                         soc_gpio.gparen0.u32 |= bit;
                 } else {
@@ -644,9 +800,9 @@ xwer_t rpi4bxwds_soc_drv_eirq_req(struct xwds_soc * soc,
                 } else {
                         soc_gpio.gplen0.u32 &= ~bit;
                 }
-                xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+                xwos_splk_unlock_cpuirqrs(&drvdata->eirq.lock, cpuirq);
         } else {
-                xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+                xwos_splk_lock_cpuirqsv(&drvdata->eirq.lock, &cpuirq);
                 if (XWDS_SOC_EIF_TM_RISING & eiflag) {
                         soc_gpio.gparen1.u32 |= bit;
                 } else {
@@ -667,7 +823,7 @@ xwer_t rpi4bxwds_soc_drv_eirq_req(struct xwds_soc * soc,
                 } else {
                         soc_gpio.gplen1.u32 &= ~bit;
                 }
-                xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+                xwos_splk_unlock_cpuirqrs(&drvdata->eirq.lock, cpuirq);
         }
         return XWOK;
 }
@@ -687,21 +843,661 @@ xwer_t rpi4bxwds_soc_drv_eirq_rls(struct xwds_soc * soc,
         drvdata = soc->dev.data;
         bit = rpi4bxwds_eirq_pin_bit(eiid);
         if (eiid < (xwid_t)32U) {
-                xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+                xwos_splk_lock_cpuirqsv(&drvdata->eirq.lock, &cpuirq);
                 soc_gpio.gparen0.u32 &= ~bit;
                 soc_gpio.gpafen0.u32 &= ~bit;
                 soc_gpio.gphen0.u32 &= ~bit;
                 soc_gpio.gplen0.u32 &= ~bit;
                 soc_gpio.gpeds0.u32 = bit;
-                xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+                xwos_splk_unlock_cpuirqrs(&drvdata->eirq.lock, cpuirq);
         } else {
-                xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+                xwos_splk_lock_cpuirqsv(&drvdata->eirq.lock, &cpuirq);
                 soc_gpio.gparen1.u32 &= ~bit;
                 soc_gpio.gpafen1.u32 &= ~bit;
                 soc_gpio.gphen1.u32 &= ~bit;
                 soc_gpio.gplen1.u32 &= ~bit;
                 soc_gpio.gpeds1.u32 = bit;
-                xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+                xwos_splk_unlock_cpuirqrs(&drvdata->eirq.lock, cpuirq);
         }
         return XWOK;
+}
+
+/******** ******** DMA operation driver ******** ********/
+static
+xwer_t rpi4bxwds_soc_drv_dma_req(struct xwds_soc * soc, xwid_t ch)
+{
+        struct rpi4bxwds_soc_driver_data * drvdata;
+        xwreg_t cpuirq;
+        xwer_t rc;
+        xwu16_t chbit;
+
+        drvdata = soc->dev.data;
+        chbit = (xwu16_t)(1U << (xwu16_t)ch);
+        xwos_splk_lock_cpuirqsv(&drvdata->dma.lock, &cpuirq);
+        if (drvdata->dma.channels & chbit) {
+                rc = -EBUSY;
+                goto err_busy;
+        }
+        drvdata->dma.channels |= chbit;
+        switch (ch) {
+        case 0U:
+                soc_dma0.cs.b.reset = 1U;
+                break;
+        case 1U:
+                soc_dma1.cs.b.reset = 1U;
+                break;
+        case 2U:
+                soc_dma2.cs.b.reset = 1U;
+                break;
+        case 3U:
+                soc_dma3.cs.b.reset = 1U;
+                break;
+        case 4U:
+                soc_dma4.cs.b.reset = 1U;
+                break;
+        case 5U:
+                soc_dma5.cs.b.reset = 1U;
+                break;
+        case 6U:
+                soc_dma6.cs.b.reset = 1U;
+                break;
+        case 7U:
+                soc_dma7.cs.b.reset = 1U;
+                break;
+        case 8U:
+                soc_dma8.cs.b.reset = 1U;
+                break;
+        case 9U:
+                soc_dma9.cs.b.reset = 1U;
+                break;
+        case 10U:
+                soc_dma10.cs.b.reset = 1U;
+                break;
+        case 11U:
+                soc_dma11.debug.b.reset = 1U;
+                break;
+        case 12U:
+                soc_dma12.debug.b.reset = 1U;
+                break;
+        case 13U:
+                soc_dma13.debug.b.reset = 1U;
+                break;
+        case 14U:
+                soc_dma14.debug.b.reset = 1U;
+                break;
+        default:
+                break;
+        }
+        xwos_splk_unlock_cpuirqrs(&drvdata->dma.lock, cpuirq);
+        return XWOK;
+
+err_busy:
+        xwos_splk_unlock_cpuirqrs(&drvdata->dma.lock, cpuirq);
+        return rc;
+}
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_rls(struct xwds_soc * soc, xwid_t ch)
+{
+        struct rpi4bxwds_soc_driver_data * drvdata;
+        xwreg_t cpuirq;
+        xwer_t rc;
+        xwu16_t chbit;
+
+        drvdata = soc->dev.data;
+        chbit = (xwu16_t)(1U << (xwu16_t)ch);
+        xwos_splk_lock_cpuirqsv(&drvdata->dma.lock, &cpuirq);
+        if (!(drvdata->dma.channels & chbit)) {
+                rc = -EPERM;
+                goto err_perm;
+        }
+        switch (ch) {
+        case 0U:
+                soc_dma0.cb.u32 = 0U;
+                break;
+        case 1U:
+                soc_dma1.cb.u32 = 0U;
+                break;
+        case 2U:
+                soc_dma2.cb.u32 = 0U;
+                break;
+        case 3U:
+                soc_dma3.cb.u32 = 0U;
+                break;
+        case 4U:
+                soc_dma4.cb.u32 = 0U;
+                break;
+        case 5U:
+                soc_dma5.cb.u32 = 0U;
+                break;
+        case 6U:
+                soc_dma6.cb.u32 = 0U;
+                break;
+        case 7U:
+                soc_dma7.cb.u32 = 0U;
+                break;
+        case 8U:
+                soc_dma8.cb.u32 = 0U;
+                break;
+        case 9U:
+                soc_dma9.cb.u32 = 0U;
+                break;
+        case 10U:
+                soc_dma10.cb.u32 = 0U;
+                break;
+        case 11U:
+                soc_dma11.cb.u32 = 0U;
+                break;
+        case 12U:
+                soc_dma12.cb.u32 = 0U;
+                break;
+        case 13U:
+                soc_dma13.cb.u32 = 0U;
+                break;
+        case 14U:
+                soc_dma14.cb.u32 = 0U;
+                break;
+        default:
+                break;
+        }
+        drvdata->dma.channels &= ~chbit;
+        xwos_splk_unlock_cpuirqrs(&drvdata->dma.lock, cpuirq);
+        return XWOK;
+
+err_perm:
+        xwos_splk_unlock_cpuirqrs(&drvdata->dma.lock, cpuirq);
+        return rc;
+}
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg)
+{
+        const struct rpi4bxwds_dma_cfg * dma_cfg;
+        struct rpi4bxwds_soc_driver_data * drvdata;
+        xwreg_t cpuirq;
+        xwptr_t addr;
+        xwer_t rc;
+        xwu16_t chbit;
+
+        drvdata = soc->dev.data;
+        dma_cfg = (const struct rpi4bxwds_dma_cfg *)cfg;
+        chbit = (xwu16_t)(1U << (xwu16_t)ch);
+        if (NULL == cfg) {
+                rc = -EFAULT;
+                goto err_cfg;
+        }
+        addr = (xwptr_t)&dma_cfg->cb.dma;
+        xwos_splk_lock_cpuirqsv(&drvdata->dma.lock, &cpuirq);
+        if (!(drvdata->dma.channels & chbit)) {
+                rc = -EPERM;
+                goto err_perm;
+        }
+        switch (ch) {
+        case 0U:
+                soc_dma0.cb.u32 = (xwu32_t)addr;
+                soc_dma0.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma0.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma0.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma0.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 1U:
+                soc_dma1.cb.u32 = (xwu32_t)addr;
+                soc_dma1.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma1.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma1.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma1.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 2U:
+                soc_dma2.cb.u32 = (xwu32_t)addr;
+                soc_dma2.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma2.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma2.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma2.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 3U:
+                soc_dma3.cb.u32 = (xwu32_t)addr;
+                soc_dma3.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma3.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma3.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma3.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 4U:
+                soc_dma4.cb.u32 = (xwu32_t)addr;
+                soc_dma4.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma4.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma4.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma4.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 5U:
+                soc_dma5.cb.u32 = (xwu32_t)addr;
+                soc_dma5.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma5.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma5.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma5.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 6U:
+                soc_dma6.cb.u32 = (xwu32_t)addr;
+                soc_dma6.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma6.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma6.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma6.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 7U:
+                soc_dma7.cb.u32 = (xwu32_t)addr;
+                soc_dma7.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma7.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma7.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma7.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 8U:
+                soc_dma8.cb.u32 = (xwu32_t)addr;
+                soc_dma8.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma8.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma8.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma8.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 9U:
+                soc_dma9.cb.u32 = (xwu32_t)addr;
+                soc_dma9.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma9.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma9.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma9.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 10U:
+                soc_dma10.cb.u32 = (xwu32_t)addr;
+                soc_dma10.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma10.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma10.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma10.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 11U:
+                soc_dma11.cb.u32 = (xwu32_t)(addr >> 5U);
+                soc_dma11.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma11.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma11.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma11.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 12U:
+                soc_dma12.cb.u32 = (xwu32_t)(addr >> 5U);
+                soc_dma12.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma12.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma12.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma12.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 13U:
+                soc_dma13.cb.u32 = (xwu32_t)(addr >> 5U);
+                soc_dma13.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma13.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma13.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma13.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        case 14U:
+                soc_dma14.cb.u32 = (xwu32_t)(addr >> 5U);
+                soc_dma14.cs.b.priority = dma_cfg->cs_priority;
+                soc_dma14.cs.b.panic_priority = dma_cfg->cs_panic_priority;
+                soc_dma14.cs.b.disdebug = dma_cfg->cs_disdebug;
+                soc_dma14.cs.b.wait_for_outstanding_writes =
+                        dma_cfg->cs_wait_for_outstanding_writes;
+                break;
+        default:
+                break;
+        }
+        xwos_splk_unlock_cpuirqrs(&drvdata->dma.lock, cpuirq);
+        return XWOK;
+
+err_perm:
+        xwos_splk_unlock_cpuirqrs(&drvdata->dma.lock, cpuirq);
+err_cfg:
+        return rc;
+}
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_enable(struct xwds_soc * soc, xwid_t ch)
+{
+        XWOS_UNUSED(soc);
+        XWOS_UNUSED(ch);
+        return XWOK;
+}
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_disable(struct xwds_soc * soc, xwid_t ch)
+{
+        XWOS_UNUSED(soc);
+        XWOS_UNUSED(ch);
+        return XWOK;
+}
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_start(struct xwds_soc * soc, xwid_t ch)
+{
+        struct rpi4bxwds_soc_driver_data * drvdata;
+        xwreg_t cpuirq;
+        xwer_t rc;
+        xwu16_t chbit;
+
+        drvdata = soc->dev.data;
+        chbit = (xwu16_t)(1U << (xwu16_t)ch);
+        xwos_splk_lock_cpuirqsv(&drvdata->dma.lock, &cpuirq);
+        if (!(drvdata->dma.channels & chbit)) {
+                rc = -EPERM;
+                goto err_perm;
+        }
+        switch (ch) {
+        case 0U:
+                soc_dma0.cs.b.active = 1U;
+                break;
+        case 1U:
+                soc_dma1.cs.b.active = 1U;
+                break;
+        case 2U:
+                soc_dma2.cs.b.active = 1U;
+                break;
+        case 3U:
+                soc_dma3.cs.b.active = 1U;
+                break;
+        case 4U:
+                soc_dma4.cs.b.active = 1U;
+                break;
+        case 5U:
+                soc_dma5.cs.b.active = 1U;
+                break;
+        case 6U:
+                soc_dma6.cs.b.active = 1U;
+                break;
+        case 7U:
+                soc_dma7.cs.b.active = 1U;
+                break;
+        case 8U:
+                soc_dma8.cs.b.active = 1U;
+                break;
+        case 9U:
+                soc_dma9.cs.b.active = 1U;
+                break;
+        case 10U:
+                soc_dma10.cs.b.active = 1U;
+                break;
+        case 11U:
+                soc_dma11.cs.b.active = 1U;
+                break;
+        case 12U:
+                soc_dma12.cs.b.active = 1U;
+                break;
+        case 13U:
+                soc_dma13.cs.b.active = 1U;
+                break;
+        case 14U:
+                soc_dma14.cs.b.active = 1U;
+                break;
+        default:
+                break;
+        }
+        xwos_splk_unlock_cpuirqrs(&drvdata->dma.lock, cpuirq);
+        return XWOK;
+
+err_perm:
+        xwos_splk_unlock_cpuirqrs(&drvdata->dma.lock, cpuirq);
+        return rc;
+}
+
+static
+xwer_t rpi4bxwds_soc_drv_dma_stop(struct xwds_soc * soc, xwid_t ch)
+{
+        struct rpi4bxwds_soc_driver_data * drvdata;
+        xwreg_t cpuirq;
+
+        drvdata = soc->dev.data;
+        xwos_splk_lock_cpuirqsv(&drvdata->dma.lock, &cpuirq);
+        switch (ch) {
+        case 0U:
+                soc_dma0.cs.b.active = 0U;
+                break;
+        case 1U:
+                soc_dma1.cs.b.active = 0U;
+                break;
+        case 2U:
+                soc_dma2.cs.b.active = 0U;
+                break;
+        case 3U:
+                soc_dma3.cs.b.active = 0U;
+                break;
+        case 4U:
+                soc_dma4.cs.b.active = 0U;
+                break;
+        case 5U:
+                soc_dma5.cs.b.active = 0U;
+                break;
+        case 6U:
+                soc_dma6.cs.b.active = 0U;
+                break;
+        case 7U:
+                soc_dma7.cs.b.active = 0U;
+                break;
+        case 8U:
+                soc_dma8.cs.b.active = 0U;
+                break;
+        case 9U:
+                soc_dma9.cs.b.active = 0U;
+                break;
+        case 10U:
+                soc_dma10.cs.b.active = 0U;
+                break;
+        case 11U:
+                soc_dma11.cs.b.active = 0U;
+                break;
+        case 12U:
+                soc_dma12.cs.b.active = 0U;
+                break;
+        case 13U:
+                soc_dma13.cs.b.active = 0U;
+                break;
+        case 14U:
+                soc_dma14.cs.b.active = 0U;
+                break;
+        default:
+                break;
+        }
+        xwos_splk_unlock_cpuirqrs(&drvdata->dma.lock, cpuirq);
+        return XWOK;
+}
+
+/******** ******** DMA ISR ******** ********/
+static
+void rpi4bxwds_soc_dmach_isr(xwsq_t ch)
+{
+        struct xwds_soc * soc;
+        xwu8_t triggered;
+
+        soc = &rpi4bxwds_soc;
+        triggered = 0U;
+        switch (ch) {
+        case 0U:
+                if (soc_dma0.cs.b.intr) {
+                        soc_dma0.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 1U:
+                if (soc_dma1.cs.b.intr) {
+                        soc_dma1.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 2U:
+                if (soc_dma2.cs.b.intr) {
+                        soc_dma2.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 3U:
+                if (soc_dma3.cs.b.intr) {
+                        soc_dma3.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 4U:
+                if (soc_dma4.cs.b.intr) {
+                        soc_dma4.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 5U:
+                if (soc_dma5.cs.b.intr) {
+                        soc_dma5.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 6U:
+                if (soc_dma6.cs.b.intr) {
+                        soc_dma6.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 7U:
+                if (soc_dma7.cs.b.intr) {
+                        soc_dma7.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 8U:
+                if (soc_dma8.cs.b.intr) {
+                        soc_dma8.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 9U:
+                if (soc_dma9.cs.b.intr) {
+                        soc_dma9.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 10U:
+                if (soc_dma10.cs.b.intr) {
+                        soc_dma10.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 11U:
+                if (soc_dma11.cs.b.intr) {
+                        soc_dma11.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 12U:
+                if (soc_dma12.cs.b.intr) {
+                        soc_dma12.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 13U:
+                if (soc_dma13.cs.b.intr) {
+                        soc_dma13.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        case 14U:
+                if (soc_dma14.cs.b.intr) {
+                        soc_dma14.cs.b.intr = 1U;
+                        triggered = 1U;
+                }
+                break;
+        default:
+                break;
+        }
+        if ((triggered) && (soc->dma.chcbs[ch])) {
+                soc->dma.chcbs[ch](soc, (xwid_t)ch, 0U, soc->dma.chcbargs[ch]);
+        }
+}
+
+static
+void rpi4bxwds_soc_dma0_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(0U);
+}
+
+static
+void rpi4bxwds_soc_dma1_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(1U);
+}
+
+static
+void rpi4bxwds_soc_dma2_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(2U);
+}
+
+static
+void rpi4bxwds_soc_dma3_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(3U);
+}
+
+static
+void rpi4bxwds_soc_dma4_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(4U);
+}
+
+static
+void rpi4bxwds_soc_dma5_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(5U);
+}
+
+static
+void rpi4bxwds_soc_dma6_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(6U);
+}
+
+static
+void rpi4bxwds_soc_dma7_8_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(7U);
+        rpi4bxwds_soc_dmach_isr(8U);
+}
+
+static
+void rpi4bxwds_soc_dma9_10_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(9U);
+        rpi4bxwds_soc_dmach_isr(10U);
+}
+
+static
+void rpi4bxwds_soc_dma11_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(11U);
+}
+
+static
+void rpi4bxwds_soc_dma12_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(12U);
+}
+
+static
+void rpi4bxwds_soc_dma13_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(13U);
+}
+
+static
+void rpi4bxwds_soc_dma14_isr(void)
+{
+        rpi4bxwds_soc_dmach_isr(14U);
 }

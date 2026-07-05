@@ -22,6 +22,7 @@
 #define __board_xwac_xwds_soc_h__
 
 #include <board/std.h>
+#include <xwcd/soc/arm64/v8a/a72/bcm2711/soc_dma.h>
 
 /**
  * @brief BCM2711 GPIO引脚配置
@@ -29,6 +30,21 @@
 struct rpi4bxwds_gpio_cfg {
         xwu32_t function; /**< 功能选择: SOC_GPIO_ALT_GPI / GPO / ALT0~5 */
         xwu32_t pud; /**< 上下拉: SOC_GPIO_PUPDC_NO / PU / PD */
+};
+
+/**
+ * @brief BCM2711 DMA通道配置
+ */
+struct __xwcc_aligned(32) rpi4bxwds_dma_cfg {
+        union {
+                struct soc_dma_cb dma; /**< 普通DMA (Ch 0~6) */
+                struct soc_dma_lite_cb lite; /**< DMA Lite (Ch 7~10) */
+                struct soc_dma4_cb dma4; /**< DMA4 (Ch 11~14) */
+        } cb; /**< 控制块 */
+        xwu32_t cs_priority; /**< AXI优先级 (0~15) */
+        xwu32_t cs_panic_priority; /**< AXI panic优先级 (0~15) */
+        xwu32_t cs_disdebug; /**< 禁用debug暂停: 0=正常, 1=禁用 */
+        xwu32_t cs_wait_for_outstanding_writes; /**< 等待写响应: 0=不等, 1=等 */
 };
 
 #endif /* board/xwac/xwds/soc.h */

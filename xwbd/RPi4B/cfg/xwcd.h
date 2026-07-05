@@ -40,7 +40,7 @@
 #define XWCDCFG_ds_SOC_GPIO                                     1
 #define XWCDCFG_ds_SOC_EIRQ                                     1
 #define XWCDCFG_ds_SOC_EIRQ_ROISRT                              0
-#define XWCDCFG_ds_SOC_DMA                                      0
+#define XWCDCFG_ds_SOC_DMA                                      1
 #define XWCDCFG_ds_SOC_DMA_ROCBT                                0
 
 /******** ******** UART ******** ********/
