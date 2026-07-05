@@ -21,7 +21,6 @@ xwdx/wkspc
 GTAGS
 GRTAGS
 GPATH
-compile_commands.json
 .cache
 *.~undo-tree~
 Cargo.lock

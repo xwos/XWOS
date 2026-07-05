@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "RPI4B",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "${env:XWTC}/arm/bin/aarch64-none-elf-gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-arm64",
+            "compileCommands": ".vscode/rpi4b.compile_commands.json"
+        },
+        {
+            "name": "STM32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "${env:XWTC}/arm/bin/arm-none-eabi-gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-arm",
+            "compileCommands": ".vscode/stm32.compile_commands.json"
+        }
+    ],
+    "version": 4
+}
