@@ -4,19 +4,14 @@
 
 [pi4]
 arm_64bit=1
-arm_peri_high=1
+arm_peri_high=0
 core_freq=500
 core_freq_min=500
-armstub=armstub8-gic-highperi.bin
+armstub=armstub8-gic.bin
 kernel=loop.bin
 enable_jtag_gpio=1
 gpio=22=pu
 gpio=22-27=a4
 enable_gic=1
 enable_uart=1
-# dtoverlay=disable-bt
-# dtoverlay=uart0
-# init_uart_clock=48000000
-init_uart_baud=2000000
 # uart_2ndstage=1
-gpu_mem=512
