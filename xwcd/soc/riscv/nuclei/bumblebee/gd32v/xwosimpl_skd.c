@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/ospl/soc/xwsc.h>
+#include <xwos/ospl/xwsc.h>
 #include <xwos/ospl/skd.h>
 #include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc.h>
 #include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_irq.h>
