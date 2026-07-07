@@ -27,6 +27,8 @@ XWOS提供了比较多的示例工程：
   + [AtkApolloH743XWOS](https://gitee.com/xwos/AtkApolloH743XWOS.git)：正点原子阿波罗STM32H743开发板
   + [FK429M1XWOS](https://gitee.com/xwos/FK429M1XWOS.git)：反客STM32F429-M1开发板
   + [WeActMiniStm32H750XWOS](https://gitee.com/xwos/WeActMiniStm32H750XWOS.git)：微行电子MiniStm32H750开发板
++ Flagchip
+  + [Fc7300DemoBoard](https://xwos.tech/Docs/UserManual/Board/Flagchip/Fc7300DemoBoard/)：FC7300 Demo Board
 + GD32
   + [GD32F103CBXWOS](https://gitee.com/xwos/GD32F103CBXWOS.git)：GD32F103CB核心板
   + [GD32F303CCXWOS](https://gitee.com/xwos/GD32F303CCXWOS.git)：GD32F303CC核心板

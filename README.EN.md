@@ -20,7 +20,7 @@ adopted in an increasing number of production automotive projects.
 
 XWOS provides a number of example projects:
 
-+ [Raspberry Pi 4B](https://xwos.tech/Docs/UserManual/Board/RPi4B/)
++ [Raspberry Pi 4B](https://xwos.tech/en/Docs/UserManual/Board/RPi4B/)
 + STM32
   + [STM32F072C8XWOS](https://gitee.com/xwos/STM32F072C8XWOS.git): STM32F072C8 minimal system
   + [STM32F103C8XWOS](https://gitee.com/xwos/STM32F103C8XWOS.git): STM32F103C8 minimal system
@@ -30,6 +30,8 @@ XWOS provides a number of example projects:
   + [AtkApolloH743XWOS](https://gitee.com/xwos/AtkApolloH743XWOS.git): ALIENTEK Apollo STM32H743 dev board
   + [FK429M1XWOS](https://gitee.com/xwos/FK429M1XWOS.git): Fanke STM32F429-M1 dev board
   + [WeActMiniStm32H750XWOS](https://gitee.com/xwos/WeActMiniStm32H750XWOS.git): WeAct MiniStm32H750 dev board
++ Flagchip
+  + [Fc7300DemoBoard](https://xwos.tech/en/Docs/UserManual/Board/Flagchip/Fc7300DemoBoard/)：FC7300 Demo Board
 + GD32
   + [GD32F103CBXWOS](https://gitee.com/xwos/GD32F103CBXWOS.git): GD32F103CB core board
   + [GD32F303CCXWOS](https://gitee.com/xwos/GD32F303CCXWOS.git): GD32F303CC core board
