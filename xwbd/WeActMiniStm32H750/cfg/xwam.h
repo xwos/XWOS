@@ -39,7 +39,6 @@
 #define XWAMCFG_sample_c_mm_memslice                    1
 #define XWAMCFG_sample_c_mm_bma                         1
 #define XWAMCFG_sample_c_xwlib_crc                      1
-#define XWAMCFG_sample_c_cxx                            1
 #define XWAMCFG_sample_c_isc_xwmq                       1
 #define XWAMCFG_sample_c_isc_xwcq                       1
 
