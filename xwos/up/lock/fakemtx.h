@@ -68,7 +68,7 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
         XWOS_UNUSED(sprio);
         rc = XWUP_SEM_API(create, &sem, 1, 1);
         if (XWOK == rc) {
-                *ptrbuf = (void *)sem;
+                *ptrbuf = (struct xwup_mtx *)sem;
         }
         return rc;
 }
@@ -133,7 +133,7 @@ xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
 }
 
 static __xwup_inline_api
-xwer_t xwup_mtx_get_lkst(struct xwup_mtx * mtx, xwsq_t * lkst)
+xwer_t xwup_mtx_get_status(struct xwup_mtx * mtx, xwsq_t * lkst)
 {
         xwer_t rc;
         xwssq_t val;
