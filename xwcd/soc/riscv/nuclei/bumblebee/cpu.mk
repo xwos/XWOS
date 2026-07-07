@@ -19,10 +19,10 @@
 #
 
 CPU_INCDIRS :=
-CPU_AFLAGS := -march=rv32imac -mabi=ilp32
-CPU_CFLAGS := -march=rv32imac -mabi=ilp32
-CPU_CXXFLAGS := -march=rv32imac -mabi=ilp32
-CPU_LDFLAGS := -march=rv32imac -mabi=ilp32
+CPU_AFLAGS := -march=rv32imac_zicsr_zifencei -mabi=ilp32
+CPU_CFLAGS := -march=rv32imac_zicsr_zifencei -mabi=ilp32
+CPU_CXXFLAGS := -march=rv32imac_zicsr_zifencei -mabi=ilp32
+CPU_LDFLAGS := -march=rv32imac_zicsr_zifencei -mabi=ilp32
 
 CPU_ASRCS :=
 CPU_CSRCS :=
