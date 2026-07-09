@@ -214,7 +214,6 @@ SECTIONS {
         tbss_vma_offset = ADDR(.tbss) - ADDR(.tdata);
         tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
         tls_offset = MAX(8, tls_align);
-        data_vma_end = tbss_vma_end;
 
         .noncacheable.data : ALIGN(32) {
                 *(.*mcal_nocacheable_data*)

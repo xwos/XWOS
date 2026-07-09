@@ -158,6 +158,7 @@ SECTIONS {
                 *(.*mcal_data*)
                 *(.*mcal_nocacheable_data*)
                 *(.*mcal_shareable_data*)
+                *(.percpu.data*)
                 . = ALIGN(32);
                 data_vma_end = .;
         } > data_mr AT> code_mr
@@ -194,7 +195,6 @@ SECTIONS {
         tbss_vma_offset = ADDR(.tbss) - ADDR(.tdata);
         tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
         tls_offset = MAX(8, tls_align);
-        data_vma_end = tbss_vma_end;
         /* -------- Data -------- */
 
         .firmware.tail : ALIGN(32) {
