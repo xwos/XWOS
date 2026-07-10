@@ -200,19 +200,119 @@ void soc_relocate_ivt(void)
         armv7m_scs.scb.vtor.u32 = (xwu32_t)armv7m_ivt_vma_base;
 }
 
+#define WDOG0_BASE_ADDR                 (0x40052000U)
+#define WDOG1_BASE_ADDR                 (0x40053000U)
+
+#define WDOG_CS_OFFSET                  (0x0000U) /* Watchdog Control and Status Register */
+#define WDOG_COUNTER_OFFSET             (0x0004U) /* Watchdog Counter Register */
+#define WDOG_TIMEOUT_OFFSET             (0x0008U) /* Watchdog Timeout Value Register */
+#define WDOG_WINDOW_OFFSET              (0x000CU) /* Watchdog Window Register */
+
+#define WDOG_CS_UPDATE                  (1U << 5U)  /* Bit 5:  Allow updates */
+#define WDOG_CS_CLK_SEL_SHIFT           (8U) /* Bits 8-9: Watchdog Clock */
+#define WDOG_CS_CLK_SEL_MASK            (3U << WDOG_CS_CLK_SEL_SHIFT)
+#define WDOG_CS_CLK_SEL_BUS_CLK         (0U << WDOG_CS_CLK_SEL_SHIFT) /* Bus clock */
+#define WDOG_CS_CLK_SEL_AON_CLK         (1U << WDOG_CS_CLK_SEL_SHIFT) /* AON clock */
+#define WDOG_CS_CLK_SEL_SOSC_CLK        (2U << WDOG_CS_CLK_SEL_SHIFT) /* SOSC clock */
+#define WDOG_CS_CLK_SEL_SIRC_CLK        (3U << WDOG_CS_CLK_SEL_SHIFT) /* SIRC clock */
+#define WDOG_CS_RECFG_STAT              (1U << 10U) /* Bit 10: Reconfiguration Success */
+#define WDOG_CS_ULK_STAT                (1U << 11U) /* Bit 11: Unlock status */
+#define WDOG_CS_PRESCALER_SHIFT         (12U) /* Bit 12: Watchdog 256 prescale enable/disable */
+#define WDOG_CS_PRESCALER_MASK          (1U << WDOG_CS_PRESCALER_SHIFT)
+#define WDOG_CS_PRESCALER_ENABLE        (1U << WDOG_CS_PRESCALER_SHIFT) /* Bit 12: Watchdog prescalr */
+
+#define WDOG_COUNTER_UNLOCK             (0x08181982U)  /* Value to unlock the watchdog registers */
+#define WDOG_CS_DISABLE_WDOG            (WDOG_CS_UPDATE | WDOG_CS_CLK_SEL_AON_CLK | \
+                                         WDOG_CS_PRESCALER_ENABLE | WDOG_CS_ULK_STAT)
+
+void soc_disable_wdog0(void)
+{
+        register xwu32_t val;
+        register xwu32_t try = 128u;
+
+        /* If it is not the first time to configure wdog, unlock status will only
+           persist for 128 bus clocks. */
+        while (0UL != try) {
+                val = xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET);
+                if ((val & WDOG_CS_ULK_STAT) == 0U) {
+                        break;
+                }
+                try--;
+        }
+        /* If ULK_STAT turns into 0 in 128 try counts, it means this is not the
+           first time to configure the wdog. */
+        if (0UL != try) {
+                /* When ULK_STAT = 0, the wdog can only be unlocked when RECFG_STAT
+                   becomes 1. */
+                do {
+                        val = xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_RECFG_STAT) == 0U);
+
+                /* Unlock the wdog.
+                   Note: The unlock status only persist for 128 bus clocks.
+                   SHALL NOT use single-step or break points in the following lines. */
+                xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_COUNTER_OFFSET) =
+                        WDOG_COUNTER_UNLOCK;
+
+                do {
+                        /* Wait until the unlock take effect. */
+                        val = xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_ULK_STAT) == 0U);
+        }
+        /* Disable Watchdog */
+        xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET) = WDOG_CS_DISABLE_WDOG;
+        xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xFFFFU;
+        /* Wait the RECFG_STAT to become 1. */
+        do {
+                val = xwmb_access(xwu32_t, WDOG0_BASE_ADDR + WDOG_CS_OFFSET);
+        } while ((val & WDOG_CS_RECFG_STAT) == 0U);
+}
+
+void soc_disable_wdog1(void)
+{
+        register xwu32_t val;
+        register xwu32_t try = 128u;
+
+        /* If it is not the first time to configure wdog, unlock status will only
+           persist for 128 bus clocks. */
+        while (0UL != try) {
+                val = xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET);
+                if ((val & WDOG_CS_ULK_STAT) == 0U) {
+                        break;
+                }
+                try--;
+        }
+        /* If ULK_STAT turns into 0 in 128 try counts, it means this is not the
+           first time to configure the wdog. */
+        if (0UL != try) {
+                /* When ULK_STAT = 0, the wdog can only be unlocked when RECFG_STAT
+                   becomes 1. */
+                do {
+                        val = xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_RECFG_STAT) == 0U);
+
+                /* Unlock the wdog.
+                   Note: The unlock status only persist for 128 bus clocks.
+                   SHALL NOT use single-step or break points in the following lines. */
+                xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_COUNTER_OFFSET) =
+                        WDOG_COUNTER_UNLOCK;
+
+                do {
+                        /* Wait until the unlock take effect. */
+                        val = xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET);
+                } while ((val & WDOG_CS_ULK_STAT) == 0U);
+        }
+        /* Disable Watchdog */
+        xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET) = WDOG_CS_DISABLE_WDOG;
+        xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_TIMEOUT_OFFSET) = 0xFFFFU;
+        /* Wait the RECFG_STAT to become 1. */
+        do {
+                val = xwmb_access(xwu32_t, WDOG1_BASE_ADDR + WDOG_CS_OFFSET);
+        } while ((val & WDOG_CS_RECFG_STAT) == 0U);
+}
+
 void soc_disable_wdg(void)
 {
-        /* disable wdog 0 */
-        *(volatile xwu32_t *)0x40052004 = 0x08181982;
-        while (0U == (0x800u & *(volatile xwu32_t *)0x40052000));
-        *(volatile xwu32_t *)0x40052000 = 0x2920;
-        *(volatile xwu32_t *)0x40052008 = 0xF000;
-        while (0U == (0x400u & *(volatile xwu32_t *)0x40052000));
-
-        /* disable wdog 1 */
-        *(volatile xwu32_t *)0x40053004 = 0x08181982;
-        while (0U == (0x800u & *(volatile xwu32_t *)0x40053000));
-        *(volatile xwu32_t *)0x40053000 = 0x2920;
-        *(volatile xwu32_t *)0x40053008 = 0xF000;
-        while (0U == (0x400u & *(volatile xwu32_t *)0x40053000));
+        soc_disable_wdog0();
+        soc_disable_wdog1();
 }
