@@ -2,7 +2,7 @@
     "C_Cpp.clang_format_style": "file",
     "editor.tabSize": 8,
     "editor.insertSpaces": true,
-    "editor.detectIndentation": false
+    "editor.detectIndentation": false,
     "[c]": {
         "editor.tabSize": 8,
         "editor.insertSpaces": true
@@ -51,6 +51,5 @@
         "*.cc": "cpp"
     },
     "files.eol": "\n",
-    "cmake.configureOnOpen": false,
-    "diffEditor.codeLens": false,
+    "cmake.configureOnOpen": false
 }
