@@ -42,10 +42,13 @@ d distclean: cfg
 	$(MAKE) -C $(WKSPC) NODEP=y distclean
 	@rm -rf $(WKSPC)
 
+ccdb:
+	../../xwbs/util/sh/genccdb --top=../.. --build=xwbd/WeActMiniStm32H750 ../../.vscode/stm32.compile_commands.json
+
 FORCE:
 
 .DEFAULT:
 	@$(MAKE) cfg
 	$(MAKE) -C $(WKSPC) $@
 
-.PHONY : all cfg c clean d distclean
+.PHONY : all cfg c clean d distclean ccdb

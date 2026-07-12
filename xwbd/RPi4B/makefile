@@ -67,10 +67,13 @@ d distclean: cfg
 	@rm -rf $(WKSPC)
 	@rm -rf $(WKSPC)/*.gdb
 
+ccdb:
+	../../xwbs/util/sh/genccdb --top=../.. --build=xwbd/RPi4B ../../.vscode/rpi4b.compile_commands.json
+
 FORCE:
 
 .DEFAULT:
 	@$(MAKE) cfg
 	$(MAKE) -C $(WKSPC) $@
 
-.PHONY : all cfg c clean d distclean script jlink daplink core0.dbg core1.dbg core2.dbg core3.dbg
+.PHONY : all cfg c clean d distclean script jlink daplink core0.dbg core1.dbg core2.dbg core3.dbg ccdb
