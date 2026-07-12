@@ -1,26 +1,28 @@
 ---
 name: openspec-propose
-description: 一步提案新变更并生成所有产出物。当用户想要快速描述他们想要构建的内容，并获得包含设计、规格说明和任务的完整提案以准备实现时使用。
+description: 一步生成所有产出物来提议新变更。当用户想快速描述要构建的内容并获得包含设计、规范和任务的完整提案时使用。
 license: MIT
 compatibility: 需要 openspec-cn CLI。
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.4.1"
+  generatedBy: "1.5.0"
 ---
 
-提案新变更 - 一步创建变更并生成所有产出物。
+提议新变更 - 一步创建变更并生成所有产出物。
 
 我将创建一个包含以下产出物的变更：
-- proposal.md（什么和为什么）
-- design.md（实现方式）
+- proposal.md（做什么 & 为什么）
+- design.md（怎么做）
 - tasks.md（实现步骤）
 
-准备好实现后，运行 /opsx-apply
+准备实现时，运行 /opsx-apply
 
 ---
 
-**输入**：用户的请求应包含变更名称（kebab-case）或对他们想要构建内容的描述。
+**Store 选择：** 如果用户指定了某个 Store（Store 是在本机注册的独立 OpenSpec 仓库），或者工作位于某个 Store 中，请运行 `openspec-cn store list --json` 来查找已注册的 Store ID，然后在读写规范和变更的命令上传递 `--store <id>` 参数（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`）。其他命令不需要此参数。命令输出的提示信息中已包含该参数；请在后续操作中保留它。如果没有指定 Store，命令将对最近的本地 `openspec/` 根目录生效。
+
+**输入**：用户的请求应当包含变更名称（kebab-case）或对想要构建内容的描述。
 
 **步骤**
 
@@ -37,7 +39,7 @@ metadata:
    ```bash
    openspec-cn new change "<name>"
    ```
-   这将在 CLI 解析的规划主目录中创建一个带有 `.openspec.yaml` 的脚手架变更。
+   这将在 CLI 解析的规划主目录中创建一个脚手架变更。
 
 3. **获取产出物构建顺序**
    ```bash
@@ -107,5 +109,5 @@ metadata:
 - 创建实现所需的所有产出物（由 Schema 的 `apply.requires` 定义）
 - 在创建新产出物之前始终阅读依赖产出物
 - 如果上下文极其不清楚，询问用户 - 但倾向于做出合理的决定以保持势头
-- 如果同名变更已存在，询问用户是否要继续它或创建一个新的
+- 如果同名变更已存在，询问用户是否要继续处理它或创建一个新的
 - 在继续下一个之前，验证写入后每个产出物文件是否存在
