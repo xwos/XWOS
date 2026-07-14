@@ -46,6 +46,9 @@
 #define XWMM_BMA_ORDER_MASK             ((xwu8_t)0x7F) /**< 阶的掩码 */
 #define XWMM_BMA_INUSED                 ((xwu8_t)0x80) /**< 块正在被使用 */
 
+#define XWMM_BMA_ORDERLIST_SIZE(bo) sizeof(struct xwmm_bma_orderlist[(bo) + 1U])
+#define XWMM_BMA_BCB_SIZE(bo) sizeof(struct xwmm_bma_bcb[1U << (bo)])
+
 /**
  * @brief 定义伙伴算法内存块分配器结构体的RAW内存空间，
  *        用于初始化伙伴算法内存块分配器结构体
@@ -54,8 +57,7 @@
  */
 #define XWMM_BMA_RAWOBJ_DEF(name, blkodr) \
         xwu8_t name[sizeof(struct xwmm_bma) + \
-                    sizeof(struct xwmm_bma_orderlist[(blkodr) + 1U]) + \
-                    sizeof(struct xwmm_bma_bcb[1U << (blkodr)])]
+                    XWMM_BMA_ORDERLIST_SIZE(blkodr) + XWMM_BMA_BCB_SIZE(blkodr)]
 
 /**
  * @brief 阶链表
