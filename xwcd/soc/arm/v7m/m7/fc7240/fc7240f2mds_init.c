@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC描述层：FC7300F4MDS初始化
+ * @brief SOC描述层：FC7240F2MDS初始化
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -253,6 +253,8 @@ void soc_init_ram(void)
 
         /* STCU PCC Enable */
         xwmb_access(xwu32_t, PCC_STCU_ADDR) = 0x00800000U;
+        __asm__ volatile("dsb");
+        __asm__ volatile("isb");
 
         /* Get the reset reason */
         val = xwmb_access(xwu32_t, RGM_BASE_ADDR + RGM_SRS_OFFSET);
