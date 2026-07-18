@@ -195,3 +195,4 @@ xwer_t MX_RTC_Get_DateTime(struct tm * tm, suseconds_t * ms)
 }
 
 /* USER CODE END 1 */
+

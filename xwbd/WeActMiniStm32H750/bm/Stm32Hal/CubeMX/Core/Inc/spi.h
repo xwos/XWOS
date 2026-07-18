@@ -78,3 +78,4 @@ xwer_t MX_SPI_Abort(xwu32_t hwid);
 #endif
 
 #endif /* __SPI_H__ */
+

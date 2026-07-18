@@ -72,3 +72,4 @@ xwer_t MX_I2C_Abort(xwu32_t hwid, xwu16_t addr);
 #endif
 
 #endif /* __I2C_H__ */
+

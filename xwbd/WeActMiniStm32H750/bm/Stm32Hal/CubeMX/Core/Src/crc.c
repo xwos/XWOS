@@ -170,3 +170,4 @@ xwer_t MX_CRC8_Cal(xwu8_t * crc8,
   return rc;
 }
 /* USER CODE END 1 */
+

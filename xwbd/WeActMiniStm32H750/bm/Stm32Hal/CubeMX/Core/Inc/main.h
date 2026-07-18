@@ -39,6 +39,7 @@ extern "C" {
 #include "stm32h7xx_ll_pwr.h"
 #include "stm32h7xx_ll_gpio.h"
 #include "stm32h7xx_ll_dma.h"
+#include "stm32h7xx_ll_hsem.h"
 
 #include "stm32h7xx_ll_exti.h"
 

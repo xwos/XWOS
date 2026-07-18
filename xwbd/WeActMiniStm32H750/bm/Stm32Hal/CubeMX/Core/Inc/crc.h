@@ -56,3 +56,4 @@ xwer_t MX_CRC8_Cal(xwu8_t * crc8,
 #endif
 
 #endif /* __CRC_H__ */
+
