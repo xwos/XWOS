@@ -1,12 +1,13 @@
 ---
 name: openspec-sync-specs
 description: 将变更中的增量规范同步到主规范。当用户希望将增量规范的变更更新到主规范中（而不归档变更）时使用。
+allowed-tools: Bash(openspec-cn:*)
 license: MIT
 compatibility: 需要 openspec-cn CLI。
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.5.0"
+  generatedBy: "1.6.0"
 ---
 
 将变更中的增量规范同步到主规范。
@@ -130,7 +131,7 @@ metadata:
 
 **<capability-1>**：
 - 新增需求："新功能"
-- 修��需求："现有功能"（新增 1 个场景）
+- 修改需求："现有功能"（新增 1 个场景）
 
 **<capability-2>**：
 - 创建新规范文件

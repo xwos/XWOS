@@ -1,12 +1,13 @@
 ---
 name: openspec-apply-change
 description: 从 OpenSpec 变更中实现任务。当用户想开始实现、继续实现或处理任务时使用。
+allowed-tools: Bash(openspec-cn:*)
 license: MIT
 compatibility: 需要 openspec-cn CLI。
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.5.0"
+  generatedBy: "1.6.0"
 ---
 
 从 OpenSpec 变更中实现任务。

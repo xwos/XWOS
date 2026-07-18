@@ -1,12 +1,13 @@
 ---
 name: openspec-archive-change
 description: 在实验性工作流中归档已完成的变更。当用户想在实现完成后定稿并归档变更时使用。
+allowed-tools: Bash(openspec-cn:*)
 license: MIT
 compatibility: 需要 openspec-cn CLI。
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.5.0"
+  generatedBy: "1.6.0"
 ---
 
 在实验性工作流中归档已完成的变更。

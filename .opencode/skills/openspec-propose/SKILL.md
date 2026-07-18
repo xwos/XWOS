@@ -1,12 +1,13 @@
 ---
 name: openspec-propose
 description: 一步生成所有产出物来提议新变更。当用户想快速描述要构建的内容并获得包含设计、规范和任务的完整提案时使用。
+allowed-tools: Bash(openspec-cn:*)
 license: MIT
 compatibility: 需要 openspec-cn CLI。
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.5.0"
+  generatedBy: "1.6.0"
 ---
 
 提议新变更 - 一步创建变更并生成所有产出物。
