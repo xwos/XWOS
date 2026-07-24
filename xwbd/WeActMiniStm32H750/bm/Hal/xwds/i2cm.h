@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief Hal::xwds::i2cm
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,28 +18,12 @@
  * > limitations under the License.
  */
 
+#ifndef bm_Hal_xwds_i2cm_h__
+#define bm_Hal_xwds_i2cm_h__
+
 #include <board/std.h>
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/time.h>
-#include <xwcd/peripheral/i2c/eeprom/driver.h>
-#include <bm/Hal/mi.h>
+#include <xwcd/ds/i2c/master.h>
 
-#define LOGTAG "TST|EEPROM"
+void stm32xwds_i2cm_on_complete(struct xwds_i2cm * i2cm, xwer_t xrc);
 
-void tst_eeprom_init(void)
-{
-        xwu8_t rdbuf[64];
-        xwsz_t rdsz;
-        xwer_t rc;
-
-        rdsz = sizeof(rdbuf);
-        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
-                                rdbuf, &rdsz, 0,
-                                xwtm_ft(xwtm_s(1)));
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
-        } else {
-                rdbuf[63] = 0;
-                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
-        }
-}
+#endif /* bm/Hal/xwds/i2cm.h */

@@ -22,16 +22,11 @@
 #include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <xwcd/peripheral/spi/lcd/st7735/driver.h>
-#ifdef XWCFG_LIBC__newlib
-#  include <xwmd/libc/newlibac/mi.h>
-#endif
-#ifdef XWCFG_LIBC__picolibc
-#  include <xwmd/libc/picolibcac/mi.h>
-#endif
 #include <xwmd/vm/lua/mi.h>
 #include <board/xwac/fatfs/sdcard.h>
 #include <board/xwac/xwssc/xwssc.h>
-#include <bm/Stm32Hal/mi.h>
+#include <board/xwac/libc/mi.h>
+#include <bm/Hal/mi.h>
 
 #include <xwos/lib/xwlog.h>
 #define MTHD_LOGTAG "Mthd"
@@ -88,18 +83,11 @@ xwer_t mthd_mainfunc(void * arg)
         xwds_st7735_draw(&stm32xwds_st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 
         xwlogf(I, MTHD_LOGTAG, "Init C++ Runtime ...\r\n");
-#ifdef XWCFG_LIBC__newlib
-        newlibac_init();
-#endif
-#ifdef XWCFG_LIBC__picolibc
-        picolibcac_init();
-#endif
+        libc_init();
         xwlogf(I, MTHD_LOGTAG, "Init XWSSC.UART3 ...\r\n");
         xwssc3_init();
-
         xwlogf(I, MTHD_LOGTAG, "Start Rust Applications ...\r\n");
         xwrust_main();
-
         rc = xwlua_start();
         if (rc < 0) {
                 xwlogf(ERR, MTHD_LOGTAG, "Start Lua VM ... <rc:%d>", rc);

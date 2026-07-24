@@ -22,7 +22,7 @@
 #include <xwmd/isc/xwssc/protocol.h>
 #include <xwmd/isc/xwssc/mi.h>
 #include <xwmd/isc/xwssc/hwif/uart.h>
-#include <bm/Stm32Hal/xwds/device.h>
+#include <bm/Hal/mi.h>
 #include "board/xwac/xwssc/xwssc.h"
 
 #include <xwos/lib/xwlog.h>

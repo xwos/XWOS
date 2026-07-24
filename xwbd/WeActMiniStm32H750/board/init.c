@@ -24,7 +24,7 @@
 #include <string.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwem/debug/CmBacktrace/cm_backtrace.h>
-#include <bm/Stm32Hal/mi.h>
+#include <bm/Hal/mi.h>
 #include "board/xwac/xwos/pm.h"
 #include "board/xwac/xwlib/crc.h"
 

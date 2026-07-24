@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief 板级描述层：XWOS适配层：libc：mi
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,28 +18,11 @@
  * > limitations under the License.
  */
 
-#include <board/std.h>
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/time.h>
-#include <xwcd/peripheral/i2c/eeprom/driver.h>
-#include <bm/Hal/mi.h>
+#ifndef __board_xwac_libc_mi_h__
+#define __board_xwac_libc_mi_h__
 
-#define LOGTAG "TST|EEPROM"
+#include "board/std.h"
 
-void tst_eeprom_init(void)
-{
-        xwu8_t rdbuf[64];
-        xwsz_t rdsz;
-        xwer_t rc;
+void libc_init(void);
 
-        rdsz = sizeof(rdbuf);
-        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
-                                rdbuf, &rdsz, 0,
-                                xwtm_ft(xwtm_s(1)));
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
-        } else {
-                rdbuf[63] = 0;
-                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
-        }
-}
+#endif /* board/xwac/libc/mi.h */

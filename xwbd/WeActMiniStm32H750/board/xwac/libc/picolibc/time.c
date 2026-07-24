@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief 板级描述层：XWOS适配层：picolibc：时钟
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,28 +18,15 @@
  * > limitations under the License.
  */
 
-#include <board/std.h>
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/time.h>
-#include <xwcd/peripheral/i2c/eeprom/driver.h>
-#include <bm/Hal/mi.h>
+#include "board/std.h"
+#include "bm/Hal/mi.h"
 
-#define LOGTAG "TST|EEPROM"
-
-void tst_eeprom_init(void)
+xwer_t picolibcac_rtc_set_datetime(struct tm * tm, suseconds_t ms)
 {
-        xwu8_t rdbuf[64];
-        xwsz_t rdsz;
-        xwer_t rc;
+        return stm32hal_rtc_set_datetime(tm, ms);
+}
 
-        rdsz = sizeof(rdbuf);
-        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
-                                rdbuf, &rdsz, 0,
-                                xwtm_ft(xwtm_s(1)));
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
-        } else {
-                rdbuf[63] = 0;
-                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
-        }
+xwer_t picolibcac_rtc_get_datetime(struct tm * tm, suseconds_t * ms)
+{
+        return stm32hal_rtc_get_datetime(tm, ms);
 }

@@ -21,7 +21,7 @@
 #include <board/std.h>
 #include <xwos/lib/xwlog.h>
 #include <xwcd/peripheral/spi/flash/w25qxx/driver.h>
-#include <bm/Stm32Hal/xwds/device.h>
+#include <bm/Hal/mi.h>
 #include <xwam/application/w25qpt/mi.h>
 #include <xwam/application/w25qpt/hwif/uart.h>
 

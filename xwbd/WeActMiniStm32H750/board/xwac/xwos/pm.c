@@ -21,7 +21,7 @@
 #include "board/std.h"
 #include <xwos/osal/pm.h>
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
-#include <bm/Stm32Hal/mi.h>
+#include <bm/Hal/mi.h>
 
 void xwosac_pmop_resume_periph(void * arg)
 {

@@ -21,7 +21,7 @@
 #include "board/std.h"
 #include <xwos/osal/skd.h>
 #include <xwos/osal/thd.h>
-#include <bm/Stm32Hal/mi.h>
+#include <bm/Hal/mi.h>
 
 xwer_t board_log_write(const char * s, xwsz_t * n)
 {

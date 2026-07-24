@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <xwem/fs/fatfs/ff.h>
 #include <xwem/fs/fatfs/diskio.h>
-#include "bm/Stm32Hal/mi.h"
+#include "bm/Hal/mi.h"
 
 #include <xwos/lib/xwlog.h>
 #define LOGTAG "sdcard"

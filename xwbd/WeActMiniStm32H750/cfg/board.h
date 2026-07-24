@@ -65,7 +65,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BMCFG_Stm32Hal                          1
+#define BMCFG_Hal                               1
 #define BMCFG_RustApp                           1
 #define BMCFG_MainThread                        1
 #define BMCFG_Test_eeprom                       1

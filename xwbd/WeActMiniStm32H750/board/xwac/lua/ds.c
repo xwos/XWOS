@@ -24,7 +24,7 @@
 #include <xwmd/vm/lua/xwlua/xwds/uart.h>
 #include <xwmd/vm/lua/xwlua/xwds/spim.h>
 #include <xwmd/vm/lua/xwlua/xwds/i2cm.h>
-#include "bm/Stm32Hal/xwds/device.h"
+#include "bm/Hal/mi.h"
 
 void xwlua_open_brdlibs(lua_State * L)
 {

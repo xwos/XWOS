@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：测试程序：eeprom
+ * @brief Hal::xwds::eeprom
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,27 +19,27 @@
  */
 
 #include <board/std.h>
-#include <xwos/lib/xwlog.h>
-#include <xwos/osal/time.h>
+#include <xwcd/peripheral/i2c/eeprom/device.h>
 #include <xwcd/peripheral/i2c/eeprom/driver.h>
-#include <bm/Hal/mi.h>
+#include "bm/Hal/xwds/device.h"
 
-#define LOGTAG "TST|EEPROM"
-
-void tst_eeprom_init(void)
-{
-        xwu8_t rdbuf[64];
-        xwsz_t rdsz;
-        xwer_t rc;
-
-        rdsz = sizeof(rdbuf);
-        rc = xwds_eeprom_pgread(&stm32xwds_eeprom256k,
-                                rdbuf, &rdsz, 0,
-                                xwtm_ft(xwtm_s(1)));
-        if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Failed to read ... <%ld>\n", rc);
-        } else {
-                rdbuf[63] = 0;
-                xwlogf(INFO, LOGTAG, "Content:%s\n", rdbuf);
-        }
-}
+struct xwds_eeprom stm32xwds_eeprom256k = {
+        /* attributes */
+        .i2cp = {
+                .dev = {
+                        .name = "stm32xwds.eeprom.256k",
+                        .id = 0,
+                        .resources = NULL,
+                        .drv = xwds_cast(struct xwds_driver *, &at24md_drv),
+                        .data = NULL,
+                },
+                .bus = &stm32xwds_i2cm1,
+                .addr = 0x50,
+        },
+        .parameter = {
+                .page_size = 64,
+                .total = 512,
+        },
+        .pwr_gpiorsc = NULL,
+        .wp_gpiorsc = NULL,
+};

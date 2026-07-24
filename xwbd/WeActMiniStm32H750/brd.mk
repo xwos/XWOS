@@ -19,18 +19,18 @@
 #
 
 STM32CUBE_DEFS := -DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32H750xx -DUSE_PWR_LDO_SUPPLY
-STM32CUBE_INCDIRS := bm/Stm32Hal/CubeMX/Core/Inc
-STM32CUBE_INCDIRS += bm/Stm32Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc
-STM32CUBE_INCDIRS += bm/Stm32Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
-STM32CUBE_INCDIRS += bm/Stm32Hal/CubeMX/Drivers/CMSIS/Device/ST/STM32H7xx/Include
-STM32CUBE_INCDIRS += bm/Stm32Hal/CubeMX/Drivers/CMSIS/Include
+STM32CUBE_INCDIRS := bm/Hal/CubeMX/Core/Inc
+STM32CUBE_INCDIRS += bm/Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc
+STM32CUBE_INCDIRS += bm/Hal/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
+STM32CUBE_INCDIRS += bm/Hal/CubeMX/Drivers/CMSIS/Device/ST/STM32H7xx/Include
+STM32CUBE_INCDIRS += bm/Hal/CubeMX/Drivers/CMSIS/Include
 
 BRD_INCDIRS := $(STM32CUBE_INCDIRS)
 BRD_AFLAGS := $(STM32CUBE_DEFS)
 BRD_CFLAGS := $(STM32CUBE_DEFS)
 BRD_CXXFLAGS := $(STM32CUBE_DEFS)
 BRD_LDFLAGS :=
-BRD_CPPCHECK_FLAGS := -i $(XWOS_BRD_DIR)/bm/Stm32Hal/CubeMX
+BRD_CPPCHECK_FLAGS := -i $(XWOS_BRD_DIR)/bm/Hal/CubeMX
 
 BRD_ASRCS :=
 BRD_CSRCS :=
@@ -52,10 +52,12 @@ BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwds)
 BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/lua)
 BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/fatfs)
 ifeq ($(XWCFG_LIBC),newlib)
-  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/newlib)
+  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/libc)
+  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/libc/newlib)
 endif
 ifeq ($(XWCFG_LIBC),picolibc)
-  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/picolibc)
+  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/libc)
+  BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/libc/picolibc)
 endif
 BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwssc)
 BRD_CSRCS += $(call BrdWildcard,*.c,board/xwac/xwrust)

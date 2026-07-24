@@ -24,7 +24,7 @@
 #include <xwos/osal/skd.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/lock/mtx.h>
-#include "bm/Stm32Hal/mi.h"
+#include "bm/Hal/mi.h"
 
 struct xwos_splk xwlibac_crc_splk;
 struct xwos_mtx xwlibac_crc_mtx;

@@ -1,0 +1,189 @@
+/**
+ * @file
+ * @brief Hal::xwds::i2cm
+ * @author
+ * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
+ * @copyright
+ * + Copyright © 2015 xwos.tech, All Rights Reserved.
+ * > Licensed under the Apache License, Version 2.0 (the "License");
+ * > you may not use this file except in compliance with the License.
+ * > You may obtain a copy of the License at
+ * >
+ * >         http://www.apache.org/licenses/LICENSE-2.0
+ * >
+ * > Unless required by applicable law or agreed to in writing, software
+ * > distributed under the License is distributed on an "AS IS" BASIS,
+ * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * > See the License for the specific language governing permissions and
+ * > limitations under the License.
+ */
+
+#include <board/std.h>
+#include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/cond.h>
+#include <xwcd/ds/i2c/master.h>
+#include "bm/Hal/CubeMX/Core/Inc/i2c.h"
+#include "bm/Hal/xwds/device.h"
+#include "bm/Hal/xwds/i2cm.h"
+
+static
+xwer_t stm32xwds_i2cm_drv_start(struct xwds_device * dev);
+
+static
+xwer_t stm32xwds_i2cm_drv_stop(struct xwds_device * dev);
+
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+static
+xwer_t stm32xwds_i2cm_drv_suspend(struct xwds_device * dev);
+
+static
+xwer_t stm32xwds_i2cm_drv_resume(struct xwds_device * dev);
+#endif
+
+static
+xwer_t stm32xwds_i2cm_drv_xfer(struct xwds_i2cm * i2cm,
+                               struct xwds_i2c_msg * msg, xwsz_t num,
+                               xwtm_t to);
+
+const struct xwds_i2cm_driver stm32xwds_i2cm_drv = {
+        .base = {
+                .name = "stm32xwds.i2cm",
+                .probe = NULL,
+                .remove = NULL,
+                .start = stm32xwds_i2cm_drv_start,
+                .stop = stm32xwds_i2cm_drv_stop,
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+                .suspend = stm32xwds_i2cm_drv_suspend,
+                .resume =  stm32xwds_i2cm_drv_resume,
+#endif
+        },
+        .xfer = stm32xwds_i2cm_drv_xfer,
+};
+
+struct xwds_i2cm stm32xwds_i2cm1 = {
+        /* attributes */
+        .dev = {
+                .name = "stm32xwds.i2cm",
+                .id = 1,
+                .resources = NULL,
+                .drv = xwds_cast(struct xwds_driver *, &stm32xwds_i2cm_drv),
+                .data = (void *)&hi2c1_drvdata,
+        },
+        .xwccfg = NULL,
+};
+
+static
+xwer_t stm32xwds_i2cm_drv_start(struct xwds_device * dev)
+{
+        struct xwds_i2cm * i2cm;
+        struct MX_I2C_MasterDriverData * drvdata;
+
+        i2cm = xwds_cast(struct xwds_i2cm *, dev);
+        drvdata = i2cm->dev.data;
+        drvdata->i2cm = i2cm;
+
+        MX_I2C_Init(dev->id);
+        return XWOK;
+}
+
+static
+xwer_t stm32xwds_i2cm_drv_stop(struct xwds_device * dev)
+{
+        MX_I2C_DeInit(dev->id);
+        return XWOK;
+}
+
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+static
+xwer_t stm32xwds_i2cm_drv_resume(struct xwds_device * dev)
+{
+        return stm32xwds_i2cm_drv_start(dev);
+}
+
+static
+xwer_t stm32xwds_i2cm_drv_suspend(struct xwds_device * dev)
+{
+        return stm32xwds_i2cm_drv_stop(dev);
+}
+#endif
+
+static
+xwer_t stm32xwds_i2cm_xfer(struct xwds_i2cm * i2cm,
+                           struct xwds_i2c_msg * msg,
+                           xwtm_t to)
+{
+        struct MX_I2C_MasterDriverData * drvdata;
+        xwu16_t addm;
+        union xwos_ulock ulk;
+        xwreg_t cpuirq;
+        xwsq_t lkst;
+        xwer_t rc;
+
+        drvdata = i2cm->dev.data;
+        MX_I2C_GetAddressingMode(i2cm->dev.id, &addm);
+        if ((msg->flag & XWDS_I2C_F_10BITADDR) != addm) {
+                MX_I2C_ReInit(i2cm->dev.id, msg->flag & XWDS_I2C_F_10BITADDR);
+        }
+        if (0U == (msg->flag & XWDS_I2C_F_10BITADDR)) {
+                msg->addr <<= 1U;
+        }
+        ulk.osal.splk = &drvdata->splk;
+        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        drvdata->rc = -EINPROGRESS;
+        drvdata->msg = msg;
+        rc = MX_I2C_Xfer(i2cm->dev.id, msg);
+        if (XWOK == rc) {
+                rc = xwos_cond_wait_to(&drvdata->cond,
+                                       ulk, XWOS_LK_SPLK, NULL,
+                                       to, &lkst);
+                if (XWOK == rc) {
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                                xwos_splk_lock(&drvdata->splk);
+                        }
+                        rc = drvdata->rc;
+                } else {
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                                xwos_splk_lock(&drvdata->splk);
+                        }
+                        drvdata->rc = -ECANCELED;
+                }
+        } else {
+                drvdata->rc = -ECANCELED;
+        }
+        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        return rc;
+}
+
+static
+xwer_t stm32xwds_i2cm_drv_xfer(struct xwds_i2cm * i2cm,
+                               struct xwds_i2c_msg * msg,
+                               xwsz_t num,
+                               xwtm_t to)
+{
+        xwer_t rc;
+        xwsq_t i;
+
+        rc = XWOK;
+        for (i = 0; i < num; i++) {
+                rc = stm32xwds_i2cm_xfer(i2cm, &msg[i], to);
+                if (rc < 0) {
+                        break;
+                }
+        }
+        return rc;
+}
+
+void stm32xwds_i2cm_on_complete(struct xwds_i2cm * i2cm, xwer_t xrc)
+{
+        struct MX_I2C_MasterDriverData * drvdata;
+        xwreg_t cpuirq;
+
+        drvdata = i2cm->dev.data;
+        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        if (-ECANCELED != drvdata->rc) {
+                drvdata->rc = xrc;
+        } else {
+        }
+        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_cond_broadcast(&drvdata->cond);
+}
