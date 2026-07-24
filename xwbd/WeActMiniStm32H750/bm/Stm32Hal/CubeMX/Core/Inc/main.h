@@ -74,11 +74,11 @@ void stm32cubemx_override_linkage_it(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define LED_Pin GPIO_PIN_3
-#define LED_GPIO_Port GPIOE
-#define BUTTON_Pin GPIO_PIN_13
-#define BUTTON_GPIO_Port GPIOC
-#define BUTTON_EXTI_IRQn EXTI15_10_IRQn
+#define LedH_Pin GPIO_PIN_3
+#define LedH_GPIO_Port GPIOE
+#define KeyH_Pin GPIO_PIN_13
+#define KeyH_GPIO_Port GPIOC
+#define KeyH_EXTI_IRQn EXTI15_10_IRQn
 #define LCD_CS_Pin GPIO_PIN_11
 #define LCD_CS_GPIO_Port GPIOE
 #define LCD_DC_Pin GPIO_PIN_13
