@@ -168,7 +168,6 @@ SECTIONS {
         tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
         tls_offset = MAX(8, tls_align);
 
-        /* STM32H7的SRAM4分区 */
         .data4 : ALIGN(32) {
                 *(.data4)
                 . = ALIGN(32);
@@ -176,6 +175,14 @@ SECTIONS {
         } > data4_mr AT> code_mr
         data4_vma_base = ADDR(.data4);
         data4_lma_base = LOADADDR(.data4);
+
+        .lpdata : ALIGN(32) {
+                *(.lpdata)
+                . = ALIGN(32);
+                lpdata_vma_end = .;
+        } > lpdata_mr AT> code_mr
+        lpdata_vma_base = ADDR(.lpdata);
+        lpdata_lma_base = LOADADDR(.lpdata);
 
         .firmware.tail : ALIGN(32) {
                 KEEP(*(.firmware.tail))

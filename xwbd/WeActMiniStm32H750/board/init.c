@@ -89,9 +89,13 @@ void xwos_preinit(void)
 {
         arch_init();
         soc_init();
-        stm32hal_preinit();
+        stm32hal_pre_init();
         soc_relocate_data();
         soc_relocate_ivt();
+        soc_relocate_data4();
+        if (stm32hal_get_rcc_rsr()) {
+                soc_relocate_lpdata();
+        }
 }
 
 /**

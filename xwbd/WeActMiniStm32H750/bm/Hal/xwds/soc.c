@@ -101,9 +101,6 @@ static
 void stm32xwds_soc_axisram_init(void);
 
 static
-void stm32xwds_soc_sram4_init(void);
-
-static
 void stm32xwds_soc_cache_init(void);
 
 const struct xwds_soc_driver stm32xwds_soc_drv = {
@@ -256,7 +253,6 @@ xwer_t stm32xwds_soc_drv_start(struct xwds_device * dev)
         MX_DMA_Init();
         MX_RTC_Init();
         stm32xwds_soc_axisram_init();
-        stm32xwds_soc_sram4_init();
         /* 若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
          * 开启Cache可能会因为Cache的预取操作导致宕机。
          * 开启Cache必须在上述器件初始化完成之后。*/
@@ -297,10 +293,6 @@ xwer_t stm32xwds_soc_drv_resume(struct xwds_device * dev)
 extern xwsz_t axisram_mr_origin[];
 extern xwsz_t axisram_mr_size[];
 
-extern xwu8_t data4_lma_base[];
-extern xwu8_t data4_vma_base[];
-extern xwu8_t data4_vma_end[];
-
 static
 void stm32xwds_soc_axisram_init(void)
 {
@@ -310,25 +302,6 @@ void stm32xwds_soc_axisram_init(void)
 
         for (i = 0; i < n; i++) {
                 origin[i] = 0;
-        }
-}
-
-static
-void stm32xwds_soc_sram4_init(void)
-{
-        xwsz_t count, i;
-        xwu8_t * src;
-        xwu8_t * dst;
-
-        src = data4_lma_base;
-        dst = data4_vma_base;
-        if (dst != src) {
-                count = (xwsz_t)data4_vma_end - (xwsz_t)data4_vma_base;
-                for (i = 0; i < count; i++) {
-                        *dst = *src;
-                        dst++;
-                        src++;
-                }
         }
 }
 

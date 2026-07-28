@@ -28,6 +28,14 @@ extern xwu8_t data_lma_base[];
 extern xwu8_t data_vma_base[];
 extern xwu8_t data_vma_end[];
 
+extern xwu8_t data4_lma_base[];
+extern xwu8_t data4_vma_base[];
+extern xwu8_t data4_vma_end[];
+
+extern xwu8_t lpdata_lma_base[];
+extern xwu8_t lpdata_vma_base[];
+extern xwu8_t lpdata_vma_end[];
+
 extern xwu8_t bss_vma_base[];
 extern xwu8_t bss_vma_end[];
 
@@ -112,6 +120,46 @@ void soc_relocate_ivt(void)
         dst = armv7m_ivt_vma_base;
         if (dst != src) {
                 cnt = (xwsz_t)armv7m_ivt_vma_end - (xwsz_t)armv7m_ivt_vma_base;
+                for (i = 0; i < cnt; i++) {
+                        dst[i] = src[i];
+                }
+        }
+}
+
+/**
+ * @brief 重定向.data4数据区
+ */
+__xwbsp_init_code
+void soc_relocate_data4(void)
+{
+        xwsz_t cnt, i;
+        xwu8_t * src;
+        xwu8_t * dst;
+
+        src = data4_lma_base;
+        dst = data4_vma_base;
+        if (dst != src) {
+                cnt = (xwsz_t)data4_vma_end - (xwsz_t)data4_vma_base;
+                for (i = 0; i < cnt; i++) {
+                        dst[i] = src[i];
+                }
+        }
+}
+
+/**
+ * @brief 重定向.lpdata数据区
+ */
+__xwbsp_init_code
+void soc_relocate_lpdata(void)
+{
+        xwsz_t cnt, i;
+        xwu8_t * src;
+        xwu8_t * dst;
+
+        src = lpdata_lma_base;
+        dst = lpdata_vma_base;
+        if (dst != src) {
+                cnt = (xwsz_t)lpdata_vma_end - (xwsz_t)lpdata_vma_base;
                 for (i = 0; i < cnt; i++) {
                         dst[i] = src[i];
                 }

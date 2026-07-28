@@ -23,7 +23,8 @@
 
 #include "board/std.h"
 
-void stm32cubemx_preinit(void);
+void stm32cubemx_pre_init(void);
 void stm32cubemx_init(void);
+xwu32_t stm32cubemx_get_rcc_rsr(void);
 
 #endif /* bm/Hal/CubeMX/integration.h */

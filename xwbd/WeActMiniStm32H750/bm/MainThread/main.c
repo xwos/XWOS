@@ -78,7 +78,7 @@ xwer_t mthd_mainfunc(void * arg)
 
         XWOS_UNUSED(arg);
 
-        stm32hal_postinit();
+        stm32hal_post_init();
         sdcard_fatfs_mount();
         xwds_st7735_draw(&stm32xwds_st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 

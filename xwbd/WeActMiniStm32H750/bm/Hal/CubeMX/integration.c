@@ -41,20 +41,22 @@ extern
 void stm32cubemx_init_vtor(void);
 
 /**
- * @brief STM32CUBE模块：预初始化
+ * @brief STM32CUBEMX模块：预初始化
  * @details
  * + 此函数在 `xwos_preinit()` 中被调用。
  * + 此函数被设计为，在重定向数据 `soc_relocate_data()` 函数之 **前** 调用。
  *   只能配置部分寄存器，不可访问全局变量。
  */
 __xwbsp_init_code
-void stm32cubemx_preinit(void)
+void stm32cubemx_pre_init(void)
 {
         SystemInit();
         __HAL_RCC_D2SRAM1_CLK_ENABLE();
         __HAL_RCC_D2SRAM2_CLK_ENABLE();
         __HAL_RCC_D2SRAM3_CLK_ENABLE();
-        __HAL_RCC_D3SRAM1_CLKAM_ENABLE();
+        __HAL_RCC_BKPRAM_CLK_ENABLE();
+        HAL_PWR_EnableBkUpAccess();
+        __HAL_RCC_BKPRAM_CLKAM_ENABLE();
         stm32cubemx_init_vtor(); /* 覆盖HAL库中的VTOR的值 */
 }
 
@@ -70,4 +72,11 @@ void stm32cubemx_init(void)
 {
         HAL_Init();
         SystemClock_Config();
+}
+
+#define RCC_RSR_ALLRST (0x55FA0000UL)
+
+xwu32_t stm32cubemx_get_rcc_rsr(void)
+{
+        return RCC->RSR & RCC_RSR_ALLRST;
 }

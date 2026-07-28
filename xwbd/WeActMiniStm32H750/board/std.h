@@ -26,4 +26,7 @@
 #define BOARD_BUG() XWOS_BUG()
 #define BOARD_BUG_ON(x) XWOS_BUG_ON(x)
 
+#define __data4 __xwcc_section(".data4")
+#define __lpdata __xwcc_section(".lpdata")
+
 #endif /* board/std.h */

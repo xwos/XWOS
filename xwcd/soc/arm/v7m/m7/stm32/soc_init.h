@@ -23,8 +23,10 @@
 
 #include <xwos/standard.h>
 
-void soc_relocate_ivt(void);
 void soc_relocate_data(void);
+void soc_relocate_ivt(void);
+void soc_relocate_data4(void);
+void soc_relocate_lpdata(void);
 void soc_init(void);
 
 #endif /* xwcd/soc/arm/v7m/m7/stm32/soc_init.h */

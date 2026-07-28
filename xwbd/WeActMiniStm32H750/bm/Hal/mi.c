@@ -37,9 +37,9 @@ void stm32hal_init_devices(void);
 void stm32hal_fini_devices(void);
 
 __xwbsp_init_code
-void stm32hal_preinit(void)
+void stm32hal_pre_init(void)
 {
-        stm32cubemx_preinit();
+        stm32cubemx_pre_init();
 }
 
 __xwbsp_init_code
@@ -51,7 +51,7 @@ void stm32hal_init(void)
 }
 
 __xwbsp_init_code
-void stm32hal_postinit(void)
+void stm32hal_post_init(void)
 {
         stm32hal_init_devices();
 }
@@ -148,6 +148,11 @@ void stm32hal_fini_devices(void)
 void stm32hal_inc_tick(void)
 {
         HAL_IncTick();
+}
+
+xwu32_t stm32hal_get_rcc_rsr(void)
+{
+        return stm32cubemx_get_rcc_rsr();
 }
 
 xwer_t stm32hal_crc32_cal(xwu32_t * crc32,

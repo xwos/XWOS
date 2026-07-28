@@ -31,7 +31,7 @@
  * @details
  * + 此函数在 `xwos_preinit()` 中被调用。
  */
-void stm32hal_preinit(void);
+void stm32hal_pre_init(void);
 
 /**
  * @brief 初始化
@@ -45,7 +45,7 @@ void stm32hal_init(void);
  * @details
  * + 此函数在主线程中被调用。
  */
-void stm32hal_postinit(void);
+void stm32hal_post_init(void);
 
 /**
  * @brief 恢复
@@ -81,6 +81,9 @@ void stm32hal_sleep(void);
  * + 此函数在Systick中断Hook中被调用。
  */
 void stm32hal_inc_tick(void);
+
+/******** ******** Reset Reason ******** ********/
+xwu32_t stm32hal_get_rcc_rsr(void);
 
 /******** ******** CRC ******** ********/
 xwer_t stm32hal_crc32_cal(xwu32_t * crc32,
