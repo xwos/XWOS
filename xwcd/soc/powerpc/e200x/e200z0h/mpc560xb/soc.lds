@@ -24,7 +24,7 @@ SECTIONS {
                 firmware_info_vma_end = .;
         } > code_mr AT> code_mr
 
-        .xwos.rx : ALIGN(8) {
+        .xwos.code : ALIGN(8) {
                 *(.xwos.init.text)
                 *(.xwos.init.rodata)
                 *(.xwos.exit.text)
@@ -34,7 +34,7 @@ SECTIONS {
                 *(.xwos.rodata)
         } > code_mr AT> code_mr
 
-        .rx : ALIGN(8) {
+        .code : ALIGN(8) {
                 *(.text)
                 *(.text.*)
                 KEEP (*(.init))

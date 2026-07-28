@@ -53,7 +53,7 @@ SECTIONS {
         firmware_info_vma_base = ADDR(.firmware.info);
         firmware_info_lma_base = LOADADDR(.firmware.info);
 
-        .xwos.rx : ALIGN(8) {
+        .xwos.code : ALIGN(8) {
                 FILL(0xFF)
                 *(.xwos.init.text)
                 *(.xwos.init.rodata)
@@ -64,7 +64,7 @@ SECTIONS {
                 *(.xwos.rodata)
         } > code_mr AT> code_mr
 
-        .rx : ALIGN(8) {
+        .code : ALIGN(8) {
                 FILL(0xFF)
                 KEEP (*(.init))
                 KEEP (*(.fini))

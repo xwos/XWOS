@@ -37,7 +37,7 @@ SECTIONS {
                 *(.armv8a.exception.text.el1)
         } > xwos_mr
 
-        .xwos.rx : ALIGN(16) {
+        .xwos.code : ALIGN(16) {
                 *(.xwos.init.text)
                 *(.xwos.init.rodata)
                 *(.xwos.exit.text)
@@ -47,7 +47,7 @@ SECTIONS {
                 *(.xwos.rodata)
         } > xwos_mr
 
-        .rx : ALIGN(16) {
+        .code : ALIGN(16) {
                 KEEP (*(.init))
                 KEEP (*(.fini))
                 *(.text .text.* .gnu.linkonce.t.*)

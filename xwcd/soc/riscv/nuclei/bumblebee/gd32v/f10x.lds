@@ -46,7 +46,7 @@ SECTIONS {
         eclic_ivt_vma_base = ADDR(.eclic.ivt);
         eclic_ivt_lma_base = LOADADDR(.eclic.ivt);
 
-        .rx : ALIGN(4) {
+        .code : ALIGN(4) {
                 firmware_info_vma_base = .;
                 KEEP(*(.firmware.info))
                 KEEP(*(.soc.ivt))
@@ -63,7 +63,7 @@ SECTIONS {
                 *(.rodata .rodata.* .gnu.linkonce.r.*)
                 *(.srodata .srodata.* .gnu.linkonce.sr.*)
         } > code_mr AT> code_mr
-        firmware_info_lma_base = LOADADDR(.rx);
+        firmware_info_lma_base = LOADADDR(.code);
 
         /* ++++++++ 以下与unwinding有关，用于异常处理和栈回溯 ++++++++ */
         .eh_frame_hdr : ALIGN(8) { /* 用于栈展开 */

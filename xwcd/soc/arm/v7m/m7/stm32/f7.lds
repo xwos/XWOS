@@ -37,7 +37,7 @@ SECTIONS {
         firmware_info_vma_base = ADDR(.firmware.info);
         firmware_info_lma_base = LOADADDR(.firmware.info);
 
-        .xwos.rx : ALIGN(8) {
+        .xwos.code : ALIGN(8) {
                 *(.xwos.init.text)
                 *(.xwos.init.rodata)
                 *(.xwos.exit.text)
@@ -47,7 +47,7 @@ SECTIONS {
                 *(.xwos.rodata)
         } > code_mr AT> code_mr
 
-        .rx : ALIGN(8) {
+        .code : ALIGN(8) {
                 KEEP (*(.init))
                 KEEP (*(.fini))
                 *(.text .text.* .gnu.linkonce.t.*)
@@ -144,6 +144,7 @@ SECTIONS {
 
         .data : ALIGN(32) {
                 *(.data .data.* .gnu.linkonce.d.*)
+                *(.RamFunc*)
                 . = ALIGN(32);
                 data_vma_end = .;
         } > data_mr AT> code_mr
@@ -152,7 +153,6 @@ SECTIONS {
 
         .tdata : ALIGN(32) {
                 *(.tdata .tdata.* .gnu.linkonce.td.*)
-                *(.RamFunc*)
                 tdata_vma_end = .;
 	} > data_mr AT> code_mr
         tdata_vma_base = ADDR(.tdata);

@@ -44,7 +44,7 @@ SECTIONS {
         firmware_info_vma_base = ADDR(.firmware.info);
         firmware_info_lma_base = LOADADDR(.firmware.info);
 
-        .rx : ALIGN(8) {
+        .code : ALIGN(8) {
                 *(.xwos.init.text)
                 *(.xwos.init.rodata)
                 *(.xwos.exit.text)
