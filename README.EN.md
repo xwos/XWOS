@@ -22,14 +22,15 @@ XWOS provides a number of example projects:
 
 + [Raspberry Pi 4B](https://xwos.tech/en/Docs/UserManual/Board/RPi4B/)
 + STM32
+  + [AtkM100zStm32H750XWOS](https://gitee.com/xwos/AtkM100zStm32H750XWOS.git)：ALIENTEK M100Z-M7 board
+  + [WeActMiniStm32H750XWOS](https://gitee.com/xwos/WeActMiniStm32H750XWOS.git): WeAct MiniStm32H750 dev board
+  + [EmbedFireStm32H743XWOS](https://gitee.com/xwos/EmbedFireStm32H743XWOS.git): EmbedFire STM32H743-Pro dev board
+  + [AtkApolloH743XWOS](https://gitee.com/xwos/AtkApolloH743XWOS.git): ALIENTEK Apollo STM32H743 dev board
   + [STM32F072C8XWOS](https://gitee.com/xwos/STM32F072C8XWOS.git): STM32F072C8 minimal system
   + [STM32F103C8XWOS](https://gitee.com/xwos/STM32F103C8XWOS.git): STM32F103C8 minimal system
   + [ATKSTM32F103ZXWOS](https://gitee.com/xwos/ATKSTM32F103ZXWOS.git): ALIENTEK F103 core board
   + [ATKSTM32F407ZXWOS](https://gitee.com/xwos/ATKSTM32F407ZXWOS.git): ALIENTEK F407 core board
-  + [EmbedFireStm32H743XWOS](https://gitee.com/xwos/EmbedFireStm32H743XWOS.git): EmbedFire STM32H743-Pro dev board
-  + [AtkApolloH743XWOS](https://gitee.com/xwos/AtkApolloH743XWOS.git): ALIENTEK Apollo STM32H743 dev board
   + [FK429M1XWOS](https://gitee.com/xwos/FK429M1XWOS.git): Fanke STM32F429-M1 dev board
-  + [WeActMiniStm32H750XWOS](https://gitee.com/xwos/WeActMiniStm32H750XWOS.git): WeAct MiniStm32H750 dev board
 + Flagchip
   + [Fc7300DemoBoard](https://xwos.tech/en/Docs/UserManual/Board/Flagchip/Fc7300DemoBoard/)：FC7300 Demo Board
 + GD32

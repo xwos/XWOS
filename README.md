@@ -19,14 +19,15 @@ XWOS提供了比较多的示例工程：
 
 + [树莓派4B](https://xwos.tech/Docs/UserManual/Board/RPi4B/)
 + STM32
+  + [AtkM100zStm32H750XWOS](https://gitee.com/xwos/AtkM100zStm32H750XWOS.git)：正点原子M100Z-M7开发板
+  + [WeActMiniStm32H750XWOS](https://gitee.com/xwos/WeActMiniStm32H750XWOS.git)：微行电子MiniStm32H750开发板
+  + [EmbedFireStm32H743XWOS](https://gitee.com/xwos/EmbedFireStm32H743XWOS.git)：野火STM32H743-Pro开发板
+  + [AtkApolloH743XWOS](https://gitee.com/xwos/AtkApolloH743XWOS.git)：正点原子阿波罗STM32H743开发板
   + [STM32F072C8XWOS](https://gitee.com/xwos/STM32F072C8XWOS.git)：STM32F072C8最小系统
   + [STM32F103C8XWOS](https://gitee.com/xwos/STM32F103C8XWOS.git)：STM32F103C8最小系统
   + [ATKSTM32F103ZXWOS](https://gitee.com/xwos/ATKSTM32F103ZXWOS.git)：正点原子F103核心板
   + [ATKSTM32F407ZXWOS](https://gitee.com/xwos/ATKSTM32F407ZXWOS.git)：正点原子F407核心板
-  + [EmbedFireStm32H743XWOS](https://gitee.com/xwos/EmbedFireStm32H743XWOS.git)：野火STM32H743-Pro开发板
-  + [AtkApolloH743XWOS](https://gitee.com/xwos/AtkApolloH743XWOS.git)：正点原子阿波罗STM32H743开发板
   + [FK429M1XWOS](https://gitee.com/xwos/FK429M1XWOS.git)：反客STM32F429-M1开发板
-  + [WeActMiniStm32H750XWOS](https://gitee.com/xwos/WeActMiniStm32H750XWOS.git)：微行电子MiniStm32H750开发板
 + Flagchip
   + [Fc7300DemoBoard](https://xwos.tech/Docs/UserManual/Board/Flagchip/Fc7300DemoBoard/)：FC7300 Demo Board
 + GD32
