@@ -123,6 +123,8 @@ xwer_t xwds_eeprom_power_on(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
+        XWDS_VALIDATE(eeprom, "nullptr", -EFAULT);
+
         if (eeprom->pwr_gpiorsc) {
                 const struct xwds_resource_gpio * gpiorsc = eeprom->pwr_gpiorsc;
                 rc = xwds_gpio_set(gpiorsc->soc,
@@ -138,6 +140,8 @@ __xwbsp_api
 xwer_t xwds_eeprom_power_off(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
+
+        XWDS_VALIDATE(eeprom, "nullptr", -EFAULT);
 
         if (eeprom->pwr_gpiorsc) {
                 const struct xwds_resource_gpio * gpiorsc = eeprom->pwr_gpiorsc;
@@ -155,6 +159,8 @@ xwer_t xwds_eeprom_wp_enable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
+        XWDS_VALIDATE(eeprom, "nullptr", -EFAULT);
+
         if (eeprom->wp_gpiorsc) {
                 const struct xwds_resource_gpio * gpiorsc = eeprom->wp_gpiorsc;
                 rc = xwds_gpio_set(gpiorsc->soc,
@@ -170,6 +176,8 @@ __xwbsp_api
 xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
+
+        XWDS_VALIDATE(eeprom, "nullptr", -EFAULT);
 
         if (eeprom->wp_gpiorsc) {
                 const struct xwds_resource_gpio * gpiorsc = eeprom->wp_gpiorsc;
@@ -190,6 +198,8 @@ xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
         const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
+        XWDS_VALIDATE(eeprom, "nullptr", -EFAULT);
+
         drv = xwds_cast(const struct xwds_eeprom_driver *, eeprom->i2cp.dev.drv);
         if ((drv) && (drv->putc)) {
                 rc = drv->putc(eeprom, data, addr, to);
@@ -207,6 +217,9 @@ xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
         const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
+        XWDS_VALIDATE(eeprom, "nullptr", -EFAULT);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
+
         drv = xwds_cast(const struct xwds_eeprom_driver *, eeprom->i2cp.dev.drv);
         if ((drv) && (drv->getc)) {
                 rc = drv->getc(eeprom, buf, addr, to);
@@ -221,14 +234,28 @@ xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
                            xwu8_t * data, xwsz_t * size, xwsq_t pgidx,
                            xwtm_t to)
 {
+        const struct xwds_eeprom_parameter * param;
         const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        drv = xwds_cast(const struct xwds_eeprom_driver *, eeprom->i2cp.dev.drv);
-        if ((drv) && (drv->pgwrite)) {
-                rc = drv->pgwrite(eeprom, data, size, pgidx, to);
+        XWDS_VALIDATE(eeprom, "nullptr", -EFAULT);
+        XWDS_VALIDATE(data, "nullptr", -EFAULT);
+        XWDS_VALIDATE(size, "nullptr", -EFAULT);
+
+        param = &eeprom->parameter;
+        if (*size > param->page_size) {
+                *size = param->page_size;
+        }
+        if (pgidx < param->total) {
+                drv = xwds_cast(const struct xwds_eeprom_driver *,
+                                eeprom->i2cp.dev.drv);
+                if ((drv) && (drv->pgwrite)) {
+                        rc = drv->pgwrite(eeprom, data, size, pgidx, to);
+                } else {
+                        rc = -ENOSYS;
+                }
         } else {
-                rc = -ENOSYS;
+                rc = -ENXIO;
         }
         return rc;
 }
@@ -238,14 +265,28 @@ xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
                           xwu8_t * buf, xwsz_t * size, xwsq_t pgidx,
                           xwtm_t to)
 {
+        const struct xwds_eeprom_parameter * param;
         const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        drv = xwds_cast(const struct xwds_eeprom_driver *, eeprom->i2cp.dev.drv);
-        if ((drv) && (drv->pgread)) {
-                rc = drv->pgread(eeprom, buf, size, pgidx, to);
+        XWDS_VALIDATE(eeprom, "nullptr", -EFAULT);
+        XWDS_VALIDATE(data, "nullptr", -EFAULT);
+        XWDS_VALIDATE(size, "nullptr", -EFAULT);
+
+        param = &eeprom->parameter;
+        if (*size > param->page_size) {
+                *size = param->page_size;
+        }
+        if (pgidx < param->total) {
+                drv = xwds_cast(const struct xwds_eeprom_driver *,
+                                eeprom->i2cp.dev.drv);
+                if ((drv) && (drv->pgread)) {
+                        rc = drv->pgread(eeprom, buf, size, pgidx, to);
+                } else {
+                        rc = -ENOSYS;
+                }
         } else {
-                rc = -ENOSYS;
+                rc = -ENXIO;
         }
         return rc;
 }
