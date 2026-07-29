@@ -133,6 +133,15 @@ SECTIONS {
         } > code_mr AT> code_mr
         /* -------- Global Offset Table -------- */
 
+        .ramcode : ALIGN(16) {
+                *(.ramcode*)
+                *(.RamFunc*)
+                . = ALIGN(16);
+                ramcode_vma_end = .;
+        } > ramcode_mr AT> code_mr
+        ramcode_vma_base = ADDR(.ramcode);
+        ramcode_lma_base = LOADADDR(.ramcode);
+
         .xwos.data : ALIGN(32) {
                 *(.xwos.data)
                 *(.percpu.data)
@@ -144,7 +153,6 @@ SECTIONS {
 
         .data : ALIGN(32) {
                 *(.data .data.* .gnu.linkonce.d.*)
-                *(.RamFunc*)
                 . = ALIGN(32);
                 data_vma_end = .;
         } > data_mr AT> code_mr

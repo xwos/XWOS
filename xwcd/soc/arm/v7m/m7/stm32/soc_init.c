@@ -19,6 +19,9 @@
  */
 
 #include <xwcd/soc/arm/v7m/m7/stm32/soc_init.h>
+extern xwu8_t ramcode_lma_base[];
+extern xwu8_t ramcode_vma_base[];
+extern xwu8_t ramcode_vma_end[];
 
 extern xwu8_t xwos_data_lma_base[];
 extern xwu8_t xwos_data_vma_base[];
@@ -55,6 +58,17 @@ void soc_relocate_data(void)
         xwsz_t cnt, i;
         xwu8_t * src;
         xwu8_t * dst;
+
+        src = ramcode_lma_base;
+        dst = ramcode_vma_base;
+        if (dst != src) {
+                cnt = (xwsz_t)ramcode_vma_end - (xwsz_t)ramcode_vma_base;
+                for (i = 0; i < cnt; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
 
         src = xwos_data_lma_base;
         dst = xwos_data_vma_base;

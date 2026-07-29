@@ -31,15 +31,18 @@ MEMORY {
         bkram_mr (rw): org = 0x38800000, len = 4k /* backup SRAM */
 
         armv7m_ivt_lmr (rx): org = 0x90000000, len = 2048 /* vectors table lma region */
-        armv7m_ivt_vmr (rw): org = 0x20000000, len = 2048 /* vectors table vma region */
+        armv7m_ivt_vmr (rw): org = 0x00000000, len = 2048 /* vectors table vma region */
         firmware_info_mr (rx): org = 0x90000800, len = 1k /* firmware info */
         code_mr (rx): org = 0x90000C00, len = 8189k /* text & rodata */
-        armv7m_isr_stack_mr (arw): org = 0x0000E000, len = 8k /* ISR stack in ITCM */
-        xwos_data_mr (arw): org = 0x20000800, len = 126k /* .xwos.data in DTCM */
-        data_mr (arw): org = 0x30000000, len = 288k /* .data & .bss in D2 */
-        data4_mr (arw): org = 0x38000000, len = 64k /* .data4 in D3 */
+        armv7m_isr_stack_mr (arw): org = 0x00000800, len = 6k /* ISR stack in ITCM */
+        ramcode_mr (rwx): org = 0x00002000, len = 56k /* .ramcode in ITCM */
+        xwos_data_mr (arw): org = 0x20000000, len = 128k /* .xwos.data in DTCM */
+        data_mr (arw): org = 0x30000000, len = 288k /* .data & .bss, In D2 Domain */
+        data4_mr (arw): org = 0x38000000, len = 64k /* .data4, In D3 Domain */
         lpdata_mr (arw): org = 0x38800000, len = 4k /* .lpdata in Backup RAM */
 }
+
+INCLUDE h7.lds
 
 dtcm_mr_origin = ORIGIN(dtcm_mr);
 dtcm_mr_size = LENGTH(dtcm_mr);
@@ -59,8 +62,6 @@ armv7m_isr_stack_mr_origin = ORIGIN(armv7m_isr_stack_mr);
 armv7m_isr_stack_mr_size = LENGTH(armv7m_isr_stack_mr);
 armv7m_isr_stack_top = armv7m_isr_stack_mr_origin + armv7m_isr_stack_mr_size;
 armv7m_isr_stack_end = armv7m_isr_stack_mr_origin;
-
-INCLUDE h7.lds
 
 /* 用于CmBacktrace */
 cmb_cstack_mr_origin = armv7m_isr_stack_mr_origin;
