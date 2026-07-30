@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：XWOS适配层：newlib：时钟
+ * @brief 板级描述层：XWOS适配层：libc：newlib：时钟
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright

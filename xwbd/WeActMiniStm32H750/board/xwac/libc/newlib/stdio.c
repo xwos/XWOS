@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：XWOS适配层：newlib：标准输入输出
+ * @brief 板级描述层：XWOS适配层：libc：newlib：标准输入输出
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright

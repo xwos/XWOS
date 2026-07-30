@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：XWOS适配层：newlib：动态内存池
+ * @brief 板级描述层：XWOS适配层：libc：newlib：动态内存池
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright

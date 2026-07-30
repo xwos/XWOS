@@ -28,6 +28,7 @@ ifeq ($(XWMDCFG_libc_picolibcac_SETJMP),y)
   XWMO_CSRCS += setjmp.c
 endif
 ifeq ($(XWMDCFG_libc_picolibcac_FOPS),y)
+  XWMO_CSRCS += stdio.c
   XWMO_CSRCS += fops.c
 endif
 ifeq ($(XWMDCFG_libc_picolibcac_FATFS),y)

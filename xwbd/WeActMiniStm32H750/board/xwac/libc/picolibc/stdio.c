@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：XWOS适配层：picolibc：标准输入输出
+ * @brief 板级描述层：XWOS适配层：libc：picolibc：标准输入输出
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,6 +23,39 @@
 #include <xwos/osal/skd.h>
 #include <xwos/osal/thd.h>
 #include <bm/Hal/mi.h>
+
+int picolibcac_fops_put(char c)
+{
+        xwer_t rc;
+
+        rc = xwds_uartc_putc(&stm32xwds_usart1, c, XWTM_MAX);
+        if (rc < 0) {
+                errno = -rc;
+                rc = -1;
+        } else {
+                errno = 0;
+                rc = (xwer_t)c;
+        }
+        return (int)rc;
+}
+
+int picolibcac_fops_get(void)
+{
+        xwer_t rc;
+        xwsz_t sz;
+        xwu8_t c;
+
+        sz = 1U;
+        rc = xwds_uartc_rx(&stm32xwds_usart1, &c, &sz, xwtm_ft(xwtm_ms(20)));
+        if (rc < 0) {
+                errno = -rc;
+                rc = -1;
+        } else {
+                errno = 0;
+                rc = (xwer_t)c;
+        }
+        return (int)rc;
+}
 
 xwssz_t picolibcac_fops_read_stdin(int fd, void * buf, xwsz_t cnt)
 {

@@ -28,7 +28,6 @@ void picolibcac_fops_linkage_stub(void)
 }
 
 int open(const char * path, int flag, ...); // cppcheck-suppress [misra-c2012-5.8]
-int open64(const char * path, int flag, ...);
 int close(int fd); // cppcheck-suppress [misra-c2012-5.8]
 ssize_t read(int fd, void * buf, size_t cnt);
 ssize_t write(int fd, const void * data, size_t cnt);
@@ -46,28 +45,7 @@ int open(const char * path, int flag, ...)
 {
         int fd;
 
-#if defined(XWMDCFG_libc_newlibac_FATFS) && (1 == XWMDCFG_libc_newlibac_FATFS)
-        va_list args;
-        int mode;
-
-        va_start(args, flag);
-        mode = va_arg(args, int);
-        fd = picolibcac_fatfs_open(path, flag, mode);
-        va_end(args);
-#else
-        XWOS_UNUSED(path);
-        XWOS_UNUSED(flag);
-        errno = ENOSYS;
-        fd = -1;
-#endif
-        return fd;
-}
-
-int open64(const char * path, int flag, ...)
-{
-        int fd;
-
-#if defined(XWMDCFG_libc_newlibac_FATFS) && (1 == XWMDCFG_libc_newlibac_FATFS)
+#if defined(XWMDCFG_libc_picolibcac_FATFS) && (1 == XWMDCFG_libc_picolibc_FATFS)
         va_list args;
         int mode;
 

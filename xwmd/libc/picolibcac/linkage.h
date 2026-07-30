@@ -21,6 +21,7 @@ void picolibcac_string_linkage_stub(void);
 void picolibcac_sprintf_linkage_stub(void);
 void picolibcac_mem_linkage_stub(void);
 void picolibcac_setjmp_linkage_stub(void);
+void picolibcac_stdio_linkage_stub(void);
 void picolibcac_fops_linkage_stub(void);
 void picolibcac_isatty_linkage_stub(void);
 void picolibcac_kill_linkage_stub(void);
