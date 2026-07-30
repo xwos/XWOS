@@ -111,7 +111,7 @@
     (progn
      (loge "Can't find file: ivt.c.template")
      (kill-emacs ENOENT)))
-(defvar out-dir (expand-directory opt-stm32cube-dir "Core/Src/"))
+(defvar out-dir (expand-directory opt-stm32cube-dir "./"))
 (if (not (file-exists-p out-dir))
     (make-directory out-dir))
 (defvar device-dir (expand-directory opt-stm32cube-dir "Drivers/CMSIS/Device/ST/"))

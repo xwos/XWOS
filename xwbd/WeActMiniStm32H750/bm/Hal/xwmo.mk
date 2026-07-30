@@ -25,17 +25,24 @@ include xwbs/functions.mk
 # 定义C源码
 XWMO_CSRCS := $(call XwmoWildcard,*.c,CubeMX/Core/Src)
 XWMO_CSRCS += $(call XwmoWildcard,*.c,CubeMX/Drivers/STM32H7xx_HAL_Driver/Src)
+XWMO_CSRCS += CubeMX/ivt.c
 XWMO_CSRCS += CubeMX/integration.c
 XWMO_CSRCS += $(call XwmoWildcard,*.c,xwds)
 XWMO_CSRCS += mi.c
 
 # 定义编译选项
-XWMO_CFLAGS := -Wno-undef -Wno-unused-parameter -Wno-sign-conversion
+XWMO_CFLAGS := -DUSE_FULL_LL_DRIVER -DUSE_HAL_DRIVER -DSTM32H750xx -DUSE_PWR_LDO_SUPPLY
+XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter -Wno-sign-conversion
 XWMO_CFLAGS += -Wno-error=undef
 XWMO_CFLAGS_llvm += -Wno-error=unknown-attributes
 
 # 定义头文件路径
-XWMO_INCDIRS :=
+XWMO_INCDIRS := $(call getXwmoDir)/
+XWMO_INCDIRS += $(call getXwmoDir)/CubeMX/Core/Inc
+XWMO_INCDIRS += $(call getXwmoDir)/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc
+XWMO_INCDIRS += $(call getXwmoDir)/CubeMX/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
+XWMO_INCDIRS += $(call getXwmoDir)/CubeMX/Drivers/CMSIS/Device/ST/STM32H7xx/Include
+XWMO_INCDIRS += $(call getXwmoDir)/CubeMX/Drivers/CMSIS/Include
 
 # 引入编译规则
 include xwbs/xwmo.mk
