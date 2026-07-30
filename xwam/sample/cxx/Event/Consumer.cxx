@@ -53,13 +53,13 @@ xwer_t Consumer::thdMainFunction()
     xwtm_t to;
     xwos::Bmp<EVENT_NUM> bmp;
     xwos::Bmp<EVENT_NUM> msk;
-    msk.set(0UL);
-    msk.set(1UL);
-    msk.set(2UL);
-    msk.set(3UL);
-    msk.set(4UL);
-    msk.set(10UL);
-    msk.set(31UL);
+    msk.set((xwsq_t)0);
+    msk.set((xwsq_t)1);
+    msk.set((xwsq_t)2);
+    msk.set((xwsq_t)3);
+    msk.set((xwsq_t)4);
+    msk.set((xwsq_t)10);
+    msk.set((xwsq_t)31);
     from = xwtm_now();
     to = from + skCfgLoopPeriod;
     while (!shouldStop()) {

@@ -18,9 +18,9 @@
 
 int picolibcac_fatfs_open(const char * path, int flag, int mode);
 int picolibcac_fatfs_close(int fd);
-_ssize_t picolibcac_fatfs_read(int fd, void * buf, size_t cnt);
-_ssize_t picolibcac_fatfs_write(int fd, const void * data, size_t cnt);
-_off_t picolibcac_fatfs_lseek(int fd, _off_t pos, int whence);
+ssize_t picolibcac_fatfs_read(int fd, void * buf, size_t cnt);
+ssize_t picolibcac_fatfs_write(int fd, const void * data, size_t cnt);
+off_t picolibcac_fatfs_lseek(int fd, off_t pos, int whence);
 int picolibcac_fatfs_unlink(const char * path);
 int picolibcac_fatfs_rename(const char * oldname, const char * newname);
 int picolibcac_fatfs_fstat(int fd, struct stat * sbuf);

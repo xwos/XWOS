@@ -12,7 +12,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/errno.h>
-#include <xwos/mm/mempool/allocator.h>
+#include <xwos/mm/bma.h>
 #include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
 #include <stdio.h>

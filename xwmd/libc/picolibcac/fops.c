@@ -32,8 +32,7 @@ int open64(const char * path, int flag, ...);
 int close(int fd); // cppcheck-suppress [misra-c2012-5.8]
 ssize_t read(int fd, void * buf, size_t cnt);
 ssize_t write(int fd, const void * data, size_t cnt);
-_off_t lseek(int fd, _off_t pos, int whence);
-_off64_t lseek64(int fd, _off64_t offset, int whence);
+off_t lseek(int fd, off_t pos, int whence);
 int unlink(const char * path);
 // cppcheck-suppress [misra-c2012-21.2]
 int rename(const char * oldname, const char * newname);
@@ -148,7 +147,7 @@ ssize_t write(int fd, const void * data, size_t cnt)
         return ret;
 }
 
-_off_t lseek(int fd, _off_t pos, int whence)
+off_t lseek(int fd, off_t pos, int whence)
 {
         int curpos;
         XWOS_UNUSED(fd);
@@ -167,11 +166,6 @@ _off_t lseek(int fd, _off_t pos, int whence)
 #endif
         }
         return curpos;
-}
-
-_off64_t lseek64(int fd, _off64_t offset, int whence)
-{
-        return (_off64_t)lseek(fd, (off_t) offset, whence);
 }
 
 int unlink(const char * path)

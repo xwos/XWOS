@@ -32,6 +32,7 @@ XWMO_CSRCS += mi.c
 # 定义编译选项
 XWMO_CFLAGS := -Wno-undef -Wno-unused-parameter -Wno-sign-conversion
 XWMO_CFLAGS += -Wno-error=undef
+XWMO_CFLAGS_llvm += -Wno-error=unknown-attributes
 
 # 定义头文件路径
 XWMO_INCDIRS :=

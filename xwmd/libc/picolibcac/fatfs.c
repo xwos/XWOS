@@ -515,12 +515,12 @@ ssize_t picolibcac_fatfs_write(int fd, const void * data, size_t cnt)
         return ret;
 }
 
-_off_t picolibcac_fatfs_lseek(int fd, _off_t pos, int whence)
+off_t picolibcac_fatfs_lseek(int fd, off_t pos, int whence)
 {
         xwssq_t idx;
         FRESULT fsrc;
         FIL * fp;
-        _off_t curpos;
+        off_t curpos;
 
         if (fd >= ((int)PICOLIBCAC_FATFS_FD_NUM + (int)PICOLIBCAC_FATFS_FD_OFFSET)) {
                 errno = EPERM;

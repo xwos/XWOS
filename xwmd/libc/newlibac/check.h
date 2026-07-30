@@ -27,8 +27,4 @@
 #  error "_REENT_ONLY must NOT be defined!"
 #endif
 
-#ifndef _FVWRITE_IN_STREAMIO
-#  error "_FVWRITE_IN_STREAMIO must be defined! Build newlib without the option '--enable-newlib-fvwrite-in-streamio' !"
-#endif
-
 #endif /* xwmd/libc/newlib/check.h */

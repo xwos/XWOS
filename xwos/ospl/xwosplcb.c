@@ -135,6 +135,7 @@ struct xwospl_skd * xwosplcb_skd_post_swcx_lic(struct xwospl_skd * xwskd)
 __xwos_code
 xwer_t xwosplcb_skd_suspend_lic(struct xwospl_skd * xwskd)
 {
+        XWOS_UNUSED(xwskd);
         return xwup_skd_dec_wklkcnt();
 }
 
