@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配层：动态内存申请与释放
+ * @brief newlib适配层：基于mempool的动态内存申请与释放
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -150,7 +150,6 @@ int _mallopt_r(struct _reent * r, int parameter, int value)
         XWOS_UNUSED(r);
         XWOS_UNUSED(parameter);
         XWOS_UNUSED(value);
-
         return 0;
 }
 
@@ -161,7 +160,6 @@ struct mallinfo _mallinfo_r(struct _reent * r)
         XWOS_UNUSED(r);
 
         mi.arena = newlibac_mempool->pa.zone.size;
-        /* FIXME */
         return mi;
 }
 
@@ -174,23 +172,17 @@ void _malloc_stats_r(struct _reent * r)
         mi = mallinfo();
         // cppcheck-suppress [misra-c2012-17.7]
         fprintf(stderr, "max system bytes = %10lu\n", (long) mi.arena);
-        /* FIXME */
 }
-
 
 size_t _malloc_usable_size_r(struct _reent * r, void * mem)
 {
         xwer_t rc;
-        struct xwmm_mempool_page * pg;
         size_t sz;
 
         XWOS_UNUSED(r);
-
-        rc = xwmm_mempool_page_find(&newlibac_mempool->pa, mem, &pg);
-        if (XWOK == rc) {
-                sz = pg->data.value;
-        } else {
-                sz = 0;
+        rc = xwmm_mempool_malloc_usable_size(newlibac_mempool, mem, &sz);
+        if (rc < 0) {
+                sz = 0U;
         }
         return sz;
 }
@@ -199,6 +191,5 @@ int _malloc_trim_r(struct _reent * r, size_t pad)
 {
         XWOS_UNUSED(r);
         XWOS_UNUSED(pad);
-        /* TODO */
         return 0;
 }

@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwbop.h>
@@ -402,6 +403,7 @@ __xwos_api
 xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
 {
         struct xwmm_bma_bcb * bcb;
+        xwptr_t unaligned;
         xwreg_t flag;
         xwer_t rc;
 
@@ -413,6 +415,8 @@ xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
                 rc = -ERANGE;
                 goto err_range;
         }
+        unaligned = ((xwptr_t)mem - bma->zone.origin) % (xwptr_t)bma->blksize;
+        mem = (void *)((xwptr_t)mem - unaligned);
         bcb = xwmm_bma_mem_to_bcb(bma, mem);
         if (is_err(bcb)) {  // cppcheck-suppress [misra-c2012-14.4]
                 rc = ptr_err(bcb);
@@ -435,5 +439,144 @@ xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
 
 err_invalmem:
 err_range:
+        return rc;
+}
+
+__xwos_api
+xwer_t xwmm_bma_malloc(struct xwmm_bma * bma, xwsz_t size, void ** membuf)
+{
+        xwer_t rc;
+        xwsz_t nrblk;
+        xwssq_t p2;
+
+        XWOS_VALIDATE((bma), "nullptr", -EFAULT);
+        XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
+
+        if ((xwsz_t)0 == size) {
+                rc = XWOK;
+                *membuf = NULL;
+        } else {
+                nrblk = XWBOP_DIV_ROUND_UP(size, bma->blksize);
+                p2 = xwbop_fls(xwsz_t, nrblk);
+                while ((p2 < 0) || ((bma->blksize << (xwsz_t)p2) < size)) {
+                        p2++;
+                }
+                rc = xwmm_bma_alloc(bma, (xwsq_t)p2, membuf);
+        }
+        return rc;
+}
+
+__xwos_api
+xwer_t xwmm_bma_realloc(struct xwmm_bma * bma, xwsz_t size, void ** membuf)
+{
+        struct xwmm_bma_bcb * bcb;
+        xwptr_t unaligned;
+        xwsz_t oldsize;
+        xwer_t rc;
+        void * oldm;
+        void * newm;
+
+        XWOS_VALIDATE((bma), "nullptr", -EFAULT);
+        XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
+
+        oldm = *membuf;
+        if (NULL == oldm) {
+                rc = xwmm_bma_malloc(bma, size, membuf);
+        } else if ((xwsz_t)0 == size) {
+                rc = xwmm_bma_free(bma, oldm);
+                if (XWOK == rc) {
+                        *membuf = NULL;
+                }
+        } else {
+                if ((((xwptr_t)oldm < bma->zone.origin) ||
+                     ((xwptr_t)oldm >= (bma->zone.origin + bma->zone.size)))) {
+                        rc = -ERANGE;
+                } else {
+                        unaligned = (((xwptr_t)oldm - bma->zone.origin) %
+                                     (xwptr_t)bma->blksize);
+                        oldm = (void *)((xwptr_t)oldm - unaligned);
+                        bcb = xwmm_bma_mem_to_bcb(bma, oldm);
+                        oldsize = bcb->order & XWMM_BMA_ORDER_MASK;
+                        oldsize = (1U << oldsize);
+                        if (size <= oldsize) {
+                                rc = XWOK;
+                        } else {
+                                rc = xwmm_bma_malloc(bma, size, &newm);
+                                if (XWOK == rc) {
+                                        // cppcheck-suppress [misra-c2012-17.7]
+                                        memcpy(newm, oldm, size);
+                                        *membuf = newm;
+                                        xwmm_bma_free(bma, oldm);
+                                } else {
+                                        *membuf = NULL;
+                                }
+                        }
+                }
+        }
+        return rc;
+}
+
+__xwos_api
+xwer_t xwmm_bma_memalign(struct xwmm_bma * bma, xwsz_t alignment, xwsz_t size,
+                         void ** membuf)
+{
+        xwssq_t p2;
+        xwer_t rc;
+
+        XWOS_VALIDATE((bma), "nullptr", -EFAULT);
+        XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
+
+        if (alignment < XWMM_ALIGNMENT) {
+                alignment = XWMM_ALIGNMENT;
+        }
+        p2 = xwbop_fls(xwsz_t, alignment);
+        if (((xwsz_t)1 << (xwsz_t)p2) != alignment) {
+                rc = -EINVAL;
+                goto err_notp2;
+        }
+        if ((xwsz_t)0 == size) {
+                rc = XWOK;
+                *membuf = NULL;
+                goto nothing;
+        }
+
+        if (size <= alignment) {
+                size = alignment;
+        } else {
+                p2 = xwbop_fls(xwsz_t, size);
+                while (((xwsz_t)1 << (xwsz_t)p2) < size) {
+                        p2++;
+                }
+                size = ((xwsz_t)1 << p2);
+        }
+        rc = xwmm_bma_malloc(bma, size, membuf);
+
+nothing:
+err_notp2:
+        return rc;
+}
+
+xwer_t xwmm_bma_malloc_usable_size(struct xwmm_bma * bma, void * mem, xwsz_t * size)
+{
+        struct xwmm_bma_bcb * bcb;
+        xwptr_t unaligned;
+        xwsz_t realsize;
+        xwer_t rc;
+
+        XWOS_VALIDATE((bma), "nullptr", -EFAULT);
+        XWOS_VALIDATE((size), "nullptr", -EFAULT);
+
+        if ((((xwptr_t)mem < bma->zone.origin) ||
+             ((xwptr_t)mem >= (bma->zone.origin + bma->zone.size)))) {
+                rc = -ERANGE;
+        } else {
+                rc = XWOK;
+                unaligned = (((xwptr_t)mem - bma->zone.origin) % (xwptr_t)bma->blksize);
+                mem = (void *)((xwptr_t)mem - unaligned);
+                bcb = xwmm_bma_mem_to_bcb(bma, mem);
+                realsize = bcb->order & XWMM_BMA_ORDER_MASK;
+                realsize = (1U << realsize);
+                *size = realsize;
+        }
         return rc;
 }

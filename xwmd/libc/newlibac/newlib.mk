@@ -18,8 +18,11 @@ XWMO_CSRCS += string.c
 ifeq ($(XWMDCFG_libc_newlibac_SPRINTF),y)
   XWMO_CSRCS += sprintf.c
 endif
-ifeq ($(XWMDCFG_libc_newlibac_MEM),y)
-  XWMO_CSRCS += mem.c
+ifeq ($(XWMDCFG_libc_newlibac_BMA),y)
+  XWMO_CSRCS += bma.c
+endif
+ifeq ($(XWMDCFG_libc_newlibac_MEMPOOL),y)
+  XWMO_CSRCS += mempool.c
 endif
 ifeq ($(XWMDCFG_libc_newlibac_SETJMP),y)
   XWMO_CSRCS += setjmp.c

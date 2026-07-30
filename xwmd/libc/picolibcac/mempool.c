@@ -168,14 +168,11 @@ void malloc_stats(void)
 size_t malloc_usable_size(void * mem)
 {
         xwer_t rc;
-        struct xwmm_mempool_page * pg;
         size_t sz;
 
-        rc = xwmm_mempool_page_find(&picolibcac_mempool->pa, mem, &pg);
-        if (XWOK == rc) {
-                sz = pg->data.value;
-        } else {
-                sz = 0;
+        rc = xwmm_mempool_malloc_usable_size(picolibcac_mempool, mem, &sz);
+        if (rc < 0) {
+                sz = 0U;
         }
         return sz;
 }

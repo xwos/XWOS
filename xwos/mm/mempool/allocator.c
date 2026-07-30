@@ -536,3 +536,21 @@ nothing:
 err_notp2:
         return rc;
 }
+
+xwer_t xwmm_mempool_malloc_usable_size(struct xwmm_mempool * mp,
+                                       void * mem, xwsz_t * size)
+{
+        xwer_t rc;
+        struct xwmm_mempool_page * pg;
+
+        XWOS_VALIDATE((mp), "nullptr", -EFAULT);
+        XWOS_VALIDATE((size), "nullptr", -EFAULT);
+
+        rc = xwmm_mempool_page_find(&mp->pa, mem, &pg);
+        if (XWOK == rc) {
+                *size = pg->data.value;
+        } else {
+                *size = 0U;
+        }
+        return rc;
+}

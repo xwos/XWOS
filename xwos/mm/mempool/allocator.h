@@ -222,7 +222,7 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size,
  * + 上下文：中断、中断底半部、线程
  * + 重入性：可重入
  * @details
- * + 此API类似于C标准中的 `memalign()` 函数：
+ * + 此API类似于C标准中的 `aligned_alloc()` 函数：
  *   + `alignment` 如果比 `XWMM_ALIGNMENT` 小，会被扩大为 `XWMM_ALIGNMENT` ：
  *   + `alignment` 只能是2的n次方：
  *   + 若size小于 `alignment` ， `size` 会被扩大为 `alignment` ，
@@ -232,6 +232,25 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size,
 xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
                              xwsz_t alignment, xwsz_t size,
                              void ** membuf);
+
+/**
+ * @brief XWMM API：返回该块内存实际可用字节数
+ * @param[in] mp: 内存池的指针
+ * @param[in] mem: 内存块的起始地址
+ * @param[out] size: 指向缓冲区的指针，通过此缓冲区返回内存快实际大小
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ERANGE: 内存块不在BMA空间
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
+ * + 此API类似于GNUC中的 `malloc_usable_size()` 函数。
+ */
+xwer_t xwmm_mempool_malloc_usable_size(struct xwmm_mempool * mp,
+                                       void * mem, xwsz_t * size);
 
 /**
  * @} xwmm_mempool

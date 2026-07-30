@@ -144,6 +144,100 @@ xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf);
 xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem);
 
 /**
+ * @brief XWMM API：申请指定大小的连续内存
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] size: 申请的大小
+ * @param[out] membuf: 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOMEM: 内存不足
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
+ * + 此函数向内存池申请大小为 `size` 的内存：
+ *   + 若申请成功，通过 `*membuf` 返回申请到的内存地址 ，返回错误码为 `XWOK` ；
+ *   + 若申请失败，通过 `*membuf` 返回 `NULL` ，返回值为负的错误码。
+ * + 内存不会被初始化；
+ * + 当 `size` 为 `0` ， 通过 `*membuf` 返回 `NULL` ，返回错误码为 `XWOK` ；
+ */
+xwer_t xwmm_bma_malloc(struct xwmm_bma * bma, xwsz_t size, void ** membuf);
+
+
+/**
+ * @brief XWMM API：调整内存大小
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] size: 申请的大小，当size == 0，realloc等价于free
+ * @param[in,out] membuf: 指向缓冲区的指针，此缓冲区
+ * + (I) 作为输入时，当*membuf == NULL，realloc等价于malloc
+ * + (O) 作为输出时，通过此缓冲区返回申请到的内存的首地址
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOMEM: 内存不足
+ * @retval -ERANGE: 内存地址不在内存池的范围内
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
+ * + 此API类似于C11标准中的 `realloc()` 函数：
+ *   + 当 `*membuf` 为 `NULL` ，此函数等价于 `xwmm_bma_mealloc(mp, size, membuf)` ；
+ *   + 当 `*membuf` 不为 `NULL` 且 `size` 为 `0` ，
+ *     此函数等价于 `xwmm_bma_free(mp, *membuf)` ，并且通过 `*membuf` 返回 `NULL` ；
+ *   + 当 `*membuf` 不为 `NULL` 且 `size` 比之前的小 ，此函数不重新申请内存，直接返回原来的 `*membuf` 以及 `XWOK` ；
+ *   + 当 `*membuf` 不为 `NULL` 且 `size` 比之前的大 ，此函数会尝试重新申请内存：
+ *     + 如果申请失败，原来的内存不会受影响，且通过 `*membuf` 返回 `NULL` 以及 错误码；
+ *     + 如果申请成功，会将旧内存空间的内容移动到新内存空间内，然后返回新的 `*membuf` 以及 `XWOK` 。
+ */
+xwer_t xwmm_bma_realloc(struct xwmm_bma * bma, xwsz_t size, void ** membuf);
+
+/**
+ * @brief XWMM API：申请对齐的内存
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] alignment: 内存的起始地址对齐的字节数，只能是2的n次方
+ * @param[in] size: 申请的大小
+ * @param[out] membuf: 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOMEM: 内存不足
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
+ * + 此API类似于C标准中的 `aligned_alloc()` 函数：
+ *   + `alignment` 如果比 `XWMM_ALIGNMENT` 小，会被扩大为 `XWMM_ALIGNMENT` ：
+ *   + `alignment` 只能是2的n次方：
+ *   + 若size小于 `alignment` ， `size` 会被扩大为 `alignment` ，
+ *   + 若size大于 `alignment` ， `size` 会向上对齐到2的n次方，此时也一定为 `alignment` 的整数倍。
+ * + 申请内存失败时，此函数不会修改 `*membuf` 的值。
+ */
+xwer_t xwmm_bma_memalign(struct xwmm_bma * bma, xwsz_t alignment, xwsz_t size,
+                         void ** membuf);
+
+/**
+ * @brief XWMM API：返回该块内存实际可用字节数
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] mem: 内存块的起始地址
+ * @param[out] size: 指向缓冲区的指针，通过此缓冲区返回内存快实际大小
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ERANGE: 内存块不在BMA空间
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
+ * + 此API类似于GNUC中的 `malloc_usable_size()` 函数。
+ */
+xwer_t xwmm_bma_malloc_usable_size(struct xwmm_bma * bma, void * mem, xwsz_t * size);
+
+/**
  * @} xwmm_bma
  */
 
