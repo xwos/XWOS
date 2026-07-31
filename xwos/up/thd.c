@@ -53,7 +53,10 @@
 #if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
 #  include <xwos/up/sync/cond.h>
 #endif
-#include <xwos/up/pm.h>
+
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
+#  include <xwos/up/pm.h>
+#endif
 
 /* #define XWOS_THDLOGF */ /**< 调试日志开关 */
 #ifdef XWOS_THDLOGF

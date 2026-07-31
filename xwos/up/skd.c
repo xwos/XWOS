@@ -22,7 +22,9 @@
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/tls.h>
-#include <xwos/up/pm.h>
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
+#  include <xwos/up/pm.h>
+#endif
 #include <xwos/up/thd.h>
 #include <xwos/up/rtrq.h>
 #include <xwos/up/tt.h>
@@ -1481,6 +1483,31 @@ xwsq_t xwup_pm_get_stage(void)
 }
 
 #else
+
+__xwup_code
+xwer_t xwup_skd_inc_wklkcnt(void)
+{
+        return -ENOSYS;
+}
+
+__xwup_code
+xwer_t xwup_skd_dec_wklkcnt(void)
+{
+        return -ENOSYS;
+}
+
+__xwup_code
+xwer_t xwup_skd_wakelock_lock(void)
+{
+        return xwup_skd_inc_wklkcnt();
+}
+
+__xwup_code
+xwer_t xwup_skd_wakelock_unlock(void)
+{
+        return xwup_skd_dec_wklkcnt();
+}
+
 __xwup_code
 xwer_t xwup_skd_suspend_lc(struct xwup_skd * xwskd)
 {
@@ -1508,7 +1535,7 @@ void xwup_pm_resume(void)
 __xwup_api
 xwsq_t xwup_pm_get_stage(void)
 {
-        return (xwsq_t)XWUP_PM_STAGE_RUNNING;
+        return (xwsq_t)0;
 }
 #endif
 
