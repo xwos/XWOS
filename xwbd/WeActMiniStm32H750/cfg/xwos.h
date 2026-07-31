@@ -41,6 +41,9 @@
 #define XWLIBCFG_XWAOP32                                1
 #define XWLIBCFG_XWAOP64                                1
 
+#define XWLIBCFG_SPF_FLOAT                              1
+#define XWLIBCFG_SPF_LONG_DOUBLE                        1
+
 #define XWLIBCFG_MAP                                    1
 
 #define XWLIBCFG_CRC32                                  1

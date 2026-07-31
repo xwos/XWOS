@@ -46,10 +46,14 @@ enum xwvsnpf_format_type_em {
         XWVSNPF_FT_INT,
         XWVSNPF_FT_XWSZ_T,
         XWVSNPF_FT_PTRDIFF,
+#if defined(XWLIBCFG_SPF_FLOAT) && (1U == XWLIBCFG_SPF_FLOAT)
         XWVSNPF_FT_FLOAT,
         XWVSNPF_FT_FLOAT_SCI,
+#  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
         XWVSNPF_FT_LONG_DOUBLE,
         XWVSNPF_FT_LONG_DOUBLE_SCI,
+#  endif /* XWLIBCFG_SPF_LONG_DOUBLE */
+#endif /* XWLIBCFG_SPF_FLOAT */
 };
 
 struct xwvsnpf_format_spec {
@@ -410,6 +414,7 @@ char * xwvsnpf_format_pointer(const char * fmt, char * buf, char * end, void * p
         return xwvsnpf_format_number(buf, end, (xwptr_t)ptr, spec);
 }
 
+#if defined(XWLIBCFG_SPF_FLOAT) && (1U == XWLIBCFG_SPF_FLOAT)
 static inline
 char * xwvsnpf_put_float_decimal(char * buf, char * end, unsigned long long num, int digits)
 {
@@ -572,6 +577,7 @@ char * xwvsnpf_format_float(char * buf, char * end, double num,
         return buf;
 }
 
+#  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
 static inline
 char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
                                   struct xwvsnpf_format_spec spec)
@@ -704,6 +710,8 @@ char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
 
         return buf;
 }
+#  endif /* XWLIBCFG_SPF_LONG_DOUBLE */
+#endif /* XWLIBCFG_SPF_FLOAT */
 
 static inline
 int xwvsnpf_format_decode(const char * fmt,
@@ -865,33 +873,47 @@ qualifier:
                 spec->base = 16;
                 break;
 
+#if defined(XWLIBCFG_SPF_FLOAT) && (1U == XWLIBCFG_SPF_FLOAT)
         case 'f':
+#  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
                 if ('L' == spec->qualifier) {
                         spec->type = XWVSNPF_FT_LONG_DOUBLE;
                 } else {
                         spec->type = XWVSNPF_FT_FLOAT;
                 }
+#  else
+                spec->type = XWVSNPF_FT_FLOAT;
+#  endif
                 fmt++;
                 return fmt - start;
 
         case 'e':
                 spec->flags |= XWVSNPF_F_SMALL;
+#  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
                 if ('L' == spec->qualifier) {
                         spec->type = XWVSNPF_FT_LONG_DOUBLE_SCI;
                 } else {
                         spec->type = XWVSNPF_FT_FLOAT_SCI;
                 }
+#  else
+                spec->type = XWVSNPF_FT_FLOAT_SCI;
+#  endif
                 fmt++;
                 return fmt - start;
 
         case 'E':
+#  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
                 if ('L' == spec->qualifier) {
                         spec->type = XWVSNPF_FT_LONG_DOUBLE_SCI;
                 } else {
                         spec->type = XWVSNPF_FT_FLOAT_SCI;
                 }
+#  else
+                spec->type = XWVSNPF_FT_FLOAT_SCI;
+#  endif
                 fmt++;
                 return fmt - start;
+#endif /* XWLIBCFG_SPF_FLOAT */
 
         case 'd':
         case 'i':
@@ -1039,15 +1061,19 @@ int xwvsnpf(char * buf, xwsz_t size, const char * fmt, va_list args)
                         ++str;
                         break;
 
+#if defined(XWLIBCFG_SPF_FLOAT) && (1U == XWLIBCFG_SPF_FLOAT)
                 case XWVSNPF_FT_FLOAT:
                 case XWVSNPF_FT_FLOAT_SCI:
                         str = xwvsnpf_format_float(str, end, va_arg(args, double), spec);
                         break;
 
+#  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
                 case XWVSNPF_FT_LONG_DOUBLE:
                 case XWVSNPF_FT_LONG_DOUBLE_SCI:
                         str = xwvsnpf_format_long_double(str, end, va_arg(args, long double), spec);
                         break;
+#  endif /* XWLIBCFG_SPF_LONG_DOUBLE */
+#endif /* XWLIBCFG_SPF_FLOAT */
 
                 default:
                         switch (spec.type) {
