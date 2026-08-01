@@ -32,6 +32,9 @@
 
 #include <xwos/lib/xwlog.h>
 #define LOGTAG "stm32hal"
+#define hallogd(fmt, ...) xwlogf(D, LOGTAG, fmt, ##__VA_ARGS__)
+#define hallogi(fmt, ...) xwlogf(I, LOGTAG, fmt, ##__VA_ARGS__)
+#define halloge(fmt, ...) xwlogf(E, LOGTAG, fmt, ##__VA_ARGS__)
 
 void stm32hal_init_devices(void);
 void stm32hal_fini_devices(void);
@@ -45,9 +48,14 @@ void stm32hal_pre_init(void)
 __xwbsp_init_code
 void stm32hal_init(void)
 {
+        xwer_t rc;
+
         stm32cubemx_init();
         stm32xwds_init();
-        stm32xwds_soc_init();
+        rc = stm32xwds_soc_init();
+        XWOS_BUG_ON(rc < 0);
+        rc = stm32xwds_uart_init();
+        XWOS_BUG_ON(rc < 0);
 }
 
 __xwbsp_init_code
@@ -66,8 +74,7 @@ void stm32hal_suspend(void)
         xwds_pm_suspend(&stm32xwds); /* 暂停所有设备 */
 
         /* 设置休眠方式为STOP模式：
-           STOP模式下寄存器与内部RAM数据不丢失，
-           因此休眠方式为SuspendToRAM，唤醒后运行状态可恢复。*/
+           STOP模式下寄存器与内部RAM数据不丢失，唤醒后运行状态可恢复。*/
         LL_PWR_SetRegulModeDS(LL_PWR_REGU_DSMODE_LOW_POWER);
         LL_PWR_EnableFlashPowerDown();
         LL_PWR_CPU_SetD1PowerMode(LL_PWR_CPU_MODE_D1STOP);
@@ -91,29 +98,26 @@ __xwbsp_init_code
 void stm32hal_init_devices(void)
 {
         xwer_t rc;
-
-        rc = stm32xwds_uart_init();
-        XWOS_BUG_ON(rc < 0);
         /* Can print log from here */
         rc = stm32xwds_spi_init();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Init SPI ... <rc:%d>\n", rc);
+                halloge("Init SPI ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_w25q64jv_init();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Init W25Q64JV ... <rc:%d>\n", rc);
+                halloge("Init W25Q64JV ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_st7735_init();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Init ST7735 ... <rc:%d>\n", rc);
+                halloge("Init ST7735 ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_i2c_init();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Init I2C ... <rc:%d>\n", rc);
+                halloge("Init I2C ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_eeprom_init();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Init EEPROM ... <rc:%d>\n", rc);
+                halloge("Init EEPROM ... <rc:%d>\n", rc);
         }
 }
 
@@ -124,25 +128,24 @@ void stm32hal_fini_devices(void)
 
         rc = stm32xwds_eeprom_fini();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Fini EEPROM ... <rc:%d>\n", rc);
+                halloge("Fini EEPROM ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_i2c_fini();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Fini I2C ... <rc:%d>\n", rc);
+                halloge("Fini I2C ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_st7735_fini();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Fini ST7735 ... <rc:%d>\n", rc);
+                halloge("Fini ST7735 ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_w25q64jv_fini();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Fini W25Q64JV ... <rc:%d>\n", rc);
+                halloge("Fini W25Q64JV ... <rc:%d>\n", rc);
         }
         rc = stm32xwds_spi_fini();
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "Fini SPI ... <rc:%d>\n", rc);
+                halloge("Fini SPI ... <rc:%d>\n", rc);
         }
-        stm32xwds_uart_fini();
 }
 
 void stm32hal_inc_tick(void)
@@ -150,11 +153,13 @@ void stm32hal_inc_tick(void)
         HAL_IncTick();
 }
 
+/******** ******** Reset Reason ******** ********/
 xwu32_t stm32hal_get_rcc_rsr(void)
 {
         return stm32cubemx_get_rcc_rsr();
 }
 
+/******** ******** CRC ******** ********/
 xwer_t stm32hal_crc32_cal(xwu32_t * crc32,
                           bool refin, xwu32_t polynomial, xwu32_t direction,
                           const xwu8_t stream[], xwsz_t * size)
@@ -176,7 +181,7 @@ xwer_t stm32hal_sdmmc1_init(void)
         MX_SDMMC1_SD_Init();
         rc = MX_SDMMC1_SD_TrimClk(10);
         if (rc < 0) {
-                xwlogf(ERR, LOGTAG, "MX_SDMMC1_SD_TrimClk() ... <rc:%d>\n", rc);
+                halloge("MX_SDMMC1_SD_TrimClk() ... <rc:%d>\n", rc);
         }
         return rc;
 }

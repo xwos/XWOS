@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
+#include <board/std.h>
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/syshwt.h>
 #include <xwos/ospl/skd.h>
-#include "bm/stm32cube/Core/Inc/main.h"
+#include "bm/Hal/CubeMX/Core/Inc/main.h"
 
 struct soc_ivt {
         xwisr_f exc[SOCCFG_EXC_NUM];
@@ -62,7 +62,7 @@ __xwcc_section(".armv7m.ivt") struct soc_ivt stm32_ivt = {
         },
 };
 
-void stm32cube_init_vtor(void)
+void stm32cubemx_init_vtor(void)
 {
         SCB->VTOR = (xwu32_t)&stm32_ivt;
 }

@@ -21,7 +21,7 @@
 #ifndef bm_Hal_CubeMX_integration_h__
 #define bm_Hal_CubeMX_integration_h__
 
-#include "board/std.h"
+#include <board/std.h>
 
 void stm32cubemx_pre_init(void);
 void stm32cubemx_init(void);

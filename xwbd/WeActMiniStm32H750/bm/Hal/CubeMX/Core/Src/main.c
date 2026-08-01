@@ -6,8 +6,8 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
-  * Copyright (c) 2023 xwos.tech.
+  * Copyright (c) 2026 STMicroelectronics.
+  * Copyright (c) 2026 xwos.tech.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -191,7 +191,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-
+  __BKPT(0);
   /* USER CODE END Error_Handler_Debug */
 }
 #ifdef USE_FULL_ASSERT

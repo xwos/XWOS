@@ -7,8 +7,8 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
-  * Copyright (c) 2023 xwos.tech.
+  * Copyright (c) 2026 STMicroelectronics.
+  * Copyright (c) 2026 xwos.tech.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -85,9 +85,6 @@ void HAL_MspInit(void)
   HAL_NVIC_SetPriority(PendSV_IRQn, 7, 1);
 
   /* USER CODE BEGIN MspInit 1 */
-  HAL_EnableDBGSleepMode();
-  HAL_EnableDBGStopMode();
-  HAL_EnableDBGStandbyMode();
 
   /* USER CODE END MspInit 1 */
 }

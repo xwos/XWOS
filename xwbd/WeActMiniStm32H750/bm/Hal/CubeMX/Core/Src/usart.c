@@ -7,8 +7,8 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
-  * Copyright (c) 2023 xwos.tech.
+  * Copyright (c) 2026 STMicroelectronics.
+  * Copyright (c) 2026 xwos.tech.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -22,7 +22,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-#include "board/std.h"
+#include <board/std.h>
 #include <string.h>
 #include <xwos/lib/xwbop.h>
 #include "bm/Hal/xwds/uart.h"

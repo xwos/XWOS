@@ -97,12 +97,6 @@ xwer_t stm32xwds_soc_drv_eirq_rls(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask,
                                   xwid_t eiid);
 
-static
-void stm32xwds_soc_axisram_init(void);
-
-static
-void stm32xwds_soc_cache_init(void);
-
 const struct xwds_soc_driver stm32xwds_soc_drv = {
         .base = {
                 .name = "stm32xwds.soc",
@@ -248,16 +242,6 @@ xwer_t stm32xwds_soc_drv_start(struct xwds_device * dev)
 {
 
         XWOS_UNUSED(dev);
-
-        MX_GPIO_Init();
-        MX_DMA_Init();
-        MX_RTC_Init();
-        stm32xwds_soc_axisram_init();
-        /* 若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
-         * 开启Cache可能会因为Cache的预取操作导致宕机。
-         * 开启Cache必须在上述器件初始化完成之后。*/
-        stm32xwds_soc_cache_init();
-
         return XWOK;
 }
 
@@ -265,10 +249,6 @@ static
 xwer_t stm32xwds_soc_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
-
-        MX_DMA_DeInit();
-        MX_GPIO_DeInit();
-
         return XWOK;
 }
 
@@ -289,33 +269,6 @@ xwer_t stm32xwds_soc_drv_resume(struct xwds_device * dev)
         return XWOK;
 }
 #endif
-
-extern xwsz_t axisram_mr_origin[];
-extern xwsz_t axisram_mr_size[];
-
-static
-void stm32xwds_soc_axisram_init(void)
-{
-        xwsq_t i;
-        xwsz_t * origin = (xwsz_t *)axisram_mr_origin;
-        xwsz_t n = (xwsz_t)axisram_mr_size / sizeof(xwsz_t);
-
-        for (i = 0; i < n; i++) {
-                origin[i] = 0;
-        }
-}
-
-static
-void stm32xwds_soc_cache_init(void)
-{
-#if defined(BRDCFG_ICACHE) && (1 == BRDCFG_ICACHE)
-        SCB_EnableICache();
-#endif
-#if defined(BRDCFG_DCACHE) && (1 == BRDCFG_DCACHE)
-        SCB_EnableDCache();
-        SCB_CleanInvalidateDCache();
-#endif
-}
 
 /******** ******** gpio operation driver ******** ********/
 static

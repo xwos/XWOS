@@ -18,8 +18,11 @@
  * > limitations under the License.
  */
 
-#include "board/std.h"
+#include <board/std.h>
 #include "bm/Hal/CubeMX/Core/Inc/main.h"
+#include "bm/Hal/CubeMX/Core/Inc/dma.h"
+#include "bm/Hal/CubeMX/Core/Inc/gpio.h"
+#include "bm/Hal/CubeMX/Core/Inc/rtc.h"
 
 /**
  * @brief 链接选择表
@@ -39,6 +42,9 @@ void SystemClock_Config(void);
 
 extern
 void stm32cubemx_init_vtor(void);
+
+static
+void stm32cubemx_cache_init(void);
 
 /**
  * @brief STM32CUBEMX模块：预初始化
@@ -72,6 +78,15 @@ void stm32cubemx_init(void)
 {
         HAL_Init();
         SystemClock_Config();
+        HAL_DBGMCU_EnableDBGSleepMode();
+        HAL_DBGMCU_EnableDBGStopMode();
+        MX_GPIO_Init();
+        MX_DMA_Init();
+        MX_RTC_Init();
+        /* 若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
+         * 开启Cache可能会因为Cache的预取操作导致宕机。
+         * 开启Cache必须在上述器件初始化完成之后。*/
+        stm32cubemx_cache_init();
 }
 
 #define RCC_RSR_ALLRST (0x55FA0000UL)
@@ -79,4 +94,16 @@ void stm32cubemx_init(void)
 xwu32_t stm32cubemx_get_rcc_rsr(void)
 {
         return RCC->RSR & RCC_RSR_ALLRST;
+}
+
+static
+void stm32cubemx_cache_init(void)
+{
+#if defined(BRDCFG_ICACHE) && (1 == BRDCFG_ICACHE)
+        SCB_EnableICache();
+#endif
+#if defined(BRDCFG_DCACHE) && (1 == BRDCFG_DCACHE)
+        SCB_EnableDCache();
+        SCB_CleanInvalidateDCache();
+#endif
 }

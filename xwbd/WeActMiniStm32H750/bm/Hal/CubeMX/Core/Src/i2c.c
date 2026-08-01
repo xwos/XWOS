@@ -7,8 +7,8 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
-  * Copyright (c) 2023 xwos.tech.
+  * Copyright (c) 2026 STMicroelectronics.
+  * Copyright (c) 2026 xwos.tech.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -22,7 +22,7 @@
 #include "i2c.h"
 
 /* USER CODE BEGIN 0 */
-#include "board/std.h"
+#include <board/std.h>
 #include <string.h>
 #include <xwos/lib/xwbop.h>
 #include "bm/Hal/xwds/i2cm.h"
@@ -49,7 +49,7 @@ void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00B03FDB;
+  hi2c1.Init.Timing = 0x30B70F24;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;

@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
+#include <board/std.h>
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/syshwt.h>
 #include <xwos/ospl/skd.h>

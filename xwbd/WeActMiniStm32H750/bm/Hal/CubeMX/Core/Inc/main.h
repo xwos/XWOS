@@ -7,8 +7,8 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
-  * Copyright (c) 2023 xwos.tech.
+  * Copyright (c) 2026 STMicroelectronics.
+  * Copyright (c) 2026 xwos.tech.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -45,7 +45,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "board/std.h"
+#include <board/std.h>
 
 /* USER CODE END Includes */
 
