@@ -222,7 +222,7 @@ static void get_cur_thread_stack_info(uint32_t *sp, uint32_t *start_addr, size_t
     *start_addr = (uint32_t)ptThread->tx_thread_stack_start;
     *size = ptThread->tx_thread_stack_size;
 #elif  (CMB_OS_PLATFORM_TYPE == CMB_OS_PLATFORM_XWOS)
-    struct xwos_thd_stack_info info;
+    struct xwos_thd_stack_info info = { 0 };
     size_t delta;
     xwos_cthd_get_stack_info(&info);
     delta = (size_t)info.guard_base - (size_t)info.base;
