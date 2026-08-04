@@ -50,6 +50,5 @@
         "*.hh": "cpp",
         "*.cc": "cpp"
     },
-    "files.eol": "\n",
-    "cmake.configureOnOpen": false
+    "files.eol": "\n"
 }

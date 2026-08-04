@@ -15,7 +15,7 @@ XWOS的源码遵循 **MISRA-C:2012** 标准，已经在汽车行业有越来越�
 
 # 示例工程
 
-XWOS提供了比较多的示例工程：
+XWOS提供了常见开发板的示例工程：
 
 + [树莓派4B](https://xwos.tech/Docs/UserManual/Board/RPi4B/)
 + STM32
