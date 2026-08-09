@@ -481,6 +481,7 @@ xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
         p2 = xwbop_fls(xwsz_t, alignment);
         if (((xwsz_t)1 << (xwsz_t)p2) != alignment) {
                 rc = -EINVAL;
+                *membuf = NULL;
                 goto err_notp2;
         }
         if ((xwsz_t)0 == size) {

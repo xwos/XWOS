@@ -408,8 +408,11 @@ xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
         xwer_t rc;
 
         XWOS_VALIDATE((bma), "nullptr", -EFAULT);
-        XWOS_VALIDATE((mem), "nullptr", -EFAULT);
 
+        if (NULL == mem) {
+                rc = XWOK;
+                goto do_nothing;
+        }
         if ((((xwptr_t)mem < bma->zone.origin) ||
              ((xwptr_t)mem >= (bma->zone.origin + bma->zone.size)))) {
                 rc = -ERANGE;
@@ -439,6 +442,7 @@ xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
 
 err_invalmem:
 err_range:
+do_nothing:
         return rc;
 }
 
@@ -490,6 +494,7 @@ xwer_t xwmm_bma_realloc(struct xwmm_bma * bma, xwsz_t size, void ** membuf)
         } else {
                 if ((((xwptr_t)oldm < bma->zone.origin) ||
                      ((xwptr_t)oldm >= (bma->zone.origin + bma->zone.size)))) {
+                        *membuf = NULL;
                         rc = -ERANGE;
                 } else {
                         unaligned = (((xwptr_t)oldm - bma->zone.origin) %
@@ -532,6 +537,7 @@ xwer_t xwmm_bma_memalign(struct xwmm_bma * bma, xwsz_t alignment, xwsz_t size,
         p2 = xwbop_fls(xwsz_t, alignment);
         if (((xwsz_t)1 << (xwsz_t)p2) != alignment) {
                 rc = -EINVAL;
+                *membuf = NULL;
                 goto err_notp2;
         }
         if ((xwsz_t)0 == size) {
