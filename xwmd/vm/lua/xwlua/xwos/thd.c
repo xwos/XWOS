@@ -20,8 +20,6 @@
 #include "xwmd/vm/lua/xwlua/xwvm/debug.h"
 
 /******** xwos.thd ********/
-#define XWLUA_SCRIPT_PRIORITY XWOS_SKD_PRIORITY_RT_MIN
-
 void xwlua_os_init_thdsp(lua_State * L);
 
 xwer_t xwlua_thd_script_main(void * arg)
@@ -86,7 +84,7 @@ int xwlua_thd_dofile(lua_State * L)
         xwos_thd_attr_init(&attr);
         attr.stack = NULL;
         attr.stack_size = XWLUA_THD_STACK_SIZE;
-        attr.priority = XWLUA_SCRIPT_PRIORITY;
+        attr.priority = XWLUA_THD_PRIORITY;
         do {
                 if (top >= 2) {
                         if (lua_toboolean(L, 2)) {
@@ -194,7 +192,7 @@ int xwlua_thd_dostring(lua_State * L)
         xwos_thd_attr_init(&attr);
         attr.stack = NULL;
         attr.stack_size = XWLUA_THD_STACK_SIZE;
-        attr.priority = XWLUA_SCRIPT_PRIORITY;
+        attr.priority = XWLUA_THD_PRIORITY;
         do {
                 if (top >= 2) {
                         if (lua_toboolean(L, 2)) {
@@ -320,7 +318,7 @@ int xwlua_thd_call(lua_State * L)
         xwos_thd_attr_init(&attr);
         attr.stack = NULL;
         attr.stack_size = XWLUA_THD_STACK_SIZE;
-        attr.priority = XWLUA_SCRIPT_PRIORITY;
+        attr.priority = XWLUA_THD_PRIORITY;
         do {
                 if (top >= 2) {
                         if (lua_toboolean(L, 2)) {

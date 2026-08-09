@@ -15,6 +15,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t xwlua_start(void);
+xwer_t xwlua_init(void);
 
 #endif /* xwmd/vm/lua/mi.h */

@@ -11,38 +11,44 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/thd.h>
 #include <xwmd/vm/lua/xwlua/prefix.h>
 #include <xwmd/vm/lua/xwlua/port.h>
 #include <xwmd/vm/lua/mi.h>
 
-#define XWLUA_TASK_PRIORITY (XWOS_SKD_PRIORITY_RAISE(XWOS_SKD_PRIORITY_RT_MIN, 1))
-
-char * xwlua_argv[] = {
+char * xwlua_replthd_argv[] = {
         "xwlua",
         NULL,
 };
 
-struct xwlua_arg xwlua_arg = {
-        .argc = xw_array_size(xwlua_argv) - 1,
-        .argv = xwlua_argv,
+struct xwlua_arg xwlua_replthd_arg = {
+        .argc = xw_array_size(xwlua_replthd_argv) - 1,
+        .argv = xwlua_replthd_argv,
 };
 
-xwos_thd_d xwlua_thd;
+#define XWLUA_REPLTHD_PRIORITY          (XWOS_SKD_PRIORITY_RT_MAX)
+#define XWLUA_REPLTHD_STACK_SIZE        (16384U)
+__xwcc_alignl1cache xwu8_t xwlua_replthd_stack[XWLUA_REPLTHD_STACK_SIZE] = {0};
+const struct xwos_thd_desc xwlua_replthd_desc = {
+        .attr = {
+                .name = "xwlua.repl.thd",
+                .stack = (xwstk_t *)xwlua_replthd_stack,
+                .stack_size = sizeof(xwlua_replthd_stack),
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = XWLUA_REPLTHD_PRIORITY,
+                .detached = true,
+                .privileged = true,
+        },
+        .func = xwlua_replthd_mainfunc,
+        .arg = &xwlua_replthd_arg,
+};
+struct xwos_thd xwlua_replthd;
+xwos_thd_d xwlua_replthdd;
 
-xwer_t xwlua_start(void)
+xwer_t xwlua_init(void)
 {
-        xwer_t rc;
-        struct xwos_thd_attr attr;
-
-        xwos_thd_attr_init(&attr);
-        attr.name = "xwlua.thd";
-        attr.stack = NULL;
-        attr.stack_size = XWLUA_THD_STACK_SIZE;
-        attr.priority = XWLUA_TASK_PRIORITY;
-        attr.detached = true;
-        attr.privileged = true;
-        rc = xwos_thd_create(&xwlua_thd, &attr, xwlua_task, &xwlua_arg);
-        return rc;
+        return xwos_thd_init(&xwlua_replthd, &xwlua_replthdd,
+                             &xwlua_replthd_desc.attr,
+                             xwlua_replthd_desc.func,
+                             xwlua_replthd_desc.arg);
 }

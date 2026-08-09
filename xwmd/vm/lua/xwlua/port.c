@@ -13,7 +13,6 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <stdio.h>
-#include <xwos/mm/mempool/allocator.h>
 #include "xwmd/vm/lua/src/lua.h"
 #include "xwmd/vm/lua/src/lualib.h"
 #include "xwmd/vm/lua/src/lauxlib.h"
@@ -78,21 +77,4 @@ void xwlua_xt_openlibs(lua_State * L)
                 luaL_requiref(L, lib->name, lib->func, 1);
                 lua_pop(L, 1);
         }
-}
-
-void * xwlua_alloc(void * ud, void * ptr, xwsz_t osize, xwsz_t nsize)
-{
-        void * mem;
-
-        XWOS_UNUSED(ud);
-        XWOS_UNUSED(osize);
-
-        if (0 == nsize) {
-                xwmm_mempool_free(xwlua_mempool, ptr);
-                mem = NULL;
-        } else {
-                mem = ptr;
-                xwmm_mempool_realloc(xwlua_mempool, nsize, &mem);
-        }
-        return mem;
 }

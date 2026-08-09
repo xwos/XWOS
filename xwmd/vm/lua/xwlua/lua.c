@@ -673,7 +673,7 @@ int pmain(lua_State * L)
   return 1;
 }
 
-xwer_t xwlua_task(void * arg)
+xwer_t xwlua_replthd_mainfunc(void * arg)
 {
   xwer_t rc;
   int status, result;
