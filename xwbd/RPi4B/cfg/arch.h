@@ -35,7 +35,7 @@
 #define ARCHCFG_GICV3                           0
 
 /******** ******** architecture libs ******** ********/
-/******** libc.a ********/
+/******** compiler ********/
 #define ARCHCFG_COMPILER_ERRNO                  1
 
 /******** xwbop ********/
@@ -79,7 +79,7 @@
 /******** lfq ********/
 #define ARCHCFG_LIB_LFQ                         1
 
-/******** lfq ********/
+/******** spinlock ********/
 #define ARCHCFG_LIB_SPINLOCK                    1
 
 /******** ******** ******** ******** ******** ******** ******** ********
