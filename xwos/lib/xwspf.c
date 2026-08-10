@@ -425,7 +425,9 @@ char * xwvsnpf_put_float_decimal(char * buf, char * end, unsigned long long num,
         int j;
 
         if (num == 0) {
-                tmp[i++] = '0';
+                if (digits > 0) {
+                        tmp[i++] = '0';
+                }
         } else {
                 while (num > 0 && i < 29) {
                         tmp[i++] = (char)('0' + (num % 10));
@@ -502,6 +504,13 @@ char * xwvsnpf_format_float(char * buf, char * end, double num,
         char exp_char = (spec.flags & XWVSNPF_F_SMALL) ? 'e' : 'E';
 
         if (isnan(num)) {
+                if (signbit(num)) {
+                        if (buf < end) *buf++ = '-';
+                } else if (spec.flags & XWVSNPF_F_PLUS) {
+                        if (buf < end) *buf++ = '+';
+                } else if (spec.flags & XWVSNPF_F_SPACE) {
+                        if (buf < end) *buf++ = ' ';
+                }
                 if (buf < end) *buf++ = 'n';
                 if (buf < end) *buf++ = 'a';
                 if (buf < end) *buf++ = 'n';
@@ -511,6 +520,10 @@ char * xwvsnpf_format_float(char * buf, char * end, double num,
         if (isinf(num)) {
                 if (num < 0) {
                         if (buf < end) *buf++ = '-';
+                } else if (spec.flags & XWVSNPF_F_PLUS) {
+                        if (buf < end) *buf++ = '+';
+                } else if (spec.flags & XWVSNPF_F_SPACE) {
+                        if (buf < end) *buf++ = ' ';
                 }
                 if (buf < end) *buf++ = 'i';
                 if (buf < end) *buf++ = 'n';
@@ -686,6 +699,13 @@ char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
         char exp_char = (spec.flags & XWVSNPF_F_SMALL) ? 'e' : 'E';
 
         if (isnan(num)) {
+                if (signbit(num)) {
+                        if (buf < end) *buf++ = '-';
+                } else if (spec.flags & XWVSNPF_F_PLUS) {
+                        if (buf < end) *buf++ = '+';
+                } else if (spec.flags & XWVSNPF_F_SPACE) {
+                        if (buf < end) *buf++ = ' ';
+                }
                 if (buf < end) *buf++ = 'n';
                 if (buf < end) *buf++ = 'a';
                 if (buf < end) *buf++ = 'n';
@@ -695,6 +715,10 @@ char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
         if (isinf(num)) {
                 if (num < 0) {
                         if (buf < end) *buf++ = '-';
+                } else if (spec.flags & XWVSNPF_F_PLUS) {
+                        if (buf < end) *buf++ = '+';
+                } else if (spec.flags & XWVSNPF_F_SPACE) {
+                        if (buf < end) *buf++ = ' ';
                 }
                 if (buf < end) *buf++ = 'i';
                 if (buf < end) *buf++ = 'n';
