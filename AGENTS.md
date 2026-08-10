@@ -12,12 +12,12 @@ XWOS 使用基于 Makefile 的构建系统，支持多平台、多架构。构�
 
 ### 环境设置
 
-1. 进入目标板级目录（例如 `xwbd/WeActMiniStm32H750/`）
+1. 进入目标板级目录（例如 `xwbd/RPi4B/`）
 2. 执行 `source env.sh` 设置环境变量（该脚本必须通过 `source` 执行）
 3. 环境会自动创建 workspace 目录并生成配置文件
 
 ```bash
-cd xwbd/WeActMiniStm32H750
+cd xwbd/RPi4B
 source env.sh
 ```
 
@@ -36,14 +36,12 @@ source env.sh
 
 ### Makefile 目标
 
-在板级目录中，可以直接使用 `make -j8` 命令：
+在板级目录 `xwbd/RPi4B` 中，可以直接使用 `make -j8` 命令：
 
 - `make` ：编译整个工程
 - `make c` ：清理编译产物
 - `make d` ：深度清理（包括 workspace 目录）
 - `make cfg`：重新生成配置文件
-
-目前有两个工程，板级目录分别是 `xwbd/RPi4B` 和 `xwbd/WeActMiniStm32H750`
 
 ### 单模块编译
 

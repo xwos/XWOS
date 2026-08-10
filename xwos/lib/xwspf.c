@@ -49,9 +49,11 @@ enum xwvsnpf_format_type_em {
 #if defined(XWLIBCFG_SPF_FLOAT) && (1U == XWLIBCFG_SPF_FLOAT)
         XWVSNPF_FT_FLOAT,
         XWVSNPF_FT_FLOAT_SCI,
+        XWVSNPF_FT_FLOAT_GENERAL,
 #  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
         XWVSNPF_FT_LONG_DOUBLE,
         XWVSNPF_FT_LONG_DOUBLE_SCI,
+        XWVSNPF_FT_LONG_DOUBLE_GENERAL,
 #  endif /* XWLIBCFG_SPF_LONG_DOUBLE */
 #endif /* XWLIBCFG_SPF_FLOAT */
 };
@@ -445,18 +447,56 @@ char * xwvsnpf_put_float_decimal(char * buf, char * end, unsigned long long num,
 }
 
 static inline
+char * xwvsnpf_format_strip_trailing_zeros(char * tmp, char * p)
+{
+        char * dot = NULL;
+        char * exp_pos = NULL;
+        char * q = tmp;
+
+        while (q < p) {
+                if ('.' == *q) {
+                        dot = q;
+                } else if (('e' == *q) || ('E' == *q)) {
+                        exp_pos = q;
+                }
+                q++;
+        }
+        if (NULL != dot) {
+                char * tail = (NULL != exp_pos) ? exp_pos : p;
+                q = tail;
+                while ((q > dot + 1) && ('0' == q[-1])) {
+                        q--;
+                }
+                if (q == dot + 1) {
+                        q = dot; /* 小数部分全部为零，移除小数点 */
+                }
+                if (NULL != exp_pos) {
+                        memmove(q, exp_pos, (xwsz_t)(p - exp_pos));
+                        p = q + (p - exp_pos);
+                } else {
+                        p = q;
+                }
+        }
+        return p;
+}
+
+static inline
 char * xwvsnpf_format_float(char * buf, char * end, double num,
                             struct xwvsnpf_format_spec spec)
 {
-        char tmp[100];
+        char tmp[256];
         char * p = tmp;
         char sign = 0;
         int precision = (spec.precision == -1) ? 6 : spec.precision;
         int is_sci = (spec.type == XWVSNPF_FT_FLOAT_SCI);
+        int is_general = (spec.type == XWVSNPF_FT_FLOAT_GENERAL);
+        int is_sci_style;
+        int digits;
         int exp = 0;
         unsigned long long int_part = 0;
         unsigned long long frac_part = 0;
         double abs_num;
+        double abs_orig;
         int i, len;
         int need_sign = 0;
         char exp_char = (spec.flags & XWVSNPF_F_SMALL) ? 'e' : 'E';
@@ -478,7 +518,7 @@ char * xwvsnpf_format_float(char * buf, char * end, double num,
                 return buf;
         }
 
-        if (num < 0) {
+        if ((num < 0) || (signbit(num))) {
                 sign = '-';
                 abs_num = -num;
         } else {
@@ -494,7 +534,13 @@ char * xwvsnpf_format_float(char * buf, char * end, double num,
                 need_sign = 1;
         }
 
-        if (is_sci) {
+        if (is_sci || is_general) {
+                if (is_general) {
+                        abs_orig = abs_num;
+                        if (precision == 0) {
+                                precision = 1;
+                        }
+                }
                 if (abs_num == 0.0) {
                         exp = 0;
                 } else if (abs_num >= 1.0) {
@@ -508,12 +554,28 @@ char * xwvsnpf_format_float(char * buf, char * end, double num,
                                 exp--;
                         }
                 }
+                if (is_general) {
+                        if ((exp < -4) || (exp >= precision)) {
+                                is_sci_style = true;
+                                digits = precision - 1;
+                        } else {
+                                is_sci_style = false;
+                                digits = precision - exp - 1;
+                                abs_num = abs_orig;
+                        }
+                } else {
+                        is_sci_style = true;
+                        digits = precision;
+                }
+        } else {
+                is_sci_style = false;
+                digits = precision;
         }
 
         int_part = (unsigned long long)abs_num;
         double frac = abs_num - (double)int_part;
         double mult = 1.0;
-        for (i = 0; i < precision; i++) {
+        for (i = 0; i < digits; i++) {
                 mult *= 10.0;
         }
         frac_part = (unsigned long long)(frac * mult + 0.5);
@@ -521,16 +583,36 @@ char * xwvsnpf_format_float(char * buf, char * end, double num,
         if (frac_part >= (unsigned long long)mult) {
                 frac_part -= (unsigned long long)mult;
                 int_part++;
+                if (is_sci_style) {
+                        int_part = (unsigned long long)1;
+                        exp++;
+                } else if (is_general) {
+                        unsigned long long n = int_part;
+                        int exp_new = 0;
+                        while (n >= 10) {
+                                n /= 10;
+                                exp_new++;
+                        }
+                        if (exp_new >= precision) {
+                                int_part = n;
+                                exp = exp_new;
+                                digits = precision - 1;
+                                is_sci_style = true;
+                        } else {
+                                exp = exp_new;
+                                digits = precision - exp_new - 1;
+                        }
+                }
         }
 
-        p = xwvsnpf_put_float_decimal(p, tmp + 99, int_part, 1);
+        p = xwvsnpf_put_float_decimal(p, tmp + 255, int_part, 1);
 
-        if (precision > 0 || (spec.flags & XWVSNPF_F_SPECIAL)) {
+        if (digits > 0 || (spec.flags & XWVSNPF_F_SPECIAL)) {
                 *p++ = '.';
-                p = xwvsnpf_put_float_decimal(p, tmp + 99, frac_part, precision);
+                p = xwvsnpf_put_float_decimal(p, tmp + 255, frac_part, digits);
         }
 
-        if (is_sci) {
+        if (is_sci_style) {
                 *p++ = exp_char;
                 if (exp >= 0) {
                         *p++ = '+';
@@ -541,7 +623,11 @@ char * xwvsnpf_format_float(char * buf, char * end, double num,
                 if (exp < 10) {
                         *p++ = '0';
                 }
-                p = xwvsnpf_put_float_decimal(p, tmp + 99, (unsigned long long)exp, 1);
+                p = xwvsnpf_put_float_decimal(p, tmp + 255, (unsigned long long)exp, 1);
+        }
+
+        if (is_general && !(spec.flags & XWVSNPF_F_SPECIAL)) {
+                p = xwvsnpf_format_strip_trailing_zeros(tmp, p);
         }
 
         len = (int)(p - tmp);
@@ -582,15 +668,19 @@ static inline
 char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
                                   struct xwvsnpf_format_spec spec)
 {
-        char tmp[100];
+        char tmp[256];
         char *p = tmp;
         char sign = 0;
         int precision = (spec.precision == -1) ? 6 : spec.precision;
         int is_sci = (spec.type == XWVSNPF_FT_LONG_DOUBLE_SCI);
+        int is_general = (spec.type == XWVSNPF_FT_LONG_DOUBLE_GENERAL);
+        int is_sci_style;
+        int digits;
         int exp = 0;
         unsigned long long int_part = 0;
         unsigned long long frac_part = 0;
         long double abs_num;
+        long double abs_orig;
         int i, len;
         int need_sign = 0;
         char exp_char = (spec.flags & XWVSNPF_F_SMALL) ? 'e' : 'E';
@@ -612,7 +702,7 @@ char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
                 return buf;
         }
 
-        if (num < 0) {
+        if ((num < 0) || (signbit(num))) {
                 sign = '-';
                 abs_num = -num;
         } else {
@@ -628,7 +718,13 @@ char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
                 need_sign = 1;
         }
 
-        if (is_sci) {
+        if (is_sci || is_general) {
+                if (is_general) {
+                        abs_orig = abs_num;
+                        if (precision == 0) {
+                                precision = 1;
+                        }
+                }
                 if (abs_num == 0.0L) {
                         exp = 0;
                 } else if (abs_num >= 1.0L) {
@@ -642,12 +738,28 @@ char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
                                 exp--;
                         }
                 }
+                if (is_general) {
+                        if ((exp < -4) || (exp >= precision)) {
+                                is_sci_style = true;
+                                digits = precision - 1;
+                        } else {
+                                is_sci_style = false;
+                                digits = precision - exp - 1;
+                                abs_num = abs_orig;
+                        }
+                } else {
+                        is_sci_style = true;
+                        digits = precision;
+                }
+        } else {
+                is_sci_style = false;
+                digits = precision;
         }
 
         int_part = (unsigned long long)abs_num;
         long double frac = abs_num - (long double)int_part;
         long double mult = 1.0L;
-        for (i = 0; i < precision; i++) {
+        for (i = 0; i < digits; i++) {
                 mult *= 10.0L;
         }
         frac_part = (unsigned long long)(frac * mult + 0.5L);
@@ -655,16 +767,36 @@ char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
         if (frac_part >= (unsigned long long)mult) {
                 frac_part -= (unsigned long long)mult;
                 int_part++;
+                if (is_sci_style) {
+                        int_part = (unsigned long long)1;
+                        exp++;
+                } else if (is_general) {
+                        unsigned long long n = int_part;
+                        int exp_new = 0;
+                        while (n >= 10) {
+                                n /= 10;
+                                exp_new++;
+                        }
+                        if (exp_new >= precision) {
+                                int_part = n;
+                                exp = exp_new;
+                                digits = precision - 1;
+                                is_sci_style = true;
+                        } else {
+                                exp = exp_new;
+                                digits = precision - exp_new - 1;
+                        }
+                }
         }
 
-        p = xwvsnpf_put_float_decimal(p, tmp + 99, int_part, 1);
+        p = xwvsnpf_put_float_decimal(p, tmp + 255, int_part, 1);
 
-        if (precision > 0 || (spec.flags & XWVSNPF_F_SPECIAL)) {
+        if (digits > 0 || (spec.flags & XWVSNPF_F_SPECIAL)) {
                 *p++ = '.';
-                p = xwvsnpf_put_float_decimal(p, tmp + 99, frac_part, precision);
+                p = xwvsnpf_put_float_decimal(p, tmp + 255, frac_part, digits);
         }
 
-        if (is_sci) {
+        if (is_sci_style) {
                 *p++ = exp_char;
                 if (exp >= 0) {
                         *p++ = '+';
@@ -675,7 +807,11 @@ char * xwvsnpf_format_long_double(char * buf, char * end, long double num,
                 if (exp < 10) {
                         *p++ = '0';
                 }
-                p = xwvsnpf_put_float_decimal(p, tmp + 99, (unsigned long long)exp, 1);
+                p = xwvsnpf_put_float_decimal(p, tmp + 255, (unsigned long long)exp, 1);
+        }
+
+        if (is_general && !(spec.flags & XWVSNPF_F_SPECIAL)) {
+                p = xwvsnpf_format_strip_trailing_zeros(tmp, p);
         }
 
         len = (int)(p - tmp);
@@ -913,6 +1049,33 @@ qualifier:
 #  endif
                 fmt++;
                 return fmt - start;
+
+        case 'g':
+                spec->flags |= XWVSNPF_F_SMALL;
+#  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
+                if ('L' == spec->qualifier) {
+                        spec->type = XWVSNPF_FT_LONG_DOUBLE_GENERAL;
+                } else {
+                        spec->type = XWVSNPF_FT_FLOAT_GENERAL;
+                }
+#  else
+                spec->type = XWVSNPF_FT_FLOAT_GENERAL;
+#  endif
+                fmt++;
+                return fmt - start;
+
+        case 'G':
+#  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
+                if ('L' == spec->qualifier) {
+                        spec->type = XWVSNPF_FT_LONG_DOUBLE_GENERAL;
+                } else {
+                        spec->type = XWVSNPF_FT_FLOAT_GENERAL;
+                }
+#  else
+                spec->type = XWVSNPF_FT_FLOAT_GENERAL;
+#  endif
+                fmt++;
+                return fmt - start;
 #endif /* XWLIBCFG_SPF_FLOAT */
 
         case 'd':
@@ -1064,12 +1227,14 @@ int xwvsnpf(char * buf, xwsz_t size, const char * fmt, va_list args)
 #if defined(XWLIBCFG_SPF_FLOAT) && (1U == XWLIBCFG_SPF_FLOAT)
                 case XWVSNPF_FT_FLOAT:
                 case XWVSNPF_FT_FLOAT_SCI:
+                case XWVSNPF_FT_FLOAT_GENERAL:
                         str = xwvsnpf_format_float(str, end, va_arg(args, double), spec);
                         break;
 
 #  if defined(XWLIBCFG_SPF_LONG_DOUBLE) && (1U == XWLIBCFG_SPF_LONG_DOUBLE)
                 case XWVSNPF_FT_LONG_DOUBLE:
                 case XWVSNPF_FT_LONG_DOUBLE_SCI:
+                case XWVSNPF_FT_LONG_DOUBLE_GENERAL:
                         str = xwvsnpf_format_long_double(str, end, va_arg(args, long double), spec);
                         break;
 #  endif /* XWLIBCFG_SPF_LONG_DOUBLE */
