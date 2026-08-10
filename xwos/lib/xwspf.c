@@ -46,6 +46,8 @@ enum xwvsnpf_format_type_em {
         XWVSNPF_FT_INT,
         XWVSNPF_FT_XWSZ_T,
         XWVSNPF_FT_PTRDIFF,
+        XWVSNPF_FT_INTMAX_T,
+        XWVSNPF_FT_UINTMAX_T,
 #if defined(XWLIBCFG_SPF_FLOAT) && (1U == XWLIBCFG_SPF_FLOAT)
         XWVSNPF_FT_FLOAT,
         XWVSNPF_FT_FLOAT_SCI,
@@ -975,7 +977,8 @@ qualifier:
         /* get the conversion qualifier */
         spec->qualifier = 0;
         if (('h' == *fmt) || ('l' == *fmt) || ('L' == *fmt) ||
-            ('z' == *fmt) || ('Z' == *fmt) || ('t' == *fmt)) {
+            ('z' == *fmt) || ('Z' == *fmt) || ('t' == *fmt) ||
+            ('j' == *fmt)) {
                 spec->qualifier = *fmt++;
                 if (spec->qualifier == *fmt) {
                         if ('l' == spec->qualifier) {
@@ -1126,6 +1129,12 @@ qualifier:
                 spec->type = XWVSNPF_FT_XWSZ_T;
         } else if ('t' == spec->qualifier) {
                 spec->type = XWVSNPF_FT_PTRDIFF;
+        } else if ('j' == spec->qualifier) {
+                if (spec->flags & XWVSNPF_F_SIGN) {
+                        spec->type = XWVSNPF_FT_INTMAX_T;
+                } else {
+                        spec->type = XWVSNPF_FT_UINTMAX_T;
+                }
         } else if ('H' == spec->qualifier) {
                 if (spec->flags & XWVSNPF_F_SIGN) {
                         spec->type = XWVSNPF_FT_BYTE;
@@ -1284,6 +1293,12 @@ int xwvsnpf(char * buf, xwsz_t size, const char * fmt, va_list args)
                                 break;
                         case XWVSNPF_FT_PTRDIFF:
                                 num = (xwu64_t)va_arg(args, ptrdiff_t);
+                                break;
+                        case XWVSNPF_FT_INTMAX_T:
+                                num = (xwu64_t)va_arg(args, intmax_t);
+                                break;
+                        case XWVSNPF_FT_UINTMAX_T:
+                                num = (xwu64_t)va_arg(args, uintmax_t);
                                 break;
                         case XWVSNPF_FT_UBYTE:
                                 num = (xwu64_t)va_arg(args, int);
