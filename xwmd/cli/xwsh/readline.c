@@ -98,6 +98,11 @@ uint16_t xwsh_cherryrl_sput(chry_readline_t * rl, const void * data, uint16_t si
         buf = data;
         if (size > 0) {
                 ret = fwrite(buf, size, 1, stdout);
+                if (ret > 0) {
+                        rc = XWOK;
+                } else {
+                        rc = -errno;
+                }
                 rc = -errno;
                 if (rc < 0) {
                         if (xwos_cthd_shld_frz()) {
@@ -125,6 +130,11 @@ uint16_t xwsh_cherryrl_sget(chry_readline_t * rl, void * data, uint16_t size)
 
         buf = data;
         ret = fread(buf, size, 1, stdin);
+        if (ret > 0) {
+                rc = XWOK;
+        } else {
+                rc = -errno;
+        }
         rc = -errno;
         if (rc < 0) {
                 ret = 0;

@@ -89,7 +89,11 @@ uint16_t xwlua_cherryrl_sput(chry_readline_t * rl, const void * data, uint16_t s
         buf = data;
         if (size > 0) {
                 ret = fwrite(buf, size, 1, stdout);
-                rc = -errno;
+                if (ret > 0) {
+                        rc = XWOK;
+                } else {
+                        rc = -errno;
+                }
                 if (rc < 0) {
                         if (xwos_cthd_shld_frz()) {
                                 xwos_cthd_freeze();
@@ -116,6 +120,11 @@ uint16_t xwlua_cherryrl_sget(chry_readline_t * rl, void * data, uint16_t size)
 
         buf = data;
         ret = fread(buf, size, 1, stdin);
+        if (ret > 0) {
+                rc = XWOK;
+        } else {
+                rc = -errno;
+        }
         rc = -errno;
         if (rc < 0) {
                 ret = 0;
