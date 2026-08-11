@@ -42,6 +42,8 @@
 #define XWAMCFG_sample_c_isc_xwmq                               1
 #define XWAMCFG_sample_c_isc_xwcq                               1
 
+#define XWAMCFG_sample_cxx_basic_Thd                            1
+#define XWAMCFG_sample_cxx_basic_Swt                            1
 #define XWAMCFG_sample_cxx_extended_Event                       1
 #define XWAMCFG_sample_cxx_extended_SmpMutex                    1
 #define XWAMCFG_sample_cxx_extended_SameCpuMutex                1
