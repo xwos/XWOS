@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::Event::Consumer
+ * @brief sample::cxx::extended::Event::mi
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,13 +18,11 @@
  * > limitations under the License.
  */
 
-#include "xwam/sample/cxx/Event/Consumer.hxx"
-#include "xwam/sample/cxx/Event/Producer.hxx"
+#ifndef __xwam_sample_cxx_extended_Event_mi_h__
+#define __xwam_sample_cxx_extended_Event_mi_h__
 
-extern "C" {
-void SampleEvent_init(void)
-{
-    sample::Event::Consumer::sInstance.init();
-    sample::Event::Producer::sInstance.init();
-}
-}
+#include <xwos/standard.h>
+
+void CxxExtSample_Event_init(void);
+
+#endif /* xwam/sample/cxx/extended/Event/mi.h */

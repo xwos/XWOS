@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SameCpuMutex::Producer
+ * @brief sample::cxx::extended::SmpMutex::Producer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,15 +18,17 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_SameCpuMutex_Producer_hxx__
-#define __xwam_sample_cxx_SameCpuMutex_Producer_hxx__
+#ifndef __xwam_sample_cxx_extended_SmpMutex_Producer_hxx__
+#define __xwam_sample_cxx_extended_SmpMutex_Producer_hxx__
 
 #include <xwos/standard.hxx>
 #include <xwos/cxx/SThd.hxx>
 #include <xwos/cxx/lock/SMtx.hxx>
 
 namespace sample {
-namespace SameCpuMutex {
+namespace cxx {
+namespace extended {
+namespace SmpMutex {
 
 #define PRODUCER_THD_STACK_SIZE (2048U)
 #define PRODUCER_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 4)
@@ -52,7 +54,9 @@ class Producer
     static const xwtm_t skCfgLoopPeriod = XWTM_MS(1000); /**< 轮询周期 */
 };
 
-} // namespace SameCpuMutex
+} // namespace SmpMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample
 
-#endif /* xwam/sample/cxx/SameCpuMutex/Producer.hxx */
+#endif /* xwam/sample/cxx/extended/SmpMutex/Producer.hxx */

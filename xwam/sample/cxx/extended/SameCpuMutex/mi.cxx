@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SameCpuMutex::Log
+ * @brief sample::cxx::extended::SameCpuMutex::mi
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,28 +18,19 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_SameCpuMutex_Log_hxx__
-#define __xwam_sample_cxx_SameCpuMutex_Log_hxx__
+#include "xwam/sample/cxx/extended/SameCpuMutex/Consumer.hxx"
+#include "xwam/sample/cxx/extended/SameCpuMutex/Producer.hxx"
 
-#include <xwos/standard.hxx>
-#include <xwos/lib/xwlog.hxx>
+extern "C" {
 
-namespace sample {
-namespace SameCpuMutex {
+void CxxExtSample_SameCpuMutex_Consumer_init(void)
+{
+    sample::cxx::extended::SameCpuMutex::Consumer::sInstance.init();
+}
 
-#ifndef LOGTAG
-#  define LOGTAG "sample::SameCpuMutex"
-#endif
+void CxxExtSample_SameCpuMutex_Producer_init(void)
+{
+    sample::cxx::extended::SameCpuMutex::Producer::sInstance.init();
+}
 
-#if defined(SAMPLE_DEBUG)
-#  define sampleLogD(fmt, ...) xwlogf(D, LOGTAG, fmt, ##__VA_ARGS__)
-#else
-#  define sampleLogD(fmt, ...)
-#endif
-#define sampleLogI(fmt, ...) xwlogf(I, LOGTAG, fmt, ##__VA_ARGS__)
-#define sampleLogE(fmt, ...) xwlogf(E, LOGTAG, fmt, ##__VA_ARGS__)
-
-} // namespace SameCpuMutex
-} // namespace sample
-
-#endif /* xwam/sample/cxx/SameCpuMutex/Log.hxx */
+}

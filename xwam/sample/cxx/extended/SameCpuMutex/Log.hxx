@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SmpMutex::Log
+ * @brief sample::cxx::extended::SameCpuMutex::Log
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,17 +18,19 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_SmpMutex_Log_hxx__
-#define __xwam_sample_cxx_SmpMutex_Log_hxx__
+#ifndef __xwam_sample_cxx_SameCpuMutex_Log_hxx__
+#define __xwam_sample_cxx_SameCpuMutex_Log_hxx__
 
 #include <xwos/standard.hxx>
 #include <xwos/lib/xwlog.hxx>
 
 namespace sample {
-namespace SmpMutex {
+namespace cxx {
+namespace extended {
+namespace SameCpuMutex {
 
 #ifndef LOGTAG
-#  define LOGTAG "sample::SmpMutex"
+#  define LOGTAG "sample::SameCpuMutex"
 #endif
 
 #if defined(SAMPLE_DEBUG)
@@ -39,7 +41,9 @@ namespace SmpMutex {
 #define sampleLogI(fmt, ...) xwlogf(I, LOGTAG, fmt, ##__VA_ARGS__)
 #define sampleLogE(fmt, ...) xwlogf(E, LOGTAG, fmt, ##__VA_ARGS__)
 
-} // namespace SmpMutex
+} // namespace SameCpuMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample
 
-#endif /* xwam/sample/cxx/SmpMutex/Log.hxx */
+#endif /* xwam/sample/cxx/extended/SameCpuMutex/Log.hxx */

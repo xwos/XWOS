@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SmpMutex::Consumer
+ * @brief sample::cxx::extended::SmpMutex::mi
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,17 +18,23 @@
  * > limitations under the License.
  */
 
-#include "xwam/sample/cxx/SmpMutex/Consumer.hxx"
-#include "xwam/sample/cxx/SmpMutex/Producer.hxx"
+#ifndef __xwam_sample_cxx_extended_SmpMutex_mi_h__
+#define __xwam_sample_cxx_extended_SmpMutex_mi_h__
 
-extern "C" {
-void SampleSmpMutex_Producer_init(void)
-{
-    sample::SmpMutex::Producer::sInstance.init();
-}
+#include <xwos/standard.h>
 
-void SampleSmpMutex_Consumer_init(void)
-{
-    sample::SmpMutex::Consumer::sInstance.init();
-}
-}
+/**
+ * @brief 初始化生产者线程
+ * @note
+ * 在CPU0上调用
+ */
+void CxxExtSample_SmpMutex_Producer_init(void);
+
+/**
+ * @brief 初始化消费者线程
+ * @note
+ * 在CPU1上调用
+ */
+void CxxExtSample_SmpMutex_Consumer_init(void);
+
+#endif /* xwam/sample/cxx/extended/SmpMutex/mi.h */

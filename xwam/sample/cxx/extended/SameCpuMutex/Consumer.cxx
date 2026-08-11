@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SameCpuMutex::Producer
+ * @brief sample::cxx::extended::SameCpuMutex::Consumer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,30 +18,30 @@
  * > limitations under the License.
  */
 
-#include "xwam/sample/cxx/SameCpuMutex/Consumer.hxx"
-#include "xwam/sample/cxx/SameCpuMutex/Producer.hxx"
+#include "xwam/sample/cxx/extended/SameCpuMutex/Consumer.hxx"
+#include "xwam/sample/cxx/extended/SameCpuMutex/Producer.hxx"
 
 #define SAMPLE_DEBUG
-#define LOGTAG "sample::SameCpuMutex::Producer"
-#include "xwam/sample/cxx/SameCpuMutex/Log.hxx"
+#define LOGTAG "sample::SameCpuMutex::Consumer"
+#include "xwam/sample/cxx/extended/SameCpuMutex/Log.hxx"
 
 namespace sample {
+namespace cxx {
+namespace extended {
 namespace SameCpuMutex {
 
-/* Producer Non-static Member */
-Producer::Producer(xwstk_t stack[], xwsz_t stack_size)
-    : SThd("SameCpuMutexSample::Producer",
-           stack, stack_size,
-           XWOS_STACK_GUARD_SIZE_DEFAULT, PRODUCER_THD_PRIORITY)
-    , mData(0)
+/* Consumer Non-static Member */
+Consumer::Consumer(xwstk_t stack[], xwsz_t stack_size)
+    : SThd("SameCpuMutexSample::Consumer", stack, stack_size,
+           XWOS_STACK_GUARD_SIZE_DEFAULT, CONSUMER_THD_PRIORITY)
 {
 }
 
-Producer::~Producer()
+Consumer::~Consumer()
 {
 }
 
-void Producer::init()
+void Consumer::init()
 {
     xwer_t rc = launch();
     if (rc < 0) {
@@ -51,7 +51,7 @@ void Producer::init()
     }
 }
 
-xwer_t Producer::thdMainFunction()
+xwer_t Consumer::thdMainFunction()
 {
     xwu32_t copy;
     xwtm_t from = xwtm_now();
@@ -60,19 +60,20 @@ xwer_t Producer::thdMainFunction()
             freeze();
         }
         {
-            xwos::lock::Mtx::Grd grd(mMutex);
-            mData++;
-            copy = mData;
+            xwos::lock::Mtx::Grd grd(Producer::sInstance.mMutex);
+            copy = Producer::sInstance.mData;
         }
-        sampleLogI("Write: %d\r\n", copy);
+        sampleLogI("Read: %d\r\n", copy);
         sleepFrom(&from, skCfgLoopPeriod);
     }
     return XWOK;
 }
 
-/* Producer Static Member */
-Producer Producer::sInstance(sStack, sizeof(sStack));
-xwstk_t Producer::sStack[PRODUCER_THD_STACK_SIZE / sizeof(xwstk_t)];
+/* Consumer Static Member */
+Consumer Consumer::sInstance(sThdStack, sizeof(sThdStack));
+xwstk_t Consumer::sThdStack[CONSUMER_THD_STACK_SIZE / sizeof(xwstk_t)];
 
 } // namespace SameCpuMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample

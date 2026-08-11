@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::Event::Log
+ * @brief sample::cxx::extended::Event::Log
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,13 +18,15 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_Event_Log_hxx__
-#define __xwam_sample_cxx_Event_Log_hxx__
+#ifndef __xwam_sample_cxx_extended_Event_Log_hxx__
+#define __xwam_sample_cxx_extended_Event_Log_hxx__
 
 #include <xwos/standard.hxx>
 #include <xwos/lib/xwlog.hxx>
 
 namespace sample {
+namespace cxx {
+namespace extended {
 namespace Event {
 
 #ifndef LOGTAG
@@ -40,6 +42,8 @@ namespace Event {
 #define sampleLogE(fmt, ...) xwlogf(E, LOGTAG, fmt, ##__VA_ARGS__)
 
 } // namespace Event
+} // namespace extended
+} // namespace cxx
 } // namespace sample
 
-#endif /* xwam/sample/cxx/Event/Log.hxx */
+#endif /* xwam/sample/cxx/extended/Event/Log.hxx */

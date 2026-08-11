@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SameCpuMutex::Consumer
+ * @brief sample::cxx::extended::SmpMutex::Consumer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,18 +18,21 @@
  * > limitations under the License.
  */
 
-#include "xwam/sample/cxx/SameCpuMutex/Consumer.hxx"
-#include "xwam/sample/cxx/SameCpuMutex/Producer.hxx"
+#include "xwam/sample/cxx/extended/SmpMutex/Consumer.hxx"
+#include "xwam/sample/cxx/extended/SmpMutex/Producer.hxx"
 
 #define SAMPLE_DEBUG
-#define LOGTAG "sample::SameCpuMutex::Consumer"
-#include "xwam/sample/cxx/SameCpuMutex/Log.hxx"
+#define LOGTAG "sample::SmpMutex::Consumer"
+#include "xwam/sample/cxx/extended/SmpMutex/Log.hxx"
 
 namespace sample {
-namespace SameCpuMutex {
+namespace cxx {
+namespace extended {
+namespace SmpMutex {
+
 /* Consumer Non-static Member */
 Consumer::Consumer(xwstk_t stack[], xwsz_t stack_size)
-    : SThd("SameCpuMutexSample::Consumer", stack, stack_size,
+    : SThd("SmpMutexSample::Consumer", stack, stack_size,
            XWOS_STACK_GUARD_SIZE_DEFAULT, CONSUMER_THD_PRIORITY)
 {
 }
@@ -70,5 +73,7 @@ xwer_t Consumer::thdMainFunction()
 Consumer Consumer::sInstance(sThdStack, sizeof(sThdStack));
 xwstk_t Consumer::sThdStack[CONSUMER_THD_STACK_SIZE / sizeof(xwstk_t)];
 
-} // namespace SameCpuMutex
+} // namespace SmpMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample

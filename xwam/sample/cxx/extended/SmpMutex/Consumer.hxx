@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SameCpuMutex::Consumer
+ * @brief sample::cxx::extended::SmpMutex::Consumer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,23 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_SameCpuMutex_Consumer_hxx__
-#define __xwam_sample_cxx_SameCpuMutex_Consumer_hxx__
+#ifndef __xwam_sample_cxx_extended_SmpMutex_Consumer_hxx__
+#define __xwam_sample_cxx_extended_SmpMutex_Consumer_hxx__
 
 #include <xwos/standard.hxx>
 #include <xwos/cxx/SThd.hxx>
 #include <xwos/cxx/lock/SMtx.hxx>
 
 namespace sample {
-namespace SameCpuMutex {
+namespace cxx {
+namespace extended {
+namespace SmpMutex {
 
 #define CONSUMER_THD_STACK_SIZE (2048U)
 #define CONSUMER_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
 class Consumer
-    : public xwos::SThd<0>
+    : public xwos::SThd<1>
 {
   public:
     void init();
@@ -47,7 +49,9 @@ class Consumer
     static const xwtm_t skCfgLoopPeriod = XWTM_MS(1000); /**< 轮询周期 */
 };
 
-} // namespace SameCpuMutex
+} // namespace SmpMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample
 
-#endif /* xwam/sample/cxx/Mutex/Consumer.hxx */
+#endif /* xwam/sample/cxx/extended/SmpMutex/Consumer.hxx */

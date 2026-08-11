@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SmpMutex::Producer
+ * @brief sample::cxx::extended::Event::Producer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,22 +18,23 @@
  * > limitations under the License.
  */
 
-#include "xwam/sample/cxx/SmpMutex/Consumer.hxx"
-#include "xwam/sample/cxx/SmpMutex/Producer.hxx"
+#include "xwam/sample/cxx/extended/Event/Consumer.hxx"
+#include "xwam/sample/cxx/extended/Event/Producer.hxx"
 
 #define SAMPLE_DEBUG
-#define LOGTAG "sample::SmpMutex::Producer"
-#include "xwam/sample/cxx/SmpMutex/Log.hxx"
+#define LOGTAG "sample::Event::Producer"
+#include "xwam/sample/cxx/extended/Event/Log.hxx"
 
 namespace sample {
-namespace SmpMutex {
+namespace cxx {
+namespace extended {
+namespace Event {
 
 /* Producer Non-static Member */
 Producer::Producer(xwstk_t stack[], xwsz_t stack_size)
-    : SThd("SmpMutexSample::Producer",
+    : SThd("Event::Producer",
            stack, stack_size,
-           XWOS_STACK_GUARD_SIZE_DEFAULT, PRODUCER_THD_PRIORITY)
-    , mData(0)
+           XWOS_STACK_GUARD_SIZE_DEFAULT, EVENTER_PRODUCER_PRIORITY)
 {
 }
 
@@ -46,33 +47,28 @@ void Producer::init()
     xwer_t rc = launch();
     if (rc < 0) {
         sampleLogE("launch ... %d\r\n", rc);
-    } else {
-        sampleLogI("launch ... OK\r\n");
     }
 }
 
 xwer_t Producer::thdMainFunction()
 {
-    xwu32_t copy;
     xwtm_t from = xwtm_now();
     while (!shouldStop()) {
         if (shouldFreeze()) {
             freeze();
         }
-        {
-            xwos::lock::Mtx::Grd grd(mMutex);
-            mData++;
-            copy = mData;
-        }
-        sampleLogI("Write: %d\r\n", copy);
-        sleepFrom(&from, skCfgLoopPeriod);
+        Event::Consumer::sInstance.setEvent(4U);
+        sleepFrom(&from, skLoopPeriod);
     }
+
     return XWOK;
 }
 
 /* Producer Static Member */
 Producer Producer::sInstance(sStack, sizeof(sStack));
-xwstk_t Producer::sStack[PRODUCER_THD_STACK_SIZE / sizeof(xwstk_t)];
+xwstk_t Producer::sStack[EVENTER_PRODUCER_STACK_SIZE / sizeof(xwstk_t)];
 
-} // namespace SmpMutex
+} // namespace Event
+} // namespace extended
+} // namespace cxx
 } // namespace sample

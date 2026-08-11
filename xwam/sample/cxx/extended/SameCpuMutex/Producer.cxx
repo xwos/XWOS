@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::Event::Producer
+ * @brief sample::cxx::extended::SameCpuMutex::Producer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,24 @@
  * > limitations under the License.
  */
 
-#include "xwam/sample/cxx/Event/Consumer.hxx"
-#include "xwam/sample/cxx/Event/Producer.hxx"
+#include "xwam/sample/cxx/extended/SameCpuMutex/Consumer.hxx"
+#include "xwam/sample/cxx/extended/SameCpuMutex/Producer.hxx"
 
 #define SAMPLE_DEBUG
-#define LOGTAG "sample::Event::Producer"
-#include "xwam/sample/cxx/Event/Log.hxx"
+#define LOGTAG "sample::SameCpuMutex::Producer"
+#include "xwam/sample/cxx/extended/SameCpuMutex/Log.hxx"
 
 namespace sample {
-namespace Event {
+namespace cxx {
+namespace extended {
+namespace SameCpuMutex {
 
 /* Producer Non-static Member */
 Producer::Producer(xwstk_t stack[], xwsz_t stack_size)
-    : SThd("Event::Producer",
+    : SThd("SameCpuMutexSample::Producer",
            stack, stack_size,
-           XWOS_STACK_GUARD_SIZE_DEFAULT, EVENTER_PRODUCER_PRIORITY)
+           XWOS_STACK_GUARD_SIZE_DEFAULT, PRODUCER_THD_PRIORITY)
+    , mData(0)
 {
 }
 
@@ -45,26 +48,35 @@ void Producer::init()
     xwer_t rc = launch();
     if (rc < 0) {
         sampleLogE("launch ... %d\r\n", rc);
+    } else {
+        sampleLogI("launch ... OK\r\n");
     }
 }
 
 xwer_t Producer::thdMainFunction()
 {
+    xwu32_t copy;
     xwtm_t from = xwtm_now();
     while (!shouldStop()) {
         if (shouldFreeze()) {
             freeze();
         }
-        Event::Consumer::sInstance.setEvent(4U);
-        sleepFrom(&from, skLoopPeriod);
+        {
+            xwos::lock::Mtx::Grd grd(mMutex);
+            mData++;
+            copy = mData;
+        }
+        sampleLogI("Write: %d\r\n", copy);
+        sleepFrom(&from, skCfgLoopPeriod);
     }
-
     return XWOK;
 }
 
 /* Producer Static Member */
 Producer Producer::sInstance(sStack, sizeof(sStack));
-xwstk_t Producer::sStack[EVENTER_PRODUCER_STACK_SIZE / sizeof(xwstk_t)];
+xwstk_t Producer::sStack[PRODUCER_THD_STACK_SIZE / sizeof(xwstk_t)];
 
-} // namespace Event
+} // namespace SameCpuMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample

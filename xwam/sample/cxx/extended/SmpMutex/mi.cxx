@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SameCpuMutex::Consumer
+ * @brief sample::cxx::extended::SmpMutex::Consumer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,17 +18,17 @@
  * > limitations under the License.
  */
 
-#include "xwam/sample/cxx/SameCpuMutex/Consumer.hxx"
-#include "xwam/sample/cxx/SameCpuMutex/Producer.hxx"
+#include "xwam/sample/cxx/extended/SmpMutex/Consumer.hxx"
+#include "xwam/sample/cxx/extended/SmpMutex/Producer.hxx"
 
 extern "C" {
-void SampleSameCpuMutex_Consumer_init(void)
+void CxxExtSample_SmpMutex_Producer_init(void)
 {
-    sample::SameCpuMutex::Consumer::sInstance.init();
+    sample::cxx::extended::SmpMutex::Producer::sInstance.init();
 }
 
-void SampleSameCpuMutex_Producer_init(void)
+void CxxExtSample_SmpMutex_Consumer_init(void)
 {
-    sample::SameCpuMutex::Producer::sInstance.init();
+    sample::cxx::extended::SmpMutex::Consumer::sInstance.init();
 }
 }

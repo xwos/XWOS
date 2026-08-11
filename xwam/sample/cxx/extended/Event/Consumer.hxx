@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::Event::Consumer
+ * @brief sample::cxx::extended::Event::Consumer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,16 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_Event_Consumer_hxx__
-#define __xwam_sample_cxx_Event_Consumer_hxx__
+#ifndef __xwam_sample_cxx_extended_Event_Consumer_hxx__
+#define __xwam_sample_cxx_extended_Event_Consumer_hxx__
 
 #include <xwos/standard.hxx>
 #include <xwos/cxx/SThd.hxx>
 #include <xwos/cxx/sync/SFlg.hxx>
 
 namespace sample {
+namespace cxx {
+namespace extended {
 namespace Event {
 
 #define EVENT_NUM (32U)
@@ -56,6 +58,8 @@ class Consumer
 };
 
 } // namespace Event
+} // namespace extended
+} // namespace cxx
 } // namespace sample
 
-#endif /* xwam/sample/cxx/Event/Consumer.hxx */
+#endif /* xwam/sample/cxx/extended/Event/Consumer.hxx */

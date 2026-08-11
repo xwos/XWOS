@@ -27,10 +27,11 @@ function childthd_main()
   local tstsem = xwxt.tstsem
   print("Child Thread:", sp)
   rc = tstsem:wait()
+  local value = tstsem:get_value()
   if (rc == 0) then
-    print("[Child Thread] Wait semaphore ... OK, value:", tstsem:get_value(), ", max:", tstsem:get_max())
+    print("[Child Thread] Wait semaphore ... OK, value:", value)
   else
-    print("[Child Thread] Wait semaphore ... error:", rc)
+    print("[Child Thread] Wait semaphore ... error:", rc, ",value:", value)
   end
 end
 print("Main Thread:", xwos.cthd.sp())
@@ -52,10 +53,11 @@ function childthd_main()
   local tstsem = xwxt.tstsem
   print("Child Thread:", sp)
   rc = tstsem:wait_to(xwtm.ms(100))
+  local value = tstsem:get_value()
   if (rc == 0) then
-    print("[Child Thread] Wait semaphore ... OK, value:", tstsem:get_value(), ", max:", tstsem:get_max())
+    print("[Child Thread] Wait semaphore ... OK, value:", value)
   else
-    print("[Child Thread] Wait semaphore ... error:", rc, ",value:", tstsem:get_value(), ", max:", tstsem:get_max())
+    print("[Child Thread] Wait semaphore ... error:", rc, ",value:", value)
   end
 end
 print("Main Thread:", xwos.cthd.sp())
@@ -77,10 +79,11 @@ function childthd_main()
   local tstsem = xwxt.tstsem
   print("Child Thread:", sp)
   rc = tstsem:wait()
+  local value = tstsem:get_value()
   if (rc == 0) then
-    print("[Child Thread] Wait semaphore ... OK, value:", tstsem:get_value(), ", max:", tstsem:get_max())
+    print("[Child Thread] Wait semaphore ... OK, value:", value)
   else
-    print("[Child Thread] Wait semaphore ... error:", rc, ",value:", tstsem:get_value(), ", max:", tstsem:get_max())
+    print("[Child Thread] Wait semaphore ... error:", rc, ",value:", value)
   end
 end
 print("Main Thread:", xwos.cthd.sp())

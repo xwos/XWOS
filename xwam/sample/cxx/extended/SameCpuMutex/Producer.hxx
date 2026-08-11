@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::Event::Producer
+ * @brief sample::cxx::extended::SameCpuMutex::Producer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,28 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_Event_Producer_hxx__
-#define __xwam_sample_cxx_Event_Producer_hxx__
+#ifndef __xwam_sample_cxx_SameCpuMutex_Producer_hxx__
+#define __xwam_sample_cxx_SameCpuMutex_Producer_hxx__
 
 #include <xwos/standard.hxx>
 #include <xwos/cxx/SThd.hxx>
+#include <xwos/cxx/lock/SMtx.hxx>
 
 namespace sample {
-namespace Event {
+namespace cxx {
+namespace extended {
+namespace SameCpuMutex {
 
-#define EVENTER_PRODUCER_STACK_SIZE (4096U)
-#define EVENTER_PRODUCER_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 4)
+#define PRODUCER_THD_STACK_SIZE (2048U)
+#define PRODUCER_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 4)
 
 class Producer
     : public xwos::SThd<0>
 {
+  public:
+    xwos::lock::SMtx mMutex;
+    xwu32_t mData;
+
   private:
     Producer(xwstk_t stack[], xwsz_t stack_size);
     ~Producer();
@@ -43,11 +50,13 @@ class Producer
 
   public:
     static Producer sInstance; /**< 单例模式 */
-    static xwstk_t sStack[EVENTER_PRODUCER_STACK_SIZE / sizeof(xwstk_t)]; /**< Thread Stack */
-    static const xwtm_t skLoopPeriod = XWTM_MS(1000); /**< 轮询周期 */
+    static xwstk_t sStack[PRODUCER_THD_STACK_SIZE / sizeof(xwstk_t)]; /**< Thread Stack */
+    static const xwtm_t skCfgLoopPeriod = XWTM_MS(1000); /**< 轮询周期 */
 };
 
-} // namespace Event
+} // namespace SameCpuMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample
 
-#endif /* xwam/sample/cxx/Event/Producer.hxx */
+#endif /* xwam/sample/cxx/extended/SameCpuMutex/Producer.hxx */

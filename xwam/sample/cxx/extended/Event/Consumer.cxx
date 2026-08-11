@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::Event::Consumer
+ * @brief sample::cxx::extended::Event::Consumer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,17 @@
  * > limitations under the License.
  */
 
-#include "xwam/sample/cxx/Event/Consumer.hxx"
+#include "xwam/sample/cxx/extended/Event/Consumer.hxx"
 
 #define SAMPLE_DEBUG
 #define LOGTAG "sample::Event::Consumer"
-#include "xwam/sample/cxx/Event/Log.hxx"
+#include "xwam/sample/cxx/extended/Event/Log.hxx"
 
 namespace sample {
+namespace cxx {
+namespace extended {
 namespace Event {
+
 /* Consumer Non-static Member */
 Consumer::Consumer(xwstk_t stack[], xwsz_t stack_size)
     : SThd("Event::Consumer", stack, stack_size,
@@ -116,4 +119,6 @@ Consumer Consumer::sInstance(sThdStack, sizeof(sThdStack));
 xwstk_t Consumer::sThdStack[EVENT_CONSUMER_THD_STACK_SIZE / sizeof(xwstk_t)];
 
 } // namespace Event
+} // namespace extended
+} // namespace cxx
 } // namespace sample

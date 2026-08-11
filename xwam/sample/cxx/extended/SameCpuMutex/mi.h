@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Sample::SameCpuMutex::mi
+ * @brief sample::cxx::extended::SameCpuMutex::mi
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,12 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_SameCpuMutex_mi_h__
-#define __xwam_sample_cxx_SameCpuMutex_mi_h__
+#ifndef __xwam_sample_cxx_extended_SameCpuMutex_mi_h__
+#define __xwam_sample_cxx_extended_SameCpuMutex_mi_h__
 
 #include <xwos/standard.h>
 
-void SampleSameCpuMutex_Consumer_init(void);
-void SampleSameCpuMutex_Producer_init(void);
+void CxxExtSample_SameCpuMutex_Consumer_init(void);
+void CxxExtSample_SameCpuMutex_Producer_init(void);
 
-#endif /* xwam/sample/cxx/SameCpuMutex/mi.h */
+#endif /* xwam/sample/cxx/extended/SameCpuMutex/mi.h */

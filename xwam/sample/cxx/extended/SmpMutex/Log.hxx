@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SmpMutex::Consumer
+ * @brief sample::cxx::extended::SmpMutex::Log
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,36 +18,32 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_SmpMutex_Consumer_hxx__
-#define __xwam_sample_cxx_SmpMutex_Consumer_hxx__
+#ifndef __xwam_sample_cxx_extended_SmpMutex_Log_hxx__
+#define __xwam_sample_cxx_extended_SmpMutex_Log_hxx__
 
 #include <xwos/standard.hxx>
-#include <xwos/cxx/SThd.hxx>
-#include <xwos/cxx/lock/SMtx.hxx>
+#include <xwos/lib/xwlog.hxx>
 
 namespace sample {
+namespace cxx {
+namespace extended {
 namespace SmpMutex {
 
-#define CONSUMER_THD_STACK_SIZE (2048U)
-#define CONSUMER_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+#ifndef LOGTAG
+#  define LOGTAG "sample::SmpMutex"
+#endif
 
-class Consumer
-    : public xwos::SThd<1>
-{
-  public:
-    void init();
-  private:
-    Consumer(xwstk_t stack[], xwsz_t stack_size);
-    ~Consumer();
-    virtual xwer_t thdMainFunction() override;
-
-  public:
-    static Consumer sInstance; /**< 单例模式 */
-    static xwstk_t sThdStack[CONSUMER_THD_STACK_SIZE / sizeof(xwstk_t)]; /**< Thread Stack */
-    static const xwtm_t skCfgLoopPeriod = XWTM_MS(1000); /**< 轮询周期 */
-};
+#if defined(SAMPLE_DEBUG)
+#  define sampleLogD(fmt, ...) xwlogf(D, LOGTAG, fmt, ##__VA_ARGS__)
+#else
+#  define sampleLogD(fmt, ...)
+#endif
+#define sampleLogI(fmt, ...) xwlogf(I, LOGTAG, fmt, ##__VA_ARGS__)
+#define sampleLogE(fmt, ...) xwlogf(E, LOGTAG, fmt, ##__VA_ARGS__)
 
 } // namespace SmpMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample
 
-#endif /* xwam/sample/cxx/Mutex/Consumer.hxx */
+#endif /* xwam/sample/cxx/SmpMutex/Log.hxx */

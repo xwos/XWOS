@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SmpMutex::Producer
+ * @brief sample::cxx::extended::SameCpuMutex::Consumer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,41 +18,40 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_sample_cxx_SmpMutex_Producer_hxx__
-#define __xwam_sample_cxx_SmpMutex_Producer_hxx__
+#ifndef __xwam_sample_cxx_extended_SameCpuMutex_Consumer_hxx__
+#define __xwam_sample_cxx_extended_SameCpuMutex_Consumer_hxx__
 
 #include <xwos/standard.hxx>
 #include <xwos/cxx/SThd.hxx>
 #include <xwos/cxx/lock/SMtx.hxx>
 
 namespace sample {
-namespace SmpMutex {
+namespace cxx {
+namespace extended {
+namespace SameCpuMutex {
 
-#define PRODUCER_THD_STACK_SIZE (2048U)
-#define PRODUCER_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 4)
+#define CONSUMER_THD_STACK_SIZE (2048U)
+#define CONSUMER_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
-class Producer
+class Consumer
     : public xwos::SThd<0>
 {
   public:
-    xwos::lock::SMtx mMutex;
-    xwu32_t mData;
-
+    void init();
   private:
-    Producer(xwstk_t stack[], xwsz_t stack_size);
-    ~Producer();
+    Consumer(xwstk_t stack[], xwsz_t stack_size);
+    ~Consumer();
     virtual xwer_t thdMainFunction() override;
 
   public:
-    void init();
-
-  public:
-    static Producer sInstance; /**< 单例模式 */
-    static xwstk_t sStack[PRODUCER_THD_STACK_SIZE / sizeof(xwstk_t)]; /**< Thread Stack */
+    static Consumer sInstance; /**< 单例模式 */
+    static xwstk_t sThdStack[CONSUMER_THD_STACK_SIZE / sizeof(xwstk_t)]; /**< Thread Stack */
     static const xwtm_t skCfgLoopPeriod = XWTM_MS(1000); /**< 轮询周期 */
 };
 
-} // namespace SmpMutex
+} // namespace SameCpuMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample
 
-#endif /* xwam/sample/cxx/SmpMutex/Producer.hxx */
+#endif /* xwam/sample/cxx/extended/SameCpuMutex/Consumer.hxx */

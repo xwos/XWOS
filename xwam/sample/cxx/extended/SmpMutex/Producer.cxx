@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief sample::SmpMutex::Consumer
+ * @brief sample::cxx::extended::SmpMutex::Producer
  * @author
  * + 隐星曜 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,27 +18,32 @@
  * > limitations under the License.
  */
 
-#include "xwam/sample/cxx/SmpMutex/Consumer.hxx"
-#include "xwam/sample/cxx/SmpMutex/Producer.hxx"
+#include "xwam/sample/cxx/extended/SmpMutex/Consumer.hxx"
+#include "xwam/sample/cxx/extended/SmpMutex/Producer.hxx"
 
 #define SAMPLE_DEBUG
-#define LOGTAG "sample::SmpMutex::Consumer"
-#include "xwam/sample/cxx/SmpMutex/Log.hxx"
+#define LOGTAG "sample::SmpMutex::Producer"
+#include "xwam/sample/cxx/extended/SmpMutex/Log.hxx"
 
 namespace sample {
+namespace cxx {
+namespace extended {
 namespace SmpMutex {
-/* Consumer Non-static Member */
-Consumer::Consumer(xwstk_t stack[], xwsz_t stack_size)
-    : SThd("SmpMutexSample::Consumer", stack, stack_size,
-           XWOS_STACK_GUARD_SIZE_DEFAULT, CONSUMER_THD_PRIORITY)
+
+/* Producer Non-static Member */
+Producer::Producer(xwstk_t stack[], xwsz_t stack_size)
+    : SThd("SmpMutexSample::Producer",
+           stack, stack_size,
+           XWOS_STACK_GUARD_SIZE_DEFAULT, PRODUCER_THD_PRIORITY)
+    , mData(0)
 {
 }
 
-Consumer::~Consumer()
+Producer::~Producer()
 {
 }
 
-void Consumer::init()
+void Producer::init()
 {
     xwer_t rc = launch();
     if (rc < 0) {
@@ -48,7 +53,7 @@ void Consumer::init()
     }
 }
 
-xwer_t Consumer::thdMainFunction()
+xwer_t Producer::thdMainFunction()
 {
     xwu32_t copy;
     xwtm_t from = xwtm_now();
@@ -57,18 +62,21 @@ xwer_t Consumer::thdMainFunction()
             freeze();
         }
         {
-            xwos::lock::Mtx::Grd grd(Producer::sInstance.mMutex);
-            copy = Producer::sInstance.mData;
+            xwos::lock::Mtx::Grd grd(mMutex);
+            mData++;
+            copy = mData;
         }
-        sampleLogI("Read: %d\r\n", copy);
+        sampleLogI("Write: %d\r\n", copy);
         sleepFrom(&from, skCfgLoopPeriod);
     }
     return XWOK;
 }
 
-/* Consumer Static Member */
-Consumer Consumer::sInstance(sThdStack, sizeof(sThdStack));
-xwstk_t Consumer::sThdStack[CONSUMER_THD_STACK_SIZE / sizeof(xwstk_t)];
+/* Producer Static Member */
+Producer Producer::sInstance(sStack, sizeof(sStack));
+xwstk_t Producer::sStack[PRODUCER_THD_STACK_SIZE / sizeof(xwstk_t)];
 
 } // namespace SmpMutex
+} // namespace extended
+} // namespace cxx
 } // namespace sample
