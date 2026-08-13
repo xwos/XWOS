@@ -478,63 +478,59 @@ xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
         if (alignment < XWMM_ALIGNMENT) {
                 alignment = XWMM_ALIGNMENT;
         }
+
         p2 = xwbop_fls(xwsz_t, alignment);
-        if (((xwsz_t)1 << (xwsz_t)p2) != alignment) {
-                rc = -EINVAL;
-                *membuf = NULL;
-                goto err_notp2;
+        while (((xwsz_t)1 << (xwsz_t)p2) < alignment) {
+                p2++;
         }
+        alignment = (xwsz_t)1 << (xwsz_t)p2;
         if ((xwsz_t)0 == size) {
                 rc = XWOK;
                 *membuf = NULL;
-                goto nothing;
-        }
-        if (size <= alignment) {
-                size = alignment;
         } else {
-                p2 = xwbop_fls(xwsz_t, size);
-                while (((xwsz_t)1 << (xwsz_t)p2) < size) {
-                        p2++;
+                if (size <= alignment) {
+                        size = alignment;
+                } else {
+                        p2 = xwbop_fls(xwsz_t, size);
+                        while (((xwsz_t)1 << (xwsz_t)p2) < size) {
+                                p2++;
+                        }
+                        size = (xwsz_t)1 << (xwsz_t)p2;
                 }
-                size = (xwsz_t)1 << (xwsz_t)p2;
+                switch (size) {
+                case 8:
+                        ia = (void *)&mp->oc_8;
+                        break;
+                case 16:
+                        ia = (void *)&mp->oc_16;
+                        break;
+                case 32:
+                        ia = (void *)&mp->oc_32;
+                        break;
+                case 64:
+                        ia = (void *)&mp->oc_64;
+                        break;
+                case 128:
+                        ia = (void *)&mp->oc_128;
+                        break;
+                case 256:
+                        ia = (void *)&mp->oc_256;
+                        break;
+                case 512:
+                        ia = (void *)&mp->oc_512;
+                        break;
+                case 1024:
+                        ia = (void *)&mp->oc_1024;
+                        break;
+                case 2048:
+                        ia = (void *)&mp->oc_2048;
+                        break;
+                default:
+                        ia = (void *)&mp->pa;
+                        break;
+                }
+                rc = ia->malloc(ia, size, membuf);
         }
-
-        switch (size) {
-        case 8:
-                ia = (void *)&mp->oc_8;
-                break;
-        case 16:
-                ia = (void *)&mp->oc_16;
-                break;
-        case 32:
-                ia = (void *)&mp->oc_32;
-                break;
-        case 64:
-                ia = (void *)&mp->oc_64;
-                break;
-        case 128:
-                ia = (void *)&mp->oc_128;
-                break;
-        case 256:
-                ia = (void *)&mp->oc_256;
-                break;
-        case 512:
-                ia = (void *)&mp->oc_512;
-                break;
-        case 1024:
-                ia = (void *)&mp->oc_1024;
-                break;
-        case 2048:
-                ia = (void *)&mp->oc_2048;
-                break;
-        default:
-                ia = (void *)&mp->pa;
-                break;
-        }
-        rc = ia->malloc(ia, size, membuf);
-
-nothing:
-err_notp2:
         return rc;
 }
 

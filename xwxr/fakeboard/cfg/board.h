@@ -40,6 +40,7 @@
 #define BRDCFG_ESR_BUSFAULT                     1
 #define BRDCFG_ESR_USAGEFAULT                   1
 #define BRDCFG_ESR_DBGMON                       1
+#define BRDCFG_ESR_STACK_OVERFLOW               1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       xwlib       ******** ******** ********
@@ -58,19 +59,13 @@
 #define BRDCFG_ICACHE                           1
 
 /******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********    board config   ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define BRDCFG_BOOT_FROM_BOOTLOADER             1
+
+/******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   firmware info   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BRDCFG_FIRMWARE_TAILFLAG                "XWOS,MCU:STM32H750"
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********   board modules   ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#define BMCFG_Stm32Hal                          1
-#define BMCFG_CmBacktrace                       1
-#define BMCFG_RustApp                           1
-#define BMCFG_MainThread                        1
-#define BMCFG_Test_eeprom                       1
-#define BMCFG_Test_w25qxx                       1
-#define BMCFG_Test_xwssc                        1
 
 #endif /* cfg/board.h */

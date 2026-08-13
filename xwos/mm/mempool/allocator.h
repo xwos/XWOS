@@ -223,8 +223,8 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size,
  * + 重入性：可重入
  * @details
  * + 此API类似于C标准中的 `aligned_alloc()` 函数：
- *   + `alignment` 如果比 `XWMM_ALIGNMENT` 小，会被扩大为 `XWMM_ALIGNMENT` ：
- *   + `alignment` 只能是2的n次方：
+ *   + `alignment` 如果比 `XWMM_ALIGNMENT` 小，会被扩大为 `XWMM_ALIGNMENT`
+ *   + `alignment` 会被扩大为2的n次方
  *   + 若size小于 `alignment` ， `size` 会被扩大为 `alignment` ，
  *   + 若size大于 `alignment` ， `size` 会向上对齐到2的n次方，此时也一定为 `alignment` 的整数倍。
  * + 申请内存失败时，此函数不会修改 `*membuf` 的值。

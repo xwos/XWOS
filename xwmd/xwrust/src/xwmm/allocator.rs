@@ -2,22 +2,19 @@
 //! ========
 //!
 //! Rust的 `#![no_std]` 环境要求用户定义 [`global_allocator`] ，作为动态内存管理的实现。
-//! 标准的Rust库依赖crate libc的 `memalign()` 与 `free()` 函数来实现 [`global_allocator`] 。
-//! XWOS RUST不依赖crate libc，使用 `xwos/mm/mempool` 算法来实现 [`global_allocator`] 。
-//! 同时，XWOS RUST也提供虚假的 [`global_allocator`] ，用于禁止动态内存的情况。
 //!
 //!
 //! # 允许动态内存的情况
 //!
 //! 若用户需要使用基于动态内存的特性，例如 [`Box<T>`] 和 [`Arc<T>`] ，
-//! 需要在应用代码中定义 `GLOBAL_ALLOCATOR` 并赋值为 [`AllocatorMempool`] 。
+//! 需要在应用代码中定义 `GLOBAL_ALLOCATOR` 并赋值为 [`XwrustAllocator`] 。
 //!
 //! ```rust
 //! #![no_std]
-//! use xwrust::xwmm::allocator::AllocatorMempool;
+//! use xwrust::xwmm::allocator::XwrustAllocator;
 //!
 //! #[global_allocator]
-//! pub static GLOBAL_ALLOCATOR: AllocatorMempool = AllocatorMempool;
+//! pub static GLOBAL_ALLOCATOR: XwrustAllocator = XwrustAllocator;
 //!
 //! #[no_mangle]
 //! pub unsafe extern "C" fn xwrust_main() {
@@ -25,27 +22,17 @@
 //! }
 //! ```
 //!
-//! 同时，用户需要在C语言层面提供 `xwrust_mempool` 的定义，
-//! 例如 `XWOS/xwbd/WeActMiniStm32H750/bm/xwac/xwrust/allocator.c`
-//!
-//! ```C
-//! #include <xwos/mm/mempool/allocator.h>
-//!
-//! extern xwsz_t axisram_mr_origin[];
-//! struct xwmm_mempool * xwrust_mempool = (void *)axisram_mr_origin;
-//! ```
-//!
 //!
 //! # 禁止动态内存的情况
 //!
 //! 若用户禁止在代码中使用动态内存，只使用静态内存，
-//! 需要在应用代码中定义 `GLOBAL_ALLOCATOR` 并赋值为 [`AllocatorDummy`] 。
+//! 需要在应用代码中定义 `GLOBAL_ALLOCATOR` 并赋值为 [`DummyAllocator`] 。
 //!
 //! ```rust
-//! use xwrust::xwmm::allocator::AllocatorDummy;
+//! use xwrust::xwmm::allocator::DummyAllocator;
 //!
 //! #[global_allocator]
-//! pub static GLOBAL_ALLOCATOR: AllocatorDummy = AllocatorDummy;
+//! pub static GLOBAL_ALLOCATOR: DummyAllocator = DummyAllocator;
 //!
 //! #[no_mangle]
 //! pub unsafe extern "C" fn xwrust_main() {
@@ -77,10 +64,10 @@ extern "C" {
     fn xwrustffi_allocator_free(mem: *mut c_void);
 }
 
-/// 基于mempool的内存分配器
-pub struct AllocatorMempool;
+/// 内存分配器
+pub struct XwrustAllocator;
 
-unsafe impl GlobalAlloc for AllocatorMempool {
+unsafe impl GlobalAlloc for XwrustAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         xwrustffi_allocator_alloc(layout.align(), layout.size()) as *mut _
     }
@@ -91,9 +78,9 @@ unsafe impl GlobalAlloc for AllocatorMempool {
 }
 
 /// 虚假的内存分配器
-pub struct AllocatorDummy;
+pub struct DummyAllocator;
 
-unsafe impl GlobalAlloc for AllocatorDummy {
+unsafe impl GlobalAlloc for DummyAllocator {
     #[allow(unreachable_code)]
     unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
         loop {

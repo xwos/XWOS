@@ -28,7 +28,7 @@
 #define XWCFG_SUBARCH                           v7m
 #define XWCFG_COMPILER                          gcc
 #define XWCFG_LIBC                              newlib
-#define XWCFG_LDSCRIPT                          brd.lds
+#define XWCFG_LDSCRIPT                          rom.lds
 #include <cfg/arch.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

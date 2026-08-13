@@ -319,7 +319,7 @@ xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf)
 
         XWOS_VALIDATE((bma), "nullptr", -EFAULT);
         XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
-        XWOS_VALIDATE((order <= (xwsq_t)XWSSQ_MAX), "out-of-range", -ERANGE);
+        XWOS_VALIDATE((order <= (xwsq_t)XWMM_BMA_MAX_ORDER), "out-of-range", -ERANGE);
 
         ol = NULL;
         bcb = err_ptr(-ENOENT);
@@ -535,30 +535,27 @@ xwer_t xwmm_bma_memalign(struct xwmm_bma * bma, xwsz_t alignment, xwsz_t size,
                 alignment = XWMM_ALIGNMENT;
         }
         p2 = xwbop_fls(xwsz_t, alignment);
-        if (((xwsz_t)1 << (xwsz_t)p2) != alignment) {
-                rc = -EINVAL;
-                *membuf = NULL;
-                goto err_notp2;
+        while (((xwsz_t)1 << (xwsz_t)p2) < alignment) {
+                p2++;
         }
+        alignment = (xwsz_t)1 << (xwsz_t)p2;
         if ((xwsz_t)0 == size) {
                 rc = XWOK;
                 *membuf = NULL;
-                goto nothing;
-        }
-
-        if (size <= alignment) {
-                size = alignment;
         } else {
-                p2 = xwbop_fls(xwsz_t, size);
-                while (((xwsz_t)1 << (xwsz_t)p2) < size) {
-                        p2++;
+                if (size <= alignment) {
+                        size = alignment;
+                } else {
+                        p2 = xwbop_fls(xwsz_t, size);
+                        while (((xwsz_t)1 << (xwsz_t)p2) < size) {
+                                p2++;
+                        }
+                        size = ((xwsz_t)1 << (xwsz_t)p2);
                 }
-                size = ((xwsz_t)1 << p2);
+                /* 因BMA的特点，申请到的内存地址一定对齐到size，
+                   只要size是alignment的整数倍，也一定对齐到alignment。 */
+                rc = xwmm_bma_malloc(bma, size, membuf);
         }
-        rc = xwmm_bma_malloc(bma, size, membuf);
-
-nothing:
-err_notp2:
         return rc;
 }
 

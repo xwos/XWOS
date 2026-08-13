@@ -59,10 +59,10 @@
 //! ```rust
 //! #![no_std]
 //!
-//! use xwrust::xwmm::allocator::AllocatorMempool;
+//! use xwrust::xwmm::allocator::XwrustAllocator;
 //!
 //! #[global_allocator]
-//! pub static GLOBAL_ALLOCATOR: AllocatorMempool = AllocatorMempool;
+//! pub static GLOBAL_ALLOCATOR: XwrustAllocator = XwrustAllocator;
 //!
 //! #[no_mangle]
 //! pub unsafe extern "C" fn xwrust_main() {
@@ -74,24 +74,31 @@
 //!
 //! ```C
 //! extern void xwrust_main(void);
-//! xwer_t xwrust_task(void * arg);
 //!
-//! xwos_thd_d xwrust_thd;
+//! #define XWRUST_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+//! xwer_t xwrust_thd_mainfunc(void * arg);
+//! __xwcc_alignl1cache xwstk_t xwrust_thd_stack[2048U] = {0};
+//! struct xwos_thd xwrust_thd;
+//! xwos_thd_d xwrust_thdd;
+//!
 //! xwer_t xwos_main(void)
 //! {
+//!         xwer_t rc;
 //!         struct xwos_thd_attr attr;
 //!
 //!         xwos_thd_attr_init(&attr);
 //!         attr.name = "xwrust.thd";
-//!         attr.stack = NULL;
-//!         attr.stack_size = 8192;
+//!         attr.stack = xwrust_thd_stack;
+//!         attr.stack_size = sizeof(xwrust_thd_stack);
 //!         attr.priority = XWRUST_THD_PRIORITY;
 //!         attr.detached = true;
 //!         attr.privileged = true;
-//!         xwos_thd_create(&xwrust_thd, &attr, xwrust_task, NULL);
+//!         rc = xwos_thd_init(&xwrust_thd, &xwrust_thdd,
+//!                            &attr,
+//!                            xwrust_thd_mainfunc, NULL);
 //! }
 //!
-//! xwer_t xwrust_task(void * arg)
+//! xwer_t xwrust_thd_mainfunc(void * arg)
 //! {
 //!         xwrust_main();
 //! }

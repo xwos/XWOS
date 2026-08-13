@@ -11,20 +11,33 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/mm/mempool/allocator.h>
-
-extern struct xwmm_mempool * xwrust_mempool;
+#include <xwos/mm/common.h>
+#include <xwos/lib/xwbop.h>
+#include <stdlib.h>
 
 void * xwrustffi_allocator_alloc(xwsz_t alignment, xwsz_t size)
 {
-        void * mem = NULL;
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwmm_mempool_memalign(xwrust_mempool, alignment, size, &mem);
+        void * mem;
+        xwssz_t p2;
+
+        if ((alignment < XWMM_ALIGNMENT) && (alignment < size)) {
+                mem = malloc(size);
+        } else {
+                if (size <= alignment) {
+                        size = alignment;
+                } else {
+                        p2 = xwbop_fls(xwsz_t, size);
+                        while (((xwsz_t)1 << (xwsz_t)p2) < size) {
+                                p2++;
+                        }
+                        size = ((xwsz_t)1 << (xwsz_t)p2);
+                }
+                mem = aligned_alloc(alignment, size);
+        }
         return mem;
 }
 
 void xwrustffi_allocator_free(void * mem)
 {
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwmm_mempool_free(xwrust_mempool, mem);
+        free(mem);
 }

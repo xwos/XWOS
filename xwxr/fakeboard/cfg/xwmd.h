@@ -51,6 +51,11 @@
 #define XWMDCFG_isc_xwcq                                        1
 #define XWMDCFG_isc_xwcq_CXX                                    1
 
+/******** ******** Inter-OS Communication ******** ********/
+#define XWMDCFG_isc_xwioc                                       0
+#define XWMDCFG_isc_xwioc_CXX                                   1
+#define XWMDCFG_isc_xwioc_PORT_NUM                              (16U)
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      AUTOSAR classical Platform     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
@@ -63,14 +68,16 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_libc                                            1
 #define XWMDCFG_libc_newlibac_SETJMP                            1
-#define XWMDCFG_libc_newlibac_MEM                               1
-#define XWMDCFG_libc_newlibac_SPRINTF                           0
+#define XWMDCFG_libc_newlibac_BMA                               1
+#define XWMDCFG_libc_newlibac_MEMPOOL                           0
+#define XWMDCFG_libc_newlibac_SPRINTF                           1
 #define XWMDCFG_libc_newlibac_FOPS                              1
 #define XWMDCFG_libc_newlibac_FATFS                             1
 #define XWMDCFG_libc_newlibac_TIME                              1
 #define XWMDCFG_libc_picolibcac_SETJMP                          1
-#define XWMDCFG_libc_picolibcac_MEM                             1
-#define XWMDCFG_libc_picolibcac_SPRINTF                         0
+#define XWMDCFG_libc_picolibcac_BMA                             1
+#define XWMDCFG_libc_picolibcac_MEMPOOL                         0
+#define XWMDCFG_libc_picolibcac_SPRINTF                         1
 #define XWMDCFG_libc_picolibcac_FOPS                            1
 #define XWMDCFG_libc_picolibcac_FATFS                           1
 #define XWMDCFG_libc_picolibcac_TIME                            1
