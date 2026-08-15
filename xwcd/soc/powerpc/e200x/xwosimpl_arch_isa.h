@@ -29,6 +29,9 @@
 
 /******** ******** Bug report ******** ********/
 
+/******** ******** Nop ******** ********/
+#define soc_nop()               __asm__ volatile("se_nop\n");
+
 /******** ******** barrier ******** ********/
 #define eppc_isb()              __asm__ volatile("se_isync" : : : "memory")
 #define eppc_dmb()              __asm__ volatile("msync" : : : "memory")

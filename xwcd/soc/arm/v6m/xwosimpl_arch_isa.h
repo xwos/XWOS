@@ -34,6 +34,9 @@ void soc_bug(void)
         __asm__ volatile("bkpt  0\n");
 }
 
+/******** ******** Nop ******** ********/
+#define soc_nop()               __asm__ volatile("nop\n");
+
 /******** ******** barrier ******** ********/
 #define armv6m_isb()            __asm__ volatile("isb" : : : "memory")
 #define armv6m_dsb()            __asm__ volatile("dsb" : : : "memory")

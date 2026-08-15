@@ -1322,11 +1322,6 @@ xwssz_t armv6m_itm_putns(xwu32_t port, const char * s, xwsz_t n)
 }
 
 /**
- * @brief noop function
- */
-#define noop()          __asm__ volatile("nop")
-
-/**
  * @brief System Resets
  */
 static __xwbsp_inline

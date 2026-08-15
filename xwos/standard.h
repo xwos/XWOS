@@ -65,6 +65,8 @@
 
 #define XWOS_UNUSED(x)          ((void)(x))     /**< 去除未使用变量的警告 */
 
+#define xwos_nop()              soc_nop() /**< 插入NOP指令 */
+
 
 /**
  * @brief 检查函数参数是否有效

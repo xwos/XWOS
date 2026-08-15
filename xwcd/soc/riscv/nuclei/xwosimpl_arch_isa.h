@@ -34,6 +34,9 @@ void soc_bug(void)
         __asm__ volatile("ebreak");
 }
 
+/******** ******** Nop ******** ********/
+#define soc_nop()               __asm__ volatile("nop\n");
+
 /******** ******** barrier ******** ********/
 #define xwmb_compiler()         __asm__ volatile("": : :"memory")
 #define xwmb_isb()              __asm__ volatile("fence.i" : : : "memory")
