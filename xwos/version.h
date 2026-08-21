@@ -37,7 +37,7 @@
 /**
  * @brief XWOS的小版本号
  */
-#define XWOS_VERSION_MINOR              0
+#define XWOS_VERSION_MINOR              1
 /**
  * @brief XWOS的修订号
  */
@@ -46,7 +46,7 @@
 /**
  * @brief XWOS的版本开发阶段
  */
-#define XWOS_VERSION_PHASE              release
+#define XWOS_VERSION_PHASE              alpha
 
 /**
  * @brief XWOS的版本号（数值形式）
