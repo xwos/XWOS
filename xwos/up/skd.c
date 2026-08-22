@@ -95,13 +95,19 @@ xwer_t xwup_skd_bhd(struct xwup_skd * xwskd);
 
 static __xwup_code
 void xwup_skd_init_bhd(void);
+
+static __xwup_code
+xwer_t xwup_skd_sw_bh_nochk(struct xwup_skd * xwskd);
+
+static __xwup_code
+xwer_t xwup_skd_sw_bh(struct xwup_skd * xwskd);
 #endif
 
 static __xwup_code
 bool xwup_skd_chkpmpt_thd(struct xwup_thd * t);
 
 static __xwup_code
-xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd);
+xwer_t xwup_skd_chkswcx(struct xwup_thd * t, struct xwup_thd ** pmthd);
 
 static __xwup_code
 xwer_t xwup_skd_swcx(void);
@@ -550,23 +556,16 @@ struct xwup_skd * xwup_skd_enbh_lc(void)
 {
         struct xwup_skd * xwskd = &xwup_skd;
         xwreg_t cpuirq;
-        bool sched = false;
 
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->dis_bh_cnt--;
         if ((xwsq_t)0 == xwskd->dis_bh_cnt) {
                 if ((xwsq_t)0 != xwskd->req_bh_cnt) {
-                        if (!xwup_skd_tst_in_bh_lc()) {
-                                xwskd->pstk = xwskd->cstk;
-                                xwskd->cstk = XWUP_SKD_BH_STK(xwskd);
-                                sched = true;
-                        }
+                        // cppcheck-suppress [misra-c2012-17.7]
+                        xwup_skd_sw_bh_nochk(xwskd);
                 }
         }
         xwospl_cpuirq_restore_lc(cpuirq);
-        if (sched) {
-                xwospl_skd_req_swcx(xwskd);
-        }
         return xwskd;
 }
 
@@ -598,23 +597,16 @@ struct xwup_skd * xwup_skd_rsbh_lc(xwsq_t dis_bh_cnt)
 {
         struct xwup_skd * xwskd = &xwup_skd;
         xwreg_t cpuirq;
-        bool sched = false;
 
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->dis_bh_cnt = dis_bh_cnt;
         if ((xwsq_t)0 == xwskd->dis_bh_cnt) {
                 if ((xwsq_t)0 != xwskd->req_bh_cnt) {
-                        if (!xwup_skd_tst_in_bh_lc()) {
-                                xwskd->pstk = xwskd->cstk;
-                                xwskd->cstk = XWUP_SKD_BH_STK(xwskd);
-                                sched = true;
-                        }
+                        // cppcheck-suppress [misra-c2012-17.7]
+                        xwup_skd_sw_bh_nochk(xwskd);
                 }
         }
         xwospl_cpuirq_restore_lc(cpuirq);
-        if (sched) {
-                xwospl_skd_req_swcx(xwskd);
-        }
         return xwskd;
 }
 
@@ -629,7 +621,47 @@ bool xwup_skd_tstbh_lc(void)
         struct xwup_skd * xwskd;
 
         xwskd = &xwup_skd;
-        return ((xwsq_t)0 == xwskd->dis_bh_cnt);
+        return !!((xwsq_t)0 == xwskd->dis_bh_cnt);
+}
+
+static __xwup_code
+xwer_t xwup_skd_sw_bh_nochk(struct xwup_skd * xwskd)
+{
+        xwer_t rc;
+
+        if (NULL != xwskd->pstk) {
+                rc = -EINPROGRESS;
+        } else if (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk) {
+                rc = -EALREADY;
+        } else {
+                xwskd->pstk = xwskd->cstk;
+                xwskd->cstk = XWUP_SKD_BH_STK(xwskd);
+                xwospl_skd_req_swcx(xwskd);
+                rc = XWOK;
+        }
+        return rc;
+}
+
+/**
+ * @brief 切换至中断底半部上下文
+ * @param[in] xwskd: XWOS MP调度器的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EPERM: 中断底半部已被禁止
+ * @retval -EINPROGRESS: 切换上下文的过程正在进行中
+ * @retval -EALREADY: 当前上下文已经是中断底半部上下文
+ */
+static __xwup_code
+xwer_t xwup_skd_sw_bh(struct xwup_skd * xwskd)
+{
+        xwer_t rc;
+
+        if ((xwsq_t)0 == xwskd->dis_bh_cnt) {
+                rc = xwup_skd_sw_bh_nochk(xwskd);
+        } else {
+                rc = -EPERM;
+        }
+        return rc;
 }
 
 /**
@@ -651,23 +683,8 @@ xwer_t xwup_skd_req_bh(void)
         if (xwskd->req_bh_cnt < XWSQ_MAX) {
                 xwskd->req_bh_cnt++;
         }
-        if ((xwsq_t)0 == xwskd->dis_bh_cnt) {
-                if (NULL != xwskd->pstk) {
-                        rc = -EINPROGRESS;
-                } else if (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk) {
-                        rc = -EALREADY;
-                } else {
-                        xwskd->pstk = xwskd->cstk;
-                        xwskd->cstk = XWUP_SKD_BH_STK(xwskd);
-                        rc = XWOK;
-                }
-        } else {
-                rc = -EPERM;
-        }
+        rc = xwup_skd_sw_bh(xwskd);
         xwospl_cpuirq_restore_lc(cpuirq);
-        if (XWOK == rc) {
-                xwospl_skd_req_swcx(xwskd);
-        }
         return rc;
 }
 
@@ -683,7 +700,7 @@ bool xwup_skd_tst_in_bh_lc(void)
         struct xwup_skd * xwskd = &xwup_skd;
         return (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk);
 }
-#endif
+#endif /* XWOSCFG_SKD_BH */
 
 __xwup_api
 struct xwup_skd * xwup_skd_dspmpt_lc(void)
@@ -807,7 +824,7 @@ __xwup_code
 bool xwup_skd_tstpmpt_lc(void)
 {
         struct xwup_skd * xwskd = &xwup_skd;
-        return ((xwsq_t)0 == xwskd->dis_pmpt_cnt);
+        return !!((xwsq_t)0 == xwskd->dis_pmpt_cnt);
 }
 
 /**
@@ -895,7 +912,7 @@ void xwup_skd_chkpmpt(void)
  * + 此函数被调用时需要关闭本地CPU的中断。
  */
 static __xwup_code
-xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd)
+xwer_t xwup_skd_chkswcx(struct xwup_thd * t, struct xwup_thd ** pmthd)
 {
         struct xwup_skd * xwskd;
         struct xwup_rtrq * xwrtrq;
@@ -945,7 +962,7 @@ xwer_t xwup_skd_swcx(void)
                 }
         } else {
                 cthd = xwup_skd_get_cthd_lc();
-                rc = xwup_skd_check_swcx(cthd, &swt);
+                rc = xwup_skd_chkswcx(cthd, &swt);
                 if (XWOK == rc) {
                         if (cthd == swt) {
                                 /* 当前线程的状态可能在中断中被改变，

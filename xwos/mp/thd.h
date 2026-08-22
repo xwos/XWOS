@@ -131,8 +131,7 @@ xwer_t xwmp_thd_rq_add_head(struct xwmp_thd * thd, xwpr_t prio);
 xwer_t xwmp_thd_rq_add_tail(struct xwmp_thd * thd, xwpr_t prio);
 xwer_t xwmp_thd_rq_remove(struct xwmp_thd * thd);
 xwer_t xwmp_thd_wakeup(struct xwmp_thd * thd);
-xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt,
-                              xwtm_t to, xwreg_t cpuirq);
+xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt, xwtm_t to);
 
 #if (1 == XWOSRULE_SKD_WQ_RT)
 void xwmp_thd_eq_rtwq_locked(struct xwmp_thd * thd,

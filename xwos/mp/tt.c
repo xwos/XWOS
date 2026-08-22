@@ -13,7 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
-#include <xwos/lib/xwaop.h>
 #include <xwos/ospl/syshwt.h>
 #include <xwos/mp/irq.h>
 #include <xwos/mp/skd.h>
@@ -47,7 +46,7 @@ void xwmp_ttn_init(struct xwmp_ttn * ttn)
         xwlib_bclst_init_node(&ttn->rbb);
         xwlib_rbtree_init_node(&ttn->rbn);
         ttn->wkup_xwtm = (xwtm_t)0;
-        xwaop_write(xwsq_t, &ttn->wkuprs, (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN, NULL);
+        ttn->wkuprs = (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN;
         ttn->cb = NULL;
         ttn->xwtt = NULL;
 }
@@ -77,7 +76,6 @@ xwer_t xwmp_tt_init(struct xwmp_tt * xwtt)
  * @brief 加入节点到时间树
  * @param[in] xwtt: 时间树的指针
  * @param[in] ttn: 时间树节点的指针
- * @param[in] cpuirq: CPU中断开关标志
  * @retval XWOK: 没有错误
  * @retval -EINTR: 被中断
  * @retval -ETIMEDOUT: 超时
@@ -85,19 +83,16 @@ xwer_t xwmp_tt_init(struct xwmp_tt * xwtt)
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
 __xwmp_code
-xwer_t xwmp_tt_add_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn, xwreg_t cpuirq)
+xwer_t xwmp_tt_add_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn)
 {
         struct xwlib_rbtree_node ** pos;
         struct xwlib_rbtree_node * rbn;
         struct xwmp_ttn * n;
         struct xwmp_ttn * leftmost;
         xwptr_t lpc;
-        xwsq_t seq;
         xwer_t rc;
         xwtm_t nt;
 
-retry:
-        /* the state of thread may be change in IRQ */
         if ((NULL == ttn->cb) || (xwtt != ttn->xwtt)) {
                 rc = -EINTR;
         } else {
@@ -105,8 +100,7 @@ retry:
                 lpc = (xwptr_t)pos;
                 n = NULL;
                 leftmost = xwtt->leftmost;
-                if (NULL == leftmost) {
-                        /* rbtree is empty. */
+                if (NULL == leftmost) { /* 空树 */
                         xwtt->deadline = ttn->wkup_xwtm;
                         xwtt->leftmost = ttn;
                 } else if (xwtm_cmp(ttn->wkup_xwtm, xwtt->deadline) < 0) {
@@ -119,51 +113,21 @@ retry:
                         n = leftmost;
                 } else {
                         rbn = *pos;
-                        seq = xwmp_sqlk_get_seq(&xwtt->lock);
-                        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                        /* IRQs may happen */
-                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
-                        xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
-                        if (xwmp_sqlk_rd_retry(&xwtt->lock, seq)) {
-                                goto retry; // cppcheck-suppress [misra-c2012-15.2]
-                        }
                         while (NULL != rbn) { // cppcheck-suppress [misra-c2012-15.4]
                                 n = xwlib_rbtree_entry(rbn, struct xwmp_ttn, rbn);
                                 nt = n->wkup_xwtm;
-                                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                                /* IRQs may happen */
-                                seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                                 rc = xwtm_cmp(ttn->wkup_xwtm, nt);
                                 if (rc < 0) {
                                         pos = &rbn->left;
                                         lpc = (xwptr_t)pos;
-                                        xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
-                                        if (xwmp_sqlk_rd_retry(&xwtt->lock, seq)) {
-                                                // cppcheck-suppress [misra-c2012-15.2]
-                                                goto retry;
-                                        }
                                         rbn = rbn->left;
                                 } else if (rc > 0) {
                                         pos = &rbn->right;
                                         lpc = ((xwptr_t)pos |
                                                (xwptr_t)XWLIB_RBTREE_POS_RIGHT);
-                                        xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
-                                        if (xwmp_sqlk_rd_retry(&xwtt->lock, seq)) {
-                                                // cppcheck-suppress [misra-c2012-15.2]
-                                                goto retry;
-                                        }
                                         rbn = rbn->right;
                                 } else {
                                         lpc = (xwptr_t)0;
-                                        xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
-                                        if (xwmp_sqlk_rd_retry(&xwtt->lock, seq)) {
-                                                // cppcheck-suppress [misra-c2012-15.2]
-                                                goto retry;
-                                        }
                                         break;
                                 }
                         }
@@ -213,11 +177,10 @@ void xwmp_tt_rmrbn_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn)
         struct xwlib_rbtree_node * s;
 
         if (ttn == xwtt->leftmost) {
-                s = ttn->rbn.right; /* The successor of a min node is its
-                                       right child due to the property 5 of
-                                       red-black tree. Or if there is no
-                                       right child, the successor is its
-                                       parent. */
+                s = ttn->rbn.right; /* 根据红黑树性质5，可知
+                                     * + 最小节点的后继(successor)是其右子节点
+                                     * + 若右子节点不存在，后继(successor)是其父节点
+                                     */
                 if (NULL == s) {
                         s = xwlib_rbtree_get_parent(&ttn->rbn);
                 }
@@ -257,7 +220,7 @@ xwer_t xwmp_tt_remove_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn)
                         xwmp_tt_rmrbn_locked(xwtt, ttn);
                 }
                 ttn->xwtt = NULL;
-                xwaop_write(xwsq_t, &ttn->wkuprs, (xwsq_t)XWMP_TTN_WKUPRS_INTR, NULL);
+                ttn->wkuprs = (xwsq_t)XWMP_TTN_WKUPRS_INTR;
                 ttn->cb = NULL;
                 rc = XWOK;
         }
@@ -307,8 +270,7 @@ void xwmp_tt_bh(struct xwmp_tt * xwtt)
         xwlib_bclst_itr_prev_entry_del(ttn, &xwtt->timeout, struct xwmp_ttn, rbb) {
                 xwlib_bclst_del_init(&ttn->rbb);
                 cb = ttn->cb;
-                xwaop_write(xwsq_t, &ttn->wkuprs, (xwsq_t)XWMP_TTN_WKUPRS_TIMEDOUT,
-                            NULL);
+                ttn->wkuprs = (xwsq_t)XWMP_TTN_WKUPRS_TIMEDOUT;
                 ttn->cb = NULL;
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 cb(ttn);
@@ -342,7 +304,6 @@ xwer_t xwmp_syshwt_init(struct xwmp_syshwt * hwt)
         hwt->timetick = (xwtm_t)(-(XWOSCFG_SYSHWT_PERIOD));
         hwt->irqrsc = NULL;
         hwt->irqs_num = (xwsz_t)0;
-        xwmp_sqlk_init(&hwt->lock);
         rc = xwospl_syshwt_init(hwt);
         if (XWOK == rc) {
                 XWOS_BUG_ON(NULL == hwt->irqrsc);
@@ -384,13 +345,12 @@ xwer_t xwmp_syshwt_stop(struct xwmp_syshwt * hwt)
 __xwmp_code
 xwtm_t xwmp_syshwt_get_time(struct xwmp_syshwt * hwt)
 {
-        xwsq_t seq;
+        xwreg_t cpuirq;
         xwtm_t time;
 
-        do {
-                seq = xwmp_sqlk_rd_begin(&hwt->lock);
-                time = hwt->timetick;
-        } while (xwmp_sqlk_rd_retry(&hwt->lock, seq));
+        xwmp_cpuirq_save_lc(&cpuirq);
+        time = hwt->timetick;
+        xwmp_cpuirq_restore_lc(cpuirq);
         return time;
 }
 
@@ -406,16 +366,15 @@ xwtm_t xwmp_syshwt_get_time(struct xwmp_syshwt * hwt)
 __xwmp_code
 xwtm_t xwmp_syshwt_get_timestamp(struct xwmp_syshwt * hwt)
 {
-        xwsq_t seq;
+        xwreg_t cpuirq;
         xwtm_t ts;
         xwtm_t timeconfetti;
 
-        do {
-                seq = xwmp_sqlk_rd_begin(&hwt->lock);
-                ts = hwt->timetick;
-                timeconfetti = xwospl_syshwt_get_timeconfetti(hwt);
-                ts = xwtm_add(ts, timeconfetti);
-        } while (xwmp_sqlk_rd_retry(&hwt->lock, seq));
+        xwmp_cpuirq_save_lc(&cpuirq);
+        ts = hwt->timetick;
+        timeconfetti = xwospl_syshwt_get_timeconfetti(hwt);
+        xwmp_cpuirq_restore_lc(cpuirq);
+        ts = xwtm_add(ts, timeconfetti);
         return ts;
 }
 
@@ -448,9 +407,9 @@ void xwmp_syshwt_task(struct xwmp_syshwt * hwt)
 
         xwtt = xwmp_syshwt_get_tt(hwt);
         xwskd = xwmp_tt_get_skd(xwtt);
-        xwmp_sqlk_wr_lock_cpuirqsv(&hwt->lock, &cpuirq);
+        xwmp_cpuirq_save_lc(&cpuirq);
         hwt->timetick = xwtm_add(hwt->timetick, XWOSCFG_SYSHWT_PERIOD);
-        xwmp_sqlk_wr_unlock_cpuirqrs(&hwt->lock, cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
         rc = xwmp_tt_check_deadline(xwtt);
         if (-ETIMEDOUT == rc) {
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)

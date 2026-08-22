@@ -130,8 +130,7 @@ void xwup_cthd_return(xwer_t rc);
 xwer_t xwup_thd_rq_add_head(struct xwup_thd * thd);
 xwer_t xwup_thd_rq_add_tail(struct xwup_thd * thd);
 void xwup_thd_rq_remove(struct xwup_thd * thd);
-xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt,
-                              xwtm_t to, xwreg_t flag);
+xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt, xwtm_t to);
 
 #if (1 == XWOSRULE_SKD_WQ_RT)
 void xwup_thd_eq_rtwq(struct xwup_thd * thd, struct xwup_rtwq * xwrtwq,

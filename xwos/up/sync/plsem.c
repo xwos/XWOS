@@ -518,7 +518,7 @@ xwer_t xwup_plsem_block_to(struct xwup_plsem * sem,
                 xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_SLEEPING);
                 // cppcheck-suppress [misra-c2012-17.7]
-                xwup_thd_tt_add_locked(thd, xwtt, to, cpuirq);
+                xwup_thd_tt_add_locked(thd, xwtt, to);
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         }
 

@@ -57,7 +57,7 @@ typedef void (* xwmp_wqn_f)(struct xwmp_wqn *);
  */
 struct xwmp_wqn {
         xwsq_t type; /**< 等待队列类型（信号量、互斥锁） */
-        atomic_xwsq_t reason; /**< 唤醒原因 */
+        xwsq_t reason; /**< 唤醒原因 */
         void * wq; /**< 指向所属的等待队列的指针 */
         xwmp_wqn_f cb; /**< 被唤醒时的回调函数 */
         struct xwmp_splk lock; /**< 保护此结构体的锁 */

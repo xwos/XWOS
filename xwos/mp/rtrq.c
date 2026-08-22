@@ -9,11 +9,10 @@
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  * @note
- * - 锁的顺序：同级的锁不可同时获得
+ * + 锁的顺序：同级的锁不可同时获得
  *   + ① xwmp_mtxtree.lock
- *   + ① xwmp_skd.pm.lock
- *     + ② xwmp_rtrq.lock
- *       + ③ xwmp_thd.stlock
+ *   + ② xwmp_rtrq.lock
+ *   + ③ xwmp_thd.stlock
  */
 
 #include <xwos/standard.h>

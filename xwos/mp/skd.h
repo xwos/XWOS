@@ -16,7 +16,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
-#include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/rtrq.h>
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/mp/bh.h>
@@ -93,7 +92,7 @@ struct xwmp_skdobj_stack {
         xwmp_thd_f main; /**< 主函数 */
         void * arg; /**< 主函数的参数 */
         const char * name; /**< 名字字符串 */
-        atomic_xwsq_t flag; /**< 标签，取值 @ref xwmp_skdobj_flag_em */
+        xwsq_t flag; /**< 标签，取值 @ref xwmp_skdobj_flag_em */
 };
 
 /**
@@ -141,7 +140,7 @@ struct xwmp_skd_pm_operation {
  * @brief 调度器电源管理控制块
  */
 struct xwmp_skd_pm {
-        atomic_xwsq_t wklkcnt; /**< 唤醒锁，取值 @ref xwmp_skd_wakelock_cnt_em */
+        xwsq_t wklkcnt; /**< 唤醒锁，取值 @ref xwmp_skd_wakelock_cnt_em */
         xwsz_t frz_thd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
         struct xwmp_skd_pm_operation op; /**< 电源管理操作集合函数集合 */
@@ -174,23 +173,21 @@ struct __xwcc_alignl1cache xwmp_skd {
         } rq; /**< 就绪队列 */
         struct xwmp_skdobj_stack idle; /**< 空闲任务的栈信息 */
         xwsq_t req_schedule_cnt; /**< 请求调度的计数器 */
-        atomic_xwsq_t req_chkpmpt_cnt; /**< 请求检查抢占的计数器 */
-        atomic_xwsq_t dis_pmpt_cnt; /**< 关闭抢占的计数器 */
+        xwsq_t req_chkpmpt_cnt; /**< 请求检查抢占的计数器 */
+        xwsq_t dis_pmpt_cnt; /**< 关闭抢占的计数器 */
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        atomic_xwsq_t req_bh_cnt; /**< 请求进入中断底半部的计数器 */
-        atomic_xwsq_t dis_bh_cnt; /**< 关闭中断底半部的计数器 */
+        xwsq_t req_bh_cnt; /**< 请求进入中断底半部的计数器 */
+        xwsq_t dis_bh_cnt; /**< 关闭中断底半部的计数器 */
         struct xwmp_bh_cb bhcb; /**< 中断底半部控制块 */
         struct xwmp_skdobj_stack bh; /**< 中断底半部任务的栈信息 */
 #endif
         xwsq_t dis_th_cnt; /**< 关闭中断顶半部的计数器 */
         xwreg_t th_cpuirq; /**< 原本的CPU的中断标志 */
         struct xwmp_tt tt; /**< 时间树 */
-        struct xwmp_splk cxlock; /**< 上下文切换的锁 */
         struct xwmp_skd_pm pm; /**< 调度器电源管理控制块 */
 
         struct xwlib_bclst_head thdlist; /**< 本调度器中所有线程的链表头 */
         xwsz_t thd_num; /**< 本调度器中的线程数量 */
-        struct xwmp_splk thdlistlock; /**< 保护thdlist的锁 */
         struct xwlib_bclst_head thdelist; /**< 本调度器中所有待删除的线程的链表头 */
         struct {
                 int error_number; /**< 错误码 */

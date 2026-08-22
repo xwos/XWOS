@@ -76,7 +76,6 @@ xwer_t xwup_tt_init(struct xwup_tt * xwtt)
  * @brief 将节点加入到时间树
  * @param[in] xwtt: 时间树的指针
  * @param[in] ttn: 时间树节点的指针
- * @param[in] cpuirq: CPU中断开关标志
  * @retval XWOK: 没有错误
  * @retval -EINTR: 被中断
  * @retval -ETIMEDOUT: 超时
@@ -84,20 +83,16 @@ xwer_t xwup_tt_init(struct xwup_tt * xwtt)
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
 __xwup_code
-xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn,
-                          xwreg_t cpuirq)
+xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
 {
         struct xwlib_rbtree_node ** pos;
         struct xwlib_rbtree_node * rbn;
         struct xwup_ttn * n;
         struct xwup_ttn * leftmost;
         xwptr_t lpc;
-        xwsq_t seq;
         xwer_t rc;
         xwtm_t nt;
 
-retry:
-        /* the state of thread may be change in IRQ */
         if ((NULL == ttn->cb) || (xwtt != ttn->xwtt)) {
                 rc = -EINTR;
         } else {
@@ -105,8 +100,7 @@ retry:
                 lpc = (xwptr_t)pos;
                 n = NULL;
                 leftmost = xwtt->leftmost;
-                if (NULL == leftmost) {
-                        /* rbtree is empty. */
+                if (NULL == leftmost) { /* 空树 */
                         xwtt->deadline = ttn->wkup_xwtm;
                         xwtt->leftmost = ttn;
                 } else if (xwtm_cmp(ttn->wkup_xwtm, xwtt->deadline) < 0) {
@@ -119,51 +113,21 @@ retry:
                         n = leftmost;
                 } else {
                         rbn = *pos;
-                        seq = xwup_sqlk_get_seq(&xwtt->lock);
-                        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                        /* IRQs may happen */
-                        seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
-                        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                        seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
-                        if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
-                                goto retry; // cppcheck-suppress [misra-c2012-15.2]
-                        }
                         while (NULL != rbn) { // cppcheck-suppress [misra-c2012-15.4]
                                 n = xwlib_rbtree_entry(rbn, struct xwup_ttn, rbn);
                                 nt = n->wkup_xwtm;
-                                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                                /* IRQs may happen */
-                                seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
                                 rc = xwtm_cmp(ttn->wkup_xwtm, nt);
                                 if (rc < 0) {
                                         pos = &rbn->left;
                                         lpc = (xwptr_t)pos;
-                                        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
-                                        if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
-                                                // cppcheck-suppress [misra-c2012-15.2]
-                                                goto retry;
-                                        }
                                         rbn = rbn->left;
                                 } else if (rc > 0) {
                                         pos = &rbn->right;
                                         lpc = ((xwptr_t)pos |
                                                (xwptr_t)XWLIB_RBTREE_POS_RIGHT);
-                                        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
-                                        if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
-                                                // cppcheck-suppress [misra-c2012-15.2]
-                                                goto retry;
-                                        }
                                         rbn = rbn->right;
                                 } else {
                                         lpc = (xwptr_t)0;
-                                        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
-                                        if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
-                                                // cppcheck-suppress [misra-c2012-15.2]
-                                                goto retry;
-                                        }
                                         break;
                                 }
                         }
@@ -213,11 +177,10 @@ void xwup_tt_rmrbn_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
         struct xwlib_rbtree_node * s;
 
         if (ttn == xwtt->leftmost) {
-                s = ttn->rbn.right; /* The successor of a min node is its
-                                       right child due to the property 5 of
-                                       red-black tree. Or if there is no
-                                       right child, the successor is its
-                                       parent. */
+                s = ttn->rbn.right; /* 根据红黑树性质5，可知
+                                     * + 最小节点的后继(successor)是其右子节点
+                                     * + 若右子节点不存在，后继(successor)是其父节点
+                                     */
                 if (NULL == s) {
                         s = xwlib_rbtree_get_parent(&ttn->rbn);
                 }
@@ -339,7 +302,6 @@ xwer_t xwup_syshwt_init(struct xwup_syshwt * hwt)
         hwt->timetick = (xwtm_t)(-(XWOSCFG_SYSHWT_PERIOD));
         hwt->irqrsc = NULL;
         hwt->irqs_num = (xwsz_t)0;
-        xwup_sqlk_init(&hwt->lock);
         rc = xwospl_syshwt_init(hwt);
         if (XWOK == rc) {
                 XWOS_BUG_ON(NULL == hwt->irqrsc);
@@ -381,13 +343,12 @@ xwer_t xwup_syshwt_stop(struct xwup_syshwt * hwt)
 __xwup_code
 xwtm_t xwup_syshwt_get_time(struct xwup_syshwt * hwt)
 {
-        xwsq_t seq;
+        xwreg_t cpuirq;
         xwtm_t timetick;
 
-        do {
-                seq = xwup_sqlk_rd_begin(&hwt->lock);
-                timetick = hwt->timetick;
-        } while (xwup_sqlk_rd_retry(&hwt->lock, seq));
+        xwup_cpuirq_save_lc(&cpuirq);
+        timetick = hwt->timetick;
+        xwup_cpuirq_restore_lc(cpuirq);
         return timetick;
 }
 
@@ -403,16 +364,15 @@ xwtm_t xwup_syshwt_get_time(struct xwup_syshwt * hwt)
 __xwup_code
 xwtm_t xwup_syshwt_get_timestamp(struct xwup_syshwt * hwt)
 {
-        xwsq_t seq;
+        xwreg_t cpuirq;
         xwtm_t ts;
         xwtm_t timeconfetti;
 
-        do {
-                seq = xwup_sqlk_rd_begin(&hwt->lock);
-                ts = hwt->timetick;
-                timeconfetti = xwospl_syshwt_get_timeconfetti(hwt);
-                ts = xwtm_add(ts, timeconfetti);
-        } while (xwup_sqlk_rd_retry(&hwt->lock, seq));
+        xwup_cpuirq_save_lc(&cpuirq);
+        ts = hwt->timetick;
+        timeconfetti = xwospl_syshwt_get_timeconfetti(hwt);
+        xwup_cpuirq_restore_lc(cpuirq);
+        ts = xwtm_add(ts, timeconfetti);
         return ts;
 }
 
@@ -443,9 +403,9 @@ void xwup_syshwt_task(struct xwup_syshwt * hwt)
         xwreg_t cpuirq;
 
         xwtt = xwup_syshwt_get_tt(hwt);
-        xwup_sqlk_wr_lock_cpuirqsv(&hwt->lock, &cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         hwt->timetick = xwtm_add(hwt->timetick, XWOSCFG_SYSHWT_PERIOD);
-        xwup_sqlk_wr_unlock_cpuirqrs(&hwt->lock, cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         rc = xwup_tt_check_deadline(xwtt);
         if (-ETIMEDOUT == rc) {
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)

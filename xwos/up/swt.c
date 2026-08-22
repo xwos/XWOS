@@ -388,7 +388,7 @@ void xwup_swt_ttn_callback(struct xwup_ttn * ttn)
                         swt->ttn.cb = xwup_swt_ttn_callback;
                         xwup_swt_grab(swt); // cppcheck-suppress [misra-c2012-17.7]
                         // cppcheck-suppress [misra-c2012-17.7]
-                        xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
+                        xwup_tt_add_locked(xwtt, &swt->ttn);
                         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                         xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
@@ -433,7 +433,7 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
         swt->ttn.wkuprs = (xwsq_t)XWUP_TTN_WKUPRS_UNKNOWN;
         swt->ttn.cb = xwup_swt_ttn_callback;
         swt->ttn.xwtt = xwtt;
-        rc = xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
+        rc = xwup_tt_add_locked(xwtt, &swt->ttn);
         if (rc < 0) {
                 goto err_add;
         }

@@ -32,7 +32,6 @@ struct xwmp_tt;
  */
 struct xwmp_syshwt {
         xwtm_t timetick; /**< 系统时间 */
-        struct xwmp_sqlk lock; /**< 保护本结构体的锁 */
         const xwirq_t * irqrsc; /**< 中断资源 */
         xwsz_t irqs_num; /**< 中断资源的数量 */
 };
@@ -47,7 +46,7 @@ struct xwmp_tt {
         xwtm_t deadline; /**< 红黑树中最小（最左边）的关键字 */
         struct xwmp_ttn * leftmost; /**< 指向最小关键字节点的指针 */
         struct xwlib_bclst_head timeout; /**< 超时链表的表头 */
-        struct xwmp_sqlk lock; /**< 保护本结构体的自旋锁 */
+        struct xwmp_sqlk lock; /**< 保护本结构体的锁 */
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         struct xwmp_bh_node bhn; /**< 中断底半部节点 */
 #endif
@@ -76,7 +75,7 @@ struct xwmp_ttn {
                                           组成双循环链表，此为链表节点 */
         struct xwlib_rbtree_node rbn; /**< 红黑树节点 */
         xwtm_t wkup_xwtm; /**< 唤醒时间 */
-        atomic_xwsq_t wkuprs; /**< 唤醒原因 */
+        xwsq_t wkuprs; /**< 唤醒原因 */
         xwmp_tt_cb_f cb; /**< 回调函数：NULL表示节点不在时间树上 */
         struct xwmp_tt * xwtt; /**< 时间树 */
 };
@@ -84,8 +83,7 @@ struct xwmp_ttn {
 void xwmp_ttn_init(struct xwmp_ttn * ttn);
 
 xwer_t xwmp_tt_init(struct xwmp_tt * xwtt);
-xwer_t xwmp_tt_add_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn,
-                          xwreg_t cpuirq);
+xwer_t xwmp_tt_add_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn);
 xwer_t xwmp_tt_remove_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn);
 xwer_t xwmp_tt_check_deadline(struct xwmp_tt * xwtt);
 struct xwmp_skd * xwmp_tt_get_skd(struct xwmp_tt * xwtt);

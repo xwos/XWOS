@@ -31,7 +31,6 @@ struct xwup_tt;
  */
 struct xwup_syshwt {
         xwtm_t timetick; /**< 系统时间 */
-        struct xwup_sqlk lock; /**< 保护本结构体的锁 */
         const xwirq_t * irqrsc; /**< 中断资源 */
         xwsz_t irqs_num; /**< 中断资源的数量 */
 };
@@ -46,7 +45,7 @@ struct xwup_tt {
         xwtm_t deadline; /**< 红黑树中最小（最左边）的关键字 */
         struct xwup_ttn * leftmost; /**< 指向最小关键字节点的指针 */
         struct xwlib_bclst_head timeout; /**< 超时链表的表头 */
-        struct xwup_sqlk lock; /**< 保护本结构体的自旋锁 */
+        struct xwup_sqlk lock; /**< 保护本结构体的锁 */
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         struct xwup_bh_node bhn; /**< 中断底半部节点 */
 #endif
@@ -83,8 +82,7 @@ struct xwup_ttn {
 void xwup_ttn_init(struct xwup_ttn * ttn);
 
 xwer_t xwup_tt_init(struct xwup_tt * xwtt);
-xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn,
-                          xwreg_t cpuirq);
+xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn);
 xwer_t xwup_tt_remove_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn);
 xwer_t xwup_tt_check_deadline(struct xwup_tt * xwtt);
 struct xwup_skd * xwup_tt_get_skd(struct xwup_tt * xwtt);

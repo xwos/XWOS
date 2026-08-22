@@ -290,6 +290,8 @@ xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t origin, xwtm_t period,
  * @brief XWOS API：停止软件定时器
  * @param[in] swt: 软件定时器的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EPERM: 没有启动
  * @note
  * + 上下文：任意
  */

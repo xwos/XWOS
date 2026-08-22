@@ -1149,14 +1149,12 @@ void xwup_thd_ttn_callback(struct xwup_ttn * ttn)
  * @param[in] thd: 线程对象的指针
  * @param[in] xwtt: 时间树的指针
  * @param[in] to: 期望唤醒的时间点
- * @param[in] cpuirq: 本地CPU的中断标志
  * @return 错误码
  * @note
  * + 此函数只能在取得写锁 `xwtt->lock` 以及关闭本地CPU的中断时才可调用。
  */
 __xwup_code
-xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt,
-                              xwtm_t to, xwreg_t cpuirq)
+xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt, xwtm_t to)
 {
         xwer_t rc;
 
@@ -1165,7 +1163,7 @@ xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt,
         thd->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
         thd->ttn.xwtt = xwtt;
         thd->ttn.cb = xwup_thd_ttn_callback;
-        rc = xwup_tt_add_locked(xwtt, &thd->ttn, cpuirq);
+        rc = xwup_tt_add_locked(xwtt, &thd->ttn);
         return rc;
 }
 
@@ -1310,7 +1308,7 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_RUNNING);
         xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_SLEEPING);
         //cppcheck-suppress [misra-c2012-17.7]
-        xwup_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
+        xwup_thd_tt_add_locked(cthd, xwtt, to);
         xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]
@@ -1397,7 +1395,7 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_RUNNING);
         xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_SLEEPING);
         //cppcheck-suppress [misra-c2012-17.7]
-        xwup_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
+        xwup_thd_tt_add_locked(cthd, xwtt, to);
         xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]

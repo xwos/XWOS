@@ -410,8 +410,7 @@ void xwmp_swt_ttn_callback(struct xwmp_ttn * ttn)
                 refcnt = xwos_object_get_refcnt(&swt->xwobj);
                 if (refcnt >= (xwsq_t)3) {
                         swt->ttn.wkup_xwtm = to;
-                        xwaop_write(xwsq_t, &swt->ttn.wkuprs,
-                                    (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN, NULL);
+                        swt->ttn.wkuprs = (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN;
                         swt->ttn.cb = xwmp_swt_ttn_callback;
                         /* 在本地CPU执行 `xwmp_tt_add_locked()` 的过程中，
                            其他CPU可能会执行 `xwmp_swt_stop() + xwmp_swt_delete()` ，
@@ -427,7 +426,7 @@ void xwmp_swt_ttn_callback(struct xwmp_ttn * ttn)
                              软件定时器不会再进入回调函数。 */
                         xwmp_swt_grab(swt); // cppcheck-suppress [misra-c2012-17.7]
                         // cppcheck-suppress [misra-c2012-17.7]
-                        xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
+                        xwmp_tt_add_locked(xwtt, &swt->ttn);
                         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                         xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
@@ -471,10 +470,10 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         swt->arg = arg;
         swt->period = period;
         swt->ttn.wkup_xwtm = to;
-        xwaop_write(xwsq_t, &swt->ttn.wkuprs, (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN, NULL);
+        swt->ttn.wkuprs = (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN;
         swt->ttn.xwtt = xwtt;
         swt->ttn.cb = xwmp_swt_ttn_callback;
-        rc = xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
+        rc = xwmp_tt_add_locked(xwtt, &swt->ttn);
         if (rc < 0) {
                 goto err_swt_add;
         }

@@ -617,8 +617,7 @@ xwer_t xwmp_plsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn)
         if (XWOK == rc) {
                 wqn->wq = NULL;
                 wqn->type = (xwsq_t)XWMP_WQTYPE_UNKNOWN;
-                xwaop_store(xwsq_t, &wqn->reason,
-                            xwaop_mo_release, (xwsq_t)XWMP_WQN_REASON_INTR);
+                wqn->reason = (xwsq_t)XWMP_WQN_REASON_INTR;
                 cb = wqn->cb;
                 wqn->cb = NULL;
                 xwmp_splk_unlock(&wqn->lock);
@@ -648,8 +647,7 @@ xwer_t xwmp_plsem_post(struct xwmp_sem * sem)
                 if (NULL != wqn) {
                         wqn->wq = NULL;
                         wqn->type = (xwsq_t)XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq_t, &wqn->reason,
-                                    xwaop_mo_release, (xwsq_t)XWMP_WQN_REASON_UP);
+                        wqn->reason = (xwsq_t)XWMP_WQN_REASON_UP;
                         cb = wqn->cb;
                         wqn->cb = NULL;
                         xwmp_splk_unlock(&wqn->lock);
@@ -731,7 +729,7 @@ xwer_t xwmp_plsem_block_to(struct xwmp_sem * sem,
                 xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWMP_SKDOBJ_ST_SLEEPING);
                 xwmp_splk_unlock(&thd->stlock);
                 // cppcheck-suppress [misra-c2012-17.7]
-                xwmp_thd_tt_add_locked(thd, xwtt, to, cpuirq);
+                xwmp_thd_tt_add_locked(thd, xwtt, to);
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         }
 
@@ -748,8 +746,9 @@ xwer_t xwmp_plsem_block_to(struct xwmp_sem * sem,
         xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
-        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
-        wkuprs = xwaop_load(xwsq_t, &thd->ttn.wkuprs, xwaop_mo_relaxed);
+        reason = thd->wqn.reason;
+        wkuprs = thd->ttn.wkuprs;
+        xwmb_mp_acquire();
         if ((xwsq_t)XWMP_WQN_REASON_INTR == reason) {
                 xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwmp_tt_remove_locked(xwtt, &thd->ttn);
@@ -777,8 +776,7 @@ xwer_t xwmp_plsem_block_to(struct xwmp_sem * sem,
                 if (XWOK == rc) {
                         thd->wqn.wq = NULL;
                         thd->wqn.type = (xwsq_t)XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq_t, &thd->wqn.reason,
-                                    xwaop_mo_release, (xwsq_t)XWMP_WQN_REASON_INTR);
+                        thd->wqn.reason = (xwsq_t)XWMP_WQN_REASON_INTR;
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_splk_lock(&thd->stlock);
@@ -789,8 +787,8 @@ xwer_t xwmp_plsem_block_to(struct xwmp_sem * sem,
                         rc = -ETIMEDOUT;
                 } else {
                         xwmp_splk_unlock(&thd->wqn.lock);
+                        reason = thd->wqn.reason;
                         xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
                         if ((xwsq_t)XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
                         } else if ((xwsq_t)XWMP_WQN_REASON_UP == reason) {
@@ -807,8 +805,7 @@ xwer_t xwmp_plsem_block_to(struct xwmp_sem * sem,
                 if (XWOK == rc) {
                         thd->wqn.wq = NULL;
                         thd->wqn.type = (xwsq_t)XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq_t, &thd->wqn.reason,
-                                    xwaop_mo_release, (xwsq_t)XWMP_WQN_REASON_INTR);
+                        thd->wqn.reason = (xwsq_t)XWMP_WQN_REASON_INTR;
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_splk_lock(&thd->stlock);
@@ -819,8 +816,8 @@ xwer_t xwmp_plsem_block_to(struct xwmp_sem * sem,
                         rc = -EINTR;
                 } else {
                         xwmp_splk_unlock(&thd->wqn.lock);
+                        reason = thd->wqn.reason;
                         xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
                         if ((xwsq_t)XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
                         } else if ((xwsq_t)XWMP_WQN_REASON_UP == reason) {
@@ -892,7 +889,7 @@ xwer_t xwmp_plsem_wait(struct xwmp_sem * sem)
                 goto err_dis;
         }
         cthd = xwmp_skd_get_cthd_lc();
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        xwskd = cthd->xwskd;
         if (!xwmp_skd_tstth(xwskd)) {
                 rc = -EDISIRQ;
                 goto err_dis;
@@ -927,7 +924,7 @@ xwer_t xwmp_plsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
                 goto err_dis;
         }
         cthd = xwmp_skd_get_cthd_lc();
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        xwskd = cthd->xwskd;
         if (!xwmp_skd_tstth(xwskd)) {
                 rc = -EDISIRQ;
                 goto err_dis;
@@ -1001,7 +998,8 @@ xwer_t xwmp_plsem_block_unintr(struct xwmp_sem * sem,
         xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
-        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
+        reason = thd->wqn.reason;
+        xwmb_mp_acquire();
         if ((xwsq_t)XWMP_WQN_REASON_UP == reason) {
                 rc = XWOK;
         } else {
@@ -1051,7 +1049,7 @@ xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem)
         xwer_t rc;
 
         cthd = xwmp_skd_get_cthd_lc();
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        xwskd = cthd->xwskd;
         if (!xwospl_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
         } else if (!xwmp_skd_tstth(xwskd)) {
@@ -1207,8 +1205,7 @@ xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn)
         if (XWOK == rc) {
                 wqn->wq = NULL;
                 wqn->type = (xwsq_t)XWMP_WQTYPE_UNKNOWN;
-                xwaop_store(xwsq_t, &wqn->reason,
-                            xwaop_mo_release, (xwsq_t)XWMP_WQN_REASON_INTR);
+                wqn->reason = (xwsq_t)XWMP_WQN_REASON_INTR;
                 cb = wqn->cb;
                 wqn->cb = NULL;
                 xwmp_splk_unlock(&wqn->lock);
@@ -1238,8 +1235,7 @@ xwer_t xwmp_rtsem_post(struct xwmp_sem * sem)
                 if (NULL != wqn) {
                         wqn->wq = NULL;
                         wqn->type = (xwsq_t)XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq_t, &wqn->reason,
-                                    xwaop_mo_release, (xwsq_t)XWMP_WQN_REASON_UP);
+                        wqn->reason = (xwsq_t)XWMP_WQN_REASON_UP;
                         cb = wqn->cb;
                         wqn->cb = NULL;
                         xwmp_splk_unlock(&wqn->lock);
@@ -1319,7 +1315,7 @@ xwer_t xwmp_rtsem_block_to(struct xwmp_sem * sem,
                 xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWMP_SKDOBJ_ST_SLEEPING);
                 xwmp_splk_unlock(&thd->stlock);
                 // cppcheck-suppress [misra-c2012-17.7]
-                xwmp_thd_tt_add_locked(thd, xwtt, to, cpuirq);
+                xwmp_thd_tt_add_locked(thd, xwtt, to);
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         }
 
@@ -1336,8 +1332,9 @@ xwer_t xwmp_rtsem_block_to(struct xwmp_sem * sem,
         xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
-        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
-        wkuprs = xwaop_load(xwsq_t, &thd->ttn.wkuprs, xwaop_mo_relaxed);
+        reason = thd->wqn.reason;
+        wkuprs = thd->ttn.wkuprs;
+        xwmb_mp_acquire();
         if ((xwsq_t)XWMP_WQN_REASON_INTR == reason) {
                 xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwmp_tt_remove_locked(xwtt, &thd->ttn);
@@ -1365,8 +1362,7 @@ xwer_t xwmp_rtsem_block_to(struct xwmp_sem * sem,
                 if (XWOK == rc) {
                         thd->wqn.wq = NULL;
                         thd->wqn.type = (xwsq_t)XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq_t, &thd->wqn.reason,
-                                    xwaop_mo_release, (xwsq_t)XWMP_WQN_REASON_INTR);
+                        thd->wqn.reason = (xwsq_t)XWMP_WQN_REASON_INTR;
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_splk_lock(&thd->stlock);
@@ -1377,8 +1373,8 @@ xwer_t xwmp_rtsem_block_to(struct xwmp_sem * sem,
                         rc = -ETIMEDOUT;
                 } else {
                         xwmp_splk_unlock(&thd->wqn.lock);
+                        reason = thd->wqn.reason;
                         xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
                         if ((xwsq_t)XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
                         } else if ((xwsq_t)XWMP_WQN_REASON_UP == reason) {
@@ -1395,8 +1391,7 @@ xwer_t xwmp_rtsem_block_to(struct xwmp_sem * sem,
                 if (XWOK == rc) {
                         thd->wqn.wq = NULL;
                         thd->wqn.type = (xwsq_t)XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq_t, &thd->wqn.reason,
-                                    xwaop_mo_release, (xwsq_t)XWMP_WQN_REASON_INTR);
+                        thd->wqn.reason = (xwsq_t)XWMP_WQN_REASON_INTR;
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_splk_lock(&thd->stlock);
@@ -1407,8 +1402,8 @@ xwer_t xwmp_rtsem_block_to(struct xwmp_sem * sem,
                         rc = -EINTR;
                 } else {
                         xwmp_splk_unlock(&thd->wqn.lock);
+                        reason = thd->wqn.reason;
                         xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
                         if ((xwsq_t)XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
                         } else if ((xwsq_t)XWMP_WQN_REASON_UP == reason) {
@@ -1481,7 +1476,7 @@ xwer_t xwmp_rtsem_wait(struct xwmp_sem * sem)
                 goto err_dis;
         }
         cthd = xwmp_skd_get_cthd_lc();
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        xwskd = cthd->xwskd;
         if (!xwmp_skd_tstth(xwskd)) {
                 rc = -EDISIRQ;
                 goto err_dis;
@@ -1516,7 +1511,7 @@ xwer_t xwmp_rtsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
                 goto err_dis;
         }
         cthd = xwmp_skd_get_cthd_lc();
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        xwskd = cthd->xwskd;
         if (!xwmp_skd_tstth(xwskd)) {
                 rc = -EDISIRQ;
                 goto err_dis;
@@ -1590,7 +1585,8 @@ xwer_t xwmp_rtsem_block_unintr(struct xwmp_sem * sem,
         xwskd->dis_th_cnt = th;
 
         /* 判断唤醒原因 */
-        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
+        reason = thd->wqn.reason;
+        xwmb_mp_acquire();
         if ((xwsq_t)XWMP_WQN_REASON_UP == reason) {
                 rc = XWOK;
         } else {
@@ -1640,7 +1636,7 @@ xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem)
         xwer_t rc;
 
         cthd = xwmp_skd_get_cthd_lc();
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        xwskd = cthd->xwskd;
         if (!xwospl_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
         } else if (!xwmp_skd_tstth(xwskd)) {
