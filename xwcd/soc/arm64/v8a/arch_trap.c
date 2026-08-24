@@ -129,13 +129,33 @@ void armv8a_trap_sync_el2(struct armv8a_reg_frame * regs, xwu64_t routine)
         case ARMV8A_ESR_ELx_EC_HVC64:
                 /* HVC Call from EL1 & EL2 */
                 armv8a_sysreg_read(&hcr, hcr_el2);
-                if ((xwu64_t)8 == iss) {
+                switch (iss) {
+                case 2ULL:
+                        xwosplcb_thd_exit_lic((struct xwospl_thd *)regs->r[0],
+                                              regs->r[1]);
+                        break;
+                case 3ULL:
+                        xwosplcb_thd_freeze_lic((struct xwospl_thd *)regs->r[0]);
+                        break;
+                case 4ULL:
+                        xwosplcb_skd_suspend_lic((struct xwospl_skd *)regs->r[0]);
+                        break;
+                case 5ULL:
+                        xwosplcb_skd_resume_lic((struct xwospl_skd *)regs->r[0]);
+                        break;
+                case 6ULL:
+                        xwosplcb_thd_outmigrate_lic((struct xwospl_thd *)regs->r[0],
+                                                    regs->r[1]);
+                        break;
+                case 8ULL:
                         armv8a_skd_swcx();
-                } else {
+                        break;
+                default:
                         soc_infof("HVC",
                                   "Sync exception 0x%X HVC detected on CPU%d@EL2, "
                                   "ESR:0x%X(ISS:0x%X), HCR_EL2:0x%lX\r\n",
                                   routine, cpuid, esr, iss, hcr);
+                        break;
                 }
                 break;
         default:

@@ -72,14 +72,14 @@ void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
                 armv8a_skd_swcx();
         } else {
                 __asm__ volatile(
-                        "       dsb     sy\n"
-                        "       mov     x0, %[__xwskd]\n"
-                        "       isb\n"
-                        "       hvc     #8\n"
-                        :
-                        : [__xwskd] "r" (xwskd)
-                        : "memory"
-                                 );
+                "       dsb     sy\n"
+                "       mov     x0, %[__xwskd]\n"
+                "       isb\n"
+                "       hvc     #8\n"
+                :
+                : [__xwskd] "r" (xwskd)
+                : "memory"
+                );
         }
 }
 
