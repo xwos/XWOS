@@ -14,14 +14,6 @@
 #define __xwos_ospl_irq_h__
 
 #include <xwos/standard.h>
-
-#if defined(XWCFG_CORE__mp)
-#  include <xwos/mp/irq.h>
-#elif defined(XWCFG_CORE__up)
-#  include <xwos/up/irq.h>
-#else
-#  error "Can't find the configuration XWCFG_CORE!"
-#endif
 #include <xwosimpl_irq.h>
 
 static __xwbsp_inline void xwospl_cpuirq_enable_lc(void);

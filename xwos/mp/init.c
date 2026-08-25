@@ -11,7 +11,6 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/mp/pm.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/init.h>
 

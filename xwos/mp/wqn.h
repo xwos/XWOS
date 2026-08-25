@@ -9,9 +9,9 @@
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  * @note
- * - 锁的顺序：
+ * + 锁的顺序：
  *   + ① xwmp_rtwq.lock
- *     + ② xwmp_wqn.lock
+ *   + ② xwmp_wqn.lock
  */
 
 #ifndef __xwos_mp_wqn_h__

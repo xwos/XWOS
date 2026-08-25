@@ -23,6 +23,7 @@
 #elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
 #  include <stdlib.h>
 #endif
+#include <xwos/up/irq.h>
 #include <xwos/up/skd.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/swt.h>
@@ -380,7 +381,7 @@ void xwup_swt_ttn_callback(struct xwup_ttn * ttn)
         swt->cb(swt, swt->arg);
         if ((xwsq_t)0 != ((xwsq_t)XWUP_SWT_FLAG_RESTART & swt->flag)) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
-                xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+                xwup_cpuirq_save_lc(&cpuirq);
                 refcnt = xwos_object_get_refcnt(&swt->xwobj);
                 if (refcnt >= (xwsq_t)3) {
                         swt->ttn.wkup_xwtm = to;
@@ -389,10 +390,10 @@ void xwup_swt_ttn_callback(struct xwup_ttn * ttn)
                         xwup_swt_grab(swt); // cppcheck-suppress [misra-c2012-17.7]
                         // cppcheck-suppress [misra-c2012-17.7]
                         xwup_tt_add_locked(xwtt, &swt->ttn);
-                        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
-                        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 }
         } else {
@@ -421,7 +422,7 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
         swt->cb = cb;
         swt->arg = arg;
         swt->period = period;
-        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         if (NULL != swt->ttn.cb) {
                 rc = -EALREADY;
                 goto err_already;
@@ -437,7 +438,7 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
         if (rc < 0) {
                 goto err_add;
         }
-        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         return XWOK;
 
 err_add:
@@ -445,7 +446,7 @@ err_add:
                 xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
 err_already:
-        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
 err_swt_grab:
         return rc;
@@ -461,12 +462,12 @@ xwer_t xwup_swt_stop(struct xwup_swt * swt)
 
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
-        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         rc = xwup_tt_remove_locked(xwtt, &swt->ttn);
         if ((xwsq_t)0 != ((xwsq_t)XWUP_SWT_FLAG_RESTART & swt->flag)) {
                 xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
-        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         if (XWOK == rc) {
                 xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }

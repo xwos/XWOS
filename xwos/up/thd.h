@@ -86,7 +86,7 @@ struct xwup_thd {
         struct xwlib_bclst_node rqnode; /**< 就绪队列节点，被锁 `rtrq->lock` 保护 */
 
         /* 睡眠态 */
-        struct xwup_ttn ttn; /**< 时间树节点, 被锁 `tt->lock` 保护 */
+        struct xwup_ttn ttn; /**< 时间树节点 */
 
         /* 等待态 */
         struct xwup_wqn wqn; /**< 等待队列 */

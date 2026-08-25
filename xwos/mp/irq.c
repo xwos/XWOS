@@ -11,7 +11,6 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/irq.h>
 
@@ -72,18 +71,6 @@ xwer_t xwmp_irq_get_id(xwirq_t * irqnbuf)
 }
 
 __xwmp_api
-void xwmp_cpuirq_enable_lc(void)
-{
-        xwospl_cpuirq_enable_lc();
-}
-
-__xwmp_api
-void xwmp_cpuirq_disable_lc(void)
-{
-        xwospl_cpuirq_disable_lc();
-}
-
-__xwmp_api
 void xwmp_cpuirq_resume_lc(void)
 {
         struct xwmp_skd * xwskd;
@@ -99,22 +86,4 @@ void xwmp_cpuirq_suspend_lc(void)
 
         xwskd = xwmp_skd_get_lc();
         xwmp_skd_dsth_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-}
-
-__xwmp_api
-void xwmp_cpuirq_restore_lc(xwreg_t cpuirq)
-{
-        xwospl_cpuirq_restore_lc(cpuirq);
-}
-
-__xwmp_api
-void xwmp_cpuirq_save_lc(xwreg_t * cpuirq)
-{
-        xwospl_cpuirq_save_lc(cpuirq);
-}
-
-__xwmp_api
-bool xwmp_cpuirq_test_lc(void)
-{
-        return xwospl_cpuirq_test_lc();
 }

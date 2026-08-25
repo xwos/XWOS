@@ -53,8 +53,6 @@ void xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq)
  *   `XWMP_SKDOBJ_ST_RUNNING | XWMP_SKDOBJ_ST_FROZEN | XWMP_SKDOBJ_ST_STANDBY`
  * + 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
  *   `XWMP_SKDOBJ_ST_BLOCKING & XWMP_SKDOBJ_ST_SLEEPING`
- * @note
- * + 此函数必须在持有锁 `xwrtrq->lock` 时才可调用。
  */
 __xwmp_code
 xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd)
@@ -89,8 +87,6 @@ xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * th
  *   `XWMP_SKDOBJ_ST_RUNNING | XWMP_SKDOBJ_ST_FROZEN | XWMP_SKDOBJ_ST_STANDBY`
  * + 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
  *   `XWMP_SKDOBJ_ST_BLOCKING & XWMP_SKDOBJ_ST_SLEEPING`
- * @note
- * + 此函数必须在持有锁 `xwrtrq->lock` 时才可调用。
  */
 __xwmp_code
 xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd)
@@ -120,8 +116,6 @@ xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * th
  * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 就绪队列中没有这个线程
- * @note
- * + 此函数必须在持有锁 `xwrtrq->lock` 时才可调用。
  */
 __xwmp_code
 xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd)
@@ -152,8 +146,6 @@ xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd)
  * @brief 从实时就绪队列中选择优先级最高的线程
  * @param[in] xwrtrq: XWOS MP内核的实时就绪队列
  * @return 被选择的线程控制块的指针
- * @note
- * + 此函数必须在持有锁 `xwrtrq->lock` 时才可调用。
  */
 __xwmp_code
 struct xwmp_thd * xwmp_rtrq_choose_locked(struct xwmp_rtrq * xwrtrq)

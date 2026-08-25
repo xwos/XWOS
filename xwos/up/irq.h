@@ -17,18 +17,44 @@
 #define __xwos_up_irq_h__
 
 #include <xwos/standard.h>
+#include <xwos/ospl/irq.h>
 
 xwer_t xwup_irq_enable(xwirq_t irqn);
 xwer_t xwup_irq_disable(xwirq_t irqn);
 xwer_t xwup_irq_save(xwirq_t irqn, xwreg_t * flag);
 xwer_t xwup_irq_restore(xwirq_t irqn, xwreg_t flag);
 xwer_t xwup_irq_get_id(xwirq_t * irqnbuf);
-void xwup_cpuirq_enable_lc(void);
-void xwup_cpuirq_disable_lc(void);
 void xwup_cpuirq_resume_lc(void);
 void xwup_cpuirq_suspend_lc(void);
-void xwup_cpuirq_restore_lc(xwreg_t cpuirq);
-void xwup_cpuirq_save_lc(xwreg_t * cpuirq);
-bool xwup_cpuirq_test_lc(void);
+
+static __xwup_inline_api
+void xwup_cpuirq_enable_lc(void)
+{
+        xwospl_cpuirq_enable_lc();
+}
+
+static __xwup_inline_api
+void xwup_cpuirq_disable_lc(void)
+{
+        xwospl_cpuirq_disable_lc();
+}
+
+static __xwup_inline_api
+void xwup_cpuirq_restore_lc(xwreg_t cpuirq)
+{
+        xwospl_cpuirq_restore_lc(cpuirq);
+}
+
+static __xwup_inline_api
+void xwup_cpuirq_save_lc(xwreg_t * cpuirq)
+{
+        xwospl_cpuirq_save_lc(cpuirq);
+}
+
+static __xwup_inline_api
+bool xwup_cpuirq_test_lc(void)
+{
+        return xwospl_cpuirq_test_lc();
+}
 
 #endif /* xwos/up/irq.h */

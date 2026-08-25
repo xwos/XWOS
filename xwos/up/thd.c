@@ -26,9 +26,9 @@
 #elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
 #  include <stdlib.h>
 #endif
-#include <xwos/ospl/irq.h>
-#include <xwos/ospl/skd.h>
 #include <xwos/ospl/tls.h>
+#include <xwos/ospl/skd.h>
+#include <xwos/up/irq.h>
 #include <xwos/up/lock/seqlock.h>
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/rtrq.h>
@@ -545,12 +545,12 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg)
         thd->stack.arg = arg;
         xwospl_skd_init_stack(&thd->stack, xwup_cthd_return);
         xwospl_tls_init(&thd->stack);
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_STANDBY);
         xwup_thd_rq_add_tail(thd); //cppcheck-suppress [misra-c2012-17.7]
         xwskd->thd_num++;
         xwlib_bclst_add_tail(&xwskd->thdlist, &thd->thdnode);
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 }
 
 __xwup_api
@@ -711,15 +711,15 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
         xwreg_t cpuirq;
 
         xwskd = xwup_skd_get_lc();
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, ((xwsq_t)XWUP_SKDOBJ_ST_RUNNING |
                                         (xwsq_t)XWUP_SKDOBJ_ST_EXITING));
         xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_STANDBY);
         thd->stack.arg = err_ptr(rc);
         detached = !!((xwsq_t)XWUP_SKDOBJ_ST_DETACHED & thd->state);
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         xwup_cond_broadcast(&thd->completion); //cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_disable_lc();
+        xwup_cpuirq_disable_lc();
         xwlib_bclst_del_init(&thd->thdnode);
         xwskd->thd_num--;
         if (detached) {
@@ -727,16 +727,16 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
         }
 #  if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 xwup_skd_notify_allfrz_lc(); // cppcheck-suppress [misra-c2012-17.7]
         } else {
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
         }
 #  else
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
 #  endif
@@ -789,12 +789,12 @@ void xwup_thd_quit(struct xwup_thd * thd)
 {
         xwreg_t cpuirq;
 
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_STANDBY & thd->state)) {
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_EXITING);
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 xwup_thd_intr(thd); //cppcheck-suppress [misra-c2012-17.7]
         }
 }
@@ -812,15 +812,15 @@ xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
                 rc = -EPERM;
                 goto err_join_self;
         }
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_DETACHED & thd->state)) {
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 rc = -EINVAL;
         } else if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_JOINED & thd->state)) {
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 rc = -EALREADY;
         } else if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_STANDBY & thd->state)) {
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 rc = XWOK;
                 if (!is_err_or_null(trc)) {
                         *trc = (xwer_t)thd->stack.arg;
@@ -835,12 +835,12 @@ xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
                         if (!is_err_or_null(trc)) {
                                 *trc = (xwer_t)thd->stack.arg;
                         }
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
-                        xwospl_cpuirq_disable_lc();
+                        xwup_cpuirq_disable_lc();
                         xwbop_c0m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_JOINED);
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                 }
         }
 
@@ -854,17 +854,17 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_JOINED & thd->state)) {
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 rc = -EINVAL;
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_DETACHED);
                 if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_STANDBY & thd->state)) {
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                 }
                 rc = XWOK;
         }
@@ -1049,10 +1049,10 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_UNINTERRUPTED & thd->state)) {
                 rc = -EPERM;
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
         } else if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_BLOCKING & thd->state)) {
                 xwup_wqn_f cb;
 
@@ -1062,7 +1062,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         thd->wqn.reason = (xwu16_t)XWUP_WQN_REASON_INTR;
                         cb = thd->wqn.cb;
                         thd->wqn.cb = NULL;
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         cb(&thd->wqn);
                         rc = XWOK;
 #if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
@@ -1070,7 +1070,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         struct xwup_plsem * sem;
 
                         sem = xwcc_derof(thd->wqn.wq, struct xwup_plsem, plwq);
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         rc = xwup_plsem_intr(sem, &thd->wqn);
 #endif
 #if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
@@ -1078,7 +1078,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         struct xwup_rtsem * sem;
 
                         sem = xwcc_derof(thd->wqn.wq, struct xwup_rtsem, rtwq);
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         rc = xwup_rtsem_intr(sem, &thd->wqn);
 #endif
 #if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
@@ -1086,7 +1086,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         struct xwup_cond * sem;
 
                         sem = xwcc_derof(thd->wqn.wq, struct xwup_cond, wq);
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         rc = xwup_cond_intr(sem, &thd->wqn);
 #endif
 #if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
@@ -1094,11 +1094,11 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         struct xwup_mtx * mtx;
 
                         mtx = xwcc_derof(thd->wqn.wq, struct xwup_mtx, rtwq);
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         rc = xwup_mtx_intr(mtx, thd);
 #endif
                 } else {
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         rc = -EBUG;
                         XWOS_BUG();
                 }
@@ -1108,21 +1108,18 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
 
                 xwskd = xwup_skd_get_lc();
                 xwtt = &xwskd->tt;
-                xwup_sqlk_wr_lock(&xwtt->lock);
                 rc = xwup_tt_remove_locked(xwtt, &thd->ttn);
                 if (XWOK == rc) {
                         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_SLEEPING);
-                        xwup_sqlk_wr_unlock(&xwtt->lock);
                         xwup_thd_wakeup(thd);
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                         xwup_skd_chkpmpt();
                 } else {
-                        xwup_sqlk_wr_unlock(&xwtt->lock);
-                        xwospl_cpuirq_restore_lc(cpuirq);
+                        xwup_cpuirq_restore_lc(cpuirq);
                 }
         } else {
                 rc = -EINVAL;
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
         }
         return rc;
 }
@@ -1138,10 +1135,10 @@ void xwup_thd_ttn_callback(struct xwup_ttn * ttn)
         xwreg_t cpuirq;
 
         thd = xwcc_derof(ttn, struct xwup_thd, ttn);
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_SLEEPING);
         xwup_thd_wakeup(thd);
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 }
 
 /**
@@ -1150,8 +1147,6 @@ void xwup_thd_ttn_callback(struct xwup_ttn * ttn)
  * @param[in] xwtt: 时间树的指针
  * @param[in] to: 期望唤醒的时间点
  * @return 错误码
- * @note
- * + 此函数只能在取得写锁 `xwtt->lock` 以及关闭本地CPU的中断时才可调用。
  */
 __xwup_code
 xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt, xwtm_t to)
@@ -1178,11 +1173,11 @@ void xwup_thd_wqn_callback(struct xwup_wqn * wqn)
         xwreg_t cpuirq;
 
         thd = xwcc_derof(wqn, struct xwup_thd, wqn);
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state,
                   XWUP_SKDOBJ_ST_BLOCKING | XWUP_SKDOBJ_ST_UNINTERRUPTED);
         xwup_thd_wakeup(thd);
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         xwup_skd_chkpmpt();
 }
 
@@ -1231,12 +1226,12 @@ void xwup_cthd_yield(void)
         xwreg_t cpuirq;
 
         cthd = xwup_skd_get_cthd_lc();
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_RUNNING);
         xwup_thd_rq_add_tail(cthd); //cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_enable_lc();
+        xwup_cpuirq_enable_lc();
         xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 }
 
 __xwup_api
@@ -1250,7 +1245,7 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        if (!xwospl_cpuirq_test_lc()) {
+        if (!xwup_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
                 goto err_dis;
         }
@@ -1281,12 +1276,12 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
                 rc = XWOK;
                 goto err_timedout;
         }
-        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         /* 检查是否被中断 */
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         rc = xwup_skd_wakelock_lock();
         if (rc < 0) {
-                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 /* 调度器处于休眠态，线程需要被冻结，返回-EINTR。*/
                 rc = -EINTR;
                 goto err_intr;
@@ -1297,7 +1292,7 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
                                    (xwsq_t)XWUP_SKDOBJ_ST_STANDBY |
                                    (xwsq_t)XWUP_SKDOBJ_ST_FROZEN) & cthd->state));
         if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_EXITING & cthd->state)) {
-                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                 xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]
 #endif
@@ -1309,12 +1304,12 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_SLEEPING);
         //cppcheck-suppress [misra-c2012-17.7]
         xwup_thd_tt_add_locked(cthd, xwtt, to);
-        xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+        xwup_cpuirq_enable_lc();
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]
 #endif
         xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
         if ((xwsq_t)XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
@@ -1344,7 +1339,7 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        if (!xwospl_cpuirq_test_lc()) {
+        if (!xwup_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
                 goto err_dis;
         }
@@ -1367,12 +1362,12 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
         to = xwtm_add_safely(*from, dur);
-        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         /* 检查是否被中断 */
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         rc = xwup_skd_wakelock_lock();
         if (rc < 0) {
-                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，
                    阻塞/睡眠函数将返回-EINTR。*/
                 rc = -EINTR;
@@ -1384,7 +1379,7 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
                                    (xwsq_t)XWUP_SKDOBJ_ST_STANDBY |
                                    (xwsq_t)XWUP_SKDOBJ_ST_FROZEN) & cthd->state));
         if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_EXITING & cthd->state)) {
-                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                 xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]
 #endif
@@ -1396,12 +1391,12 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_SLEEPING);
         //cppcheck-suppress [misra-c2012-17.7]
         xwup_thd_tt_add_locked(cthd, xwtt, to);
-        xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+        xwup_cpuirq_enable_lc();
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]
 #endif
         xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
         if ((xwsq_t)XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
@@ -1451,17 +1446,17 @@ xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
 
         XWOS_BUG_ON((xwsq_t)0 == ((xwsq_t)XWUP_SKDOBJ_ST_RUNNING & thd->state));
         xwskd = xwup_skd_get_lc();
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_RUNNING);
         xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_FROZEN);
         xwskd->pm.frz_thd_cnt++;
         xwlib_bclst_add_tail(&xwskd->pm.frzlist, &thd->frznode);
         xwup_skd_enpmpt_lc(); //cppcheck-suppress [misra-c2012-17.7]
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 xwup_skd_notify_allfrz_lc(); // cppcheck-suppress [misra-c2012-17.7]
         } else {
-                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
         }
         return XWOK;
@@ -1485,13 +1480,13 @@ xwer_t xwup_thd_thaw_lc(struct xwup_thd * thd)
         xwer_t rc;
 
         xwskd = xwup_skd_get_lc();
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         XWOS_BUG_ON((xwsq_t)0 == ((xwsq_t)XWUP_SKDOBJ_ST_FROZEN & thd->state));
         xwlib_bclst_del_init(&thd->frznode);
         xwskd->pm.frz_thd_cnt--;
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_FROZEN);
         rc = xwup_thd_rq_add_tail(thd);
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         return rc;
 #else
         XWOS_UNUSED(thd);

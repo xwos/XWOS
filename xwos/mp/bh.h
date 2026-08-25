@@ -15,14 +15,12 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
-#include <xwos/mp/lock/spinlock.h>
 
 /**
  * @brief 中断底半部控制块
  */
 struct xwmp_bh_cb {
         struct xwlib_bclst_head list; /**< 链表头 */
-        struct xwmp_splk lock; /**< 保护链表的自旋锁 */
 };
 
 /**

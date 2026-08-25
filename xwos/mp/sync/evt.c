@@ -29,7 +29,7 @@
 #elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
 #  include <stdlib.h>
 #endif
-#include <xwos/ospl/irq.h>
+#include <xwos/mp/irq.h>
 #include <xwos/mp/thd.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/sync/obj.h>

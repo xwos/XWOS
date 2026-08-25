@@ -406,7 +406,7 @@ void xwmp_swt_ttn_callback(struct xwmp_ttn * ttn)
         if ((xwsq_t)0 != ((xwsq_t)XWMP_SWT_FLAG_RESTART & swt->flag)) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
                 /* 其他CPU在此时调用 `xwmp_swt_stop()` 会导致引用计数的值小于3。*/
-                xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+                xwmp_splk_lock_cpuirqsv(&xwtt->lock, &cpuirq);
                 refcnt = xwos_object_get_refcnt(&swt->xwobj);
                 if (refcnt >= (xwsq_t)3) {
                         swt->ttn.wkup_xwtm = to;
@@ -427,10 +427,10 @@ void xwmp_swt_ttn_callback(struct xwmp_ttn * ttn)
                         xwmp_swt_grab(swt); // cppcheck-suppress [misra-c2012-17.7]
                         // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_tt_add_locked(xwtt, &swt->ttn);
-                        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                         xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
-                        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                         xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 }
         } else {
@@ -457,7 +457,7 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         swt->xwskd = xwmp_skd_get_lc();
         xwtt = &swt->xwskd->tt;
         to = xwtm_add_safely(origin, period);
-        xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        xwmp_splk_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         if (NULL != swt->ttn.cb) {
                 rc = -EALREADY;
                 goto err_already;
@@ -477,7 +477,7 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         if (rc < 0) {
                 goto err_swt_add;
         }
-        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         return XWOK;
 
 err_swt_add:
@@ -485,7 +485,7 @@ err_swt_add:
                 xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
 err_already:
-        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
 err_swt_grab:
         return rc;
@@ -502,12 +502,12 @@ xwer_t xwmp_swt_stop(struct xwmp_swt * swt)
                 rc = -EPERM;
         } else {
                 xwtt = &swt->xwskd->tt;
-                xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+                xwmp_splk_lock_cpuirqsv(&xwtt->lock, &cpuirq);
                 rc = xwmp_tt_remove_locked(xwtt, &swt->ttn);
                 if ((xwsq_t)0 != ((xwsq_t)XWMP_SWT_FLAG_RESTART & swt->flag)) {
                         xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 }
-                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 if (XWOK == rc) {
                         /* 从时间树上删除成功，回调函数不可能再被执行。
                            回调函数中减少引用计数的代码也不会执行 */

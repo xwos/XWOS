@@ -46,8 +46,6 @@ void xwup_rtrq_init(struct xwup_rtrq * xwrtrq)
  *   `XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_FROZEN | XWUP_SKDOBJ_ST_STANDBY`
  * + 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
  *   `XWUP_SKDOBJ_ST_BLOCKING & XWUP_SKDOBJ_ST_SLEEPING`
- * @note
- * + 此函数只能在临界区中调用。
  */
 __xwup_code
 void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
@@ -76,8 +74,6 @@ void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
  *   `XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_FROZEN | XWUP_SKDOBJ_ST_STANDBY`
  * + 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
  *   `XWUP_SKDOBJ_ST_BLOCKING & XWUP_SKDOBJ_ST_SLEEPING`
- * @note
- * + 此函数只能在临界区中调用。
  */
 __xwup_code
 void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
@@ -98,8 +94,6 @@ void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
  * @brief 将线程从实时就绪队列中删除
  * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  * @param[in] thd: 线程控制块的指针
- * @note
- * + 此函数只能在临界区中调用。
  */
 __xwup_code
 void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
@@ -123,8 +117,6 @@ void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
  * @brief 从实时就绪队列中选择优先级最高的线程
  * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  * @return 被选择的线程控制块的指针
- * @note
- * + 此函数只能在临界区中调用。
  */
 __xwup_code
 struct xwup_thd * xwup_rtrq_choose(struct xwup_rtrq * xwrtrq)

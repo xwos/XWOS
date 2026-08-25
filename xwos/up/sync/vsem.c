@@ -11,7 +11,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/ospl/irq.h>
+#include <xwos/up/irq.h>
 #include <xwos/up/sync/obj.h>
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 #  include <xwos/up/sync/evt.h>
@@ -68,12 +68,12 @@ xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * sel, xwsq_t pos
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         rc = xwup_sel_obj_bind(sel, &vsem->synobj, pos, true);
         if ((XWOK == rc) && (vsem->count > (xwssq_t)0)) {
                 rc = xwup_sel_obj_s1i(sel, &vsem->synobj);
         }
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 
         return rc;
 }
@@ -84,12 +84,12 @@ xwer_t xwup_vsem_unbind(struct xwup_vsem * vsem, struct xwup_evt * sel)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         rc = xwup_sel_obj_unbind(sel, &vsem->synobj, true);
         if (XWOK == rc) {
                 rc = xwup_sel_obj_c0i(sel, &vsem->synobj);
         }
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 
         return rc;
 }
@@ -119,7 +119,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
         xwreg_t cpuirq;
 
         rc = XWOK;
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         if (vsem->count < (xwssq_t)0) {
                 rc = -EALREADY;
         } else {
@@ -136,7 +136,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
                 }
 #endif
         }
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 
         return rc;
 }
@@ -148,13 +148,13 @@ xwer_t xwup_vsem_thaw(struct xwup_vsem * vsem)
         xwreg_t cpuirq;
 
         rc = XWOK;
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         if (vsem->count >= (xwssq_t)0) {
                 rc = -EALREADY;
         } else {
                 vsem->count = 0;
         }
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         return rc;
 }
 

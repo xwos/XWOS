@@ -11,7 +11,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/mp/lock/spinlock.h>
+#include <xwos/mp/irq.h>
 #include <xwos/mp/bh.h>
 
 /**
@@ -22,7 +22,6 @@ __xwmp_code
 void xwmp_bh_cb_init(struct xwmp_bh_cb * bhcb)
 {
         xwlib_bclst_init_head(&bhcb->list);
-        xwmp_splk_init(&bhcb->lock);
 }
 
 /**
@@ -49,11 +48,11 @@ void xwmp_bh_node_eq(struct xwmp_bh_cb * bhcb, struct xwmp_bh_node * bhn)
 {
         xwreg_t cpuirq;
 
-        xwmp_rawly_lock_cpuirqsv(&bhcb->lock, &cpuirq);
+        xwmp_cpuirq_save_lc(&cpuirq);
         if (xwlib_bclst_tst_empty(&bhn->node)) {
                 xwlib_bclst_add_tail(&bhcb->list, &bhn->node);
         }
-        xwmp_rawly_unlock_cpuirqrs(&bhcb->lock, cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
 }
 
 /**
@@ -66,7 +65,7 @@ void xwmp_bh_node_dq(struct xwmp_bh_cb * bhcb, struct xwmp_bh_node * bhn)
 {
         xwreg_t cpuirq;
 
-        xwmp_rawly_lock_cpuirqsv(&bhcb->lock, &cpuirq);
+        xwmp_cpuirq_save_lc(&cpuirq);
         xwlib_bclst_del_init(&bhn->node);
-        xwmp_rawly_unlock_cpuirqrs(&bhcb->lock, cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
 }

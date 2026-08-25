@@ -120,11 +120,10 @@ void xwup_mtxtree_remove(struct xwup_mtxtree * mt, struct xwup_mtx * mtx)
                 }
         } else {
                 if (mtx == mt->rightmost) {
-                        p = mtx->rbnode.left; /* The predecessor of a max node is its
-                                                 left child due to the property 5 of
-                                                 red-black tree. Or if there is no
-                                                 left child, the predecessor is its
-                                                 parent. */
+                        p = mtx->rbnode.left; /* 根据红黑树性质5，可知：
+                                               * + 最小节点的前任(predecessor)是其左子节点
+                                               * + 若左子节点不存在，前任(predecessor)是其父节点
+                                               */
                         if (NULL == p) {
                                 p = xwlib_rbtree_get_parent(&mtx->rbnode);
                         }

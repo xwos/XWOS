@@ -11,8 +11,8 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/ospl/irq.h>
-#include <xwos/ospl/skd.h>
+#include <xwos/up/irq.h>
+#include <xwos/up/skd.h>
 #include <xwos/up/lock/seqlock.h>
 
 __xwup_api
@@ -86,7 +86,7 @@ __xwup_api
 void xwup_sqlk_rdex_lock_cpuirq(struct xwup_sqlk * sql)
 {
         XWOS_UNUSED(sql);
-        xwospl_cpuirq_disable_lc();
+        xwup_cpuirq_disable_lc();
         xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
@@ -102,14 +102,14 @@ void xwup_sqlk_rdex_unlock_cpuirq(struct xwup_sqlk * sql)
 {
         XWOS_UNUSED(sql);
         xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_enable_lc();
+        xwup_cpuirq_enable_lc();
 }
 
 __xwup_api
 void xwup_sqlk_rdex_lock_cpuirqsv(struct xwup_sqlk * sql, xwreg_t * flag)
 {
         XWOS_UNUSED(sql);
-        xwospl_cpuirq_save_lc(flag);
+        xwup_cpuirq_save_lc(flag);
         xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
@@ -125,7 +125,7 @@ void xwup_sqlk_rdex_unlock_cpuirqrs(struct xwup_sqlk * sql, xwreg_t flag)
 {
         XWOS_UNUSED(sql);
         xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(flag);
+        xwup_cpuirq_restore_lc(flag);
 }
 
 __xwup_api
@@ -255,7 +255,7 @@ void xwup_sqlk_wr_unlock(struct xwup_sqlk * sql)
 __xwup_api
 void xwup_sqlk_wr_lock_cpuirq(struct xwup_sqlk * sql)
 {
-        xwospl_cpuirq_disable_lc();
+        xwup_cpuirq_disable_lc();
         xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
@@ -274,13 +274,13 @@ void xwup_sqlk_wr_unlock_cpuirq(struct xwup_sqlk * sql)
         xwmb_mp_wmb();
         sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_enable_lc();
+        xwup_cpuirq_enable_lc();
 }
 
 __xwup_api
 void xwup_sqlk_wr_lock_cpuirqsv(struct xwup_sqlk * sql, xwreg_t * flag)
 {
-        xwospl_cpuirq_save_lc(flag);
+        xwup_cpuirq_save_lc(flag);
         xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
@@ -299,7 +299,7 @@ void xwup_sqlk_wr_unlock_cpuirqrs(struct xwup_sqlk * sql, xwreg_t flag)
         xwmb_mp_wmb();
         sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(flag);
+        xwup_cpuirq_restore_lc(flag);
 }
 
 __xwup_api

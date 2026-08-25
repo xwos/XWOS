@@ -11,7 +11,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/ospl/irq.h>
+#include <xwos/up/irq.h>
 #include <xwos/up/bh.h>
 
 /**
@@ -56,11 +56,11 @@ void xwup_bh_node_eq(struct xwup_bh_cb * bhcb, struct xwup_bh_node * bhn)
         XWOS_VALIDATE((NULL != bhcb), "nullptr");
         XWOS_VALIDATE((NULL != bhn), "nullptr");
 
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         if (xwlib_bclst_tst_empty(&bhn->node)) {
                 xwlib_bclst_add_tail(&bhcb->list, &bhn->node);
         }
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 }
 
 /**
@@ -76,7 +76,7 @@ void xwup_bh_node_dq(struct xwup_bh_cb * bhcb, struct xwup_bh_node * bhn)
         XWOS_VALIDATE((NULL != bhn), "nullptr");
         XWOS_UNUSED(bhcb);
 
-        xwospl_cpuirq_save_lc(&cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         xwlib_bclst_del_init(&bhn->node);
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
 }

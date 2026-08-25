@@ -72,18 +72,6 @@ xwer_t xwup_irq_get_id(xwirq_t * irqnbuf)
 }
 
 __xwup_api
-void xwup_cpuirq_enable_lc(void)
-{
-        xwospl_cpuirq_enable_lc();
-}
-
-__xwup_api
-void xwup_cpuirq_disable_lc(void)
-{
-        xwospl_cpuirq_disable_lc();
-}
-
-__xwup_api
 void xwup_cpuirq_resume_lc(void)
 {
         xwup_skd_enth_lc(); // cppcheck-suppress [misra-c2012-17.7]
@@ -93,22 +81,4 @@ __xwup_api
 void xwup_cpuirq_suspend_lc(void)
 {
         xwup_skd_dsth_lc(); // cppcheck-suppress [misra-c2012-17.7]
-}
-
-__xwup_api
-void xwup_cpuirq_restore_lc(xwreg_t cpuirq)
-{
-        xwospl_cpuirq_restore_lc(cpuirq);
-}
-
-__xwup_api
-void xwup_cpuirq_save_lc(xwreg_t * cpuirq)
-{
-        xwospl_cpuirq_save_lc(cpuirq);
-}
-
-__xwup_api
-bool xwup_cpuirq_test_lc(void)
-{
-        return xwospl_cpuirq_test_lc();
 }

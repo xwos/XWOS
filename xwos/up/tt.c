@@ -19,7 +19,6 @@
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/up/bh.h>
 #endif
-#include <xwos/up/lock/seqlock.h>
 #include <xwos/up/tt.h>
 
 #if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
@@ -60,7 +59,6 @@ xwer_t xwup_tt_init(struct xwup_tt * xwtt)
 {
         xwer_t rc;
 
-        xwup_sqlk_init(&xwtt->lock);
         xwlib_rbtree_init(&xwtt->rbtree);
         xwtt->deadline = (xwtm_t)0;
         xwtt->leftmost = NULL;
@@ -79,8 +77,6 @@ xwer_t xwup_tt_init(struct xwup_tt * xwtt)
  * @retval XWOK: 没有错误
  * @retval -EINTR: 被中断
  * @retval -ETIMEDOUT: 超时
- * @note
- * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
 __xwup_code
 xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
@@ -147,8 +143,6 @@ xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
  * @brief 从时间树中删除节点（节点有伙伴）
  * @param[in] xwtt: 时间树的指针
  * @param[in] ttn: 时间树节点的指针
- * @note
- * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
 static __xwup_code
 void xwup_tt_rmrbb_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
@@ -168,8 +162,6 @@ void xwup_tt_rmrbb_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
  * @brief 从时间树中删除节点（节点无伙伴）
  * @param[in] xwtt: 时间树的指针
  * @param[in] ttn: 时间树节点的指针
- * @note
- * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
 static __xwup_code
 void xwup_tt_rmrbn_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
@@ -177,7 +169,7 @@ void xwup_tt_rmrbn_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
         struct xwlib_rbtree_node * s;
 
         if (ttn == xwtt->leftmost) {
-                s = ttn->rbn.right; /* 根据红黑树性质5，可知
+                s = ttn->rbn.right; /* 根据红黑树性质5，可知：
                                      * + 最小节点的后继(successor)是其右子节点
                                      * + 若右子节点不存在，后继(successor)是其父节点
                                      */
@@ -201,8 +193,6 @@ void xwup_tt_rmrbn_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
  * @param[in] ttn: 时间树节点的指针
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 时间树中不存在该节点
- * @note
- * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
 __xwup_code
 xwer_t xwup_tt_remove_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
@@ -240,7 +230,7 @@ xwer_t xwup_tt_check_deadline(struct xwup_tt * xwtt)
         xwer_t rc;
 
         rc = XWOK;
-        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         for (tick = xwup_syshwt_get_time(&xwtt->hwt);
              ((NULL != xwtt->leftmost) && (xwtm_cmp(xwtt->deadline, tick) <= 0));
              tick = xwup_syshwt_get_time(&xwtt->hwt)) {
@@ -249,7 +239,7 @@ xwer_t xwup_tt_check_deadline(struct xwup_tt * xwtt)
                 xwlib_bclst_insseg_tail(&xwtt->timeout, &leftmost->rbb);
                 rc = -ETIMEDOUT;
         }
-        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         return rc;
 }
 
@@ -264,17 +254,17 @@ void xwup_tt_bh(struct xwup_tt * xwtt)
         xwreg_t cpuirq;
         xwup_tt_cb_f cb;
 
-        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        xwup_cpuirq_save_lc(&cpuirq);
         xwlib_bclst_itr_prev_entry_del(ttn, &xwtt->timeout, struct xwup_ttn, rbb) {
                 xwlib_bclst_del_init(&ttn->rbb);
                 cb = ttn->cb;
                 ttn->wkuprs = (xwsq_t)XWUP_TTN_WKUPRS_TIMEDOUT;
                 ttn->cb = NULL;
-                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwup_cpuirq_restore_lc(cpuirq);
                 cb(ttn);
-                xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwup_cpuirq_disable_lc();
         }
-        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        xwup_cpuirq_restore_lc(cpuirq);
         xwup_skd_chkpmpt();
 }
 

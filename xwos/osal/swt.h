@@ -275,6 +275,8 @@ xwos_swt_d xwos_swt_get_d(struct xwos_swt * swt)
  * @return 错误码
  * @note
  * + 上下文：任意
+ * @details
+ * 定时器会在调用此CAPI的CPU上启动。
  */
 static __xwos_inline_api
 xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t origin, xwtm_t period,
@@ -294,6 +296,8 @@ xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t origin, xwtm_t period,
  * @retval -EPERM: 没有启动
  * @note
  * + 上下文：任意
+ * @details
+ * 此CAPI可在任意CPU调用。
  */
 static __xwos_inline_api
 xwer_t xwos_swt_stop(struct xwos_swt * swt)

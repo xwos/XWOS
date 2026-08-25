@@ -13,7 +13,7 @@
 #ifndef __xwos_up_osdl_irq_h__
 #define __xwos_up_osdl_irq_h__
 
-#include <xwos/ospl/irq.h>
+#include <xwos/up/irq.h>
 
 static __xwcc_inline
 xwer_t xwosdl_irq_enable(xwirq_t irqn)

@@ -101,8 +101,6 @@ void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio
  * @brief 将等待队列节点从实时等待队列中移除（节点有伙伴）
  * @param[in] xwrtwq: 实时等待队列
  * @param[in] wqn: 等待队列节点结构体指针
- * @note
- * - 这个函数只能在临界区中调用。
  */
 static __xwup_code
 void xwup_rtwq_rmrbb(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
@@ -122,8 +120,6 @@ void xwup_rtwq_rmrbb(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
  * @brief 将等待队列节点从实时等待队列中移除（节点无伙伴）
  * @param[in] xwrtwq: 实时等待队列
  * @param[in] wqn: 等待队列节点结构体指针
- * @note
- * - 这个函数只能在临界区中调用。
  */
 static __xwup_code
 void xwup_rtwq_rmrbn(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
@@ -159,8 +155,6 @@ void xwup_rtwq_rmrbn(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
  * @param[in] wqn: 等待队列节点结构体指针
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 等待队列中不存在该节点
- * @note
- * - 这个函数只能在临界区中调用。
  */
 __xwup_code
 xwer_t xwup_rtwq_remove(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
@@ -186,8 +180,6 @@ xwer_t xwup_rtwq_remove(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
  * @brief 从实时等待队列中选择一个节点
  * @param[in] xwrtwq: 实时等待队列
  * @return 实时等待队列节点指针或空指针
- * @note
- * - 这个函数只能在临界区中调用。
  */
 __xwup_code
 struct xwup_wqn * xwup_rtwq_choose(struct xwup_rtwq * xwrtwq)

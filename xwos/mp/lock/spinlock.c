@@ -11,7 +11,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/ospl/irq.h>
+#include <xwos/mp/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/lock/spinlock.h>
 
@@ -55,7 +55,7 @@ void xwmp_rawly_unlock(struct xwmp_splk * splk)
 __xwmp_code
 void xwmp_rawly_lock_cpuirq(struct xwmp_splk * splk)
 {
-        xwospl_cpuirq_disable_lc();
+        xwmp_cpuirq_disable_lc();
 #if (CPUCFG_CPU_NUM > 1)
         xwospl_splk_lock(&splk->osplsplk);
 #else
@@ -70,11 +70,11 @@ xwer_t xwmp_rawly_trylock_cpuirq(struct xwmp_splk * splk)
         xwer_t rc;
 
         rc = XWOK;
-        xwospl_cpuirq_disable_lc();
+        xwmp_cpuirq_disable_lc();
 #if (CPUCFG_CPU_NUM > 1)
         rc = xwospl_splk_trylock(&splk->osplsplk);
         if (rc < 0) {
-                xwospl_cpuirq_enable_lc();
+                xwmp_cpuirq_enable_lc();
         }
 #else
         XWOS_UNUSED(splk);
@@ -92,13 +92,13 @@ void xwmp_rawly_unlock_cpuirq(struct xwmp_splk * splk)
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif
-        xwospl_cpuirq_enable_lc();
+        xwmp_cpuirq_enable_lc();
 }
 
 __xwmp_code
 void xwmp_rawly_lock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
 {
-        xwospl_cpuirq_save_lc(cpuirq);
+        xwmp_cpuirq_save_lc(cpuirq);
 #if (CPUCFG_CPU_NUM > 1)
         xwospl_splk_lock(&splk->osplsplk);
 #else
@@ -113,11 +113,11 @@ xwer_t xwmp_rawly_trylock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
         xwer_t rc;
 
         rc = XWOK;
-        xwospl_cpuirq_save_lc(cpuirq);
+        xwmp_cpuirq_save_lc(cpuirq);
 #if (CPUCFG_CPU_NUM > 1)
         rc = xwospl_splk_trylock(&splk->osplsplk);
         if (rc < 0) {
-                xwospl_cpuirq_restore_lc(*cpuirq);
+                xwmp_cpuirq_restore_lc(*cpuirq);
                 return rc;
         }
 #else
@@ -136,7 +136,7 @@ void xwmp_rawly_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
 }
 
 __xwmp_code
@@ -327,7 +327,7 @@ void xwmp_splk_lock_cpuirq(struct xwmp_splk * splk)
 {
         struct xwmp_skd * xwskd;
 
-        xwospl_cpuirq_disable_lc();
+        xwmp_cpuirq_disable_lc();
         xwskd = xwmp_skd_get_lc();
         xwmp_skd_dspmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
 #if (CPUCFG_CPU_NUM > 1)
@@ -345,14 +345,14 @@ xwer_t xwmp_splk_trylock_cpuirq(struct xwmp_splk * splk)
         xwer_t rc;
 
         rc = XWOK;
-        xwospl_cpuirq_disable_lc();
+        xwmp_cpuirq_disable_lc();
         xwskd = xwmp_skd_get_lc();
         xwmp_skd_dspmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
 #if (CPUCFG_CPU_NUM > 1)
         rc = xwospl_splk_trylock(&splk->osplsplk);
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-                xwospl_cpuirq_enable_lc();
+                xwmp_cpuirq_enable_lc();
         }
 #else
         XWOS_UNUSED(splk);
@@ -374,7 +374,7 @@ void xwmp_splk_unlock_cpuirq(struct xwmp_splk * splk)
 #endif
         xwskd = xwmp_skd_get_lc();
         xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_enable_lc();
+        xwmp_cpuirq_enable_lc();
 }
 
 __xwmp_api
@@ -382,7 +382,7 @@ void xwmp_splk_lock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
 {
         struct xwmp_skd * xwskd;
 
-        xwospl_cpuirq_save_lc(cpuirq);
+        xwmp_cpuirq_save_lc(cpuirq);
         xwskd = xwmp_skd_get_lc();
         xwmp_skd_dspmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
 #if (CPUCFG_CPU_NUM > 1)
@@ -400,14 +400,14 @@ xwer_t xwmp_splk_trylock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
         xwer_t rc;
 
         rc = XWOK;
-        xwospl_cpuirq_save_lc(cpuirq);
+        xwmp_cpuirq_save_lc(cpuirq);
         xwskd = xwmp_skd_get_lc();
         xwmp_skd_dspmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
 #if (CPUCFG_CPU_NUM > 1)
         rc = xwospl_splk_trylock(&splk->osplsplk);
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-                xwospl_cpuirq_restore_lc(*cpuirq);
+                xwmp_cpuirq_restore_lc(*cpuirq);
         }
 #else
         XWOS_UNUSED(splk);
@@ -429,7 +429,7 @@ void xwmp_splk_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
 #endif
         xwskd = xwmp_skd_get_lc();
         xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
 }
 
 __xwmp_api

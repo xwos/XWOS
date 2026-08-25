@@ -25,7 +25,7 @@
 #elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
 #  include <stdlib.h>
 #endif
-#include <xwos/ospl/irq.h>
+#include <xwos/mp/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
 #include <xwos/mp/rtwq.h>
@@ -723,25 +723,25 @@ xwer_t xwmp_mtx_block_to(struct xwmp_mtx * mtx,
 
         /* 加入时间树 */
         if (to > 0) {
-                xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwmp_splk_lock_cpuirq(&xwtt->lock);
                 xwmp_splk_lock(&thd->stlock);
                 xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_SLEEPING);
                 xwmp_splk_unlock(&thd->stlock);
                 // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_thd_tt_add_locked(thd, xwtt, to);
-                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         }
 
         /* 调度 */
         th = xwskd->dis_th_cnt;
         th_cpuirq = xwskd->th_cpuirq;
         xwskd->dis_th_cnt = 0;
-        xwospl_cpuirq_enable_lc();
+        xwmp_cpuirq_enable_lc();
         xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_wakelock_lock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
         xwskd->th_cpuirq = th_cpuirq;
         xwskd->dis_th_cnt = th;
 
@@ -750,24 +750,24 @@ xwer_t xwmp_mtx_block_to(struct xwmp_mtx * mtx,
         wkuprs = thd->ttn.wkuprs;
         xwmb_mp_acquire();
         if ((xwsq_t)XWMP_WQN_REASON_INTR == reason) {
-                xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwmp_splk_lock_cpuirq(&xwtt->lock);
                 rc = xwmp_tt_remove_locked(xwtt, &thd->ttn);
                 if (XWOK == rc) {
                         xwmp_splk_lock(&thd->stlock);
                         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_SLEEPING);
                         xwmp_splk_unlock(&thd->stlock);
                 }
-                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 rc = -EINTR;
         } else if ((xwsq_t)XWMP_WQN_REASON_UP == reason) {
-                xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwmp_splk_lock_cpuirq(&xwtt->lock);
                 rc = xwmp_tt_remove_locked(xwtt, &thd->ttn);
                 if (XWOK == rc) {
                         xwmp_splk_lock(&thd->stlock);
                         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_SLEEPING);
                         xwmp_splk_unlock(&thd->stlock);
                 }
-                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 rc = XWOK;
         } else if ((xwsq_t)XWMP_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 xwmp_rtwq_lock_cpuirq(&mtx->rtwq);
@@ -886,7 +886,7 @@ xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx)
         struct xwmp_skd * xwskd;
         xwer_t rc;
 
-        if (!xwospl_cpuirq_test_lc()) {
+        if (!xwmp_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
                 goto err_dis;
         }
@@ -929,7 +929,7 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
         xwtm_t now;
         xwer_t rc;
 
-        if (!xwospl_cpuirq_test_lc()) {
+        if (!xwmp_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
                 goto err_dis;
         }
@@ -1007,10 +1007,10 @@ xwer_t xwmp_mtx_block_unintr(struct xwmp_mtx * mtx, struct xwmp_thd * thd,
         th = xwskd->dis_th_cnt;
         th_cpuirq = xwskd->th_cpuirq;
         xwskd->dis_th_cnt = 0;
-        xwospl_cpuirq_enable_lc();
+        xwmp_cpuirq_enable_lc();
         xwmp_skd_enpmpt_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
         xwskd->th_cpuirq = th_cpuirq;
         xwskd->dis_th_cnt = th;
 
@@ -1062,7 +1062,7 @@ xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
         struct xwmp_thd * cthd;
         struct xwmp_skd * xwskd;
 
-        if (!xwospl_cpuirq_test_lc()) {
+        if (!xwmp_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
                 goto err_dis;
         }

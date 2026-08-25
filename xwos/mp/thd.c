@@ -27,9 +27,9 @@
 #elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
 #  include <stdlib.h>
 #endif
-#include <xwos/ospl/irq.h>
-#include <xwos/ospl/skd.h>
 #include <xwos/ospl/tls.h>
+#include <xwos/mp/irq.h>
+#include <xwos/mp/skd.h>
 #include <xwos/mp/rtrq.h>
 #if (1 == XWOSRULE_SKD_WQ_RT)
 #  include <xwos/mp/rtwq.h>
@@ -1264,17 +1264,17 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
 
                 xwskd = thd->xwskd;
                 xwtt = &xwskd->tt;
-                xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwmp_splk_lock_cpuirq(&xwtt->lock);
                 rc = xwmp_tt_remove_locked(xwtt, &thd->ttn);
                 if (XWOK == rc) {
                         xwmp_splk_lock(&thd->stlock);
                         xwbop_c0m(xwsq_t, &thd->state, (xwsq_t)XWMP_SKDOBJ_ST_SLEEPING);
                         xwmp_splk_unlock(&thd->stlock);
-                        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                         xwmp_thd_wakeup(thd); // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_skd_chkpmpt(xwskd);
                 } else {
-                        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 }
         } else {
                 rc = -EINVAL;
@@ -1341,15 +1341,12 @@ void xwmp_thd_ttn_callback(struct xwmp_ttn * ttn)
  * @param[in] xwtt: 时间树的指针
  * @param[in] to: 期望唤醒的时间点
  * @return 错误码
- * @note
- * + 此函数只能在取得写锁 `xwtt->lock` 以及关闭本地CPU的中断时才可调用。
  */
 __xwmp_code
 xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt, xwtm_t to)
 {
         xwer_t rc;
 
-        /* add to time tree */
         thd->ttn.wkup_xwtm = to;
         thd->ttn.wkuprs = (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN;
         thd->ttn.xwtt = xwtt;
@@ -1442,7 +1439,7 @@ void xwmp_cthd_yield(void)
         rc = xwmp_thd_rq_add_tail(cthd, prio);
         XWOS_BUG_ON(rc < 0);
         xwmp_skd_req_swcx(cthd->xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
 }
 
 __xwmp_api
@@ -1457,7 +1454,7 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         xwsq_t wkuprs;
         xwreg_t cpuirq;
 
-        if (!xwospl_cpuirq_test_lc()) {
+        if (!xwmp_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
                 goto err_dis;
         }
@@ -1488,11 +1485,11 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
                 rc = XWOK;
                 goto err_timedout;
         }
-        xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        xwmp_splk_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
         rc = xwmp_skd_wakelock_lock_lc(xwskd);
         if (rc < 0) {
-                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，返回-EINTR。*/
                 rc = -EINTR;
                 goto err_intr;
@@ -1506,7 +1503,7 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         if ((xwsq_t)0 != (((xwsq_t)XWMP_SKDOBJ_ST_FREEZABLE |
                            (xwsq_t)XWMP_SKDOBJ_ST_EXITING) & cthd->state)) {
                 xwmp_splk_unlock(&cthd->stlock);
-                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                 rc = -EINTR;
                 goto err_intr;
@@ -1518,10 +1515,10 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         xwmp_splk_unlock(&cthd->stlock);
         // cppcheck-suppress [misra-c2012-17.7]
         xwmp_thd_tt_add_locked(cthd, xwtt, to);
-        xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+        xwmp_splk_unlock_cpuirq(&xwtt->lock);
         xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
         wkuprs = cthd->ttn.wkuprs;
@@ -1554,7 +1551,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwsq_t wkuprs;
         xwer_t rc;
 
-        if (!xwospl_cpuirq_test_lc()) {
+        if (!xwmp_cpuirq_test_lc()) {
                 rc = -EDISIRQ;
                 goto err_dis;
         }
@@ -1577,11 +1574,11 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
         to = xwtm_add_safely(*from, dur);
-        xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        xwmp_splk_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
         rc = xwmp_skd_wakelock_lock_lc(xwskd);
         if (rc < 0) {
-                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，返回-EINTR。*/
                 rc = -EINTR;
                 goto err_intr;
@@ -1595,7 +1592,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         if ((xwsq_t)0 != (((xwsq_t)XWMP_SKDOBJ_ST_FREEZABLE |
                            (xwsq_t)XWMP_SKDOBJ_ST_EXITING) & cthd->state)) {
                 xwmp_splk_unlock(&cthd->stlock);
-                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                xwmp_splk_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
                 rc = -EINTR;
                 goto err_intr;
@@ -1607,10 +1604,10 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwmp_splk_unlock(&cthd->stlock);
         // cppcheck-suppress [misra-c2012-17.7]
         xwmp_thd_tt_add_locked(cthd, xwtt, to);
-        xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+        xwmp_splk_unlock_cpuirq(&xwtt->lock);
         xwmp_skd_wakelock_unlock_lc(xwskd); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_skd_req_swcx(xwskd); // cppcheck-suppress [misra-c2012-17.7]
-        xwospl_cpuirq_restore_lc(cpuirq);
+        xwmp_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
         wkuprs = cthd->ttn.wkuprs;
@@ -1637,22 +1634,20 @@ err_dis:
  * @retval XWOK: 没有错误
  * @retval -EALREADY: 线程已经被冻结
  * @note
- * + 此函数只可由线程所属的CPU运行；
- * + 此函数假设线程对象已经被引用，执行过程中不会成为野指针。
+ * + 此函数只可由线程所属的CPU关闭中断后调用。
  */
 __xwmp_code
 xwer_t xwmp_thd_reqfrz_lc(struct xwmp_thd * thd)
 {
-        xwreg_t cpuirq;
         xwer_t rc;
 
-        xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
+        xwmp_splk_lock(&thd->stlock);
         if ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_FROZEN & thd->state)) {
-                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
+                xwmp_splk_unlock(&thd->stlock);
                 rc = -EALREADY;
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWMP_SKDOBJ_ST_FREEZABLE);
-                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
+                xwmp_splk_unlock(&thd->stlock);
                 rc = XWOK;
         }
         return rc;
@@ -1746,7 +1741,7 @@ xwer_t xwmp_cthd_freeze(void)
  * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @note
- * + 此函数只能在线程所属的CPU的中断中执行。
+ * + 此函数只可由线程所属的CPU关闭中断后调用。
  */
 __xwmp_code
 xwer_t xwmp_thd_thaw_lc(struct xwmp_thd * thd)

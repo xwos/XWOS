@@ -30,8 +30,6 @@ void xwup_plwq_init(struct xwup_plwq * xwplwq)
  * @brief 将等待队列节点加入到管道等待队列的头部
  * @param[in] xwplwq: 管道等待队列结构体指针
  * @param[in] wqn: 等待队列节点结构体指针
- * @note
- * - 这个函数只能在临界区被调用。
  */
 __xwup_code
 void xwup_plwq_add_head(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
@@ -43,8 +41,6 @@ void xwup_plwq_add_head(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
  * @brief 将等待队列节点加入到管道等待队列的尾部
  * @param[in] xwplwq: 管道等待队列结构体指针
  * @param[in] wqn: 等待队列节点结构体指针
- * @note
- * - 这个函数只能在临界区被调用。
  */
 __xwup_code
 void xwup_plwq_add_tail(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
@@ -58,8 +54,6 @@ void xwup_plwq_add_tail(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
  * @param[in] wqn: 等待队列节点结构体指针
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 没有这个节点
- * @note
- * - 这个函数只能在临界区被调用。
  */
 __xwup_code
 xwer_t xwup_plwq_remove(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
@@ -80,8 +74,6 @@ xwer_t xwup_plwq_remove(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
  * @param[in] xwplwq: 管道等待队列结构体指针
  * @return 被选择的等待队列节点结构体指针
  * @retval NULL: 没有选中任何节点（等待队列为空）
- * @note
- * - 这个函数只能在临界区被调用。
  */
 __xwup_code
 struct xwup_wqn * xwup_plwq_choose(struct xwup_plwq * xwplwq)

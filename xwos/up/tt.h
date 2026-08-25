@@ -45,7 +45,6 @@ struct xwup_tt {
         xwtm_t deadline; /**< 红黑树中最小（最左边）的关键字 */
         struct xwup_ttn * leftmost; /**< 指向最小关键字节点的指针 */
         struct xwlib_bclst_head timeout; /**< 超时链表的表头 */
-        struct xwup_sqlk lock; /**< 保护本结构体的锁 */
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         struct xwup_bh_node bhn; /**< 中断底半部节点 */
 #endif
