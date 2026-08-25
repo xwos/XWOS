@@ -41,12 +41,12 @@
 /**
  * @brief XWOS的修订号
  */
-#define XWOS_VERSION_REVISION           0
+#define XWOS_VERSION_REVISION           1
 
 /**
  * @brief XWOS的版本开发阶段
  */
-#define XWOS_VERSION_PHASE              release
+#define XWOS_VERSION_PHASE              revision
 
 /**
  * @brief XWOS的版本号（数值形式）
