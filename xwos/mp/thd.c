@@ -130,6 +130,9 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
                          xwobj_gc_f gcfunc);
 
 static __xwmp_code
+xwer_t xwmp_thd_intr_once(struct xwmp_thd * thd);
+
+static __xwmp_code
 void xwmp_thd_ttn_callback(struct xwmp_ttn * ttn);
 
 static __xwmp_code
@@ -1187,8 +1190,8 @@ xwer_t xwmp_thd_rq_remove(struct xwmp_thd * thd)
         return rc;
 }
 
-__xwmp_api
-xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
+static __xwmp_code
+xwer_t xwmp_thd_intr_once(struct xwmp_thd * thd)
 {
         xwmp_wqn_f cb;
         xwreg_t cpuirq;
@@ -1253,8 +1256,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
 #endif
                 } else {
                         xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
-                        XWOS_BUG();
-                        rc = -EBUG;
+                        rc = -ESTALE;
                 }
         } else if ((xwsq_t)0 != ((xwsq_t)XWMP_SKDOBJ_ST_SLEEPING & thd->state)) {
                 xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
@@ -1283,6 +1285,16 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
         return rc;
 }
 
+__xwmp_api
+xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
+{
+        xwer_t rc;
+
+        do {
+                rc = xwmp_thd_intr_once(thd);
+        } while (-ESTALE == rc);
+        return rc;
+}
 
 #if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 /**
