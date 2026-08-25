@@ -1,6 +1,6 @@
 ---
 name: finishing-a-development-branch
-description: 当实现完成、所有测试通过、需要决定如何集成工作时使用——通过提供合并、PR 或清理等结构化选项来引导开发工作的收尾
+description: 当实现完成、所有测试通过、需要决定如何集成这份工作时使用
 version: "1.0.0"
 license: MIT
 metadata:
@@ -8,99 +8,80 @@ metadata:
     tags: [git, workflow]
 ---
 
-# 完成开发分支
+# 收尾一个开发分支
 
 ## 概述
 
-通过提供清晰的选项并执行所选工作流来引导开发工作的收尾。
-
 **核心原则：** 验证测试 → 检测环境 → 展示选项 → 执行选择 → 清理。
 
-**开始时宣布：** "我正在使用 finishing-a-development-branch 技能来完成这项工作。"
+**开始时宣告：** "我正在使用 finishing-a-development-branch 技能来收尾这份工作。"
 
-## 流程
+## 步骤 1：验证测试
 
-### 步骤 1：验证测试
+运行项目的完整测试套件（`npm test` / `cargo test` / `pytest` / `go test ./...`）。
 
-**在展示选项之前，验证测试通过：**
-
-```bash
-# 运行项目的测试套件
-npm test / cargo test / pytest / go test ./...
-```
-
-**如果测试失败：**
+**如果测试失败**，报告失败并停下——菜单是在测试全绿之后才出现的：
 
 ```
-测试失败（<N> 个失败）。必须先修复才能继续：
+测试失败（<N> 个）。完成之前必须先修：
 
-[显示失败信息]
-
-在测试通过之前无法进行合并/PR。
+[展示失败详情]
 ```
-
-停止。不要继续到步骤 2。
 
 **如果测试通过：** 继续步骤 2。
 
-### 步骤 2：检测环境
-
-**在展示选项之前，先确定工作区状态：**
+## 步骤 2：检测环境
 
 ```bash
 GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
 GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
+# 现在就捕获 —— 此刻还在工作区里面。步骤 5 会切换目录，
+# 而清理（步骤 6）需要这个值
+WORKTREE_PATH=$(git rev-parse --show-toplevel)
 ```
 
 这决定了展示哪种菜单、以及清理方式：
 
 | 状态 | 菜单 | 清理 |
 |------|------|------|
-| `GIT_DIR == GIT_COMMON`（普通仓库） | 标准 4 个选项 | 无 worktree 可清理 |
-| `GIT_DIR != GIT_COMMON`，命名分支 | 标准 4 个选项 | 按来源判断（见步骤 6） |
-| `GIT_DIR != GIT_COMMON`，分离 HEAD | 收敛 3 个选项（无合并） | 无清理（由外部管理） |
+| `GIT_DIR == GIT_COMMON`（普通仓库） | 标准 3 个选项 | 无 worktree 可清理 |
+| `GIT_DIR != GIT_COMMON`，命名分支 | 标准 3 个选项 | 按来源判断（见步骤 6） |
+| `GIT_DIR != GIT_COMMON`，分离 HEAD | 收敛为 2 个选项（不含合并） | 由外部管理——原地别动 |
 
-### 步骤 3：确定基础分支
+## 步骤 3：确定基础分支
 
-```bash
-# 尝试常见的基础分支
-git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null
-```
+基础分支就是这份工作从哪儿分出来的那个——通常在计划里、对话里，或者分支的 upstream 里已经写明了。如果还不知道，就问："这个分支是从 <你的最佳猜测> 分出来的，对吗？"**合并之前先确认：合并到错误的基础分支，代价很高。**
 
-或者询问："这个分支是从 main 分出来的——对吗？"
+## 步骤 4：展示选项
 
-### 步骤 4：展示选项
-
-**普通仓库和命名分支 worktree —— 准确展示以下 4 个选项：**
+**普通仓库和命名分支 worktree——精确展示这 3 个选项：**
 
 ```
 实现已完成。你想怎么做？
 
-1. 在本地合并回 <base-branch>
+1. 本地合并回 <base-branch>
 2. 推送并创建 Pull Request
-3. 保持分支现状（我稍后处理）
-4. 丢弃这项工作
+3. 保留分支不动（我稍后自己处理）
 
 选哪个？
 ```
 
-**分离 HEAD —— 准确展示以下 3 个选项：**
+**分离 HEAD——精确展示这 2 个选项：**
 
 ```
-实现已完成。你在分离 HEAD 上（由外部管理的工作区）。
+实现已完成。你当前处于分离 HEAD（由外部管理的工作区）。
 
 1. 作为新分支推送并创建 Pull Request
-2. 保持现状（我稍后处理）
-3. 丢弃这项工作
+2. 保持原样（我稍后自己处理）
 
 选哪个？
 ```
 
-**不要添加解释** —— 保持选项简洁。
+**照原文展示菜单**——简洁，每个选项都来自上面的列表。**丢弃工作只在你的人类伙伴明确提出时才发生**（见下方"如果你的人类伙伴要求丢弃这份工作"）。等他们回答；集成与否是他们的决定。
 
-### 步骤 5：执行选择
+## 步骤 5：执行选择
 
-#### 选项 1：本地合并
+### 选项 1：本地合并
 
 ```bash
 # 切到主仓库根目录，保证 CWD 安全
@@ -113,168 +94,95 @@ git pull
 git merge <feature-branch>
 
 # 在合并结果上验证测试
-<test command>
-
-# 合并成功之后再：清理 worktree（步骤 6），然后删除分支
+<测试命令>
 ```
 
-然后：清理 worktree（步骤 6），再删除分支：
+如果测试在**合并结果**上失败：停下，把 worktree 和分支原地留着，去排查——什么都还没推送，所以这次合并是本地的、可恢复的。
+
+一旦合并结果全绿：清理 worktree（步骤 6），然后删除分支：
 
 ```bash
 git branch -d <feature-branch>
 ```
 
-#### 选项 2：推送并创建 PR
+### 选项 2：推送并创建 PR
 
 ```bash
-# 推送分支
 git push -u origin <feature-branch>
-
-# 创建 PR
-gh pr create --title "<title>" --body "$(cat <<'EOF'
-## 摘要
-<2-3 条变更要点>
-
-## 测试计划
-- [ ] <验证步骤>
-EOF
-)"
+# 从分离 HEAD 出发时，在远端指定新分支名：
+# git push origin HEAD:refs/heads/<new-branch>
 ```
 
-**不要清理 worktree** —— 用户在 PR 反馈迭代时还需要它存活。
+然后用**代码托管平台**（forge）的工具针对 <base-branch> 创建 pull/merge request——有 CLI 就用它，没有就用推送时大多数平台会打印出来的创建 URL——遵循仓库里已有的 PR 模板与约定（如果有），并把 URL 报告给你的人类伙伴。
 
-#### 选项 3：保持现状
+**保留 worktree**——你的人类伙伴要在那里根据 PR 反馈继续迭代。
+
+### 选项 3：保持原样
 
 报告："保留分支 <name>。工作树保留在 <path>。"
 
-**不要清理工作树。**
+### 如果你的人类伙伴要求丢弃这份工作
 
-#### 选项 4：丢弃
-
-**先确认：**
+**这条路只作为对"明确要求把工作扔掉"的响应而存在。** 先确认：
 
 ```
 这将永久删除：
 - 分支 <name>
-- 所有提交：<commit-list>
-- 工作树 <path>
+- 所有 commit：<commit 列表>
+- 位于 <path> 的工作树
 
-输入 'discard' 确认。
+输入 'discard' 以确认。
 ```
 
-等待精确的确认。
-
-确认后：
+等待**这个精确的**确认词。收到之后：
 
 ```bash
 MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
 cd "$MAIN_ROOT"
 ```
 
-然后：清理 worktree（步骤 6），再强制删除分支：
+然后清理 worktree（步骤 6），再强制删除分支：
 
 ```bash
 git branch -D <feature-branch>
 ```
 
-### 步骤 6：清理工作区
+## 步骤 6：清理工作区
 
-**只对选项 1 和 4 执行。** 选项 2 和 3 始终保留 worktree。
+**只对选项 1 和已确认的丢弃执行。** 选项 2 和 3 始终保留 worktree。两个调用方都已经切到主仓库根目录了——移除 worktree 必须从 worktree 外面执行——因此这里使用**步骤 2 里捕获的** `GIT_DIR` / `GIT_COMMON` / `WORKTREE_PATH`，也就是那次目录切换之前的值。
 
-```bash
-GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
-GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
-WORKTREE_PATH=$(git rev-parse --show-toplevel)
-```
+> ⚠️ **不要在这里重新计算这些值。** 此刻 `git rev-parse --show-toplevel` 返回的是主仓库根目录，不是 worktree 路径 —— 溯源判断会永远匹配不上，清理会静默空转，随后分支删除还会因为 worktree 仍挂着而失败。
 
 **如果 `GIT_DIR == GIT_COMMON`：** 普通仓库，无 worktree 可清理。结束。
 
-**如果 worktree 路径在 `.worktrees/` 或 `worktrees/` 之下：** 这是 Superpowers 创建的 worktree —— 我们负责清理。
+**如果 `WORKTREE_PATH` 在 `.worktrees/` 或 `worktrees/` 之下：** 这是 Superpowers 创建的 worktree——我们负责清理：
 
 ```bash
-MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
-cd "$MAIN_ROOT"
 git worktree remove "$WORKTREE_PATH"
 git worktree prune  # 自愈：清理任何过期的注册记录
 ```
 
-**否则：** 这个工作区由宿主环境（harness）管理。**不要**移除它。如果你的平台提供了工作区退出工具，用它。否则原样保留工作区。
+**否则：** 这个工作区归宿主环境所有——原地别动。如果你的平台提供了工作区退出工具，用它。
 
 ## 快速参考
 
 | 选项 | 合并 | 推送 | 保留工作树 | 清理分支 |
 |------|------|------|-----------|---------|
-| 1. 本地合并 | ✓ | - | - | ✓ |
-| 2. 创建 PR | - | ✓ | ✓ | - |
-| 3. 保持现状 | - | - | ✓ | - |
-| 4. 丢弃 | - | - | - | ✓（强制） |
+| 1. 本地合并 | 是 | - | - | 是 |
+| 2. 创建 PR | - | 是 | 是 | - |
+| 3. 保持原样 | - | - | 是 | - |
+| 丢弃（仅在明确要求时） | - | - | - | 是（强制） |
 
-## 常见错误
+## 常见的合理化借口
 
-**跳过测试验证**
-
-- **问题：** 合并损坏的代码、创建失败的 PR
-- **修复：** 在提供选项前始终验证测试
-
-**开放式问题**
-
-- **问题：** "接下来该做什么？" → 含糊不清
-- **修复：** 准确展示 4 个结构化选项（分离 HEAD 时是 3 个）
-
-**为选项 2 清理 worktree**
-
-- **问题：** 删掉用户 PR 迭代还需要的 worktree
-- **修复：** 只在选项 1 和 4 时清理
-
-**先删分支再删 worktree**
-
-- **问题：** `git branch -d` 失败，因为 worktree 还引用着该分支
-- **修复：** 先合并，再删 worktree，最后删分支
-
-**在 worktree 内部跑 `git worktree remove`**
-
-- **问题：** 当 CWD 在被删除的 worktree 内时，命令静默失败
-- **修复：** 跑 `git worktree remove` 前先 `cd` 到主仓库根目录
-
-**清理 harness 拥有的 worktree**
-
-- **问题：** 移除 harness 创建的 worktree 会造成幻影状态
-- **修复：** 只清理 `.worktrees/` 或 `worktrees/` 下的 worktree
-
-**丢弃时不确认**
-
-- **问题：** 意外删除工作成果
-- **修复：** 要求输入 'discard' 确认
-
-## 红线
-
-**绝不：**
-
-- 在测试失败时继续
-- 合并前不验证合并结果上的测试
-- 不确认就删除工作成果
-- 未经明确请求就强制推送
-- 在确认合并成功之前移除 worktree
-- 清理不是你创建的 worktree（按来源判断）
-- 在 worktree 内部跑 `git worktree remove`
-
-**始终：**
-
-- 在提供选项前验证测试
-- 展示菜单前检测环境
-- 准确展示 4 个选项（分离 HEAD 时是 3 个）
-- 选项 4 要求输入确认
-- 只在选项 1 和 4 时清理 worktree
-- 移除 worktree 前 `cd` 到主仓库根目录
-- 移除后跑 `git worktree prune`
-
-## 集成
-
-**被以下技能调用：**
-
-- **subagent-driven-development**（步骤 7）- 所有任务完成后
-- **executing-plans**（步骤 5）- 所有批次完成后
-
-**配合使用：**
-
-- **using-git-worktrees** - 清理由该技能创建的工作树
+| 借口 | 现实 |
+|------|------|
+| "测试这个会话早先通过过" | 在**你即将集成的那棵树上**跑测试套件。一次绿色运行只能证明它当时跑的那棵树。 |
+| "他们显然是想合并的" | 集成是你人类伙伴的决定。把菜单摆出来，然后等。 |
+| "他们看起来对这个功能收工了——我提议丢弃吧" | 菜单就是原文那样，不多不少。丢弃只在你的人类伙伴用明确的话提出时才发生。 |
+| "'嗯，删掉吧'算确认了" | 只有输入 `discard` 这个词才授权删除。 |
+| "PR 已经开了，worktree 现在是碍事的垃圾" | PR 反馈要在那个 worktree 里修。它得留到工作落地为止。 |
+| "另外那个 worktree 看着像过期的——我顺手也清了" | 只清理 `.worktrees/` 或 `worktrees/` 之下的 worktree。其余的都属于宿主环境。 |
+| "合并结果的失败大概是偶发的" | 合并结果失败会让一切停下。在你排查期间，分支和 worktree 原地不动。 |
+| "基础分支明显就是 main" | 确认分叉点，或者直接问。合并到错误的基础分支，代价很高。 |
+| "推送被拒了——force-push 一下就好" | 推送被拒意味着远端动过了。去排查；只有在你人类伙伴明确要求时才 force-push。 |

@@ -7,7 +7,7 @@
 | `Read`（读取文件） | `view` |
 | `Write`（创建文件） | `create` |
 | `Edit`（编辑文件） | `edit` |
-| `Bash`（运行命令） | `bash` |
+| `Bash`（运行命令） | `bash`（Windows 上常为 `powershell`，见[异步 Shell 会话](#异步-shell-会话)） |
 | `Grep`（搜索文件内容） | `grep` |
 | `Glob`（按名称搜索文件） | `glob` |
 | `Skill` 工具（调用技能） | `skill` |
@@ -31,7 +31,11 @@ Copilot CLI 的 `task` 工具接受 `agent_type` 参数：
 
 ## 异步 Shell 会话
 
-Copilot CLI 支持持久化的异步 shell 会话，这在 Claude Code 中没有直接等价物：
+Copilot CLI 支持持久化的异步 shell 会话，这在 Claude Code 中没有直接等价物。
+
+> ⚠️ **shell 工具面随平台和版本而异，下面两套工具名不会同时出现。** 动手之前先确认你这个 build 实际注册的是哪一套 —— 照着不存在的工具名调用，agent 会找不到工具然后即兴发挥。Windows 上常见的是 powershell 那一套（实测 Copilot CLI 1.0.69-1 / Windows 只有 powershell，没有任何 `bash` / `async` 家族工具）。
+
+**Unix / macOS —— bash 一套：**
 
 | 工具 | 用途 |
 |------|---------|
@@ -40,6 +44,32 @@ Copilot CLI 支持持久化的异步 shell 会话，这在 Claude Code 中没有
 | `read_bash` | 读取异步会话的输出 |
 | `stop_bash` | 终止异步会话 |
 | `list_bash` | 列出所有活跃的 shell 会话 |
+
+**Windows —— powershell 一套：**
+
+| 工具 | 用途 |
+|------|---------|
+| `powershell` 配合 `detach: true` | 在后台启动长时间运行的命令（参数名是 `detach`，**不是** `async`） |
+| `read_powershell` | 读取会话的输出 |
+| `stop_powershell` | 终止会话 |
+| `list_powershell` | 列出所有活跃的 shell 会话 |
+| （无 `write_powershell`） | 这一套**没有**向运行中会话发送输入的工具 |
+
+### Windows 上的两个坑
+
+**1. `.sh` 脚本不能裸跑。** powershell 下直接执行 `scripts/start-server.sh` 会报 `The term 'scripts/start-server.sh' is not recognized...`，必须显式走 Git Bash：
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" scripts/start-server.sh
+```
+
+**2. `stop_powershell` 停不掉 `detach: true` 启动的进程。** detached 进程要按 PID 停：
+
+```powershell
+Stop-Process -Id <PID>
+```
+
+所以**不要把 `stop_*` 当作 detached 常驻进程的唯一清理路径** —— 必须先拿到真实的 Windows PID（不是 MSYS PID），再 `Stop-Process`。涉及长驻 server 的 skill（如 brainstorming 的视觉伴侣）在 Windows 上尤其要注意这一点。
 
 ## 额外的 Copilot CLI 工具
 

@@ -158,12 +158,8 @@ Subagent (general-purpose):
 - `[BASE_SHA]` —— 本任务之前的提交
 - `[HEAD_SHA]` —— 当前提交
 - `[DIFF_FILE]` —— 必填：控制者写入审查包的那个路径
-  （`scripts/review-package BASE HEAD` 会打印它写入的唯一路径；
+  （`scripts/review-package PLAN_FILE BASE HEAD` 会打印它写入的唯一路径；
   审查包永远不会进入控制者的上下文）
 
 **审查者返回：** 规格合规性结论（✅/❌/⚠️）、优点、问题
 （关键/重要/次要）、任务质量结论
-
-一次修复分派可以同时处理规格差距和质量发现；修复后的重新审查
-覆盖两个结论。
-</content>

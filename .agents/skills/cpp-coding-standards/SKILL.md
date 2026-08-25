@@ -168,6 +168,89 @@ class Spinlock
 };
 ```
 
+### 类成员顺序
+
++ 1. 子类型/类的定义
+  + 公共的
+  + 保护的
+  + 私有的
++ 2. 成员变量
+  + 权限顺序
+    + 公共的
+    + 保护的
+    + 私有的
+  + 先声明变量后声明常量
++ 3. 成员函数
+  + 公共的
+  + 保护的
+  + 私有的
++ 4. 静态成员变量
+  + 权限顺序
+    + 公共的
+    + 保护的
+    + 私有的
+  + 先声明变量后声明常量
++ 5. 静态成员函数
+  + 公共的
+  + 保护的
+  + 私有的
+
+```cpp
+namespace NwM {
+
+class Svc
+    : public xwos::SThd<0>
+{
+  public:
+    class IObserver
+    {
+    };
+    class Event
+    {
+    };
+
+  public:
+    Event mEvent;
+  protected:
+    xwu32_t mNmStrategy;
+  private:
+    IObserver * mObserver;
+    xwtm_t mkPeriod;
+
+  public:
+    void init();
+    void fini();
+    void wkupNwDz();
+    void wkupNwGw();
+    void setNwGwNmPdu(xwsz_t dlc, const xwu8_t * sdu);
+    void setNwDzNmPdu(xwsz_t dlc, const xwu8_t * sdu);
+  protected:
+    virtual xwer_t thdMainFunction() override;
+  private:
+    Svc(xwstk_t stack[], xwsz_t stack_size, IObserver * observer);
+    ~Svc();
+    void checkTimers();
+    void handleEvents();
+    void handleNetworkEvents();
+    void evaluatePncs();
+    void applyPncs();
+
+  public:
+    static Svc sInstance;
+    static xwstk_t sStack[NWM_SVC_THD_STACK_SIZE / sizeof(xwstk_t)];
+    static const xwsq_t skPnc0SgwPos = 24U;
+    static const xwsq_t skPnc1CgwPos = 25U;
+    static const xwsq_t skPnc2CbmPos = 26U;
+
+  public:
+    static void sOnNmStateChange(const NetworkHandleType network,
+                                 const Nm_StateType previous,
+                                 const Nm_StateType current);
+};
+
+} // namespace NwW
+```
+
 ### 格式化命令
 ```bash
 clang-format -i <文件>

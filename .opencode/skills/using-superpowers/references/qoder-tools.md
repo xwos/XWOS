@@ -16,14 +16,23 @@ Skills 使用 Claude Code 的工具名称。Qoder（阿里 AI IDE）大部分工
 
 ## Task 子 Agent 类型
 
-| Claude Code Agent | Qoder 等价 |
-|------------------|-----------|
-| `general-purpose` | `general-purpose` |
-| `Explore` | `explore-agent` |
-| `Plan` | `plan-agent` |
-| `claude-code-guide` | `qoder-guide` |
+> **适用范围：Qoder CLI。** 下表逐条核对自 [Qoder 官方文档 · 子代理](https://docs.qoder.com/zh/cli/subagent)（核对于 2026-08）。
+> **Qoder IDE 的内置 subagent 集合与此不同，我们尚未核实** —— 见下方「IDE 与 CLI 的差异」。
 
-Qoder 额外有 `browser-agent`、`code-reviewer`、`design-agent` 等专用 agent，依任务匹配选用。
+| Claude Code Agent | Qoder CLI 等价 | 说明 |
+|------------------|---------------|------|
+| `general-purpose` | `general-purpose` | 通用研究型，适合复杂搜索、多文件分析、调用链追踪、多步骤任务 |
+| `Explore` | `Explore` | 同名。只读代码探索 |
+| `Plan` | `Plan` | 同名。只读设计与规划 |
+| `claude-code-guide` | `qoder-guide` | 非 SDK 模式下可用 |
+
+文档另列出 `statusline-setup`（TUI 模式）。**没有内置的 `code-reviewer`** —— 文档里出现的 `api-reviewer` 是用户自建 subagent 的示例，不是内置项。需要专职审查者时，用 `general-purpose` 配 `superpowers:requesting-code-review` 的 `code-reviewer.md` 模板。
+
+### IDE 与 CLI 的差异
+
+[#119](https://github.com/jnMetaCode/superpowers-zh/issues/119) 报告：在 **Qoder IDE** 里跑 `subagent-driven-development` 时，Qoder 说它只提供 `CodeReview` subagent、**没有** `general-purpose`，于是自行降级为「控制者直接实现 + CodeReview agent 做审查」。
+
+官方 subagent 文档只覆盖 CLI，没有说这套内置集合同样适用于 IDE。**所以上表在 Qoder IDE 上不保证成立。** 如果你在 IDE 里遇到「找不到 general-purpose」，那是预期内的差异，不是 superpowers-zh 装错了 —— Qoder 的自动降级本身是合理适配。
 
 ## Quest MCP 工具（Qoder 原生）
 

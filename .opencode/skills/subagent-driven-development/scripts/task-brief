@@ -4,8 +4,9 @@
 # through the controller's context.
 #
 # Usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]
-# Default OUTFILE: <repo-root>/.superpowers/sdd/task-<N>-brief.md
-# (per worktree; concurrent runs in the same working tree share it).
+# Default OUTFILE: <repo-root>/.superpowers/sdd/<plan-basename>/task-<N>-brief.md
+# (per plan and per worktree; concurrent runs of the SAME plan in the same
+# working tree share it).
 #
 # 中文 fork 适配：上游只识别英文任务标题 "## Task N"，而 superpowers-zh
 # 的 writing-plans 产出的是 "### 任务 N：..."。下方 awk 同时匹配
@@ -24,7 +25,7 @@ n=$2
 if [ $# -eq 3 ]; then
   out=$3
 else
-  dir=$("$(cd "$(dirname "$0")" && pwd)/sdd-workspace")
+  dir=$("$(cd "$(dirname "$0")" && pwd)/sdd-workspace" "$plan")
   out="$dir/task-${n}-brief.md"
 fi
 

@@ -209,10 +209,3 @@ metadata:
 
 在 GitHub 上回复行内审查评论时，在评论线程中回复（`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`），不要发顶层 PR 评论。
 
-## 底线
-
-**外部反馈 = 待评估的建议，不是必须执行的命令。**
-
-验证。质疑。然后实施。
-
-不要敷衍附和。始终保持技术严谨。

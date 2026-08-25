@@ -7,23 +7,23 @@ compatibility: 需要 openspec-cn CLI。
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.6.0"
+  generatedBy: "1.10.0"
 ---
 
 从 OpenSpec 变更中实现任务。
 
-**Store 选择：** 如果用户指定了某个 Store（Store 是在本机注册的独立 OpenSpec 仓库），或者工作位于某个 Store 中，请运行 `openspec-cn store list --json` 来查找已注册的 Store ID，然后在读写规范和变更的命令上传递 `--store <id>` 参数（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`）。其他命令不需要此参数。命令输出的提示信息中已包含该参数；请在后续操作中保留它。如果没有指定 Store，命令将对最近的本地 `openspec/` 根目录生效。
+**存储选择：** 若用户指定了一个存储（存储是注册在本机上的独立 OpenSpec 仓库）或工作位于某个存储中，请运行 `openspec-cn store list --json` 发现已注册的存储 ID，然后在读写 spec 和变更的命令上传递 `--store <id>`（`new change`、`status`、`instructions`、`list`、`show`、`validate`、`archive`、`doctor`、`context`、`schemas`、`view`）。选定后，将 `--store <id>` 视为在当前工作流其余部分中固定不变。以下每个未限定范围的命令示例均为简写形式：运行前请追加该标志。例如，运行 `openspec-cn status --change "<name>" --json --store "<id>"`，而非下面展示的未限定形式。其他命令不接受此标志。命令输出的提示已包含该标志；在后续操作中请保留它。若不指定存储，命令将对最近的本地 `openspec/` 根目录生效。
 
-**输入**：可选地指定变更名。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
+**Input**: 可选地指定变更名称（例如 `/opsx-apply add-auth`）。若省略，检查能否从对话上下文推断。若模糊或歧义，你必须提示用户从可用变更中选择。
 
 **步骤**
 
 1. **选择变更**
 
    若提供了名称，使用它。否则：
-   - 若用户提到了某变更，从对话上下文推断
-   - 若仅存在一个活跃变更，自动选择
-   - 若存在歧义，运行 `openspec-cn list --json` 获取可用变更，并使用 **AskUserQuestion tool** 让用户选择
+   - 从对话上下文推断（若用户提到了某个变更）
+   - 若仅有一个活跃变更则自动选择
+   - 若存在歧义，运行 `openspec-cn list --json` 获取可用变更并让用户选择
 
    始终宣告："使用变更：<name>"，以及如何覆盖（例如 `/opsx-apply <other>`）。
 
@@ -42,16 +42,22 @@ metadata:
    openspec-cn instructions apply --change "<name>" --json
    ```
 
-   返回：
-   - `contextFiles`：产出物 ID -> 具体文件路径数组（因 schema 而异 - 可能是 proposal/specs/design/tasks 或 spec/tests/implementation/docs）
-   - 进度（总数、已完成、剩余）
-   - 带状态的任务列表
+   此命令返回：
+   - `contextFiles`：制品 ID -> 具体文件路径数组（因 schema 而异 - 可能是 proposal/specs/design/tasks 或 spec/tests/implementation/docs）
+   - 进度（总计、已完成、剩余）
+   - 任务列表及状态
    - 基于当前状态的动态指令
+   - 可选的 `context`：来自选定根路径的当前必需项目指令输入
+   - 可选的 `operationGuidance`：当前 apply 的咨询性指导
 
    **处理状态：**
-   - 若 `state: "blocked"`（缺失产出物）：展示消息，建议使用 openspec-continue-change
+   - 若 `state: "blocked"`（缺少制品）：显示消息，建议使用 `/opsx-continue`（若未安装，运行 `openspec-cn status --change "<name>" --json` 查看下一个制品，`openspec-cn instructions <artifact-id> --change "<name>" --json` 了解如何创建）
    - 若 `state: "all_done"`：祝贺，建议归档
    - 否则：继续实现
+
+   将 `context` 视为必需的提示级输入。阅读并考虑它，在实现时应用相关的项目事实、约定和约束。将 `operationGuidance` 视为可选的补充建议。阅读并考虑每个条目，遵循适用且与内置工作流兼容的条目。
+
+   将这两个字段与 CLI 返回的状态、缺失的制品、任务、进度、`contextFiles` 和内置 `instruction` 分开。它们不是任务完成的证据，不替代内置指令，且不允许绕过被阻塞状态。若 context 与内置指令、显式用户选择或 CLI 控制的值冲突，报告冲突并保留控制值。若 guidance 不适用或与这些控制输入冲突，不要遵循它并解释原因。这些是提示级行为契约，不是可强制执行的检查。
 
 4. **读取上下文文件**
 
@@ -59,6 +65,8 @@ metadata:
    文件因使用的 schema 而异：
    - **spec-driven**：proposal、specs、design、tasks
    - 其他 schema：遵循 CLI 输出的 contextFiles
+
+   不要将 `context` 或 `operationGuidance` 逐字复制到实现文件或规划制品中，除非用户单独要求该内容。
 
 5. **展示当前进度**
 
@@ -80,6 +88,7 @@ metadata:
    **暂停条件：**
    - 任务不清晰 → 请求澄清
    - 实现揭示设计问题 → 建议更新产出物
+   - 任务需要超出 spec 和 tasks 描述的工作，或者你想删减、收窄、推迟或接受指定行为的例外来勉强适配 → 把新增的范围摆出来并询问；不要默默吸收
    - 遇到错误或阻塞 → 报告并等待指导
    - 用户中断
 
@@ -119,7 +128,7 @@ metadata:
 - [x] 任务 2
 ...
 
-所有任务完成！准备归档此变更。
+All tasks complete! 你可以用 `/opsx-archive` 归档此变更。
 ```
 
 **暂停时输出（遇到问题）**
@@ -132,7 +141,7 @@ metadata:
 **进度：** 4/7 个任务已完成
 
 ### 遇到的问题
-<description of the issue>
+<对问题的描述>
 
 **选项：**
 1. <option 1>
@@ -143,14 +152,21 @@ metadata:
 ```
 
 **护栏**
-- 持续处理任务直至完成或受阻
-- 开始前始终读取上下文文件（来自实现指令输出）
-- 若任务有歧义，暂停并询问后再实现
-- 若实现揭示问题，暂停并建议产出物更新
-- 保持代码更改最小且限定于每个任务
+- 持续完成任务直至完成或受阻
+- 开始前始终读取上下文文件（来自 apply 指令输出）
+- 若任务模糊，暂停并在实现前询问
+- 若实现揭示问题，暂停并建议更新制品
+- 保持代码更改最小且聚焦于每个任务
 - 完成每个任务后立即更新任务复选框
-- 遇到错误、阻塞或不清晰需求时暂停 - 不要猜测
-- 使用 CLI 输出的 contextFiles，不要假设具体文件名
+- 在错误、阻塞或不明确的需求时暂停 - 不要猜测
+- 当任务需要超出 spec 描述的工作时，摆出新增的范围并暂停 - 绝不默默收窄、推迟或简化掉指定行为
+- 只有当任务的指定行为被完整实现时才将任务标记为 `- [x]`，而不是部分完成或推迟时
+- 使用 CLI 输出中的 contextFiles，不要假设特定文件名
+- 不要将 context 或 operation guidance 作为任务完成的证据
+- 应用相关的项目上下文；报告与控制工作流输入的冲突
+- 考虑每个 guidance 条目；解释任何不适用或冲突的建议
+- 不要将运行时 context 或 operation guidance 复制到实现文件或规划制品中
+- 保留 CLI 控制的 blocked/ready/all-done 行为和完成标准
 
 **流畅工作流集成**
 
