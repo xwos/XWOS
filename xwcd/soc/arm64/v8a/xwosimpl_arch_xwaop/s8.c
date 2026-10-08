@@ -1383,17 +1383,16 @@ xwer_t xwaop__xws8_t__tst_then_op(atomic_xws8_t * a,
         do {
                 o = (xws8_t)armv8a_load_acquire_exclusively_8b((atomic_xwu8_t *)a);
                 if (NULL != tst) {
-                        if (tst((const void *)&o, tst_args)) {
+                        rc = tst((const void *)&o, tst_args);
+                        if (XWOK == rc) {
                                 if (NULL != op) {
                                         op(&n, (const void *)&o, op_args);
                                         rc = armv8a_store_release_exclusively_8b((atomic_xwu8_t *)a, (xwu8_t)n);
                                 } else {
-                                        rc = 0;
                                         n = o;
                                         break;
                                 }
                         } else {
-                                rc = -EACCES;
                                 n = o;
                                 break;
                         }
@@ -1402,7 +1401,7 @@ xwer_t xwaop__xws8_t__tst_then_op(atomic_xws8_t * a,
                                 op(&n, (const void *)&o, op_args);
                                 rc = armv8a_store_release_exclusively_8b((atomic_xwu8_t *)a, (xwu8_t)n);
                         } else {
-                                rc = 0;
+                                rc = XWOK;
                                 n = o;
                                 break;
                         }
