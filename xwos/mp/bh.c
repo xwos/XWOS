@@ -65,6 +65,7 @@ void xwmp_bh_node_dq(struct xwmp_bh_cb * bhcb, struct xwmp_bh_node * bhn)
 {
         xwreg_t cpuirq;
 
+        XWOS_UNUSED(bhcb);
         xwmp_cpuirq_save_lc(&cpuirq);
         xwlib_bclst_del_init(&bhn->node);
         xwmp_cpuirq_restore_lc(cpuirq);
